@@ -1,0 +1,16 @@
+/* Stallion Admin screen CSS */
+
+#st-admin-main-content {
+    width: 100%;
+}
+
+#st-admin-main-content {
+    margin-top: 50px;
+    min-height: 100%;
+}
+
+#st-admin-nav-sidebar {
+    background-color: #222222;
+    min-height: 1000px;
+}
+

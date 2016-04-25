@@ -1,0 +1,15 @@
+{
+    "name": "The Hope Diamond Theft",
+    "technique": "Inside job",
+    "date": -1319475885550,
+    "criminals": ["Nermal", "Garfield"],
+    "city": "Chicago",
+    "state": "IL",
+    "cost": 12500000,
+    "created": 1401080164229,
+    "caseStatus": "COLD",
+    "extra": {
+        "detective_notes": "Baffling. Just baffling.",
+        "victim_id": 18
+    }
+}

@@ -1,0 +1,8 @@
+{% extends "base.jinja" %}
+{% block "my_content" %}
+
+<h1>{{ page.title }}</h1>
+<h2>{{ utils.formatLocalDate(page.publishedAt) }}</h2>
+<div>{{ page.content }}</div>
+<em>Built by the page template</em>
+{% endblock %}

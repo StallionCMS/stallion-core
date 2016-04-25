@@ -1,0 +1,4 @@
+pageTemplate = "page.jinja"
+cdnUrl = "http://localhost:{port}"
+siteUrl = "http://localhost:{port}"
+

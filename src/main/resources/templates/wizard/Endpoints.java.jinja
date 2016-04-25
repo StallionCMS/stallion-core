@@ -1,0 +1,21 @@
+package {{ config.javaPackageName }};
+
+import io.stallion.restfulEndpoints.EndpointsRegistry;
+import io.stallion.restfulEndpoints.EndpointResource;
+import io.stallion.templating.TemplateRenderer;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+
+public class Endpoints implements EndpointResource {
+
+    @GET
+    @Path("/hello-world")
+    @Produces("text/html")
+    public Object hello() {
+        return "Hello, world.";
+    }
+}
+

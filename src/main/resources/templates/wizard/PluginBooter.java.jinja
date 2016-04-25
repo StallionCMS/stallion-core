@@ -1,0 +1,23 @@
+package {{ config.javaPackageName }};
+
+import io.stallion.Context;
+import io.stallion.assets.BundleFile;
+import io.stallion.assets.DefinedBundle;
+import io.stallion.hooks.HookRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
+import io.stallion.services.Log;
+import io.stallion.restfulEndpoints.EndpointsRegistry;
+
+public class {{ config.pluginNameTitleCase }}Plugin extends StallionJavaPlugin {
+
+    @Override
+    public String getPluginName() {
+        return "{{ config.pluginName }}";
+    }
+
+    @Override
+    public void boot() throws Exception {
+        EndpointsRegistry.instance().addResource("", new Endpoints());
+    }
+}
+

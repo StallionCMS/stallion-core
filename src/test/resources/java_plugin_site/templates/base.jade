@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    title= title
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name="author", content=user.displayName)
+    meta(name="pluginSetting", content=timeitSomeSetting)    
+    meta(name="perf-plugin-special", content=timeitContextVariable)
+    link(rel='stylesheet', href=files.url('bootstrap.css'))
+    link(rel='stylesheet', href=files.url('stallion-site.css'))    
+    link(rel='stylesheet', href='https://s3.amazonaws.com/pfitz-public/fonts/fira/fira.css')
+    style(type='text/css')
+      body { padding-bottom: 40px; }
+      .sidebar-nav { padding: 9px 0; } 
+  body
+    block body_head
+      div.container
+        div.jumbotron
+          h1
+            a(href="/")
+              img(src=files.url("stallion-rearing-150.png"))
+              br
+              h1 Stallion
+          h2 Blazing fast, hassle-free, blog & content engine for techies
+    block content
+      div.container
+        div.jumbotron
+          h1 Override this contentn
+          p Default Content
+

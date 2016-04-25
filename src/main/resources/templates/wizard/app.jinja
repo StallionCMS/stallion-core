@@ -1,0 +1,13 @@
+{% extends "base.jinja" %}
+{% block main_body %}
+<div class="posts">
+    <section class="post">
+        <header class="post-header">
+            <h2 class="post-title">Hello{% if name %} {{ name }}{% endif %}, I am an app.</h2>
+        </header>
+        <div class="post-description">
+            Implementation to come soon.
+        </div>
+    </section>
+</div><!--end posts-->
+{% endblock %}

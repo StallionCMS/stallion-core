@@ -1,0 +1,55 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="{{ meta.generator }}" />
+  <meta name="description" content="{{ meta.description|e }}">
+  <meta property="og:title" content="{{ meta.title|e }}" />
+  <meta property="og:type" content="{{ meta.ogType }}" />
+  <meta property="og:url" content="{{ meta.url }}" />
+  <meta property="og:image" content="{{ meta.image }}" />
+  <meta property="og:description" content="{{ meta.description|e }}" />
+
+  <title>{{ meta.title|e }}</title>
+
+  <link rel="canonical" href="{{ meta.url }}" />
+
+  {% block extra_meta %}
+  {% endblock %}
+  {% for rss_link in meta.rssLinks %}
+  <link rel="alternate" type="application/rss+xml" title="{{ rss_link.title }}" href="{{ rss_link.link }}" />
+  {% endfor %}
+  {% block builtin_head_bundles %}
+    {{ assets.definedBundle("alwaysHeadStylesheets") }}
+  {% endblock %}
+  {% block bundle_css %}
+  {{ assets.bundle("site.bundle.css") }}
+  {% endblock %}
+  {% block per_request_head_literals %}
+    {{ assets.pageHeadLiterals() }}
+  {% endblock %}
+  {% block extra_head %}
+  {% endblock %}
+
+
+</head>
+<body id="st-{{ meta.bodyCssId }}" class="{% for className in meta.cssClasses %}{{className}} {% endfor %}">
+  {% block body_content %}
+  {% endblock %}
+  {%-- block builtin_footer_bundles --%}
+    {{ assets.definedBundle("alwaysFooterJavascripts") }}
+  {%-- endblock --%}
+  {%-- block bundle_js --%}
+    {{ assets.bundle("site.bundle.js") }}
+  {%-- endblock --%}
+  {%-- block per_request_footer_literals --%}
+    {{ assets.pageFooterLiterals() }}
+  {%-- endblock --%}
+
+  {% block pre_end_body %}
+  {% endblock %}
+</body>
+</html>
+
+

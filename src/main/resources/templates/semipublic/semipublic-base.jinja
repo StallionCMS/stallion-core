@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ meta.title|e }}</title>
+
+    {% block extra_meta %}
+    {% endblock %}
+    {% block builtin_head_bundles %}
+    {{ assets.definedBundle("alwaysHeadStylesheets") }}
+    {% endblock %}
+    {% block extra_head %}
+    {% endblock %}
+
+</head>
+<body>
+
+{% block main_column %}
+{% endblock %}
+{% block builtin_footer_bundles %}
+{{ assets.definedBundle("alwaysFooterJavascripts") }}
+{% endblock %}
+{% block pre_end_body %}
+{% endblock %}
+
+</body>
+</html>

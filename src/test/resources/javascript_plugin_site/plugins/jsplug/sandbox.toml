@@ -1,0 +1,23 @@
+canReadAllData = false
+
+[users]
+canAccess = true
+canReadDb = false
+canWriteDb = false
+
+[whitelist]
+cookies = []
+headers = []
+classes = [
+    'io.stallion.dal.file.TomlItem',
+    'io.stallion.dal.file.TomlItemController',
+    'io.stallion.dal.file.TomlPersister',
+    'io.stallion.dal.file.JsonFilePersister',
+    'io.stallion.requests.PostRequestHookHandler',
+    'io.stallion.plugins.javascript.JsAsyncTaskHandler',
+    'io.stallion.jobs.Job',
+    'io.stallion.jobs.JobDefinition',
+    'io.stallion.jobs.Schedule'
+    ]
+readBuckets = []
+writeBuckets = ['js-toml-things', 'js-row-things']

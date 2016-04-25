@@ -1,0 +1,49 @@
+
+# The URL at which your site is located
+siteUrl = "http://localhost:{port}"
+
+# The public facing name of your site. Will be included in various standard templates by default.
+siteName = "{{ builder.siteName }}"
+# The default <title> for all pages without a title.
+defaultTitle = "{{ builder.defaultTitle }}"
+# Will be included in the metaDescription, by default
+metaDescription = "{{ builder.siteDescription }}"
+# For the author <meta> tag
+#authorName = "Your name"
+healthCheckSecret = "{{ builder.healthCheckSecret }}"
+
+# If you require a database, configure it here, otherwise all data will be stored in the file system.
+#[database]
+#url = "jdbc:mysql://localhost:3306/database_name?autoReconnect=true"
+#username = "username"
+#password = "mypassword"
+
+# Email settings, for sending outbound emails
+# Exceptions, comments, form submissions, etc, will be sent to this address
+#[email]
+#host = "smtp.myserver.org"
+#username = "myusername"
+#password = "mypassword"
+# The email addresses where exceptions and other alerts and notifications will be sent to.
+#adminEmails = ["myaddress@mydomain.org"]
+
+
+# Define server information for where you want to publish your site.
+# All servers must be configured first using the ops scripts
+# This information is used with the >stallion publish command
+#[publishing]
+## The SSH user on the server
+#user = "sshuser"
+## The host that you will SSH into
+#host = "www.myserver.org"
+## The folder where this site will be located
+#rootFolder = "/srv/myapp"
+## URLS to check to make sure the app is running, once deployed
+#checkUrls = ["/"]
+## The port on which the stallion instance will listen. Nginx will proxy to this port.
+#basePort = 12600
+## The public facing domain at which this site will appear
+#domain = "www.myserver.org"
+## Aliases domains at which the site might also be viewable at.
+#aliases = ["myserver.org", "www.myserver.org"]
+

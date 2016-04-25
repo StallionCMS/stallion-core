@@ -1,0 +1,122 @@
+How to name variables and methods when coding in a dynamic language
+============================================================
+publishDate:2013-12-12 11:30
+slug:/how-to-name-variables
+
+
+<p>Dynamic languages lack the perfect IDE intellisense that tells us the type of every variable. Thus it&nbsp;is necessary to use variable names that allow future readers of the code to unambiguously determine the type and contents of the variable.</p>
+<!--more-->
+<h4>&nbsp;</h4>
+<h4>Method names</h4>
+<p>Method names should always be verbs or verb phrase - get_person, load_database, mark_job_completed, etc.</p>
+<p>If the method has side effects and alters a passed in object (generally a bad idea but sometimes OK), then be explicit by using the verb 'fill' or 'hydrate':</p>
+<pre class="code">def hydrate_context(context):
+&nbsp; &nbsp; context['stuff'] = Stuff()
+
+def fill_context(context):
+&nbsp; &nbsp; context['stuff] = Stuff()
+</pre>
+<p>If the method has side effects that alter a permanent datastore, use a verb like 'update_db', 'save', or 'persist'</p>
+<p>If you are grabbing a remote resource, use the verb 'fetch' rather than 'get' to imply that the code is reaching out a distance to get the content:</p>
+<pre class="code">def fetch_embed_html():
+&nbsp; &nbsp; return requests.get(self.url)
+</pre>
+<p>If your method does two things (generally a code smell, but sometimes you just need a method that wraps two other methods), then be explicit about what the method does and what it returns:</p>
+<pre class="code">def fetch_and_normalize_embed_html(self):
+&nbsp; &nbsp; html = self.fetch_embed_html()
+&nbsp; &nbsp; return self.normalize(html)
+</pre>
+<p>If you have a variable that holds some sort of callback function, add 'callback' or 'method' or 'function' to the variable name:</p>
+<code></code>
+<pre class="code"><code>#GOOD:
+def process_task(task, success_callback, error_callback):
+&nbsp; &nbsp; ''' Do stuff ... '''
+
+# BAD (It's unclear that "error" is a callback function, "error" could be anything, a message that's passed in, a list that collects error results, etc):
+def process_task(task, success, error):&nbsp;
+&nbsp; &nbsp; pass
+</code></pre>
+<p>If you want to add a simple getter to an object, use a verb in the method name if it's a method, or use a property if there is no verb in the name. &nbsp;Do not create verbless methods. (This is a python specific rule. &nbsp;Javascript does not have getters, and so using methods that are just the attribute name is quite common in jQuery).</p>
+<pre class="code">GOOD:
+def get_host(self):
+&nbsp; &nbsp; return self.request.host
+</pre>
+<pre class="code">GOOD:
+@property
+def host(self):
+&nbsp; &nbsp; return self.request.host
+
+# BAD ( I will be very confused when I do "print obj.host" and get "&lt;function host&gt;" instead of the host name)
+def host(self):
+&nbsp; &nbsp; return self.request.host
+</pre>
+<h4>&nbsp;</h4>
+<h4>Object instances</h4>
+<p>Object instances should be the lower case version of the class name, ex: game_type = GameType(), file_library = FileLibrary()</p>
+<p>Sometimes this seems to verbose. &nbsp;You are tempted to write 'library' instead of 'file_library'. &nbsp;But remember, code is read many more times than it is written. &nbsp;Optimize for the developer reading the code four months from now, not for your typing speed this second.</p>
+<h4>&nbsp;</h4>
+<h4>Lists</h4>
+<p>Variables holding lists should always be the plural form of the thing the list is holding:</p>
+<pre class="code">&nbsp; &nbsp; for person in people:
+&nbsp; &nbsp; for name in names:
+&nbsp; &nbsp; for account in accounts:
+</pre>
+<h4>&nbsp;</h4>
+<h4>Dictionaries</h4>
+<p>Dictionaries are basically used in two different ways - as schemaless objects or as a lookup table.</p>
+<h5>object-style dictionary usage</h5>
+<p>If you are in a small, standalone script, that uses almost all dictionaries and no classes, then it is OK to name the variable holding the dictionary for what the thing is:</p>
+<pre class="code">person = {
+&nbsp; &nbsp; 'name': 'jim',
+&nbsp; &nbsp; 'birthdate': '4-17-1982',
+&nbsp; &nbsp; 'hometown: 'Boston'
+&nbsp; &nbsp; }
+</pre>
+<p>But if you are in code that has a class Person, and you have a dictionary that is storing some serialized form of that class, then naming that dictionary 'person' creates confusion. &nbsp;Use 'person' to refer to an object instance, and use 'person_data' or 'person_dict' to refer to the dictionary form, and use 'person_str' or 'person_json' to refer to the serialized form:</p>
+<pre class="code">person = Person()
+person_data = Person.to_dict()
+person_json = json.dumps(person_data) &nbsp; &nbsp; &nbsp;&nbsp;
+</pre>
+<h5>Dictionaries as lookup tables</h5>
+<p>If the dictionary refers to some sort of mapping or lookup table, then name the variable for the lookup key and value:</p>
+<pre class="code"># GOOD:
+person_by_name = {
+&nbsp; &nbsp; 'jim': Person(),
+&nbsp; &nbsp; 'sam': Person()
+}
+
+cities_by_country = {
+&nbsp; &nbsp; 'United States': ['Boston', 'New York'],
+&nbsp; &nbsp; 'France': ['Paris', 'Orleans']
+}
+<br>action_to_func_map = {
+&nbsp; &nbsp; 'deploy': deploy_project,
+&nbsp; &nbsp; 'kick' : kick_project,
+}
+
+# BAD - the code reader will think this ia list of persons, not a dictionary
+persons = &nbsp;{
+&nbsp; &nbsp; 'jim': Person(),
+&nbsp; &nbsp; 'sam': Person()
+}
+</pre>
+<p>In general, name the variable either 'value_by_key' or 'key_to_value'.</p>
+<p>Never name a dictionary just 'persons' or 'cities'. &nbsp;The code reader will have no idea how to use the variable. &nbsp;They will think it is a list and be very confused to find it is a lookup table. &nbsp;Once they figure out it is a table, they will be unsure what the keys are.</p>
+<h4>&nbsp;</h4>
+<h4>Strings</h4>
+<p><strong>Strings should end in a postfix that indicates stringness/wordness</strong>. Examples of good string variable names include: &nbsp;author_name, field_label, img_src, template_source, body_text, page_key, data_str. &nbsp;If you have a variable holding a users name, do not call that variable 'user', because someone reading the code will get it confused with an instance of the User class. &nbsp;Call the variable user_name. &nbsp;Do not call a string holding the name of a file 'file', that confuses it with a file object. &nbsp;Call the string 'file_name' if it's just the file name, or 'file_path' if it contains the full path to the file.</p>
+<h4>&nbsp;</h4>
+<h4>Numbers</h4>
+<p>Numbers should end with a&nbsp;postfix marking the variable as clearly numeric. &nbsp;Do not use plurals only as that makes the variable name confusing with lists – use 'result_count' not 'results'. &nbsp;Other examples: item_id, home_price_int, costs_sum, load_avg</p>
+<p>Err on the side of being unambiguous at the expense of verbosity. &nbsp;Let's say you have a variable in a page template. The variable contains the percent of people who passed some academic test. &nbsp;If you name this variable 'percent_passed', it is not immediately obvious if the variable contains a string that looks like '34%' or a float that contains .34. Instead, name your variable 'percent_passed_formatted' for the string version and 'percent_passed_float' for the float version to make it obvious.</p>
+<h4>&nbsp;</h4>
+<h4>General Consistency</h4>
+<p>Try to be consistent within your code, so that a variable name always indicates the same thing wherever it is used.</p>
+<p>For instance, create a convention whereby:<br> (thing)_file is an instance of a file object<br> (thing)_file_name is a string with the name part of the file 'mystuff.txt'<br> (thing)_path is a string with the file full path: '/home/patrick/mystuff.txt'</p>
+<p>Do not have (thing)_file be a file object in one place and a file name in another place.</p>
+<p>If in your app 'thing_guid' refers to a string, then it should always be a string. &nbsp;If it refers to an instance of a&nbsp;uuid() or Guid() object, then it should always refer to the instance, and never have a type of string. &nbsp;Pick one way and be consistent.</p>
+<p>&nbsp;</p>
+<h4>Using Judgement</h4>
+<p>The above guidelines should be followed 99% of the time for naming class attributes, module attributes, and method parameters. &nbsp;For local variables or loop variables, you can use your judgment. &nbsp;Since the variable is initialized so close to where the variable is used, it can be pretty obvious to the person reading the code exactly what it is in it, and thus having a verbose variable name is less critical.</p>
+<p>&nbsp;</p>
+

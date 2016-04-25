@@ -1,0 +1,129 @@
+/* Stallion.css */
+
+.st-error {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all 0.5s ease 0s;
+}
+
+.st-success {
+    color: #3D7149;
+    background-color: #D5ECCD;
+    border-color: #3D7149;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all 0.5s ease 0s;
+}
+
+.pre-fade {
+    opacity: 0;
+}
+.st-form .st-field {
+    margin-bottom: 1em;
+}
+.st-form .st-field label {
+    display: block;
+    margin-bottom: .5em;
+}
+.st-form .st-field textarea, .st-form .st-field input[type="text"], .st-form .st-field input[type="email"] {
+    width: 100%;
+}
+
+.st-button-submit {
+    padding: .5em 1em .25em 1em;
+}
+
+.st-action-button {
+    padding: .5em;
+    font-size: .8em;
+}
+
+.st-button-submit:hover {
+    
+}
+
+.st-button-submit:before {
+    height: 5px;
+    display: block;
+    background: transparent;
+    margin: auto;
+    width: 0px;
+    content: ''
+}
+.st-button-submit:after {
+    content: '';
+    display: block;
+    margin: auto;
+    height: .25em;
+    width: 0px;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: width .6s ease, background-color .6s ease;
+}
+
+.st-button-submit.st-processing {
+    background-color: #BBB;
+}
+
+.st-button-submit.st-processing:after {
+    width: 100%;
+    background: #FFF;
+    border: 1px solid #444;
+    opacity: .5;
+    display: block;
+}
+
+.st-button-submit.st-processing.st-processing-narrow:after {
+    width: 10%;
+}
+
+.content-box {
+    background-color: #F9F9F9;
+    border: 1px solid #DDD;
+    padding: 2em;
+    margin-top: 1em;
+}
+
+.st-no-top-space {
+    margin-top: 0px;
+}
+.st-no-space {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.st-space {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.st-top-space {
+    margin-top: 1em;
+    margin-bottom: 0em;
+}
+.st-bottom-space {
+    margin-top: 1em;
+    margin-bottom: 0em;
+}
+
+.st-double-space {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.st-splash-header {
+    margin-top: 0em;
+    margin-bottom: 0em;
+    text-align: center;
+    font-weight: 200;
+}
+
+.st-unicode-icon {
+    font-size: 200%;
+}
+

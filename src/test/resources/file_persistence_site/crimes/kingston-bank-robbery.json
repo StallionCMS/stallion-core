@@ -1,0 +1,10 @@
+{
+    "date": 1319475885550,
+    "technique": "Safe cracking",    
+    "criminals": ["Jesse James", "Billy the Kid"],
+    "city": "Kingston",
+    "state": "IL",
+    "cost": 4500000,
+    "created": 1421080164229,
+    "caseStatus": "SOLVED"
+}

@@ -1,0 +1,289 @@
+/*
+ * Stallion: A Modern Content Management System
+ *
+ * Copyright (C) 2015 - 2016 Patrick Fitzsimmons.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 2 of
+ * the License, or (at your option) any later version. This program is distributed in the hope that
+ * it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/gpl-2.0.html>.
+ *
+ *
+ *
+ */
+
+package io.stallion.plugins;
+
+import io.stallion.boot.StallionRunAction;
+import io.stallion.plugins.javascript.JsPluginEngine;
+
+import io.stallion.plugins.javascript.TestResults;
+import io.stallion.services.Log;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.xbean.classloader.JarFileClassLoader;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
+import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.*;
+
+/**
+ * Registry Service that loads plugins, boots them, and keeps track of them.
+ *
+ */
+public class PluginRegistry {
+
+
+    private JarFileClassLoader classLoader;
+
+    private Map<String, StallionJavaPlugin> javaPluginByName = map();
+    private Map<String, JsPluginEngine> jsPlugins = map();
+
+    private static PluginRegistry _instance;
+
+    public static PluginRegistry instance() {
+
+        return _instance;
+    }
+
+    public static PluginRegistry loadWithJavaPlugins(String targetPath) {
+        if (_instance == null) {
+            _instance = new PluginRegistry();
+            _instance.loadJarPlugins(targetPath);
+        }
+        return _instance;
+    }
+
+    public static PluginRegistry loadWithJavaPlugins(String targetPath, StallionJavaPlugin ...extraPlugins) {
+        if (_instance == null) {
+            _instance = new PluginRegistry();
+            _instance.loadJarPlugins(targetPath);
+            for (StallionJavaPlugin plugin: extraPlugins) {
+                _instance.loadPluginFromBooter(plugin);
+            }
+        }
+        return _instance;
+    }
+
+    PluginRegistry() {
+        //new JarFileClassLoader()
+        this.classLoader = new JarFileClassLoader(
+                "PluginClassLoader" + System.currentTimeMillis(),
+                new URL[]{},
+                PluginRegistry.class.getClassLoader()
+        );
+    }
+
+    /*
+    public static PluginRegistry load() {
+        return PluginRegistry.load(new ArrayList<StallionPlugin>());
+    }
+
+    public static PluginRegistry load(List<StallionPlugin> extraPlugins) {
+        _instance = new PluginRegistry();
+        try {
+
+            if (extraPlugins != null) {
+                for(StallionPlugin booter: extraPlugins) {
+                    _instance.loadPluginFromBooter(booter);
+                }
+            }
+            _instance.load(true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return _instance;
+    }
+    */
+
+    public static void shutdown() {
+        if (_instance != null) {
+            for (JsPluginEngine engine: _instance.jsPlugins.values()) {
+                engine.shutdown();
+            }
+            for (StallionJavaPlugin plugin: _instance.getJavaPluginByName().values()) {
+                plugin.shutdown();
+            }
+        }
+        _instance = null;
+    }
+
+
+
+   // public void load(Boolean shouldWatchFiles) throws Exception {
+   //     loadPlugins(shouldWatchFiles);
+    //}
+
+    public List<StallionRunAction> getAllPluginDefinedStallionRunActions() {
+        List<StallionRunAction> actions = list();
+        for (StallionJavaPlugin plugin: getJavaPluginByName().values()) {
+            actions.addAll(plugin.getActions());
+        }
+        return actions;
+    }
+
+    public void loadAndRunJavascriptPlugins() {
+        loadAndRunJavascriptPlugins(true);
+    }
+
+    public void loadAndRunJavascriptPlugins(Boolean shouldWatchFiles) {
+        try {
+            doLoadAndRunJavascriptPlugins(shouldWatchFiles);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void doLoadAndRunJavascriptPlugins(Boolean shouldWatchFiles) throws Exception {
+
+
+        // Load the main javascript file, if it exists
+        String jsMainPath = settings().getTargetFolder() + "/js/main.js";
+        File jsMain = new File(jsMainPath);
+        if (jsMain.exists() && jsMain.isFile()) {
+            JsPluginEngine engine = new JsPluginEngine(shouldWatchFiles);
+            jsPlugins.put("main.js", engine);
+            engine.loadJavascript("main.js", jsMainPath);
+        }
+
+
+        String path = settings().getTargetFolder() + "/plugins";
+
+        File folder = new File(path);
+        if (!folder.exists() || !folder.isDirectory()) {
+            return;
+        }
+        File[] children = folder.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                if (child.isDirectory()) {
+
+                    loadScriptPlugin(child.getAbsolutePath(), child.getName(), shouldWatchFiles);
+                }
+            }
+        }
+
+    }
+
+    private void loadScriptPlugin(String folderPath, String pluginName, Boolean shouldWatchFiles) throws Exception {
+        //PluginDefinition definition = new Toml().parse(pluginTomlFile).to(PluginDefinition.class);
+        Log.info("Load plugin {0} name:{1}", folderPath, pluginName);
+
+        String jsPath = folderPath + "/plugin.js";
+        File jsFile = new File(jsPath);
+        if (jsFile.exists() && jsFile.isFile()) {
+            JsPluginEngine engine = new JsPluginEngine(shouldWatchFiles);
+            jsPlugins.put(pluginName, engine);
+            engine.loadJavascript(pluginName, jsPath);
+
+        }
+
+
+    }
+
+    public void loadJarPlugins(String targetPath) {
+        try {
+            doLoadJarPlugins(targetPath);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    private void doLoadJarPlugins(String targetPath) throws Exception {
+        String jarFolderPath = targetPath + "/jars";
+        Log.fine("Loading jars at {0}", jarFolderPath);
+        File jarFolder = new File(jarFolderPath);
+        if (!jarFolder.exists() || !jarFolder.isDirectory()) {
+            Log.info("No jar folder exists at {0}. No jar plugins will be loaded.", jarFolderPath);
+            return;
+        }
+        File[] files = jarFolder.listFiles();
+        ArrayList<URL> urls = new ArrayList<URL>();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].getName().endsWith(".jar")) {
+                //urls.add(files[i].toURL());
+                Log.info("Loading plugin jar {0}", files[i].toURI());
+                urls.add(files[i].toURI().toURL());
+            }
+        }
+
+        String pluginBooterClass = "";
+
+        for (URL jarUrl: urls) {
+            // Add jars to the class loader
+            getClassLoader().addURL(jarUrl);
+        }
+
+        for (URL jarUrl: urls) {
+            // Load the booter class
+            Manifest m = new JarFile(jarUrl.getFile()).getManifest();
+            Log.finer("Found manifest for jar {0}", jarUrl);
+            if (!StringUtils.isEmpty(m.getMainAttributes().getValue("pluginBooterClass"))) {
+                pluginBooterClass = m.getMainAttributes().getValue("pluginBooterClass");
+            }
+            if (empty(pluginBooterClass)) {
+                continue;
+            }
+            Log.info("Load booter class {0} for jar={1}", pluginBooterClass, jarUrl);
+            Class booterClass = getClassLoader().loadClass(pluginBooterClass);
+            Log.finer("Booter class was loaded from: {0} ", booterClass.getProtectionDomain().getCodeSource().getLocation());
+            StallionJavaPlugin booter = (StallionJavaPlugin)booterClass.newInstance();
+            loadPluginFromBooter(booter);
+        }
+    }
+
+    /**
+     * Boot all jar plugins that have already been loaded.
+     *
+     */
+     public void bootJarPlugins()  {
+        for(StallionJavaPlugin plugin: getJavaPluginByName().values()) {
+            try {
+                plugin.boot();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void loadPluginFromBooter(StallionJavaPlugin booter) {
+        Log.info("Load plugin from booter class: {0} plugin:{1}", booter.getClass().getName(), booter.getPluginName());
+        if (getJavaPluginByName().containsKey(booter.getPluginName())) {
+            Log.warn("Plugin already loaded, skipping {0}", booter.getPluginName());
+            return;
+        }
+        booter.setPluginRegistry(this);
+        getJavaPluginByName().put(booter.getPluginName(), booter);
+    }
+
+    public List<TestResults> runJsTests(String plugin, String jsFile) {
+        return jsPlugins.get(plugin).runTestsInFile(jsFile);
+    }
+
+    public JsPluginEngine getEngine(String plugin) {
+        return jsPlugins.getOrDefault(plugin, null);
+    }
+
+
+    public JarFileClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public void setClassLoader(JarFileClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+
+    public Map<String, StallionJavaPlugin> getJavaPluginByName() {
+        return javaPluginByName;
+    }
+}

@@ -1,0 +1,10 @@
+extends base
+
+block content
+  div.container
+    div.jumbotron
+      h1!=page.title
+      div!=page.content
+      h1 Timing records:
+      each record in timeitTimings.all()
+          div="Request for " + record.path + " took " + record.micros + "micros"

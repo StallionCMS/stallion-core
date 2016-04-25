@@ -1,0 +1,28 @@
+Footnoting
+================
+slug:/footnoting
+draft:false
+
+This is a first paragraph.[^one-thing]
+
+This is a second para.[^two-thing][^three-thing]
+
+This is a fourth[^four-thing].
+
+[^one-thing]: the note
+
+[^two-thing]: multi
+
+  Second *para*. [With link](http://stallion.io/)
+
+  Third para.
+
+This is not part of a note.
+
+[^fourth-thing]: fourth note
+
+[^three-thing]: third note
+
+Also not part of a note.
+
+

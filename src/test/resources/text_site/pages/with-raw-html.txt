@@ -1,0 +1,75 @@
+With Raw HTML
+============================
+slug:/with-raw-html
+publishDate:2014-05-21 16:10 UTC
+draft: false
+
+# This page has crazy raw HTML in it.
+
+"To wash my face clean after the dust of the road, and to drink, so the dry bread will not stick in my throat."
+
+"It must be inconvenient to be made of flesh," said the Scarecrow thoughtfully, "for you must sleep, and eat and drink. However, you have brains, and it is worth a lot of bother to be able to think properly."
+They left the cottage and walked through the trees until they found a little spring of clear water, where Dorothy drank and bathed and ate her breakfast. She saw there was not much bread left in the basket, and the girl was thankful the Scarecrow did not have to eat anything, for there was scarcely enough for herself and Toto for the day.
+When she had finished her meal, and was about to go back to the road of yellow brick, she was startled to hear a deep groan near by.
+"What was that?" she asked timidly.
+
+"I cannot imagine," replied the Scarecrow; "but we can go and see."
+
+
+<rawHtml>
+$dollarSignsBreakThings = 12; /* $17 */;
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+<div class="indicates-required"><span class="asterisk">*</span> indicates required</div>
+  <div>An indented block></div>
+This should not turn into a blockquote.
+
+  Neither should this.
+
+Once more.
+
+
+<link href="" rel="stylesheet" type="text/css">
+<style type="text/css">
+	#an_embed_signup{ }
+	/* This is some crazy code similiar to markdown breaking code seen in the wild.
+	   This is more of the comment that broke us. */
+</style>
+<div id="mc_embed_signup">
+<form action="" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+
+<div class="indicates-required"><span class="asterisk">*</span> indicates required</div>
+<div class="mc-field-group">
+	<label for="mce-EMAIL">Email Address  <span class="asterisk">*</span>
+</label>
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+</div>
+
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+</form>
+
+</rawHtml>
+
+<rawHtml>
+A second rawHtml section.
+
+<script>
+  /*
+  The commenting stuff
+              Blah
+            */
+</script>
+
+</rawHtml>
+
+"I presume that should you accidentally wound an enemy you would take him home and nurse him back to health," she laughed.
+
+"That is precisely what we do on Earth," I answered. "At least among civilized men."
+
+This made her laugh again. She could not understand it, for, with all her tenderness and womanly sweetness, she was still a Martian, and to a Martian the only good enemy is a dead enemy; for every dead foeman means so much more to divide between those who live.
+
+I was very curious to know what I had said or done to cause her so much perturbation a moment before and so I continued to importune her to enlighten me.

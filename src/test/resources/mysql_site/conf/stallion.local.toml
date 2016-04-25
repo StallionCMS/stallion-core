@@ -1,0 +1,2 @@
+[basicSettings]
+cdnUrl = "http://localhost:{port}/localizing"

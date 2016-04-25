@@ -1,0 +1,12 @@
+slug:/an-assetful-page
+template:assetful-page.jinja
+
+This page has assets
+========================================================
+
+Why did you build this?
+----------------------------------------
+Because I am tired of seeing DB out of connection errors on blog posts.
+
+
+

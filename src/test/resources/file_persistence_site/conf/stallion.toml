@@ -1,0 +1,16 @@
+
+[[folders]]
+type = "json"
+path = "dossiers"
+writable = true
+
+[[folders]]
+type = "markdown"
+path = "bios"
+writable = true
+
+[[folders]]
+type = "json"
+path = "crimes"
+className = "io.stallion.tests.integration.filePersistenceSite.Crime"
+writable = true

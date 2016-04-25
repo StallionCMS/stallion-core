@@ -1,0 +1,27 @@
+extends blog
+                
+block blog_content
+  - live_posts = posts.filter('isPublished', true)
+  case route.name
+    when "blog-by-tag"                
+      my_posts = live_posts.filter('tags', route.tag, 'in').all()
+    when "blog-by-month"                
+      my_posts = live_posts.filter('month', route.month, '=').filter('year', route.year, '=').all()
+    default
+      my_posts = live_posts.all()
+  div.row
+    div.col-md-12.post-container               
+      each post in my_posts
+        h3
+          a(href=post.slug) #{post.title}
+        div
+          em=post.formattedDate("MMMM d, yyyy");
+        div!=post.summary
+  p &nbsp;
+  p &nbsp;
+  p &nbsp;
+  div.row
+    div.col-md-6
+      include posts-by-month-widget
+    div.col-md-6
+      include recent-posts-widget      

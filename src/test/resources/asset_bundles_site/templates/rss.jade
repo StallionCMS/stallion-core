@@ -1,0 +1,15 @@
+!!! xml
+rss(version="2.0")
+  channel
+    title The Stallion Feed
+    link #{site.ur}/blog
+    lastBuildDate= date
+    generator stallion
+    docs http://blogs.law.harvard.edu/tech/rss
+    - each post in posts.sort('date', 'desc').pager(1, 20).items
+      item
+        title=post.title
+        link=site.url + post.slug
+        description=post.content
+        guid(isPermaLink="true")=site.url + post.slug
+        pubDate= post.date

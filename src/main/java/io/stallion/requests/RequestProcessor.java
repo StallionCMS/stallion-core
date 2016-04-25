@@ -1,0 +1,755 @@
+/*
+ * Stallion: A Modern Content Management System
+ *
+ * Copyright (C) 2015 - 2016 Patrick Fitzsimmons.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 2 of
+ * the License, or (at your option) any later version. This program is distributed in the hope that
+ * it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/gpl-2.0.html>.
+ *
+ *
+ *
+ */
+
+package io.stallion.requests;
+
+import io.stallion.Context;
+import io.stallion.assets.AssetsController;
+import io.stallion.assets.BundleHandler;
+import io.stallion.assets.DefinedBundle;
+import io.stallion.dal.base.ModelBase;
+import io.stallion.dal.base.Displayable;
+import io.stallion.dal.base.DisplayableModelController;
+import io.stallion.dal.base.Model;
+import io.stallion.exceptions.*;
+import io.stallion.hooks.HookRegistry;
+import io.stallion.plugins.javascript.JsEndpoint;
+
+import io.stallion.reflection.PropertyUtils;
+import io.stallion.restfulEndpoints.*;
+import io.stallion.services.Log;
+import io.stallion.settings.Settings;
+import io.stallion.templating.TemplateRenderer;
+import io.stallion.users.OAuthApprovalController;
+import io.stallion.users.UserController;
+import io.stallion.users.Role;
+import io.stallion.utils.ResourceHelpers;
+import io.stallion.utils.GeneralUtils;
+import io.stallion.utils.json.JSON;
+import io.stallion.utils.json.RestrictedViews;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.servlet.ServletOutputStream;
+
+import java.io.*;
+import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import static io.stallion.utils.Literals.*;
+
+/**
+ * Does the actual work of processing a Stallion request and
+ * sending data to the Stallion response.
+ *
+ */
+public class RequestProcessor {
+    private StRequest request;
+    private StResponse response;
+    public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";
+
+    public RequestProcessor(StRequest request, StResponse response) {
+        this.request = request;
+        this.response = response;
+    }
+
+    public void process() {
+        Log.fine("handleRequest:{0}={1}", request.getMethod(), request.getPath());
+        try {
+            Context.setRequest(request);
+            Context.setResponse(response);
+            // Authorize via cookie?
+            if (UserController.instance() != null) {
+                UserController.instance().checkCookieAndAuthorizeForRequest(request);
+            }
+            // Authorize via an OAuth bearer token?
+            if (!Context.getUser().isAuthorized() && Settings.instance().getoAuth().getEnabled()) {
+                OAuthApprovalController.instance().checkHeaderAndAuthorizeUserForRequest(request);
+            }
+            // Defaults
+            response.setContentType("text/html;charset=utf-8");
+            response.setStatus(200);
+            request.setHandled(true);
+            if (!"get".equals(request.getMethod().toLowerCase())) {
+                response.addCookie(RECENT_POSTBACK_COOKIE, String.valueOf(mils()), 15);
+            }
+
+            // trigger PreRequest hooks
+            HookRegistry.instance().dispatch(
+                    PreRequestHookHandler.class,
+                    new RequestInfoHolder()
+                            .setRequest(request)
+                            .setResponse(response));
+            // Dispatch the main request processing
+            doProcess();
+
+        } catch(ResponseComplete complete) {
+            // Do nothing, the response completed successfully
+        } catch(RedirectException e) {
+            response.addHeader("Location", e.getUrl());
+            response.setStatus(e.getStatusCode());
+            request.setHandled(true);
+        } catch(NotFoundException e) {
+            try {
+                handleNotFound(e.getMessage());
+            } catch (Exception ex) {
+                handleError(ex);
+            }
+        } catch(Exception ex) {
+            handleError(ex);
+        }
+        HookRegistry.instance().dispatch(
+                PostRequestHookHandler.class,
+                new RequestInfoHolder()
+                        .setRequest(request)
+                        .setResponse(response));
+
+        Log.info("status={0} {1}={2}", response.getStatus(), request.getMethod(), request.getPath());
+
+    }
+
+
+    public void doProcess() throws Exception {
+        // Handle login to a page
+        if ("true".equals(request.getParameter("stLogin")) && empty(Context.getUser().getId())) {
+            String targetUrl = Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.requestUrl(), "UTF-8");
+            throw new RedirectException(targetUrl, 302);
+        }
+
+        // Never hurts to have an extra check to prevent malicious requests
+        if (request.getPath().contains("..")) {
+            throw new ClientException("Request path contained double periods.", 400);
+        }
+
+        // try Asset Serving if the path matches
+        tryRouteAssetRequest();
+
+        // try render based on the RouteRegistry
+        tryRenderRouteRequest();
+
+        // try render based on the SlugRegistry
+        tryRenderForSlug();
+
+        // Try a redirect based on the settings
+        String redirectUrl = Settings.instance().getRedirects().getOrDefault(request.getPath(), null);
+        if (redirectUrl == null) {
+            redirectUrl = Settings.instance().getRedirects().getOrDefault(request.getPath() + "/", null);
+        }
+        if (redirectUrl != null) {
+            throw new RedirectException(redirectUrl, 301);
+        }
+
+        // Try a redirect based on old urls/moved pages
+        redirectUrl = SlugRegistry.instance().returnRedirectIfExists(request.getPath());
+        if (redirectUrl == null) {
+            redirectUrl = SlugRegistry.instance().returnRedirectIfExists(request.getPath());
+        }
+        if (redirectUrl != null) {
+            throw new RedirectException(redirectUrl, 301);
+        }
+
+        markHandled(404, "No route matches");
+        throw new NotFoundException("The page you requested could not be found.");
+
+    }
+
+    /******************************************
+     * Slug routing
+     */
+
+    /**
+     * Tries to route the request using a slug registered with the SlugRegistry
+     *
+     * Short circuits if the request is served, otherwise does nothings and returns
+     *
+     * @throws Exception
+     */
+    public void tryRenderForSlug() throws Exception {
+        if (!SlugRegistry.instance().hasUrl(request.getPath())) {
+            return;
+        }
+        Displayable item = SlugRegistry.instance().lookup(request.getPath());
+        Model baseItem = (Model)item;
+
+        // Item has an override domain, but we are accessing from a different domain
+        if (!empty(item.getOverrideDomain())) {
+            if (!item.getOverrideDomain().equals(request.getHost())) {
+                 return;
+            }
+        }
+
+        // If the item is unpublished, return, unless we are a logged in staff user viewing the article preview
+        if (!item.getPublished()) {
+            String previewKey = request.getQueryParams().getOrDefault("stPreview", null);
+            // No preview key in the query string, abort rendering
+            if (previewKey == null) {
+                return;
+            }
+            if (!request.getUser().isInRole(Role.STAFF_LIMITED)) {
+                // Non-staff user with invalid preview key, abort rendering
+                if (empty(item.getPreviewKey()) || !previewKey.equals(item.getPreviewKey())) {
+                    return;
+                }
+            }
+        }
+
+        // In local mode, check for newer version from the file system so we do not load stale items
+        if (Settings.instance().getLocalMode()) {
+            if (!baseItem.getController().getPersister().isDbBacked()) {
+                baseItem = baseItem.getController().getStash().reloadIfNewer(baseItem);
+                item = (Displayable)baseItem;
+            }
+        }
+
+
+        Map ctx = map(val("page", item), val("post", item), val("item", item));
+        response.getMeta().setDescription(item.getMetaDescription());
+        if (!empty(item.getTitleTag())) {
+            response.getMeta().setTitle(item.getTitleTag());
+        } else {
+            response.getMeta().setTitle(item.getTitle());
+        }
+        response.getMeta().setBodyCssId(item.getSlugForCssId());
+        response.getMeta().getCssClasses().add("st-" + ((ModelBase) item).getController().getBucket());
+        response.getMeta().setOgType(item.getOgType());
+        if (!empty(item.getRelCanonical())) {
+            response.getMeta().setCanonicalUrl(item.getRelCanonical());
+        }
+        markHandled(200, "slug->displayableItemController for id={0} slug={1} controller={2}", baseItem.getId(), item.getSlug(), baseItem.getController().getClass().getName());
+        String output = ((DisplayableModelController)baseItem.getController()).render(item, ctx);
+        sendContentResponse(output);
+    }
+
+
+    /*******************************************
+     * Endpoint Routing
+     */
+
+    /**
+     * Tries to route the request using an endpoint registered with RoutesRegistry
+     *
+     * Short circuits if the request is routed, otherwise returns and does nothing.
+     *
+     * @throws Exception
+     */
+    public void tryRenderRouteRequest() throws Exception {
+        RouteResult result = RoutesRegistry.instance().route(request.getPath());
+        if (result == null) {
+            result = RoutesRegistry.instance().routeForEndpoints(request, EndpointsRegistry.instance().getEndpoints());
+        }
+        if (result == null) {
+            return;
+        }
+        String output;
+        if (result.getEndpoint() != null) {
+            response.setContentType(result.getEndpoint().getProduces());
+            if ("application/json".equals(result.getEndpoint().getProduces())) {
+                request.setIsJsonRequest(true);
+            }
+            output = dispatchWsEndpoint(result);
+            sendContentResponse(output);
+        } else if (!empty(result.getRedirectUrl())) {
+            markHandled(301, "configured 301-route to " + result.getRedirectUrl());
+            throw new RedirectException(result.getRedirectUrl(), 301);
+        } else if (result != null) {
+            response.getMeta().setTitle(result.getPageTitle());
+            response.getMeta().setDescription(result.getMetaDescription());
+            markHandled(200, "templateRenderer for template {0}", result.getTemplate());
+            output = TemplateRenderer.instance().renderTemplate(result.getTemplate(), routeResultToContext(result));
+            sendContentResponse(output);
+        }
+
+    }
+
+
+    public String dispatchWsEndpoint(RouteResult result) throws Exception {
+        RestEndpointBase endpoint = result.getEndpoint();
+        if (!Context.currentUserCanAccessEndpoint(endpoint)) {
+            if ("text/html".equals(endpoint.getProduces()) && !Context.getUser().isAuthorized()) {
+                throw new RedirectException(Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.requestUrl(), "utf-8"), 302);
+            }
+            throw new ClientException("You do not have the privileges to access this endpoint.", 403);
+        }
+        List<Object> methodArgs = new ArrayList();
+        for(RequestArg arg: endpoint.getArgs()) {
+            Log.finest("ParamType: {0}", arg.getType());
+            Object val = null;
+            switch(arg.getType()) {
+                case "PathParam":
+                    val = result.getParams().get(arg.getName());
+                    break;
+                case "QueryParam":
+                    val = request.getParameter(arg.getName());
+                    break;
+                case "BodyParam":
+                    val = request.getBodyParam(arg.getName());
+                    break;
+                case "ObjectParam":
+                    val = new RequestObjectConverter(arg, request).convert();
+                    break;
+                case "MapParam":
+                    val = request.getBodyMap();
+                    break;
+                default:
+                    val = arg.getDefaultValue();
+            }
+            if (arg.getTargetClass() != null && val != null && !"ObjectParam".equals(arg.getType())) {
+                val = PropertyUtils.transform(val, arg.getTargetClass());
+            }
+            methodArgs.add(val);
+        }
+        Log.finest("PositionalArguments: count={0} values={1}", methodArgs.size(), methodArgs);
+        for(Object arg:methodArgs) {
+            if (arg != null) {
+                Log.finest("Arg: class={0} value={1}", arg.getClass().getName(), arg);
+            } else {
+                Log.finest("Arg: null");
+            }
+        }
+        Object out = null;
+        Object[] argsArray = methodArgs.toArray();
+        if (endpoint instanceof JavaRestEndpoint) {
+            JavaRestEndpoint javaRestEndpoint = (JavaRestEndpoint) endpoint;
+            Method javaMethod = javaRestEndpoint.getJavaMethod();
+            List<Object> coercedArgs = list();
+            int x = 0;
+            Class[] paramTypes = javaMethod.getParameterTypes();
+            for(Object arg: methodArgs) {
+                if (x >= paramTypes.length) {
+                    throw new UsageException("Passed in " + methodArgs.size() + " arguments to the method " + javaMethod.getName() + " but the method only accepts " + paramTypes.length + " arguments.");
+                }
+                Class type = paramTypes[x];
+                Object transformed = PropertyUtils.transform(arg, type);
+                //Log.info("Coercering arg {0} {1} to type {2} result is {3}:{4}", x, arg, type.getSimpleName(), transformed.getClass().getSimpleName(), transformed);
+                coercedArgs.add(transformed);
+                x++;
+            }
+            Object[] coercedArgsArray = coercedArgs.toArray();
+            logHandled(request, "java-endpoint:{0}:{1}({2})", javaRestEndpoint.getRoute(), javaRestEndpoint.getJavaMethod().getName(), paramTypes);
+            out = javaRestEndpoint.getJavaMethod().invoke(javaRestEndpoint.getResource(), coercedArgsArray);
+        } else {
+            JsEndpoint jsEndpoint = (JsEndpoint)endpoint;
+            // There has to be a better way to do this ... but I don't know what it is
+            // creating a variable args method on the interface simply passes the javascript an array as the first argument
+            logHandled(request, "javascript-endpoint:{0}", jsEndpoint.getRoute());
+            if (argsArray.length == 0) {
+                out = jsEndpoint.getHandler().handle();
+            } else if (argsArray.length == 1) {
+                out = jsEndpoint.getHandler().handle(argsArray[0]);
+            } else if (argsArray.length == 2) {
+                out = jsEndpoint.getHandler().handle(argsArray[0], argsArray[1]);
+            } else if (argsArray.length == 3) {
+                out = jsEndpoint.getHandler().handle(argsArray[0], argsArray[1], argsArray[2]);
+            }  else if (argsArray.length == 4) {
+                out = jsEndpoint.getHandler().handle(argsArray[0], argsArray[1], argsArray[2], argsArray[3]);
+            } else if (argsArray.length == 5) {
+                out = jsEndpoint.getHandler().handle(argsArray[0], argsArray[1], argsArray[2], argsArray[3], argsArray[4]);
+            } else if (argsArray.length == 6) {
+                out = jsEndpoint.getHandler().handle(argsArray[0], argsArray[1], argsArray[2], argsArray[3], argsArray[4], argsArray[5]);
+            } else {
+                throw new RuntimeException("A javascript handler cannot have more than 6 arguments. Try making one of your arguments a dictionary or object instead!");
+            }
+
+        }
+        if (out == null) {
+            return "";
+        }
+
+        return responseObjectToString(out, endpoint);
+    }
+
+    String responseObjectToString(Object obj, RestEndpointBase endpoint) throws Exception {
+
+        if (obj instanceof String) {
+            return (String) obj;
+        } else if (obj instanceof jdk.nashorn.internal.runtime.ConsString) {
+            return obj.toString();
+        } else {
+            if (endpoint.getJsonViewClass() == null) {
+                return JSON.stringify(obj, RestrictedViews.Member.class, false);
+            } else if (endpoint.getJsonViewClass().isAssignableFrom(RestrictedViews.Unrestricted.class)) {
+                return JSON.stringify(obj);
+            }  else {
+                return JSON.stringify(obj, endpoint.getJsonViewClass(), false);
+            }
+        }
+    }
+
+    private void sendContentResponse(String content) throws Exception {
+        response.getWriter().print(content);
+        complete();
+    }
+
+
+
+    /*******************************************
+     * Asset Routing
+     ******************************************/
+
+    /**
+     * If the path matches one our asset routing functions, serve the asset.
+     * Else, do nothing.
+     */
+    public void tryRouteAssetRequest() throws Exception{
+        if (request.getPath().startsWith("/st-resource/")) {
+            serveResourceAsset(request.getPath().substring(13));
+        } else if (request.getPath().startsWith("/st-assets/")) {
+            if ("standard".equals(request.getQueryParams().get("stBundle"))) {
+                serveBundle(request.getPath().substring(11));
+            } else if ("defined".equals(request.getQueryParams().get("stBundle"))) {
+                serveDefinedBundle(request.getPath().substring(11));
+            } else {
+                serveFolderAsset(request.getPath().substring(11));
+            }
+        }
+    }
+
+    public void serveResourceAsset(String path) throws Exception  {
+        String[] parts = path.split("/", 2);
+        String plugin = parts[0];
+        path = parts[1];
+        if (parts.length < 2) {
+            throw new ClientException("Invalid resource path " + path);
+        }
+        path = "/" + path;
+        //if (!BundleHandler.resourceIsAllowed(plugin, path)) {
+        //    Log.fine("Resource {0} not on the white list!", path);
+        //    throw new NotFoundException("Resource path does not exist or is not public: " + path);
+        //}
+        path = "/assets" + path;
+
+        if (!empty(request.getParameter("processor"))) {
+            String content = ResourceHelpers.loadAssetResource(plugin, path);
+            //if (!empty(request.getParameter("nocache"))) {
+                //content = AssetsController.instance().convertUsingProcessorNoCache(request.getParameter("processor"), path, content);
+            //} else {
+            content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), path, content);
+            //}
+            markHandled(200, "resource-asset");
+            sendContentResponse(content);
+        } else {
+            markHandled(200, "resource-asset");
+            byte[] bytes = ResourceHelpers.loadBinaryResource(plugin, path);
+            InputStream stream = new ByteArrayInputStream(bytes);
+            sendAssetResponse(stream, 0, bytes.length, path);
+        }
+    }
+
+    public void serveBundle(String path)  throws Exception {
+        BundleHandler bundleHandler = new BundleHandler(path, request.getQueryString());
+        markHandled(200, "serve-bundle");
+        String content = bundleHandler.toConcatenatedContent();
+        sendContentResponse(content, path);
+    }
+
+    public void serveDefinedBundle(String path) throws Exception  {
+        String definedBundleName = FilenameUtils.getBaseName(path);
+        BundleHandler bundleHandler = new BundleHandler(DefinedBundle.getByName(definedBundleName));
+        markHandled(200, "defined-bundle");
+        String content = bundleHandler.toConcatenatedContent();
+        sendContentResponse(content, path);
+    }
+
+    public void serveFolderAsset(String path) throws Exception  {
+        String fullPath = Settings.instance().getTargetFolder() + "/assets/" + path;
+        Log.fine("Asset path={0} fullPath={1}", path, fullPath);
+        File file = new File(fullPath);
+        if (!file.isFile()) {
+            notFound("Asset for path " + path + " is not found.");
+        }
+        if (!empty(request.getParameter("processor"))) {
+            String contents = IOUtils.toString(new FileReader(fullPath));
+            contents = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), path, contents);
+            markHandled(200, "folder-asset-with-processor");
+            sendContentResponse(contents, file.lastModified(), fullPath);
+        } else {
+            if (!empty(request.getParameter("externalPreProcessor"))) {
+                AssetsController.instance().externalPreProcessIfNecessary(request.getParameter("externalPreProcessor"), path);
+            }
+            markHandled(200, "folder-asset");
+            sendAssetResponse(file);
+        }
+    }
+
+    public void sendContentResponse(String content, String fullPath) throws Exception {
+        sendContentResponse(content, 0, fullPath);
+    }
+
+    public void sendContentResponse(String content, long modifyTime, String fullPath) throws Exception {
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        InputStream stream = new ByteArrayInputStream(bytes);
+        sendAssetResponse(stream, modifyTime, bytes.length, fullPath);
+    }
+
+    public void sendByteResponse(Byte[] bytes, long modifyTime, String fullPath) {
+
+    }
+
+    public void sendAssetResponse(File file) throws Exception {
+        sendAssetResponse(new FileInputStream(file), file.lastModified(), file.length(), file.getAbsolutePath());
+    }
+
+    public void sendAssetResponse(InputStream stream, long modifyTime, long contentLength, String fullPath) throws Exception {
+
+        // Set the caching headers
+        Long duration = 60 * 60 * 24 * 365 * 10L; // 10 years
+        Long durationMils = duration  * 1000;
+        response.addHeader("Cache-Control", "max-age=" + duration);
+        response.setDateHeader("Expires", System.currentTimeMillis() + durationMils);
+        if (modifyTime > 0) {
+            response.setDateHeader("Last-Modified", modifyTime);
+        }
+
+        // Set the Content-type
+        String contentType = GeneralUtils.guessMimeType(fullPath);
+        if (empty(contentType)) {
+            contentType = Files.probeContentType(FileSystems.getDefault().getPath(fullPath));
+        }
+        response.setContentType(contentType);
+
+        Integer BUFF_SIZE = 1024;
+        byte[] buffer = new byte[BUFF_SIZE];
+        ServletOutputStream os = response.getOutputStream();
+        response.setContentLength((int)contentLength);
+
+        try {
+            int byteRead = 0;
+            while(true) {
+                byteRead = stream.read(buffer);
+                if (byteRead == -1) {
+                    break;
+                }
+                os.write(buffer, 0, byteRead);
+            }
+            os.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            os.close();
+            stream.close();
+        }
+        complete();
+    }
+
+
+
+
+
+
+    /*********************
+    /* Error handlers */
+    /********************/
+
+
+    public void handleError(Exception ex) {
+
+        Log.exception(ex, "Error handling request " + request.getMethod() + " " + request.getPath());
+        String out = "Server error handling request.";
+        String message = "Server error handling request";
+        Throwable anEx = ex;
+        int status = 500;
+        for (int x =0; x < 10; x++) {  // because while loops are evil
+            if (anEx instanceof WebException) {
+                WebException webEx = (WebException) anEx;
+                message = webEx.getMessage();
+                status = webEx.getStatusCode();
+            } else {
+                anEx = anEx.getCause();
+            }
+            if (anEx == null) {
+                break;
+            }
+        }
+        markHandled(status, message);
+        if (isJsonRequest()) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("succeeded", false);
+            result.put("message", message);
+            if (Context.getSettings().getDebug()) {
+                result.put("debug", ex.toString());
+            }
+            try {
+                out = JSON.stringify(result);
+                response.addHeader("Content-type", "application/json");
+            } catch (Exception e) {
+                Log.exception(e, "Error stringifying");
+            }
+        } else {
+            out = TemplateRenderer.instance().render500Html(ex);
+        }
+        try {
+            response.getWriter().print(out);
+        } catch (IOException e) {
+            Log.exception(e, "Exception writing output to response stream");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void handleNotFound() throws Exception {
+        handleNotFound("");
+    }
+
+    public void handleNotFound(String message) throws Exception {
+        markHandled(404, "Page not found.");
+        String out = "Page not found.";
+        message = or(message, "Page not found.");
+        if (isJsonRequest()) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("succeeded", false);
+            result.put("message", message);
+            try {
+                out = JSON.stringify(result);
+                response.addHeader("Content-type", "application/json");
+            } catch (Exception e) {
+                Log.exception(e, "Error stringifying");
+            }
+        } else {
+            out = TemplateRenderer.instance().render404Html();
+        }
+        response.getWriter().print(out);
+    }
+
+    /*********************
+     /* Logging */
+    /********************/
+
+
+    private void logHandled(int status, StRequest request, String msg, Object...args) {
+        msg = MessageFormat.format(msg, args);
+        Log.logForFrame(2, Level.INFO, "status={0} handler=\"{1}\" {2}={3}", status, msg, request.getMethod(), request.getPath());
+    }
+
+    private void logHandled(StRequest request, String msg, Object...args) {
+        msg = MessageFormat.format(msg, args);
+        Log.logForFrame(2, Level.INFO, "handler=\"{0}\" {1}={2}", msg, request.getMethod(), request.getPath());
+    }
+
+    public void markHandled(int status, String message, Object...args) {
+        response.setStatus(status);
+        message = MessageFormat.format(message, args);
+        Log.logForFrame(2, Level.INFO, "status={0} handler=\"{1}\" {2}={3}", status, message, request.getMethod(), request.getPath());
+    }
+
+    public void notFound(String message) {
+        markHandled(404, message);
+        throw new NotFoundException(message);
+    }
+
+    public void complete(int status, String message, Object...args) {
+        markHandled(status, message);
+        throw new ResponseComplete();
+    }
+
+    public void complete() {
+        throw new ResponseComplete();
+    }
+
+
+    /*********************
+     /* Helpers */
+    /********************/
+
+
+    /**
+     * Excutes a bunch of heuristics to figure out if we should return errors
+     * as HTML or JSON
+     * @return
+     */
+    public Boolean isJsonRequest() {
+
+        if (request.getIsJsonRequest() != null) {
+            return request.getIsJsonRequest();
+        }
+        if (!StringUtils.isEmpty(response.getContentType())) {
+            if ("application/json".equals(response.getContentType())) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            return true;
+        }
+        String contentType = request.getHeader("Content-type");
+        if (!StringUtils.isEmpty(contentType)) {
+            if (contentType.contains("application/json")) {
+                return true;
+            }
+        }
+        if ("POST".equals(request.getMethod())) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public HashMap<String, Object> routeResultToContext(RouteResult result) throws Exception {
+        //val context = HashMap<String, kotlin.Any>()
+        HashMap<String, Object> context = new HashMap<String, Object>();
+        RouteResult routeResult = new RouteResult()
+                .setParams(new HashMap<String, String>())
+                .setTemplate("")
+                .setRedirectUrl("")
+                .setPreempt(false)
+                .setName("")
+                .setGroup("");
+        if (result != null) {
+            routeResult = result;
+        }
+        HashMap route = new HashMap<String, String>();
+        route.put("name", routeResult.getName());
+        route.put("group", routeResult.getGroup());
+        for(Map.Entry<String, String> entry: routeResult.getParams().entrySet()) {
+            route.put(entry.getKey(), entry.getValue());
+
+        }
+        context.put("route", route);
+        return context;
+    }
+
+    static class ResponseComplete extends RuntimeException {
+
+    }
+
+
+
+    public StRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(StRequest request) {
+        this.request = request;
+    }
+
+    public StResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(StResponse response) {
+        this.response = response;
+    }
+}

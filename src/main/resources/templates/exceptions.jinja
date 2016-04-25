@@ -1,0 +1,20 @@
+
+<style>
+    body { font-family: avenir, sans-serif; }
+    .soft { font-weight: 500; color: #777; }
+    .title { font-size: 1.5em; }
+    .message { font-size: 1.3em; }
+    code > pre { padding: 1em; background-color: #E7E7E7; border: 1px solid #CCC; display: block; }
+</style>
+<h1>Recent exceptions</h1>
+{% for exception in exceptions %}
+<hr>
+<div class="title">{{ exception.className }} <span class="message">{{ exception.message }}</span></div>
+<div class="soft">On {{ utils.formatLocalDate(exception.thrownAt) }}</div>
+<div>{{ exception.requestMethod }} {{ exception.requestUrl }}</div>
+<code><pre>{{ exception.stackTrace }}</pre></code>
+<h5>Request body:</h5>
+<code><pre>{{ exception.requestBody }}</pre></code>
+<h5>Headers:</h5>
+<code><pre>{{ exception.requestHeadersString }}</pre></code>
+{% endfor %}

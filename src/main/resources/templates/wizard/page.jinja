@@ -1,0 +1,13 @@
+{% extends "base.jinja" %}
+{% block main_body %}
+<div class="posts">
+    <section class="post">
+        <header class="post-header">
+            <h2 class="post-title">{{ page.title }}</h2>
+        </header>
+        <div class="post-description">
+            {{ page.content }}
+        </div>
+    </section>
+</div><!--end posts-->
+{% endblock %}

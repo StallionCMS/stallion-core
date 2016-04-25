@@ -1,0 +1,21 @@
+package {{ config.javaPackageName }};
+
+import io.stallion.plugins.BasePluginSettings;
+import io.stallion.reflection.PropertyUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class {{ config.pluginNameTitleCase }}Settings extends BasePluginSettings {
+
+    public static {{ config.pluginNameTitleCase }}Settings getInstance() {
+        return getInstance({{ config.pluginNameTitleCase }}Settings.class, "{{ config.pluginName }}");
+    }
+
+
+
+    @Override
+    public void assignDefaults() {
+    }
+}

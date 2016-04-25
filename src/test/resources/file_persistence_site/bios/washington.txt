@@ -1,0 +1,8 @@
+title: George Washington
+birthDate: 1732-02-22
+author: Washington Irving
+birthState: VA
+description: The father of our nation
+
+George Washington was the very first president of the United States of America.
+

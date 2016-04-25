@@ -1,0 +1,9 @@
+title: Thomas Jefferson
+birthdate: 1743-04-13
+author: Joseph Ellis
+birthState: VA
+description: The third president and writer of the Declaration
+
+Thomas Jefferson wrote the first Declaration of Independence.
+
+

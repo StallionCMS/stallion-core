@@ -1,0 +1,4 @@
+cdnUrl = "http://localhost:{port}/testing"
+
+[custom]
+foobar = "testoverriden"

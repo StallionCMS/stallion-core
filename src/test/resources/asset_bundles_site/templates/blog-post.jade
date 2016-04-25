@@ -1,0 +1,13 @@
+extends blog
+                
+block blog_content
+  div.row
+    div.col-md-12.post-container               
+      h1=post.title
+      div
+        em=post.date.formattedDate("MMMM d, yyyy");
+      div!=post.content
+  div.row.post-container
+    div.col-md-12
+      p &nbsp;
+      a(href="/blog") &#171; back to the blog  

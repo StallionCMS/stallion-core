@@ -1,0 +1,24 @@
+h4 Monthly Archives
+//- unforunately if we initilize with just {} or [] we get null objects
+//- additionally, you cannot append items to a list defined via the var = [] syntax
+- month_groups = new("java.util.HashMap")
+- slugs = new("java.util.ArrayList")
+- each post in live_posts.sort('date', 'desc').all()
+  - slug = post.date.toString('yyyy/MM')
+  //- slugs contains an orderd listing of the slug for the archive page urls
+  if slugs.contains(slug)
+    xyx = {}
+  else
+    - slugs.add(slug)
+  - existing = month_groups[slug]
+  //- for some reason the "-" syntax fox indicating JEXL code does not work with 'if' statements
+  if existing == null
+    - month_posts = new("java.util.ArrayList")
+    - month_posts.add(post)
+    - month_groups[slug] = {'posts': month_posts, 'label': post.formattedDate('MMMM yyyy')}
+  else
+    - month_groups[slug].posts.add(post)
+- each slug in slugs
+  - group = month_groups[slug]
+  div
+    a(href="/blog/archives/" + slug)=group.label + ' (' + group.posts.size() + ') '

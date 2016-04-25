@@ -1,0 +1,60 @@
+extends base
+
+block content
+  div.container.features
+    div.row
+      div.col-md-6
+        h3 Serves 500+ pages per second on a $5 box
+        p
+          :markdown
+            Stallion is written on the JVM and loads everything into local memory, which means it is fast. A request to a dynamic page takes only a couple milliseconds. If you resize your box to use more CPU, Stallion will handle even more requests per second. We registered 15,000 seconds on one Digitial Ocean VM.
+      div.col-md-6
+        h3 Dynamic - no regeneration, view all changes instantly
+        p Stallion is not a static web site generator. Stallion watches your local file system, and when you make a change, the new content is loaded and immediately when you reload the browser you will see your change. When you deploy, there is zero downtime.
+    div.row
+      div.col-md-6
+        h3 Use your favorite text editor and markdown to write content
+        p Stallion is file based, so you can write your content in Emacs, Sublime, Vim or any other text editor. Templates are written in Jade format. Templates are turring complete and can access Java code, so if you need to do some crazy custom code, you can do it.
+      div.col-md-6
+        h3 File system based. Manage your site via git. No database to worry about.
+        p Work on your posts or templates by running Stallion locally. When you are ready, commit your changes, then simply git pull on your server and you will see your changes. You have full version tracking for instant rollback, backups. Never lose your blog.
+    div.row
+      div.col-md-4
+        h5 Technical info
+        p
+          :markdown
+            * requires java 1.7
+            * that is it        
+      div.col-md-4
+        h5 Limitations
+        p
+          :markdown
+            * No GUI or web interface
+            * No commenting system yet
+            * Not actually released or available yet
+      div.col-md-4
+        h5 Next steps
+        p Stallion is the toy project of 
+          a(href="http://www.patfitzsimmons.com") Patrick Fitzsimmons. 
+          | It was created in a couple nights of feverish inspiration. It is 
+          | being used to host this very site and blog. We&#8217;ll see if 
+          | anything more comes of it.
+    div.row
+      div.col-md-12
+        h2 Updates from the Stallion blog
+    div.row
+      each post in posts.filter('isPublished', 'true').sort('publishDate', 'desc').pager(1, 3).items
+        div.col-md-4.post-teaser
+          h4=post.title
+          p.dateline=post.formattedDate('MMMM dd, yyyy')
+          p.post-summary
+            !=post.getTruncatedSummary(90)
+            a(href=post.slug) read more
+  div.container.footer
+    footer
+      p &nbsp;
+      p &copy; 2014
+        a(href="http://www.patfitzsimmons.com") Patrick Fitzsimmons
+          
+       
+  

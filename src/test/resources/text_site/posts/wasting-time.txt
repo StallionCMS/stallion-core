@@ -1,0 +1,15 @@
+Wasting Time
+============================
+slug:/wasting-time
+draft: true
+publishDate:2014-08-11 16:10 UTC
+
+<p>'If you knew Time as well as I do,' said the Hatter, 'you wouldn't talk  about wasting IT. It's HIM.'</p>
+
+<p>'I don't know what you mean,' said Alice.</p>
+
+<p>'Of course you don't!' the Hatter said, tossing his head contemptuously.  'I dare say you never even spoke to Time!'</p>
+
+<p>'Perhaps not,' Alice cautiously replied: 'but I know I have to beat time  when I learn music.'</p>
+
+<p>'Ah! that accounts for it,' said the Hatter. 'He won't stand beating.  Now, if you only kept on good terms with him, he'd do almost anything  you liked with the clock. For instance, suppose it were nine o'clock in  the morning, just time to begin lessons: you'd only have to whisper a  hint to Time, and round goes the clock in a twinkling! Half-past one,  time for dinner!'</p>

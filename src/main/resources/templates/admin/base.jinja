@@ -1,0 +1,20 @@
+{% extends "stallion:admin/base-topbar-only.jinja" %}
+  {% block main_content %}
+
+
+<div id="st-admin-main-content" class="container">
+  <div class="row">
+    <div id="st-admin-nav-sidebar" class="col-md-2">Sidebarz</div>
+    <div class="col-md-10">
+      {% block main_column %}
+      {% endblock %}
+    </div>
+  </div>  
+</div>
+  {% endblock %}
+
+
+
+
+
+

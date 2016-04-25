@@ -1,0 +1,640 @@
+#!/usr/local/bin/ipython
+
+# The following line gets replaced during the upload process
+#$$$conf$$$
+
+
+from datetime import datetime
+import logging
+import os
+import re
+import sys
+import subprocess
+import time
+
+
+
+root = os.path.abspath(os.path.join(os.path.dirname(os.path.join(os.getcwd(), sys.argv[0])), '../..'))
+
+
+
+
+
+nginx_upstream = """
+
+upstream %(instance)s {
+    server localhost:%(port)s;
+}
+
+"""
+
+nginx_non_ssl_redirect_to_ssl = """
+
+server {
+    listen 80;
+    server_name %(domain)s %(alias_domains)s %(secondary_domains)s %(redirect_domains)s;
+
+    location ~ /.well-known {
+       try_files $uri $uri/ =404;
+       alias /usr/share/nginx/html/.well-known;
+       index index.html index.htm;
+       allow all;
+    }
+
+    return 301 https://$host$request_uri;
+}
+"""
+
+nginx_non_ssl = """\
+
+server {
+    listen 80;
+    server_name %(domain)s %(alias_domains)s %(secondary_domains)s;
+    location / {
+        proxy_pass http://%(instance)s;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ~ /.well-known {
+       try_files $uri $uri/ =404;
+       alias /usr/share/nginx/html/.well-known;
+       index index.html index.htm;
+       allow all;
+    }
+}
+"""
+
+nginx_non_ssl_redirect_to_primary = """\
+
+server {
+    listen 80;
+    server_name %(redirect_domains)s;
+
+    location ~ /.well-known {
+       try_files $uri $uri/ =404;
+       alias /usr/share/nginx/html/.well-known;
+       index index.html index.htm;
+       allow all;
+    }
+    return 301 $scheme://%(domain)s$request_uri;
+}
+
+    """
+
+
+nginx_ssl = """\
+
+server {
+    listen 443;
+    server_name %(domain)s %(alias_domains)s %(secondary_domains)s;
+    ssl on;
+    ssl_certificate %(ssl_crt)s;
+    ssl_certificate_key %(ssl_key)s;
+    #enables all versions of TLS, but not SSLv2 or 3 which are weak and now deprecated.
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+    #Disables all weak ciphers
+    ssl_ciphers "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
+
+    ssl_prefer_server_ciphers on;
+
+    location ~ /.well-known {
+       try_files $uri $uri/ =404;
+       alias /usr/share/nginx/html/.well-known;
+       index index.html index.htm;
+       allow all;
+    }
+
+    location / {
+        proxy_pass http://%(instance)s;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+"""
+
+nginx_ssl_redirect_to_primary = """\
+
+server {
+    listen 443;
+    server_name %(redirect_domains)s;
+    ssl on;
+    ssl_certificate %(ssl_crt)s;
+    ssl_certificate_key %(ssl_key)s;
+    #enables all versions of TLS, but not SSLv2 or 3 which are weak and now deprecated.
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+    #Disables all weak ciphers
+    ssl_ciphers "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
+
+    ssl_prefer_server_ciphers on;
+
+    location ~ /.well-known {
+       try_files $uri $uri/ =404;
+       alias /usr/share/nginx/html/.well-known;
+       index index.html index.htm;
+       allow all;
+    }
+    return 301 $scheme://%(domain)s$request_uri;
+
+}
+"""
+
+
+
+class Publisher(object):
+    slugify_re = re.compile(r"[^\w\-]")
+
+    def __init__(self, conf):
+        if not os.path.isdir(root + '/wharf-upload'):
+            raise EnvironmentError('No wharf-upload folder found at %s. Did you rsync correctly?' % root)
+        self.deploying = ''
+        self.active = ''
+        self.port = None
+        self.instance_name = self.slugify_re.sub('--', root).strip('-').strip('-')
+        self.file_base = ''
+        self.env = conf['env']
+        self.base_port = conf['base_port']
+        self.domain = conf['domain']
+        self.alias_domains = conf.get('alias_domains', [])
+        self.secondary_domains = conf.get('secondary_domains', [])
+        self.check_urls = conf.get('check_urls', [])
+        self.host = conf.get('host', '')
+        self.ssl_crt = conf.get('ssl_crt', '')
+        self.ssl_key = conf.get('ssl_key', '')
+        self.redirect_to_ssl = conf.get('redirect_to_ssl', False)
+        self.redirect_to_primary = conf.get('redirect_to_primary', False)
+        self.executable_name = conf['executable_name']
+
+
+    def publish(self):
+        info('Publishing wharf folder for %s' % root)
+        self.verify_deps()
+        self.prepare_wharf()
+        self.active = self._read('active')
+        if not self.active:
+            self.full_deploy()
+            return
+        change_info = self.detect_changes(self.active)
+        if change_info.total_changed == 0:
+            good("No files have been changed. Exiting deploy.")
+            return
+        if change_info.total_changed < 20 and not change_info.requires_full_deploy:
+            self.quick_update()    
+            return
+        info("%s files to update. Running full deploy" % change_info.total_changed)
+        self.full_deploy()
+        good("Deploy completed successfully")
+        
+    def unlock(self):
+        os.unlink(root + "/deploying")
+
+    def prepare_wharf(self):
+        info('Prepare wharf with correct file permissions')
+        source = root + '/wharf-upload/'
+        dest = root + '/wharf-prepared'
+        cmd = "rsync -rzWvc --delete --exclude '.*' --exclude 'app-data' %s %s" % (source, dest)
+        debug("executing: %s" % cmd)
+        out = !$cmd
+        !chown -R stallionOwner.stallion {dest}
+        # Files are owner writable, group, world readable
+        db = "{}"
+        !find {dest} -type f -exec chmod 644 {db} \;
+        # Folders are owner read/write/exec, group, world read/exec
+        !find {dest} -type d -exec chmod 755 {db} \;
+        # Stallion executable is group executable
+        !chmod 754 {dest}/bin/stallion
+
+    def verify_deps(self):
+        info('Verifying server has java 8, nginx, and other required dependencies')
+        self.check_make_users()
+        out =!sudo -u stallionServer java -version
+        if not 'java version "1.8.' in '\n'.join(out):
+            warn("java version command result: \n%s" % out)
+            raise EnvironmentError('Java 1.8 not found on the system path for user stallionServer!')
+        if not os.path.isdir('/etc/nginx/sites-enabled'):
+            raise EnvironmentError('Either nginx is not installed, or the installion is not standard. Folders /etc/nginx/sites-enabled and /etc/nginx/sites-available are both requried')
+        # TODO: Verify supervisord is installed and running
+
+    def check_make_users(self):
+        info('Ensuring correct stallionServer and stallionOwner users exist')
+        r = !grep 'stallion:' /etc/group
+        if not r or not r[0].startswith('stallion:'):
+            !groupadd stallion
+        r = !id -u stallionOwner
+        if not r or not r[0].isdigit():
+            !useradd -G stallion -r stallionOwner
+        r = !id -u stallionServer
+        if not r or not r[0].isdigit():
+            !useradd -G stallion -r stallionServer
+        def verify_add_group(user, group):
+            r = !groups $user
+            in_group = group in r[0].split(':')[1].split(' ')
+            if not in_group:
+                !usermod -a -G stallion
+        verify_add_group('stallionServer', 'stallion')
+        verify_add_group('stallionOwner', 'stallion')
+        # TODO: verify stallionOwner can read the wharf folder
+        # TODO: verify stallionServer can read the wharf folder
+        
+        
+
+    def quick_update(self):
+        info("Execute quick update")
+        self.rsync_wharf_to_target(self.active)
+
+    def full_deploy(self):
+        info("Execute a full deploy")
+        self._mark_deploying()
+        self.rsync_wharf_to_target()
+        self.check_for_migrations()
+        self.try_test_start_instance()
+        self.start_stallion_instance()
+        self.verify_stallion_running()
+        self.swap_active()
+        self.cleanup()
+
+    def detect_changes(self, folder):
+        source = root + '/wharf-prepared/'
+        dest = root + '/' + folder
+        info("Detecting changes between '%s' and '%s'" % (source, dest))
+        cmd = "rsync -rzWvc --dry-run --delete --exclude '.*' --exclude app-data %s %s" % (source, dest)
+        debug("executing: %s" % cmd)
+        out = !$cmd
+        lines = out[1:-3]
+        restricted = ['jars', 'bin', 'plugins', 'users', 'conf', 'js']
+        class ChangeInfo(object):
+            total_changed = 0
+            requires_full_deploy = False
+        change_info = ChangeInfo()
+        change_info.total_changed = len(lines)
+        for line in lines:
+            for part in restricted:
+                if line == "conf/secrets.json":
+                    # secrets.json is always deleted in the wharf version, every time
+                    continue
+                if line.startswith(part + '/'):
+                    info('These changes require a complete re-deploy.')
+                    change_info.requires_full_deploy = True
+                    break
+        return change_info
+
+    def rsync_wharf_to_target(self, folder=None):
+        if not folder:
+            folder = self.deploying
+        if not folder:
+            raise ValueError('syncing to an empty folder name')
+        
+        source = root + '/wharf-prepared/'
+        dest = root + '/' + folder
+        info("Rsyncing wharf-prepared to %s" % dest)
+        # Sync in archive mode
+        cmd = "rsync -azWvcqq --delete --exclude '.*' --exclude app-data %s %s" % (source, dest)
+        if not dest.endswith('/alpha') and not dest.endswith('/beta'):
+            raise ValueError("Invalid destintion %s" % dest)
+        info("executing: %s" % cmd)
+        out = !$cmd
+        # app-data is group writable, so stallionServer can write to it
+        # app-data exists outside of the alpha and beta directory, because is always shared in common
+        # between the two nodes
+        if not os.path.exists(dest + '/app-data'):
+            if not os.path.isdir(root + "/app-data"):
+                os.mkdir(root + "/app-data")
+                db = "{}"
+                !find {root}/app-data -type f -exec chmod 660 {db} \;
+                !find {root}/app-data -type d -exec chmod 770 {db} \;
+                !chown -R stallionOwner.stallion {root}/app-data
+            !ln -s {root}/app-data {dest}/app-data
+        # We do not want the world to be able read the secrets file
+        if os.path.isfile(dest + "/conf/secrets.json"):
+            !chmod 662 {dest}/conf/secrets.json
+        if os.path.isfile(source + "conf/secrets.json"):
+            os.unlink(source + "conf/secrets.json")
+        good("New deploy directory has been prepared")
+
+    def check_for_migrations(self):
+        info("Check to see if there are SQL migrations that have not been executed.")
+        cmd = u"sudo -u stallionServer {root}/{folder}/bin/stallion sql-check-migrations -targetPath={root}/{folder} -env={env}".format(
+            root=root,
+            folder=self.deploying,
+            env=self.env
+            )
+        out =!$cmd
+        if 'result:success' not in out:
+            info("\n".join(out))
+            !unlink {root}/deploying
+            warn("\n\nThere are SQL migrations that have not been executed yet. Aborting deploy.\n\n")
+            sys.exit(1)
+        good("Database schema is up-to-date")
+
+    def try_test_start_instance(self):
+        # start the server
+        source = u"""\
+#sudo su stallionServer
+export STALLION_HOST="{host}"
+export STALLION_DOMAIN="{domain}"
+export STALLION_DEPLOY_TIME="{now_stamp}"
+exec sudo -u stallionServer {root}/{folder}/bin/{executable} serve -localMode=false -targetPath={root}/{folder} -port={port} -env={env}
+        """.format(
+                       root=root,
+                       host=self.host,
+                       domain=self.domain,
+                       executable=self.executable_name,
+                       now_stamp=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S %p'),
+                       folder=self.deploying,
+                       port=self.port,
+                       env=self.env,
+                       file_base=self.file_base)
+        server_start_path = root + "/" + self.deploying + "/bin/stallion-run.sh"
+        with open(server_start_path, "w") as f:
+            f.write(source)
+        !chmod 700 $server_start_path
+        #!/bin/bash $server_start_path
+        p = subprocess.Popen(["/bin/bash", server_start_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        try:
+            self.verify_stallion_running(p)
+            p.terminate()
+            out, err = p.communicate()
+            good("Server test boot was successful.")
+        except Exception, e:
+            p.terminate()
+            out, err = p.communicate()
+            error("Error while trying to boot the server.")
+            error(out or '')
+            error(err or '')
+            raise
+        good("Stallion instance test run succeeded.")
+
+
+
+        
+    def start_stallion_instance(self):
+        info("Creating upstart conf and starting stallion")
+        source = u"""
+start on (local-filesystems and net-device-up IFACE!=lo)
+console output
+
+setuid stallionServer
+setgid stallion
+
+script
+    sleep 3
+    NOW=$(date +"%Y-%m")
+    exec 2>>/tmp/log/stallion/upstart-{file_base}-$NOW.log
+    set -x
+    echo "Now start stallion"
+    export STALLION_HOST="{host}"
+    export STALLION_DOMAIN="{domain}"
+    export STALLION_DEPLOY_TIME="{now_stamp}"
+    exec {root}/{folder}/bin/{executable} serve -targetPath={root}/{folder} -port={port} -env={env}
+    
+end script
+
+respawn
+# give up if I respawn 3 times in 60 seconds...
+respawn limit 3 60
+""".format(
+            root=root,
+            host=self.host,
+            domain=self.domain,
+            executable=self.executable_name,
+            now_stamp=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S %p'),
+            folder=self.deploying,
+            port=self.port,
+            env=self.env,
+            file_base=self.file_base)
+        # > /tmp/log/stallion/out.{file_base}.log 2>&1
+        !mkdir -p /tmp/log/stallion
+        !chown stallionServer.stallion /tmp/log/stallion
+        path = '/etc/init/' + self.file_base + '.conf'
+        with open(path, 'w') as f:
+            f.write(source)
+        !stop {self.file_base}
+        !start {self.file_base}
+        good("Stallion started via upstart")
+
+    def verify_stallion_running(self, process=None):
+        #urls = ['/st-admin/health/warmup'] + self.check_urls
+        urls = self.check_urls or ['/']
+        max_tries = 20
+        for url in urls:
+            url = 'http://localhost:%s' % self.port + url
+            for x in range(0, max_tries + 1):
+                if process != None:
+                    result = process.poll()
+                    if result != None:
+                        raise AssertionError("Stallion process has died.")
+                info("Verify that URL %s is running" % url)
+                try: 
+                    o = !curl -v $url
+                    assert '< HTTP/1.1 200 OK' in o, "200 OK not found in curl result for %s" % url
+                    if '/st-admin/health/warmup' in url:
+                        assert 'Stallion-health: OK' in o, "Stallion-health: OK not found in curl result for /st-admin/health/warmup"        
+                    break
+                except AssertionError:
+                    if x == max_tries:
+                        error('CURL RESULT %s %s' % (url, '\n'.join(o)))
+                        raise
+                    info('Curl of %s not loading yet, waiting 3 seconds to retry' % url)
+                    time.sleep(3)
+        url = 'http://localhost:%s' % self.port + "/"
+        o = !curl -v $url
+        good("New Stallion instance is operational and healthy")
+        info("Pre-fetching assets")
+        for path in re.findall('/st-assets/[^"\'\s]+', unicode(o)):
+            if ".css" not in path and ".js" not in path:
+                continue
+            asset_url = 'http://localhost:%s' % self.port + path
+            info("Pre-fetch asset " + asset_url)
+            o = !curl -v $asset_url
+            if '< HTTP/1.1 200 OK' not in o:
+                sys.stderr.write(unicode(o))
+                raise AssertionError("200 OK not found in curl result for %s" % asset_url)
+        good("All assets preloaded")
+
+
+    def swap_active(self):
+        info("Making %s the new active instance in nginx" % self.deploying)
+        instance = self.domain.replace(".", "_").replace("-", "_")
+        params = dict(
+            instance=instance,
+            domain=self.domain,
+            port=self.port,
+            alias_domains=' '.join(self.alias_domains),
+            secondary_domains=' '.join(self.secondary_domains),
+            redirect_domains='',
+            ssl_key=self.ssl_key,
+            ssl_crt=self.ssl_crt
+            )
+        if self.redirect_to_primary:
+            params['redirect_domains'] = params['alias_domains']
+            params['alias_domains'] = ''
+        conf = nginx_upstream % params
+        if self.redirect_to_ssl and self.ssl_key:
+            conf += nginx_non_ssl_redirect_to_ssl % params
+        else:
+            conf += nginx_non_ssl % params
+        if self.redirect_to_primary:
+            conf += nginx_non_ssl_redirect_to_primary % params
+        if self.ssl_key:
+            conf += nginx_ssl % params
+            if self.redirect_to_primary:
+                conf += nginx_ssl_redirect_to_primary % params
+
+        deploying_path = '/etc/nginx/sites-available/stallion---%s-%s.conf' % (self.deploying, self.domain)
+        active_path = '/etc/nginx/sites-available/stallion---%s-%s.conf' % (self.active, self.domain)
+        enabled_path = '/etc/nginx/sites-enabled/stallion---%s.conf' % (self.domain)
+        with open(deploying_path, 'w') as f:
+            f.write(conf)
+        !unlink $enabled_path
+        !ln -s $deploying_path $enabled_path
+        !nginx -t
+        if not _exit_code == 0:
+            if self.active:
+                # reset back to the active conf
+                !ln -s $active_path $enabled_path
+            raise AssertionError('nginx config test failed!')
+        if self.active:
+            self._write('old', self.active)
+        self._write('active', self.deploying)
+        !nginx -s reload
+        good("New Stallion instance is now live!")
+            
+    def cleanup(self):
+        info("Stoping previous instance and cleaning up lock files")
+        old = self._read('old')
+        active = self._read('active')
+        if old:
+            assert old != active, "You cannot cleanup the active instance!"
+            !stop stallion.{self.instance_name}.{old}
+            !unlink /etc/init/stallion.{self.instance_name}.{old}.conf
+            !unlink {root}/old
+        !unlink {root}/deploying
+
+
+    def _mark_deploying(self):
+        info("Locking for deploy")
+        old_deploying = self._read('deploying')
+        self.active = self._read('active')
+        if old_deploying:
+            yn = raw_input("There is an existing deploy file. Someone else might be deploying at the same time! Continue anyways? (Yes/n) ")
+            if yn.lower() == "yes":
+                !unlink {root}/deploying
+                old_deploying = ""
+
+        if old_deploying:
+            raise Exception('There is an existing deploy file! Someone else may be deploying at the same time! If this is false, manually delete the "deploying" file')
+        if self.active and self.active == 'alpha':
+            self.deploying = 'beta'
+        else:
+            self.deploying = 'alpha'
+        self._write('deploying', self.deploying)
+        self.file_base = 'stallion.%s.%s' % (self.instance_name, self.deploying)
+        if self.deploying == 'alpha':
+            self.port = self.base_port + 1
+        else:
+            self.port = self.base_port + 2
+        debug("Setting deploying=%s file_base=%s active=%s port=%s" % (self.deploying, self.file_base, self.active, self.port))
+
+    def _read(self, path):
+        path = root + '/' + path
+        if not os.path.isfile(path):
+            return None
+        content = ''
+        with open(path) as f:
+            content = f.read()
+        return content
+
+    def _write(self, path, content, mode=None):
+        with open(root + '/' + path, 'w') as f:
+            f.write(content)
+
+
+
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+
+#The background is set with 40 plus the number of the color, and the foreground with 30
+
+#These are the sequences need to get colored ouput
+RESET_SEQ = "\033[0m"
+COLOR_SEQ = "\033[1;%dm"
+BOLD_SEQ = "\033[1m"
+
+def formatter_message(message, use_color = True):
+    if use_color:
+        message = message.replace("$RESET", RESET_SEQ).replace("$BOLD", BOLD_SEQ)
+    else:
+        message = message.replace("$RESET", "").replace("$BOLD", "")
+    return message
+
+GOOD = 25
+logging.addLevelName(GOOD, 'GOOD')
+
+COLORS = {
+    'WARNING': YELLOW,
+    'INFO': WHITE,
+    'DEBUG': WHITE,
+    'CRITICAL': YELLOW,
+    'ERROR': RED,
+    'GOOD': GREEN
+}
+
+class ColoredFormatter(logging.Formatter):
+    def __init__(self, msg, use_color = True):
+        logging.Formatter.__init__(self, msg)
+        self.use_color = use_color
+
+    def format(self, record):
+        levelname = record.levelname
+        #if self.use_color and levelname in COLORS:
+            #levelname_color = COLOR_SEQ % (30 + COLORS[levelname]) + levelname + RESET_SEQ
+            #record.levelname = levelname_color
+        res = logging.Formatter.format(self, record)
+        return COLOR_SEQ % (30 + COLORS[levelname]) + res + RESET_SEQ
+
+#logging.basicConfig(format='%(levelname)s %(message)s')
+logger = logging.getLogger('publisher')
+sh = logging.StreamHandler()
+level = logging.INFO
+if conf['log_level'] in ('fine', 'finer', 'finest'):
+    level = logging.DEBUG
+sh.setLevel(level)
+sh.setFormatter(ColoredFormatter('%(levelname)s %(message)s'))
+#logger.handlers[0].setFormatter(ColoredFormatter('%(levelname)s %(message)s'))
+logger.addHandler(sh)
+logger.setLevel(level)
+logger.propagate = False
+
+
+sh.flush()
+
+def info(msg, *args):
+    logger.info(msg, *args)
+
+def good(msg, *args):
+    logger.log(GOOD, msg, *args)
+
+def debug(msg, *args):
+    logger.debug(msg, *args)
+
+def warn(msg, *args):
+    logger.warn(msg, *args)
+
+def error(msg, *args):
+    logger.error(msg, *args)
+
+
+def main():
+    Publisher(conf).publish()
+
+
+
+main()
+
+logging.shutdown()
+

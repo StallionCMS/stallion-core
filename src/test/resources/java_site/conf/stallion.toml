@@ -1,0 +1,7 @@
+
+pageTemplate = "page.jade"
+cdnUrl = "http://localhost:{port}"
+siteUrl = "http://localhost:{port}"
+
+[custom]
+bar = "notoverriden"

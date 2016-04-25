@@ -1,0 +1,4 @@
+h4 Recent Posts
+each post in live_posts.sort('date', 'desc').pager(0, 5).currentItems
+  div
+    a(href=post.slug) #{post.title}
