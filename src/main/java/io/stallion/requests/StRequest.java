@@ -77,6 +77,7 @@ public class StRequest implements IRequest {
         this.query = request.getQueryString();
     }
 
+
     /**
      * Gets the absolute url of the original request.
      * Reconstructs the URL using the x-forwarded-host, if necessary,

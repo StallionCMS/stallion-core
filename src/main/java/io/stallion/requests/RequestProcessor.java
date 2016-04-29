@@ -136,7 +136,7 @@ public class RequestProcessor {
     public void doProcess() throws Exception {
         // Handle login to a page
         if ("true".equals(request.getParameter("stLogin")) && empty(Context.getUser().getId())) {
-            String targetUrl = Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.requestUrl(), "UTF-8");
+            String targetUrl = Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.getRequestUrlWithQuery(), "UTF-8");
             throw new RedirectException(targetUrl, 302);
         }
 

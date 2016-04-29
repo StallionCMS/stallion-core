@@ -82,6 +82,11 @@ public class ReadOnlyWrapper<T extends Model> implements ModelController<T> {
     }
 
     @Override
+    public T mergeUpdates(T o, T o2, String...fields) {
+        throw new UsageException("This controller is wrapped to be read-only.");
+    }
+
+    @Override
     public void save(T obj) {
         throw new UsageException("This controller is wrapped to be read-only.");
     }

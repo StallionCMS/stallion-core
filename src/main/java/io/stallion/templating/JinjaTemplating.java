@@ -64,7 +64,10 @@ public class JinjaTemplating implements Templating {
             filters = list(new MarkdownFilter());
         }
 
-        jinjava = new Jinjava();
+
+        JinjavaConfig config = JinjavaConfig.newBuilder().withMaxRenderDepth(0).build();
+        jinjava = new Jinjava(config);
+
         jinjava.setResourceLocator(new JinjaResourceLocator(targetFolder, devMode));
         for (Filter filter: filters) {
             jinjava.getGlobalContext().registerFilter(filter);
@@ -72,6 +75,7 @@ public class JinjaTemplating implements Templating {
         for (Tag tag: tags) {
             jinjava.getGlobalContext().registerTag(tag);
         }
+
         JinjaResourceLocator.clearCache();
     }
 

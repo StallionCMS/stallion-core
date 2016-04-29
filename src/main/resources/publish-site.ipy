@@ -208,7 +208,8 @@ class Publisher(object):
         # Folders are owner read/write/exec, group, world read/exec
         !find {dest} -type d -exec chmod 755 {db} \;
         # Stallion executable is group executable
-        !chmod 754 {dest}/bin/stallion
+        executable_name = self.executable_name
+        !chmod 754 {dest}/bin/{executable_name}
 
     def verify_deps(self):
         info('Verifying server has java 8, nginx, and other required dependencies')
@@ -296,7 +297,7 @@ class Publisher(object):
         # Sync in archive mode
         cmd = "rsync -azWvcqq --delete --exclude '.*' --exclude app-data %s %s" % (source, dest)
         if not dest.endswith('/alpha') and not dest.endswith('/beta'):
-            raise ValueError("Invalid destintion %s" % dest)
+            raise ValueError("Invalid destination %s" % dest)
         info("executing: %s" % cmd)
         out = !$cmd
         # app-data is group writable, so stallionServer can write to it

@@ -132,7 +132,7 @@ if (window.$ && !window.jQuery) {
         var value = "; " + document.cookie;
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
-    }
+    };
 
     st.queryParams = function() {
         var qs = (function(a) {

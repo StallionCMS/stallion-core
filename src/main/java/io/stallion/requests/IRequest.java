@@ -28,6 +28,8 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 
+import static io.stallion.utils.Literals.empty;
+
 public interface IRequest {
     /**
      * Get the full, externally facing URL used to intiate this request.
@@ -42,6 +44,19 @@ public interface IRequest {
      */
     public default String getRequestUrl() {
         return requestUrl();
+    }
+
+
+
+    /**
+     * Absolute URL of the request with the query string.
+     */
+    public default String getRequestUrlWithQuery() {
+        String url = requestUrl();
+        if (!empty(getQueryString())) {
+            url += "?" + getQueryString();
+        }
+        return url;
     }
 
     /**

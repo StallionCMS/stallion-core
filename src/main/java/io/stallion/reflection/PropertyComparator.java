@@ -37,8 +37,8 @@ public class PropertyComparator<T> implements Comparator<T> {
 
     @Override
     public int compare(T o1, T o2) {
-        Comparable val1 = (Comparable)PropertyUtils.getProperty(o1, propertyName);
-        Comparable val2 = (Comparable)PropertyUtils.getProperty(o2, propertyName);
+        Comparable val1 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o1, propertyName);
+        Comparable val2 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o2, propertyName);
         return val1.compareTo(val2);
     }
 }
