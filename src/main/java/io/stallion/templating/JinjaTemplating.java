@@ -21,6 +21,7 @@ import com.hubspot.jinjava.Jinjava;
 import com.hubspot.jinjava.JinjavaConfig;
 import com.hubspot.jinjava.lib.filter.Filter;
 import com.hubspot.jinjava.lib.tag.Tag;
+import com.hubspot.jinjava.loader.ResourceNotFoundException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.exceptions.WebException;
 import io.stallion.settings.Settings;
@@ -65,8 +66,9 @@ public class JinjaTemplating implements Templating {
         }
 
 
-        JinjavaConfig config = JinjavaConfig.newBuilder().withMaxRenderDepth(0).build();
-        jinjava = new Jinjava(config);
+        //JinjavaConfig config = JinjavaConfig.newBuilder().withMaxRenderDepth(0).build();
+        //jinjava = new Jinjava(config);
+        jinjava = new Jinjava();
 
         jinjava.setResourceLocator(new JinjaResourceLocator(targetFolder, devMode));
         for (Filter filter: filters) {
@@ -84,12 +86,16 @@ public class JinjaTemplating implements Templating {
         if (path.contains("\n")) {
             return true;
         }
+
         String result = null;
         try {
             result = jinjava.getResourceLocator().getString(path, Charset.forName("UTF-8"), null);
+        } catch (ResourceNotFoundException e) {
+            return false;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         if (StringUtils.isEmpty(result)) {
             return false;
         } else {

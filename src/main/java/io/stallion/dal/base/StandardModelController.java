@@ -160,7 +160,7 @@ public class StandardModelController<T extends Model> implements ModelController
 
     @Override
     public void save(T obj)  {
-        T existing = this.forId(obj.getId());
+        T existing = this.forIdWithDeleted(obj.getId());
         if (existing == null) {
             Log.finer("Existing object not found. {0} new={1} id={2}", getBucket(), obj.hashCode(), obj.getId());
             onPreCreatePrepare(obj);

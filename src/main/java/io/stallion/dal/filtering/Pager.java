@@ -18,8 +18,12 @@
 package io.stallion.dal.filtering;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.stallion.utils.Literals.list;
 
 /**
  * A class holding the paged results from a filter operation.
@@ -49,6 +53,7 @@ public class Pager<T> {
      * Alias for getItems()
      * @return
      */
+    @JsonIgnore
     public List<T> getCurrentItems() {
         return currentItems;
     }
@@ -142,6 +147,22 @@ public class Pager<T> {
         this.previousPageNumber = previousPageNumber;
     }
 
+
+    public List<Integer> getSurroundingPages() {
+        List<Integer> pages = list();
+        int start = currentPage - 4;
+        if (start < 1) {
+            start = 1;
+        }
+        int end = start + 7;
+        if (end > pageCount) {
+            end = pageCount;
+        }
+        for(int x = start; x <= end; x++) {
+            pages.add(x);
+        }
+        return pages;
+    }
 
 
 

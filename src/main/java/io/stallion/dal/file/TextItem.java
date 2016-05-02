@@ -32,11 +32,11 @@ import java.util.Map;
 
 public class TextItem extends StandardDisplayableModel {
 
-    private String template = null;
+
     private List<String> tags = null;
     private List<StElement> elements = null;
     private Map<String, StElement> elementById;
-    private String rawContent = "";
+
 
 
 
@@ -63,30 +63,6 @@ public class TextItem extends StandardDisplayableModel {
 
     }
 
-    public String formatPublishDate() {
-        return formatPublishDate("MMM d, YYYY");
-    }
-
-    public String formatPublishDate(String pattern) {
-        ZonedDateTime dt = getPublishDate();
-        if (dt == null) {
-            dt = DateUtils.utcNow();
-        }
-        // TODO: Localize
-        return this.getPublishDate().format(DateTimeFormatter.ofPattern(pattern));
-    }
-
-
-    public String getTemplate() {
-        return template;
-    }
-
-
-
-    public TextItem setTemplate(String template) {
-        this.template = template;
-        return this;
-    }
 
     public List<String> getTags() {
         return tags;
@@ -115,14 +91,6 @@ public class TextItem extends StandardDisplayableModel {
         return this;
     }
 
-    public String getRawContent() {
-        return rawContent;
-    }
-
-    public void setRawContent(String rawContent) {
-        this.rawContent = rawContent;
-    }
-
     public Integer getYear() {
         return getPublishDate().getYear();
     }
@@ -131,32 +99,6 @@ public class TextItem extends StandardDisplayableModel {
         return getPublishDate().getMonth().getValue();
     }
 
-    public String getSummary() {
-        int i = getContent().indexOf("<!--more-->");
-        if (i > -1) {
-            return getContent().substring(0, i);
-        }
-        i = getContent().indexOf("</p>");
-        if (i > -1) {
-            return getContent().substring(0, i + 4);
-        }
-        i = getContent().indexOf("</div>");
-        if (i > -1) {
-            return getContent().substring(0, i + 6);
-        }
-        return getContent();
-    }
-
-    public String getTruncatedSummary(int max) {
-        String summary = getSummary();
-        if (summary.length() < max) {
-            return summary;
-        }
-        else {
-            max = summary.lastIndexOf(" ", max);
-            return summary.substring(0, max) + "&hellip;";
-        }
-    }
 
 
 }

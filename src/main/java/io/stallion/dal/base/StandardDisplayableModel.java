@@ -19,11 +19,14 @@ package io.stallion.dal.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.stallion.Context;
+import io.stallion.dal.db.Converter;
+import io.stallion.dal.db.converters.JsonListConverter;
 import io.stallion.settings.SecondaryDomain;
 import io.stallion.settings.Settings;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 
+import javax.persistence.Column;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,6 +44,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
     private String title;
     private String slug;
     private String content;
+    private String originalContent;
     private String template;
     private ZonedDateTime publishDate;
     private Boolean draft = false;
@@ -59,6 +63,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * Used in the page &lt;title&gt; tag.
      * @return
      */
+    @Column
     public String getTitle() {
         return title;
     }
@@ -74,6 +79,8 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column
+    @UniqueKey
     public String getSlug() {
         return this.slug;
     }
@@ -154,6 +161,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column(columnDefinition = "longtext")
     public String getContent() {
         return this.content;
     }
@@ -173,6 +181,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column
     public String getTemplate() {
         return template;
     }
@@ -188,6 +197,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * not be visible.
      * @return
      */
+    @Column
     public ZonedDateTime getPublishDate() {
         return publishDate;
     }
@@ -201,6 +211,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * If true, the page will not be visible.
      * @return
      */
+    @Column
     public Boolean getDraft() {
         return draft;
     }
@@ -257,6 +268,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * Get the author name of this page.
      * @return
      */
+    @Column
     public String getAuthor() {
         return author;
     }
@@ -271,6 +283,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * explanation of the page in search results.
      * @return
      */
+    @Column
     public String getMetaDescription() {
         return metaDescription;
     }
@@ -288,6 +301,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column
     public String getRelCanonical() {
         return relCanonical;
     }
@@ -302,6 +316,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column
     public String getMetaKeywords() {
         return metaKeywords;
     }
@@ -313,6 +328,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
 
 
     @Override
+    @Column
     public String getTitleTag() {
         return titleTag;
     }
@@ -327,6 +343,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column
     public String getImage() {
         return image;
     }
@@ -341,6 +358,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column(length = 30)
     public String getOgType() {
         return ogType;
     }
@@ -357,6 +375,7 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column(length = 40)
     public String getPreviewKey() {
         return previewKey;
     }
@@ -372,6 +391,8 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      * @return
      */
     @Override
+    @Column(columnDefinition = "longtext")
+    @Converter(cls = JsonListConverter.class)
     public List<String> getOldUrls() {
         return oldUrls;
     }
@@ -381,4 +402,58 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
         this.oldUrls = oldUrls;
         return (D)this;
     }
+
+    @Override
+    @Column(columnDefinition = "longtext")
+    public String getOriginalContent() {
+        return originalContent;
+    }
+
+    public <D extends StandardDisplayableModel> D setOriginalContent(String originalContent) {
+        this.originalContent = originalContent;
+        return (D)this;
+    }
+
+    public String getSummary() {
+        int i = getContent().indexOf("<!--more-->");
+        if (i > -1) {
+            return getContent().substring(0, i);
+        }
+        i = getContent().indexOf("</p>");
+        if (i > -1) {
+            return getContent().substring(0, i + 4);
+        }
+        i = getContent().indexOf("</div>");
+        if (i > -1) {
+            return getContent().substring(0, i + 6);
+        }
+        return getContent();
+    }
+
+    public String getTruncatedSummary(int max) {
+        String summary = getSummary();
+        if (summary.length() < max) {
+            return summary;
+        }
+        else {
+            max = summary.lastIndexOf(" ", max);
+            return summary.substring(0, max) + "&hellip;";
+        }
+    }
+
+
+    public String formatPublishDate() {
+        return formatPublishDate("MMM d, YYYY");
+    }
+
+    public String formatPublishDate(String pattern) {
+        ZonedDateTime dt = getPublishDate();
+        if (dt == null) {
+            dt = DateUtils.utcNow();
+        }
+        // TODO: Localize
+        return this.getPublishDate().format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+
 }

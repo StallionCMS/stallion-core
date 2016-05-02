@@ -102,6 +102,16 @@ public class EmptyUser extends ModelBase implements IUser {
     }
 
     @Override
+    public Long getCreatedAt() {
+        return 0L;
+    }
+
+    @Override
+    public <U extends IUser> U setCreatedAt(Long createdAt) {
+        return null;
+    }
+
+    @Override
     public EmptyUser setAliasForId(Long id) {
         return this;
     }
@@ -193,6 +203,11 @@ public class EmptyUser extends ModelBase implements IUser {
     }
 
     @Override
+    public <U extends IUser> U setDisabled(boolean disabled) {
+        return (U)this;
+    }
+
+    @Override
     public EmptyUser setApproved(Boolean approved) {
         return null;
     }
@@ -232,4 +247,5 @@ public class EmptyUser extends ModelBase implements IUser {
     public void setFilePath(String filePath) {
 
     }
+
 }

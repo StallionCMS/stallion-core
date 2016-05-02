@@ -22,12 +22,10 @@ import org.kohsuke.args4j.Option;
 
 
 public class ServeCommandOptions extends CommandOptionsBase {
-    @Option(name="-env", usage="The environment you are running in. The file settings.(env).toml will be merged into your settings.")        // no usage
-    private String env = "local";
+
     @Option(name="-port", usage="The port number to boot the server on")
     private int port = 8090;
-    @Option(name="-devMode", usage="Set to 'true' if you want to use the development URL for resource assets")
-    private boolean devMode = false;
+
     @Option(name="-localMode", usage="Set to 'false' if you want to simulate a server environment, with bundled assets, logging to file instead of console, etc.")
     private String localMode = null;
 
@@ -37,7 +35,7 @@ public class ServeCommandOptions extends CommandOptionsBase {
         settings.setEnv(getEnv());
         settings.setTargetFolder(getTargetPath());
         settings.setPort(port);
-        settings.setDevMode(devMode);
+        settings.setDevMode(isDevMode());
         if (getLocalMode() != null) {
             settings.setLocalMode(getLocalMode());
         }
@@ -53,25 +51,7 @@ public class ServeCommandOptions extends CommandOptionsBase {
         this.port = port;
     }
 
-    @Override
-    public String getEnv() {
-        return env;
-    }
 
-    @Override
-    public void setEnv(String env) {
-        this.env = env;
-    }
-
-    @Override
-    public boolean isDevMode() {
-        return devMode;
-    }
-
-    @Override
-    public void setDevMode(boolean devMode) {
-        this.devMode = devMode;
-    }
 
     public Boolean getLocalMode() {
         if (localMode == null) {

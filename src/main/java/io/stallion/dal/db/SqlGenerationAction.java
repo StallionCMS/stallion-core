@@ -18,10 +18,12 @@
 package io.stallion.dal.db;
 
 import io.stallion.boot.AppContextLoader;
+import io.stallion.boot.SqlGenerateCommandOptions;
 import io.stallion.boot.SqlMigrateCommandOptions;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.dal.base.Model;
 import io.stallion.dal.base.ModelBase;
+import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.plugins.PluginRegistry;
@@ -54,7 +56,7 @@ import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 
-public class SqlGenerationAction  implements StallionRunAction<SqlMigrateCommandOptions> {
+public class SqlGenerationAction  implements StallionRunAction<SqlGenerateCommandOptions> {
     private ScriptEngine scriptEngine;
 
     @Override
@@ -69,34 +71,46 @@ public class SqlGenerationAction  implements StallionRunAction<SqlMigrateCommand
 
 
     @Override
-    public SqlMigrateCommandOptions newCommandOptions() {
-        return new SqlMigrateCommandOptions();
+    public SqlGenerateCommandOptions newCommandOptions() {
+        return new SqlGenerateCommandOptions();
     }
 
     @Override
-    public void loadApp(SqlMigrateCommandOptions options) {
+    public void loadApp(SqlGenerateCommandOptions options) {
         //AppContextLoader.loadWithSettingsOnly(options);
         //DB.load();
+
         DB.setUseDummyPersisterForSqlGenerationMode(true);
         AppContextLoader.loadCompletely(options);
+        if (!DB.available()) {
+            if (Settings.instance().getDatabase() == null || empty(Settings.instance().getDatabase().getUrl())) {
+                throw new ConfigException("No database url defined in your settings");
+            } else {
+                throw new ConfigException("Database is not available.");
+            }
+        }
     }
 
     @Override
-    public void execute(SqlMigrateCommandOptions options) throws Exception {
-        List<ClassLoader> loaders = list();
-        ConfigurationBuilder builder = new ConfigurationBuilder()
-                .forPackages("org.mycabal.mycabal");
-        for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
-            builder = builder.addClassLoader(plugin.getClass().getClassLoader());
-        }
+    public void execute(SqlGenerateCommandOptions options) throws Exception {
+        //List<ClassLoader> loaders = list();
+        //ConfigurationBuilder builder = new ConfigurationBuilder();
+        //if (!empty(options.getPackageName())) {
+        //    builder = builder.forPackages("io.stallion");
+        //} else {
+        //    builder = builder.forPackages(options.getPackageName());
+        //}
+        //for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
+        //    builder = builder.addClassLoader(plugin.getClass().getClassLoader());
+        //}
 
-        Reflections reflections = new Reflections(builder);
+        //Reflections reflections = new Reflections(builder);
 
         //Reflections reflections = new Reflections("org.mycabal");
 
-        Set<Class<? extends ModelBase>> classes = reflections.getSubTypesOf(ModelBase.class);
-        Log.info("Model Count {0} {1}", classes.size(), classes);
-        classes = set(User.class);
+        //Set<Class<? extends ModelBase>> classes = reflections.getSubTypesOf(ModelBase.class);
+        //Log.info("Model Count {0} {1}", classes.size(), classes);
+        //classes = set(User.class);
         boolean hasNewMigrations = false;
        // for (Class cls: classes) {
         List<Schema> schemas = DB.instance().getSchemas();
@@ -181,7 +195,7 @@ public class SqlGenerationAction  implements StallionRunAction<SqlMigrateCommand
         }
         sql.append("  `row_updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n");
         sql.append("  PRIMARY KEY (`id`),\n");
-        sql.append("  KEY `row_updated_at_key` (`row_updated_at`), \n");
+        sql.append("  KEY `row_updated_at_key` (`row_updated_at`),\n");
 
         for(Col col: schema.getColumns()) {
             if (col.getUniqueKey()) {

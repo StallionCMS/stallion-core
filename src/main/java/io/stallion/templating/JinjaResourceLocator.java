@@ -19,6 +19,7 @@ package io.stallion.templating;
 
 import com.hubspot.jinjava.interpret.JinjavaInterpreter;
 import com.hubspot.jinjava.loader.ResourceLocator;
+import com.hubspot.jinjava.loader.ResourceNotFoundException;
 import io.stallion.Context;
 import io.stallion.services.Log;
 import io.stallion.utils.Literals;
@@ -56,13 +57,13 @@ public class JinjaResourceLocator implements ResourceLocator {
     }
 
     @Override
-    public String getString(String s, Charset charset, JinjavaInterpreter jinjavaInterpreter) {
+    public String getString(String s, Charset charset, JinjavaInterpreter jinjavaInterpreter) throws IOException {
         if (templateSourceCache == null) {
-            try {
-                return getStringDirect(s, charset);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+            String source = getStringDirect(s, charset);
+            if (source == null) {
+                throw new ResourceNotFoundException("Template not found: " + s);
             }
+            return source;
         }
         Log.finest("load template: {0}", s);
         String cacheKey = "jinjaTemplate" + Literals.GSEP + s;
@@ -70,13 +71,13 @@ public class JinjaResourceLocator implements ResourceLocator {
             return templateSourceCache.get(cacheKey);
         }
 
-        try {
-            String source = getStringDirect(s, charset);
-            templateSourceCache.put(cacheKey, source);
-            return source;
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+
+        String source = getStringDirect(s, charset);
+        if (source == null) {
+            throw new ResourceNotFoundException("Template not found: " + s);
         }
+        templateSourceCache.put(cacheKey, source);
+        return source;
 
     }
 

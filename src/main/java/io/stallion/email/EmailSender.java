@@ -218,7 +218,7 @@ public abstract class EmailSender {
 
     private void executeSend(MimeMessage message, Session session, EmailSettings settings) throws EmailSendException {
         try {
-            Stubbing.checkExecuteStub(this, message, session, settings);
+            Stubbing.checkExecuteStub(this, this, message, session, settings);
         } catch (Stubbing.StubbedOut stubbedOut) {
             return;
         }

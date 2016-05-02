@@ -165,18 +165,18 @@ public class DB {
         cpds.setMinPoolSize(5);
         cpds.setAcquireIncrement(5);
         cpds.setMaxPoolSize(20);
-
-
+        cpds.setIdleConnectionTestPeriod(5000);
+        cpds.setTestConnectionOnCheckin(true);
 
         this.dataSource = cpds;
         this.tickets = new MySqlTickets(this);
 
         // Todo: why not lazy load converters???
-        this.registerConverter(new JsonMapConverter())
-                .registerConverter(new JsonSetConverter())
-                .registerConverter(new JsonObjectConverter())
-                .registerConverter(new JsonListConverter())
-        ;
+        registerConverter(new JsonMapConverter());
+        registerConverter(new JsonSetConverter());
+        registerConverter(new JsonObjectConverter());
+        registerConverter(new JsonListConverter());
+
 
         // Make sure the database server time is UTC and in sync with the local server time
         // or else stop execution to prevent nasty and insiduious errors.
@@ -337,6 +337,36 @@ public class DB {
             } else {
                 records = runner.query(sql, handler);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return records;
+    }
+
+    /**
+     * Fetch all objects, sorted
+     *
+     * @param model
+     * @param <T>
+     * @return
+     */
+    public <T extends Model> List<T> fetchAllSorted(Class<? extends T> model, String sortField, String sortDirection) {
+        Schema schema = getSchemaForModelClass(model);
+        QueryRunner runner = new QueryRunner(dataSource);
+        ModelListHandler<T> handler = new ModelListHandler<T>(schema);
+        sortDirection = sortDirection.toUpperCase();
+        if (!"ASC".equals(sortDirection) && !"DESC".equals(sortDirection)) {
+            throw new UsageException("Invalid sort direction: " + sortDirection);
+        }
+
+        if (!"id".equals(sortField)  && !"row_updated_at".equals(sortField) && !schema.getKeyNames().contains(sortField)) {
+            throw new UsageException("Sort field must be a database key. Sort field was: " + sortField + " on model " + model.getCanonicalName());
+        }
+
+        String sql = "SELECT * FROM " + schema.getName() + " ORDER BY " + sortField + " " + sortDirection;
+        List records = null;
+        try {
+            records = runner.query(sql, handler);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -747,6 +777,12 @@ public class DB {
 
     private Schema annotatedModelToSchema(Class cls) {
         Table table = (Table)cls.getDeclaredAnnotation(Table.class);
+        if (table == null) {
+            throw new UsageException("Trying to register model with database, but it has no @Table annotation: " + cls.getCanonicalName());
+        }
+        if (empty(table.name() )) {
+            throw new UsageException("Trying to register model with database, but it has no name for the @Table annotation: " + cls.getCanonicalName());
+        }
         Schema schema = new Schema(table.name(), cls);
         for(Method method: cls.getMethods()) {
             if (!method.getName().startsWith("get") && !method.getName().startsWith("is")) {
@@ -758,53 +794,65 @@ public class DB {
                 continue;
             }
 
-            String propertyName = method.getName().substring(3);
+            String propertyName = "";
             if (method.getName().startsWith("is")) {
                 propertyName = method.getName().substring(2);
+            } else {
+                propertyName = method.getName().substring(3);
+            }
+            if (empty(propertyName)) {
+                continue;
             }
             propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
             Column columnAnno = method.getAnnotation(Column.class);
-            if (columnAnno != null) {
-                String columnName = propertyName.toLowerCase();
-                if (!StringUtils.isBlank(columnAnno.name())) {
-                    columnName = columnAnno.name();
-                }
-                Col col = new Col();
-                col.setPropertyName(propertyName);
-                col.setName(columnName);
-                col.setUpdateable(columnAnno.updatable());
-                col.setjType(method.getReturnType());
-                col.setInsertable(columnAnno.insertable());
-
-                col.setDbType(columnAnno.columnDefinition());
-                col.setNullable(columnAnno.nullable());
-                col.setLength(columnAnno.length());
-
-                Converter converterAnno = method.getDeclaredAnnotation(Converter.class);
-                Log.finest("Adding schema Column {0}", columnName);
-                if (converterAnno != null) {
-                    Log.finest("ConverterAnno {0} {1} {2} ", columnName, converterAnno, converterAnno.name());
-                    if (empty(converterAnno.name())) {
-                        col.setConverterClassName(converterAnno.cls().getCanonicalName());
-                    } else {
-                        col.setConverterClassName(converterAnno.name());
-                    }
-                }
-                if (method.getAnnotation(Key.class) != null) {
-                    col.setAlternativeKey(true);
-                }
-                if (method.getAnnotation(AlternativeKey.class) != null) {
-                    col.setAlternativeKey(true);
-                }
-                if (method.getAnnotation(UniqueKey.class) != null) {
-                    col.setUniqueKey(true);
-                }
-                if (columnAnno.unique()) {
-                    col.setUniqueKey(true);
-                }
-
-                schema.getColumns().add(col);
+            if (columnAnno == null) {
+                continue;
             }
+
+            String columnName = propertyName.toLowerCase();
+            if (!StringUtils.isBlank(columnAnno.name())) {
+                columnName = columnAnno.name();
+            }
+            Col col = new Col();
+            col.setPropertyName(propertyName);
+            col.setName(columnName);
+            col.setUpdateable(columnAnno.updatable());
+            col.setjType(method.getReturnType());
+            col.setInsertable(columnAnno.insertable());
+
+            col.setDbType(columnAnno.columnDefinition());
+            col.setNullable(columnAnno.nullable());
+            col.setLength(columnAnno.length());
+
+            Converter converterAnno = method.getDeclaredAnnotation(Converter.class);
+            Log.finest("Adding schema Column {0}", columnName);
+            if (converterAnno != null) {
+                Log.finest("ConverterAnno {0} {1} {2} ", columnName, converterAnno, converterAnno.name());
+                if (empty(converterAnno.name())) {
+                    col.setConverterClassName(converterAnno.cls().getCanonicalName());
+                } else {
+                    col.setConverterClassName(converterAnno.name());
+                }
+            }
+            if (method.getAnnotation(Key.class) != null) {
+                col.setAlternativeKey(true);
+                schema.getKeyNames().add(col.getName());
+            }
+            if (method.getAnnotation(AlternativeKey.class) != null) {
+                col.setAlternativeKey(true);
+                schema.getKeyNames().add(col.getName());
+            }
+            if (method.getAnnotation(UniqueKey.class) != null) {
+                col.setUniqueKey(true);
+                schema.getKeyNames().add(col.getName());
+            }
+            if (columnAnno.unique()) {
+                col.setUniqueKey(true);
+                schema.getKeyNames().add(col.getName());
+            }
+
+            schema.getColumns().add(col);
+
         }
         return schema;
     }

@@ -188,6 +188,27 @@ public class AsyncFileCoordinator extends AsyncCoordinator {
         return taskQueue.contains(mirror);
     }
 
+    @Override
+    public boolean hasPendingTaskWithCustomKey(String key) {
+        AsyncTask task = AsyncTaskController.instance().forUniqueKey("customKey", key);
+        if (task == null) {
+            return false;
+        }
+        if ((task.getExecuteAt() == 0 || task.getExecuteAt() > DateUtils.mils()) && task.getCompletedAt() < 1) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasTaskWithCustomKey(String key) {
+        AsyncTask task = AsyncTaskController.instance().forUniqueKey("customKey", key);
+        if (task == null) {
+            return false;
+        }
+        return true;
+    }
+
 
     public PriorityBlockingQueue<AsyncTask> getTaskQueue() {
         return taskQueue;

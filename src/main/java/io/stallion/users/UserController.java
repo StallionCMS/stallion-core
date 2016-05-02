@@ -146,6 +146,9 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         if (empty(user.getEncryptionSecret())) {
             user.setEncryptionSecret(RandomStringUtils.randomAlphanumeric(36));
         }
+        if (user.getCreatedAt() == null || user.getCreatedAt() == 0) {
+            user.setCreatedAt(DateUtils.mils());
+        }
 
 
     }

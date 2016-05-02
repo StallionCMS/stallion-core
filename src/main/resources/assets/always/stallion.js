@@ -394,3 +394,95 @@ Date.prototype.format = function (mask, utc) {
 /******************
 * End dateFormat 1.2.3   *
 *******************/
+
+
+/****
+* Riot databind mixin
+*****/
+
+ var RiotDataBindMixin = {
+     init: function() {
+         this.on('update', function() {
+             var self = this;
+             self.formData = self.opts.formData || {};
+             Object.keys(self).forEach(function(key) {
+                 var ele = self[key];
+                 if (!ele) {
+                     return;
+                 }
+                 var tag = ele.tagName;
+                 if (tag === undefined || tag === null) {
+                     return;
+                 }
+                 tag = tag.toUpperCase();
+                 if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+                     return;
+                 }
+                 var val = self.formData[ele.getAttribute('name')];
+                 if (val === undefined) {
+                     return;
+                 }
+                 var type = ele.getAttribute('type');
+                 if (type === 'checkbox' || type === 'radio') {
+                     if (val === true || val === ele.value) {
+                         ele.setAttribute('checked', true);
+                     } else {
+                         ele.removeAttribute('checked');
+                     }
+                 } else if (tag === 'SELECT') {
+                     var $ele = $(ele);
+                     $option = $ele.find('option[value="' + val + '"]');
+                     $option.attr('selected', true);
+                     $(ele).val(val).change();
+                 } else {
+                     $(ele).val(val).change();
+                 }
+             });
+         });
+     },
+     getFormData: function() {
+         var self = this;
+         var data = {};
+         Object.keys(self).forEach(function(key) {
+             var ele = self[key];
+             if (!ele) {
+                 return;
+             }
+             var tag = ele.tagName;
+             if (tag === undefined || tag === null) {
+                 return;
+             }
+             tag = tag.toUpperCase();
+             if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+                 return;
+             }
+             var type = ele.getAttribute('type');
+             var $ele = $(ele);
+             if (type === 'checkbox' || type === 'radio') {
+                 var checked = $ele.is(':checked');
+                 var val = $ele.val();
+                 if (checked) {
+                     if (val && val != 'true') {
+                         data[key] = val;
+                     } else {
+                         data[key] = true;
+                     }
+                 } else {
+                     data[key] = false;
+                 }
+             } else {
+                 data[key] = $(ele).val();
+             }
+
+         });
+         return data;
+     },
+     updateData: function(formData) {
+         this.opts.formData = formData;
+         this.update();
+     }
+ };
+
+ if (window.riot) {
+     riot.mixin('databind', RiotDataBindMixin);
+ }

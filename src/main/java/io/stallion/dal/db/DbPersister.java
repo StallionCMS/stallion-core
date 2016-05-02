@@ -38,11 +38,18 @@ import static io.stallion.utils.Literals.*;
 public class DbPersister<T extends Model> extends BasePersister<T> {
     private long lastSyncAt = 0;
     private String tableName = "";
+    private String sortField = "id";
+    private String sortDirection = "ASC";
 
     @Override
     public void init(DalRegistration registration, ModelController<T> controller, Stash<T> stash) {
         super.init(registration, controller, stash);
         this.tableName = or(registration.getTableName(), getBucket());
+        DefaultSort defaultSort = getModelClass().getAnnotation(DefaultSort.class);
+        if (defaultSort != null) {
+            sortField = defaultSort.field();
+            sortDirection = defaultSort.direction();
+        }
     }
 
 
@@ -50,7 +57,7 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
     @Override
     public List<T> fetchAll() {
         lastSyncAt = DateUtils.mils();
-        List<T> things = DB.instance().fetchAll(getModelClass());
+        List<T> things = DB.instance().fetchAllSorted(getModelClass(), sortField, sortDirection);
         for (T thing: things) {
             thing.setBucket(getBucket());
         }

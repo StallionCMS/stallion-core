@@ -31,8 +31,6 @@ import static io.stallion.utils.Literals.list;
 
 
 public class CommandOptionsBase {
-    private String _env = "local";
-    private boolean _devMode = false;
     public static final String ALLOWED_LEVELS = "Allowed values: OFF, SEVERE, WARNING, INFO, FINE, FINER, FINEST";
 
     private String action = "";
@@ -45,6 +43,11 @@ public class CommandOptionsBase {
     @Option(name="-autoReload", usage="If a javascript file is touched, the entire server will reload. Use this only during development")
     private boolean autoReload = false;
 
+    @Option(name="-env", usage="The environment you are running in. The file settings.(env).toml will be merged into your settings.")        // no usage
+    private String env = "local";
+
+    @Option(name="-devMode", usage="Set to 'true' if you want to use the development URL for resource assets")
+    private boolean devMode = false;
 
     @Argument(index = 0)
     private List<String> arguments = new ArrayList<String>();
@@ -68,13 +71,6 @@ public class CommandOptionsBase {
         this.targetPath = targetPath;
     }
 
-    public String getEnv() {
-        return _env;
-    }
-
-    public void setEnv(String env) {
-        this._env = env;
-    }
 
     public String getAction() {
         if (getArguments().size() == 0) {
@@ -105,16 +101,6 @@ public class CommandOptionsBase {
     }
 
 
-
-    public boolean isDevMode() {
-        return _devMode;
-    }
-
-    public void setDevMode(boolean devMode) {
-        this._devMode = devMode;
-    }
-
-
     public String getLogLevel() {
         return logLevel;
     }
@@ -138,6 +124,27 @@ public class CommandOptionsBase {
     public CommandOptionsBase setAutoReload(boolean autoReload) {
         this.autoReload = autoReload;
         return this;
+    }
+
+
+    public String getEnv() {
+        return env;
+    }
+
+
+
+    public void setEnv(String env) {
+        this.env = env;
+    }
+
+
+    public boolean isDevMode() {
+        return devMode;
+    }
+
+
+    public void setDevMode(boolean devMode) {
+        this.devMode = devMode;
     }
 
 }

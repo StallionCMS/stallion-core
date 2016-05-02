@@ -219,7 +219,7 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
         String washBody = "Washington was the first president and leader of the continental army. Randomize " + new Date().getTime();
         String metaDescription = "the father of our nation" + new Date().getTime();
         washington.setMetaDescription(metaDescription);
-        washington.setRawContent(washBody);
+        washington.setOriginalContent(washBody);
         bios.save(washington);
 
         // Add Lincoln
@@ -228,7 +228,7 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
         lincoln.setId(103L);
         lincoln.put("birthState", "IL");
         String lincolnContent = "Lincoln was president during the Civil War. " + new Date().getTime();
-        lincoln.setRawContent(lincolnContent);
+        lincoln.setOriginalContent(lincolnContent);
         bios.save(lincoln);
 
         Assert.assertEquals(1, bios.filter("birthState", "IL").all().size());
@@ -237,12 +237,12 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
 
         lincoln = bios.filter("birthState", "IL").first();
         Assert.assertNotNull(lincoln);
-        Assert.assertEquals(lincolnContent, lincoln.getRawContent());
+        Assert.assertEquals(lincolnContent, lincoln.getOriginalContent());
         Assert.assertEquals("Abe Lincoln", lincoln.getTitle());
 
         washington = bios.filter("title", "George Washington").first();
-        Assert.assertEquals(washBody, washington.getRawContent());
-        Assert.assertEquals(lincolnContent, lincoln.getRawContent());
+        Assert.assertEquals(washBody, washington.getOriginalContent());
+        Assert.assertEquals(lincolnContent, lincoln.getOriginalContent());
 
         // Delete Lincoln
         bios.hardDelete(lincoln);

@@ -19,11 +19,14 @@ package io.stallion.users;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.Context;
-import io.stallion.exceptions.ClientException;
-import io.stallion.exceptions.RedirectException;
-import io.stallion.restfulEndpoints.BodyParam;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
-import io.stallion.restfulEndpoints.EndpointResource;
+import io.stallion.assets.AssetsController;
+import io.stallion.assets.BundleFile;
+import io.stallion.assets.BundleHandler;
+import io.stallion.assets.DefinedBundle;
+import io.stallion.dal.filtering.FilterChain;
+import io.stallion.dal.filtering.Pager;
+import io.stallion.exceptions.*;
+import io.stallion.restfulEndpoints.*;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.Sanitize;
@@ -261,8 +264,6 @@ public class UsersApiResource implements EndpointResource {
 
 
 
-
-
     @GET
     @Path("/current-user-info")
     @JsonView(RestrictedViews.Owner.class)
@@ -272,6 +273,181 @@ public class UsersApiResource implements EndpointResource {
         }
         return Context.getUser();
     }
+
+
+    /******
+     *
+     * ADMIN Endpoints
+     *
+     */
+
+
+    @GET
+    @Path("/manage")
+    @MinRole(Role.ADMIN)
+    @Produces("text/html")
+    public String manageUsers() {
+
+        DefinedBundle.register(new DefinedBundle(
+                "userAdminStylesheets", ".css",
+                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
+        ));
+        DefinedBundle.register(new DefinedBundle(
+                "userAdminJavascripts", ".js",
+                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js")
+        ));
+        Map<String, Object> ctx = map();
+        return TemplateRenderer.instance().renderTemplate("stallion:admin/admin-users.jinja", ctx);
+    }
+
+
+
+
+    @GET
+    @Path("/users-screen")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    public Map manageUsersScreen() {
+        Map<String, Object> ctx = map();
+        return ctx;
+    }
+
+    @GET
+    @Path("/users-table")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Owner.class)
+    public Pager usersTable(@QueryParam("page") Integer page, @QueryParam("withDeleted") Boolean withDeleted) {
+        Map<String, Object> ctx = map();
+        if (page == null || page < 1) {
+            page = 1;
+        }
+        withDeleted = or(withDeleted, false);
+        FilterChain chain = UserController.instance().filterChain();
+        if (withDeleted) {
+            chain = chain.includeDeleted();
+        }
+        Pager pager = chain.sort("email", "ASC").pager(page, 100);
+        return pager;
+    }
+
+
+    @GET
+    @Path("/view-user/:userId")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Owner.class)
+    public IUser viewUser(@PathParam("userId") Long userId) {
+        IUser user = UserController.instance().forIdWithDeleted(userId);
+        if (user == null) {
+            throw new io.stallion.exceptions.NotFoundException("User not found");
+        }
+        return user;
+    }
+
+    @POST
+    @Path("/update-user/:userId")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Owner.class)
+    public IUser updateUser(@PathParam("userId") Long userId, @ObjectParam(targetClass=User.class) User updatedUser) {
+        IUser user = UserController.instance().forIdWithDeleted(userId);
+        if (user == null) {
+            throw new io.stallion.exceptions.NotFoundException("User not found");
+        }
+        if (!updatedUser.getEmail().equals(user.getEmail())) {
+            IUser existing = UserController.instance().forEmail(updatedUser.getEmail());
+            if (existing != null) {
+                throw new ClientException("User with email " + updatedUser.getEmail() + " already exists");
+            }
+            user.setEmailVerified(false);
+        }
+        if (!updatedUser.getUsername().equals(user.getUsername())) {
+            IUser existing = UserController.instance().forUsername(updatedUser.getUsername());
+            if (existing != null) {
+                throw new ClientException("User with username " + updatedUser.getUsername() + " already exists");
+            }
+        }
+        user
+                .setDisplayName(updatedUser.getDisplayName())
+                .setUsername(updatedUser.getUsername())
+                .setEmail(updatedUser.getEmail())
+                .setRole(updatedUser.getRole())
+                .setFamilyName(updatedUser.getFamilyName())
+                .setGivenName(updatedUser.getGivenName());
+
+        UserController.instance().save(user);
+
+
+        return user;
+    }
+
+    @POST
+    @Path("/toggle-user-disabled/:userId")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Owner.class)
+    public Object toggleDisableUser(@PathParam("userId") Long userId, @BodyParam("disabled") boolean disabled) {
+        IUser user = UserController.instance().forIdWithDeleted(userId);
+        if (user == null) {
+            throw new io.stallion.exceptions.NotFoundException("User not found");
+        }
+        user.setDisabled(disabled);
+        UserController.instance().save(user);
+        return true;
+    }
+
+    @POST
+    @Path("/toggle-user-approved/:userId")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Owner.class)
+    public Object toggleUserApproved(@PathParam("userId") Long userId, @BodyParam("approved") boolean approved) {
+        IUser user = UserController.instance().forIdWithDeleted(userId);
+        if (user == null) {
+            throw new io.stallion.exceptions.NotFoundException("User not found");
+        }
+        user.setApproved(approved);
+        UserController.instance().save(user);
+        return true;
+    }
+
+    @POST
+    @Path("/toggle-user-deleted/:userId")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Owner.class)
+    public Object toggleUserDeleted(@PathParam("userId") Long userId, @BodyParam("deleted") boolean deleted) {
+        IUser user = UserController.instance().forIdWithDeleted(userId);
+        if (user == null) {
+            throw new io.stallion.exceptions.NotFoundException("User not found");
+        }
+        if (deleted == true) {
+            UserController.instance().softDelete(user);
+        } else {
+            user.setDeleted(deleted);
+            UserController.instance().save(user);
+        }
+
+        return true;
+    }
+
+    @POST
+    @Path("/force-password-reset/:userId")
+    @MinRole(Role.ADMIN)
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Owner.class)
+    public Object triggerPasswordReset(@PathParam("userId") Long userId) {
+        IUser user = UserController.instance().forIdWithDeleted(userId);
+        if (user == null) {
+            throw new io.stallion.exceptions.NotFoundException("User not found");
+        }
+        user.setBcryptedPassword("");
+        UserController.instance().save(user);
+        UserController.instance().sendPasswordResetEmail(user, "");
+        return true;
+    }
+
 
     public static void register() {
         if (Settings.instance().getUsers().getEnableDefaultEndpoints()) {

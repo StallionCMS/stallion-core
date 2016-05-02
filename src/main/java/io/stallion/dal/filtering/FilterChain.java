@@ -172,7 +172,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param value
      * @return
      */
-    public FilterChain exclude(String name, String value)  {
+    public FilterChain exclude(String name, Object value)  {
         return exclude(name, value, "eq");
     }
 
@@ -185,7 +185,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param op
      * @return
      */
-    public FilterChain exclude(String name, String value, String op) {
+    public FilterChain exclude(String name, Object value, String op) {
         return excludeBy(name, value, FilterOperator.fromString(op));
     }
 
@@ -197,7 +197,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param op
      * @return
      */
-    public FilterChain excludeBy(String name, String value, FilterOperator op)  {
+    public FilterChain excludeBy(String name, Object value, FilterOperator op)  {
         FilterOperation fop = new FilterOperation();
         fop.setFieldName(name);
         fop.setOperator(op);
@@ -630,6 +630,12 @@ public class FilterChain<T extends Model> implements Iterable<T> {
             pager.setHasPreviousPage(false);
             pager.setPreviousPageNumber(pager.getCurrentPage());
         }
+        if (size > 0) {
+            pager.setPageCount((getMatchingCount() / size));
+            if (getMatchingCount() % size > 0) {
+                pager.setPageCount(pager.getPageCount() + 1);
+            }
+        }
         setCached(methodKey, pager);
         return pager;
     }
@@ -665,11 +671,19 @@ public class FilterChain<T extends Model> implements Iterable<T> {
                 continue;
             }
             if (!op.getIsExclude() && op.getOperator().equals(FilterOperator.EQUAL) && stash.getUniqueFields().contains(op.getFieldName())) {
-                availableItems = list(stash.forUniqueKey(op.getFieldName(), op.getOriginalValue()));
+                T availableItem = stash.forUniqueKey(op.getFieldName(), op.getOriginalValue());
+                if (availableItem != null) {
+                    availableItems = list(availableItem);
+                } else {
+                    availableItems = list();
+                }
                 break;
             }
             if (!op.getIsExclude() && op.getOperator().equals(FilterOperator.EQUAL) && stash.getKeyFields().contains(op.getFieldName())) {
                 availableItems = stash.listForKey(op.getFieldName(), op.getOriginalValue());
+                if (availableItems == null) {
+                    availableItems = list();
+                }
                 break;
             }
         }
@@ -678,7 +692,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         List<T> items = new ArrayList<T>();
         for(T o: availableItems) {
             Boolean exclude = false;
-            if (!getIncludeDeleted() && o.getDeleted()) {
+            if (getIncludeDeleted() != true && o.getDeleted() == true) {
                 continue;
             }
             for (FilterOperation operation: getOperations()) {
@@ -814,6 +828,9 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         if (propValue == null && op.getOriginalValue() != null) {
             return false;
         }
+        if (propValue == null && op.getOriginalValue() == null && op.getOperator().equals(FilterOperator.EQUAL)) {
+            return true;
+        }
 
         // Handle the IN operator
         if (op.getOperator().equals(FilterOperator.IN)) {
@@ -882,6 +899,9 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      */
     private void hydrateTypedValue(FilterOperation op, Object propValue) {
         if (op.getTypedValue() != null) {
+            return;
+        }
+        if (op.getOriginalValue() == null) {
             return;
         }
         if (op.getOriginalValue().getClass().equals(propValue.getClass())) {

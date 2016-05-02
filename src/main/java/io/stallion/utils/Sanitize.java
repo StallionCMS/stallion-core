@@ -37,12 +37,12 @@ public class Sanitize {
 
     public static final  PolicyFactory
             STANDARD_POLICY = new HtmlPolicyBuilder()
-
+            .allowTextIn("div")
             .allowStandardUrlProtocols()
                     // Allow title="..." on any element.
             .allowAttributes("title").globally()
                     // Allow href="..." on <a> elements.
-            .allowAttributes("href").onElements("a")
+            .allowAttributes("href", "data-mentioned-contact").onElements("a")
                     // Defeat link spammers.
             .requireRelNofollowOnLinks()
                     // Allow lang= with an alphabetic value on any element.
@@ -69,7 +69,7 @@ public class Sanitize {
                     // Allow title="..." on any element.
             .allowAttributes("title").globally()
                     // Allow href="..." on <a> elements.
-            .allowAttributes("href").onElements("a")
+            .allowAttributes("href", "data-mentioned-contact").onElements("a")
                     // Defeat link spammers.
             .requireRelNofollowOnLinks()
                     // Allow lang= with an alphabetic value on any element.

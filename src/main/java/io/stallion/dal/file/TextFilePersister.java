@@ -247,7 +247,7 @@ public class TextFilePersister<T extends TextItem> extends FilePersisterBase<T> 
         }
 
         String itemContent = StElementParser.removeTags(rawContent).trim();
-        item.setRawContent(itemContent);
+        item.setOriginalContent(itemContent);
 
 
 
@@ -328,7 +328,7 @@ public class TextFilePersister<T extends TextItem> extends FilePersisterBase<T> 
 
         /* Set the content */
         item.setContent(html);
-        item.setRawContent(fileContent);
+        item.setOriginalContent(fileContent);
 
         /* Set the slug from the file path, if it does not exist */
 
@@ -449,8 +449,8 @@ public class TextFilePersister<T extends TextItem> extends FilePersisterBase<T> 
             }
         }
 
-        if (obj.getRawContent() != null) {
-            buffer.append(String.format("\n%s", obj.getRawContent()));
+        if (obj.getOriginalContent() != null) {
+            buffer.append(String.format("\n%s", obj.getOriginalContent()));
         }
 
         return buffer.toString();

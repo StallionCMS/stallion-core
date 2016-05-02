@@ -314,6 +314,19 @@ public abstract class AsyncCoordinator extends Thread {
      */
     public abstract boolean hasTaskWithId(Long taskId);
 
+    /**
+     * Has an unexecuted task with the given custom key
+     * @param key
+     * @return
+     */
+    public abstract boolean hasPendingTaskWithCustomKey(String key);
+
+    /**
+     * Has any task, pending or already run, with the given custom key
+     * @param key
+     * @return
+     */
+    public abstract boolean hasTaskWithCustomKey(String key);
 
     public static void shutDownForTests() {
         for(AsyncTaskExecuteRunnable runnable: INSTANCE.threads) {

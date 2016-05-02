@@ -25,6 +25,7 @@ import io.stallion.email.Contactable;
 import io.stallion.utils.json.RestrictedViews;
 
 import java.lang.String;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface IUser extends Contactable, Model, ModelWithFilePath {
@@ -44,6 +45,8 @@ public interface IUser extends Contactable, Model, ModelWithFilePath {
     public <U extends IUser> U setResetToken(String token);
     public Long getAliasForId();
     public <U extends IUser> U setAliasForId(Long id);
+    public Long getCreatedAt();
+    public <U extends IUser> U setCreatedAt(Long createdAt);
 
 
     @JsonView(RestrictedViews.Unrestricted.class)
@@ -109,6 +112,6 @@ public interface IUser extends Contactable, Model, ModelWithFilePath {
     public boolean getEmailVerified();
     public <U extends IUser> U setApproved(Boolean approved);
     public <U extends IUser> U setEmailVerified(boolean verified);
-
+    public <U extends IUser> U setDisabled(boolean disabled);
 
 }

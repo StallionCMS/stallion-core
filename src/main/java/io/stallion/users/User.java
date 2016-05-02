@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.dal.base.AlternativeKey;
 import io.stallion.dal.base.ModelBase;
 import io.stallion.dal.base.UniqueKey;
+import io.stallion.dal.db.DefaultSort;
 import io.stallion.dal.file.ModelWithFilePath;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.RestrictedViews;
@@ -34,6 +35,7 @@ import static io.stallion.utils.Literals.empty;
 
 
 @Table(name="stallion_users")
+@DefaultSort(field="email", direction = "ASC")
 public class User extends ModelBase implements IUser, ModelWithFilePath {
     private String username = "";
     private String displayName = "";
@@ -57,6 +59,7 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
     private boolean optedOut = false;
     private boolean totallyOptedOut = false;
     private String honorific = "";
+    private Long createdAt = 0L;
 
 
     @Override
@@ -351,4 +354,18 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         this.disabled = disabled;
         return this;
     }
+
+    @Override
+    @Column
+    @JsonView(RestrictedViews.Owner.class)
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public User setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
 }
+
+

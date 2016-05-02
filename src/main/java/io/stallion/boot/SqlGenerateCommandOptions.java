@@ -19,8 +19,20 @@ package io.stallion.boot;
 
 import org.kohsuke.args4j.Option;
 
+import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.*;
 
-public class SqlMigrateCommandOptions extends CommandOptionsBase {
 
+public class SqlGenerateCommandOptions extends SqlMigrateCommandOptions {
+    @Option(name="-package", usage="The package for which you want to introspect to find models for.")
+    private String packageName = "";
 
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public SqlGenerateCommandOptions setPackageName(String packageName) {
+        this.packageName = packageName;
+        return this;
+    }
 }

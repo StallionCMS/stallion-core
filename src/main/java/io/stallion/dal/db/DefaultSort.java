@@ -15,12 +15,13 @@
  *
  */
 
-package io.stallion.boot;
+package io.stallion.dal.db;
 
-import org.kohsuke.args4j.Option;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-
-public class SqlMigrateCommandOptions extends CommandOptionsBase {
-
-
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DefaultSort {
+    public String field() default "id";
+    public String direction() default "ASC";
 }

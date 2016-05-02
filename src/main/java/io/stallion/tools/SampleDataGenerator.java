@@ -15,12 +15,35 @@
  *
  */
 
-package io.stallion.boot;
+package io.stallion.tools;
 
-import org.kohsuke.args4j.Option;
+import io.stallion.exceptions.UsageException;
+
+import java.util.Set;
+
+import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.*;
 
 
-public class SqlMigrateCommandOptions extends CommandOptionsBase {
+public abstract class SampleDataGenerator {
+    private Set<Long> seenIds = set();
+
+    public abstract Long getBaseId();
+
+
+    public abstract void generate();
+
+    public Long newId(int extra) {
+        Long id = getBaseId() + extra;
+        if (seenIds.contains(id)) {
+            throw new UsageException("The id " + extra + " has already been used.");
+        }
+        return id;
+    }
+
+    public Long getId(int extra) {
+        return getBaseId() + extra;
+    }
 
 
 }

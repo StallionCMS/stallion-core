@@ -48,6 +48,9 @@ public class RequestObjectConverter {
 
         try {
             Object instance = JSON.parse(content, arg.getTargetClass());
+            if (arg.getSettableAllowedForClass().isAssignableFrom(SettableOptions.Unrestricted.class)) {
+                return instance;
+            }
             for(Map.Entry<String, Object> entry: PropertyUtils.getProperties(instance).entrySet()) {
                 // Any field that is not marked with the restricted annotation, gets nulled out
 

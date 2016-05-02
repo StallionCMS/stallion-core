@@ -27,6 +27,7 @@ public interface Displayable {
     public String getSlugForCssId();
     public String getOverrideDomain();
     public String getContent();
+    public String getOriginalContent();
     public String getTemplate();
     public ZonedDateTime getPublishDate();
     public Boolean getDraft();
