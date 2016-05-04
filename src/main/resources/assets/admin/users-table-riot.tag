@@ -121,7 +121,6 @@
     <div class="pure-g"  if={!loading}>
         <div class="pure-u-2-3">
             <h3>Edit user: {user.email} - {user.displayName}</h3>
-            displayName, givenName, familyName, username
             <form id="st-update-user-form" name="updateUserForm" class="pure-form pure-form-stacked" onsubmit={submit}>
                 <fieldset>
                     <div>

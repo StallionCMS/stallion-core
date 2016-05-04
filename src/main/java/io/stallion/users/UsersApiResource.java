@@ -288,14 +288,7 @@ public class UsersApiResource implements EndpointResource {
     @Produces("text/html")
     public String manageUsers() {
 
-        DefinedBundle.register(new DefinedBundle(
-                "userAdminStylesheets", ".css",
-                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
-        ));
-        DefinedBundle.register(new DefinedBundle(
-                "userAdminJavascripts", ".js",
-                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js")
-        ));
+
         Map<String, Object> ctx = map();
         return TemplateRenderer.instance().renderTemplate("stallion:admin/admin-users.jinja", ctx);
     }
@@ -453,5 +446,13 @@ public class UsersApiResource implements EndpointResource {
         if (Settings.instance().getUsers().getEnableDefaultEndpoints()) {
             EndpointsRegistry.instance().addResource("/st-admin/users", new UsersApiResource());
         }
+        DefinedBundle.register(new DefinedBundle(
+                "userAdminStylesheets", ".css",
+                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
+        ));
+        DefinedBundle.register(new DefinedBundle(
+                "userAdminJavascripts", ".js",
+                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js")
+        ));
     }
 }

@@ -20,7 +20,10 @@ package io.stallion.tests.integration.filtering;
 import io.stallion.dal.base.AlternativeKey;
 import io.stallion.dal.base.ModelBase;
 import io.stallion.dal.base.UniqueKey;
+import io.stallion.dal.db.Converter;
+import io.stallion.dal.db.converters.JsonListConverter;
 
+import javax.persistence.Column;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -36,7 +39,9 @@ public class Book extends ModelBase {
     private boolean isPublished = false;
     private Long publisherId;
     private String isbn = "";
+    private String description = "";
 
+    @Column
     @AlternativeKey
     public String getAuthor() {
         return author;
@@ -47,6 +52,7 @@ public class Book extends ModelBase {
         return this;
     }
 
+    @Column
     public ZonedDateTime getPublishDate() {
         return publishDate;
     }
@@ -56,6 +62,7 @@ public class Book extends ModelBase {
         return this;
     }
 
+    @Column
     public String getTitle() {
         return title;
     }
@@ -65,6 +72,8 @@ public class Book extends ModelBase {
         return this;
     }
 
+    @Column
+    @Converter(cls= JsonListConverter.class)
     public List<String> getCategories() {
         return categories;
     }
@@ -74,6 +83,7 @@ public class Book extends ModelBase {
         return this;
     }
 
+    @Column
     public boolean isPublished() {
         return isPublished;
     }
@@ -83,6 +93,7 @@ public class Book extends ModelBase {
         return this;
     }
 
+    @Column
     public Long getPublisherId() {
         return publisherId;
     }
@@ -93,12 +104,23 @@ public class Book extends ModelBase {
     }
 
     @UniqueKey
+    @Column
     public String getIsbn() {
         return isbn;
     }
 
     public Book setIsbn(String isbn) {
         this.isbn = isbn;
+        return this;
+    }
+
+    @Column(columnDefinition = "longtext")
+    public String getDescription() {
+        return description;
+    }
+
+    public Book setDescription(String description) {
+        this.description = description;
         return this;
     }
 }

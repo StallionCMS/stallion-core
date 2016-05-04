@@ -69,5 +69,6 @@ public class BooksController extends StandardModelController<Book> {
             save(book);
 
         }
+
     }
 }

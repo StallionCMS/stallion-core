@@ -165,7 +165,9 @@ public class SettingsLoader  {
 
 
             if (value == null) {
-                if (type == String.class) {
+                if (!empty(meta.useField())) {
+                    field.set(settings, PropertyUtils.getProperty(settings, meta.useField()));
+                } else if (type == String.class) {
                     field.set(settings, meta.val());
                 } else if (type == Integer.class) {
                     field.set(settings, meta.valInt());

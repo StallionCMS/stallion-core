@@ -26,12 +26,41 @@ import static io.stallion.utils.Literals.*;
 public class StyleSettings implements SettingsSection {
     @SettingMeta
     private String logoImage;
-    @SettingMeta
-    private String logoText;
+
+    @SettingMeta(val="#F9F9F9")
+    private String backgroundColor;
+
+    @SettingMeta(val="#FFFFFF")
+    private String mainBodyColor;
+
     @SettingMeta(val="#333333")
+    private String highlightColor;
+
+    @SettingMeta(useField="highlightColor")
+    private String linkColor;
+
+    @SettingMeta(useField="highlightColor")
     private String logoTextColor;
-    @SettingMeta(val="#E9E9E9")
-    private String logoBackgroundColor;
+
+
+    @SettingMeta(useField="highlightColor")
+    private String primaryButtonColor;
+
+
+    @SettingMeta(val="'Helvetica Neue', Helvetica, Arial, sans-serif")
+    private String headerFont;
+
+    @SettingMeta(val="'Helvetica Neue', Helvetica, Arial, sans-serif")
+    private String bodyFont;
+
+    @SettingMeta
+    private String customCss;
+
+    @SettingMeta
+    private String footer;
+
+
+
 
     public String getLogoImageUrl() {
         String url = getLogoImage();
@@ -52,31 +81,99 @@ public class StyleSettings implements SettingsSection {
         return logoImage;
     }
 
-    public void setLogoImage(String logoImage) {
+    public StyleSettings setLogoImage(String logoImage) {
         this.logoImage = logoImage;
+        return this;
     }
 
-    public String getLogoText() {
-        return logoText;
+
+    public String getBackgroundColor() {
+        return backgroundColor;
     }
 
-    public void setLogoText(String logoText) {
-        this.logoText = logoText;
+    public StyleSettings setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+        return this;
     }
 
     public String getLogoTextColor() {
         return logoTextColor;
     }
 
-    public void setLogoTextColor(String logoTextColor) {
+    public StyleSettings setLogoTextColor(String logoTextColor) {
         this.logoTextColor = logoTextColor;
+        return this;
     }
 
-    public String getLogoBackgroundColor() {
-        return logoBackgroundColor;
+    public String getMainBodyColor() {
+        return mainBodyColor;
     }
 
-    public void setLogoBackgroundColor(String logoBackgroundColor) {
-        this.logoBackgroundColor = logoBackgroundColor;
+    public StyleSettings setMainBodyColor(String mainBodyColor) {
+        this.mainBodyColor = mainBodyColor;
+        return this;
+    }
+
+    public String getHighlightColor() {
+        return highlightColor;
+    }
+
+    public StyleSettings setHighlightColor(String highlightColor) {
+        this.highlightColor = highlightColor;
+        return this;
+    }
+
+    public String getLinkColor() {
+        return linkColor;
+    }
+
+    public StyleSettings setLinkColor(String linkColor) {
+        this.linkColor = linkColor;
+        return this;
+    }
+
+    public String getPrimaryButtonColor() {
+        return primaryButtonColor;
+    }
+
+    public StyleSettings setPrimaryButtonColor(String primaryButtonColor) {
+        this.primaryButtonColor = primaryButtonColor;
+        return this;
+    }
+
+    public String getHeaderFont() {
+        return headerFont;
+    }
+
+    public StyleSettings setHeaderFont(String headerFont) {
+        this.headerFont = headerFont;
+        return this;
+    }
+
+    public String getBodyFont() {
+        return bodyFont;
+    }
+
+    public StyleSettings setBodyFont(String bodyFont) {
+        this.bodyFont = bodyFont;
+        return this;
+    }
+
+    public String getCustomCss() {
+        return customCss;
+    }
+
+    public StyleSettings setCustomCss(String customCss) {
+        this.customCss = customCss;
+        return this;
+    }
+
+    public String getFooter() {
+        return footer;
+    }
+
+    public StyleSettings setFooter(String footer) {
+        this.footer = footer;
+        return this;
     }
 }

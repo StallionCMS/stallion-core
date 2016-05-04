@@ -18,11 +18,13 @@
 package io.stallion.dal.file;
 
 import io.stallion.dal.base.*;
+import io.stallion.dal.db.DefaultSort;
 import io.stallion.dal.filtering.FilterChain;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherService;
 import io.stallion.fileSystem.TreeVisitor;
+import io.stallion.reflection.PropertyComparator;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -52,6 +54,9 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
     private Map<Long, String> idToFileMap = new HashMap<>();
     private boolean manyItemsPerFile = false;
     private String itemArrayName = "";
+    protected String sortField = "lastModifiedMillis";
+    protected String sortDirection = "DESC";
+
 
     @Override
     public void init(DalRegistration registration, ModelController<T> controller, Stash<T> stash) {
@@ -69,6 +74,13 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
                 new File(registration.getAbsolutePath()).mkdirs();
             }
         }
+
+        DefaultSort defaultSort = getModelClass().getAnnotation(DefaultSort.class);
+        if (defaultSort != null) {
+            sortField = defaultSort.field();
+            sortDirection = defaultSort.direction();
+        }
+
     }
 
     public abstract Set<String> getFileExtensions();
@@ -113,6 +125,11 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
             }
 
         }
+        objects.sort(new PropertyComparator<T>(sortField));
+        if (sortDirection.toLowerCase().equals("desc")) {
+            Collections.reverse(objects);
+        }
+
         return objects;
     }
 

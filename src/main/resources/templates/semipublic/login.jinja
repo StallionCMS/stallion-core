@@ -1,20 +1,13 @@
-{% extends "stallion:semipublic/semipublic-base.jinja" %}
+{% extends "stallion:semipublic/semipublic-single-box-page.jinja" %}
 {% block main_column %}
-
-
-<style>
-    #st-login-form input[type="password"], #st-login-form input[type="name"], #st-login-form input[type="email"] { width: 100%; }
-</style>
 <div id="layout" class="pure-g">
-    <div class="pad pure-u-1 pure-u-md-7-24">
-    </div>
-    <div class="pad pure-u-1 pure-u-md-5-12 content-box">
-        <h1 class="st-splash-header">Admin Sign in</h1>
+    <div class="pad pure-u-1">
+        <h1 class="st-splash-header">Sign in</h1>
         <form id="st-login-form" class="st-form pure-form pure-form-stacked">
             <fieldset>
                 <div class="st-bottom-space">
                     <label for="email">Username/Email</label>
-                    <input type="email" name="username" placeholder="Email">
+                    <input type="email" name="username" placeholder="Email" autofocus="autofocus">
                 </div>
                 <div class="st-bottom-space">
                     <label for="password">Password</label>
@@ -33,8 +26,6 @@
         <div>
             <a href="/st-admin/users/reset-password">Forgot your password?</a>
         </div>
-    </div>
-    <div class="pad pure-u-1 pure-u-md-7-24">
     </div>
 </div><!-- pure-g -->
 {% endblock %}

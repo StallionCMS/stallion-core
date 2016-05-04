@@ -127,3 +127,16 @@
     font-size: 200%;
 }
 
+#semipublic-page #main-column, #semipublic-page #footer, #semipublic-page #logo-area {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0px auto;
+}
+#semipublic-page #footer {
+    margin-top: 2em;
+}
+#semipublic-page .footer-info {
+    margin-top: 2em;
+    text-align: center;
+}
+

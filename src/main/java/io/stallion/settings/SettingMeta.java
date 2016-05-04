@@ -27,6 +27,7 @@ public @interface SettingMeta {
     int valInt() default 0;
     long valLong() default 0;
     boolean valBoolean() default false;
+    String useField() default "";
     String help() default "";
     Class cls() default String.class;
 

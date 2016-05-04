@@ -69,8 +69,8 @@ public class DefinedBundle extends Bundle {
                         .setLiveUrl("always/jquery-1.11.3.min.js"),
                 new BundleFile()
                         .setPluginName("stallion")
-                        .setLiveUrl("always/riot-and-compiler.js")
-                        .setDebugUrl("always/riot-and-compiler.min.js")
+                        .setLiveUrl("always/riot-and-compiler.min.js")
+                        .setDebugUrl("always/riot-and-compiler.js")
                 ,
                 new BundleFile()
                         .setPluginName("stallion")

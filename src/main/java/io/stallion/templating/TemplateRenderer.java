@@ -160,6 +160,7 @@ public class TemplateRenderer {
 
         context.put("request", Context.request());
         context.put("now", DateUtils.localNow());
+        context.put("styleSettings", Settings.instance().getStyle());
 
         if (Context.response() != null) {
 
@@ -224,7 +225,7 @@ public class TemplateRenderer {
         context.put("env", Settings.instance().getEnv());
         context.put("isProd", "prod".equals(Settings.instance().getEnv()));
 
-
+        context.put("styleSettings", Settings.instance().getStyle());
         context.put("files", AssetsController.wrapper());
         context.put("assets", AssetsController.wrapper());
         // Request, user, both pre-inserted
