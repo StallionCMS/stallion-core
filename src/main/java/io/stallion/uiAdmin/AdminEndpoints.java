@@ -40,7 +40,7 @@ public class AdminEndpoints implements EndpointResource {
     @Path("/riot-example")
     @Produces("text/html")
     public Object riotExample() {
-        String html = TemplateRenderer.instance().renderTemplate("stallion:semipublic/riot-example.jinja");
+        String html = TemplateRenderer.instance().renderTemplate("stallion:public/riot-example.jinja");
         return html;
     }
 

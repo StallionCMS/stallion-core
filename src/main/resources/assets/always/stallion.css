@@ -4,11 +4,15 @@
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1;
-    padding: 15px;
-    margin-bottom: 20px;
+    padding: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
     border: 1px solid transparent;
     border-radius: 4px;
     transition: all 0.5s ease 0s;
+}
+.st-error h2 {
+    margin: 0px;
 }
 
 .st-success {
@@ -38,6 +42,9 @@
 
 .st-button-submit {
     padding: .5em 1em .25em 1em;
+}
+.st-button-submit.pure-button {
+    padding: .5em 1em;
 }
 
 .st-action-button {
@@ -127,6 +134,10 @@
     font-size: 200%;
 }
 
+#semipublic-page, #semipublic-page div, #semipublic-page body, #semipublic-page p, #semipublic-page td, #semipublic-page h1, #semipublic-page h2, #semipublic-page h3 {
+    color: #555;
+}
+
 #semipublic-page #main-column, #semipublic-page #footer, #semipublic-page #logo-area {
     width: 100%;
     max-width: 1200px;
@@ -140,3 +151,13 @@
     text-align: center;
 }
 
+#semipublic-page  h1, #semipublic-page  h2, #semipublic-page  h3 {
+    font-weight: 300;
+}
+#semipublic-page a {
+    text-decoration: none;
+}
+#semipublic-page a:hover {
+    text-decoration: underline;
+    opacity: .8;
+}

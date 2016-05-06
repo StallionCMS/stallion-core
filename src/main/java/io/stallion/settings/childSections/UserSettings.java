@@ -17,8 +17,10 @@
 
 package io.stallion.settings.childSections;
 
+import io.stallion.exceptions.ConfigException;
 import io.stallion.settings.SettingMeta;
 import io.stallion.settings.Settings;
+import io.stallion.users.Role;
 
 import static io.stallion.utils.Literals.*;
 
@@ -29,6 +31,7 @@ public class UserSettings implements SettingsSection {
     private String passwordResetPage;
     @SettingMeta(val = "/st-admin/users/verify-email-address")
     private String verifyEmailPage;
+
     @SettingMeta(valBoolean = true)
     private Boolean syncUsersToMemory;
 
@@ -41,8 +44,6 @@ public class UserSettings implements SettingsSection {
         return url;
     }
 
-    @SettingMeta
-    private Boolean newAccountsAutoApproveIfEmailValid;
 
     @SettingMeta
     private Boolean newAccountsAutoApprove;
@@ -54,11 +55,16 @@ public class UserSettings implements SettingsSection {
     private Boolean newAccountsAllowCreation;
     @SettingMeta(valBoolean = true)
     private Boolean newAccountsRequireValidEmail;
-    @SettingMeta(val = "member")
+    @SettingMeta()
     private String newAccountsRole;
     @SettingMeta(val = "")
     private String newAccountsDomainRestricted;
 
+    public void postLoad() {
+        if (Role.valueOf(newAccountsRole.toUpperCase())  == null) {
+            throw new ConfigException("Invalid role for stallion.toml settings users.newAccountsRole: " + newAccountsRole);
+        }
+    }
 
     public String getLoginPage() {
         if (empty(loginPage)) {
@@ -150,14 +156,6 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
-    public Boolean getNewAccountsAutoApproveIfEmailValid() {
-        return newAccountsAutoApproveIfEmailValid;
-    }
-
-    public UserSettings setNewAccountsAutoApproveIfEmailValid(Boolean newAccountsAutoApproveIfEmailValid) {
-        this.newAccountsAutoApproveIfEmailValid = newAccountsAutoApproveIfEmailValid;
-        return this;
-    }
 
     public Boolean getSyncUsersToMemory() {
         return syncUsersToMemory;

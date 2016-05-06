@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -40,6 +41,7 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
     private String targetFolder = "";
     private CommandOptionsBase options;
     private JinjaTemplating templating;
+    private ProjectSettingsBuilder builder;
 
     @Override
     public String getActionName() {
@@ -61,13 +63,11 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         return new CommandOptionsBase();
     }
 
-    @Override
-    public void execute(CommandOptionsBase options) throws Exception {
+    protected void init(CommandOptionsBase options) {
         String folder = or(options.getTargetPath(), Paths.get(".").toAbsolutePath().normalize().toString());
         targetFolder = folder;
         this.options = options;
         templating = new JinjaTemplating(targetFolder, false);
-
         File dir = new File(folder);
         if (!dir.isDirectory()) {
             throw new UsageException("The target folder does not exist: " + folder);
@@ -76,17 +76,23 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         if (confDir.exists()) {
             throw new UsageException("You have already initialized the folder " + folder);
         }
+
+    }
+
+    @Override
+    public void execute(CommandOptionsBase options) throws Exception {
+        init(options);
         String msg = "Choose the starting scaffolding: \n" +
                 "1) Barebones\n" +
                 "2) Simple Text Site\n" +
                 "3) Javascript Site\n\nChoose a number: ";
         String choice = new Prompter(msg).setChoices("1", "2", "3").prompt();
         if ("1".equals(choice)) {
-            makeBareBonesSite(folder);
+            makeBareBonesSite(getTargetFolder());
         } else if ("2".equals(choice)) {
-            makeSimpleTextSite(folder);
+            makeSimpleTextSite(getTargetFolder());
         } else if ("3".equals(choice)) {
-            makeJavascriptSite(folder);
+            makeJavascriptSite(getTargetFolder());
         } else {
             throw new UsageException("Invalid choice " + choice);
         }
@@ -123,12 +129,28 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         if (!file.isDirectory()) {
             new File(targetFolder).mkdirs();
         }
-        ProjectSettingsBuilder builder = new ProjectSettingsBuilder()
+        builder = new ProjectSettingsBuilder()
                 .setHealthCheckSecret(GeneralUtils.randomToken(20))
                 .setSiteName(new Prompter("What is the name of your new site? ").prompt())
                 .setSiteDescription(new Prompter("What is a one or two sentence description of your site? ").prompt())
                 .setSiteUrl(new Prompter("What is the URL that this site will be publicly available at? ").prompt())
                 .setTitle(Prompter.prompt("What is the title for your site? "));
+        builder.setHighlightColor(or(new Prompter("Choose a (hex) highlight color for default pages and emails. Leave empty to default to dark grey (#2184A5) ")
+                .setValidPattern("(#[a-fA-F0-9]{6,6}|)")
+                .setAllowEmpty(true).prompt(), "#2184A5"));
+        boolean configureEmails = new Prompter("Do you want to configure email sending? Configuring email will allow " +
+                "your Stallion application to email you exceptions, form submissions, comments, et cetera. " +
+                "You will need the username, password, and host for an SMTP server. You can get" +
+                "a free email sending account from a service like Sendgrid, Postmark, or Mailgun. Configure email sending? (Y/n) ").yesNo();
+        if (configureEmails) {
+            builder.setEmailHost(Prompter.prompt("Email host? "));
+            builder.setEmailPort(Long.parseLong(or(new Prompter("Email port? (Default is 587) ").setAllowEmpty(true).prompt(), "587")));
+            builder.setAdminEmail(new Prompter("Administrator email address (will get exception messages, etc.)? ").setValidPattern(".+@.+").prompt());
+            builder.setEmailPassword(Prompter.prompt("Email password? "));
+            builder.setEmailUsername(Prompter.prompt("Email username? "));
+        }
+
+
         String source = templating.renderTemplate(
                 IOUtils.toString(getClass().getResource("/templates/wizard/stallion.toml.jinja")),
                 map(val("builder", builder)));
@@ -170,7 +192,15 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         if (!f.isDirectory()) {
             f.mkdirs();
         }
+
         copyFile("/templates/wizard/site.css", "assets/site.css");
+        String colorsCss = "a {\n" +
+                "    color: " + builder.getHighlightColor() + ";\n" +
+                "}\n" +
+                ".sidebar, .pure-button-primary {\n" +
+                "    background: " + builder.getHighlightColor() + ";\n" +
+                "}";
+        replaceString("/assets/site.css", "/**--highlight-color-section--*/", colorsCss);
         copyFile("/templates/wizard/site.js", "assets/site.js");
         copyFile("/templates/wizard/site.bundle.css", "assets/site.bundle.css");
         copyFile("/templates/wizard/site.bundle.js", "assets/site.bundle.js");
@@ -197,6 +227,53 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
     }
 
 
+    protected void replaceString(String relativePath, String old, String newString) {
+        File file = new File(getTargetFolder() + "/" + relativePath);
+
+        try {
+            String content = FileUtils.readFileToString(file);
+            content = content.replace(old, newString);
+            FileUtils.write(file, content, Charset.forName("utf-8"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
+    public Scanner getScanner() {
+        return scanner;
+    }
+
+    public NewProjectBuilder setScanner(Scanner scanner) {
+        this.scanner = scanner;
+        return this;
+    }
+
+    protected String getTargetFolder() {
+        return targetFolder;
+    }
+
+    protected NewProjectBuilder setTargetFolder(String targetFolder) {
+        this.targetFolder = targetFolder;
+        return this;
+    }
+
+    protected CommandOptionsBase getOptions() {
+        return options;
+    }
+
+    protected NewProjectBuilder setOptions(CommandOptionsBase options) {
+        this.options = options;
+        return this;
+    }
+
+    protected JinjaTemplating getTemplating() {
+        return templating;
+    }
+
+    protected NewProjectBuilder setTemplating(JinjaTemplating templating) {
+        this.templating = templating;
+        return this;
+    }
 }

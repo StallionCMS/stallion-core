@@ -48,6 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.ServletOutputStream;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -112,12 +113,25 @@ public class RequestProcessor {
         } catch(RedirectException e) {
             response.addHeader("Location", e.getUrl());
             response.setStatus(e.getStatusCode());
-            request.setHandled(true);
         } catch(NotFoundException e) {
             try {
                 handleNotFound(e.getMessage());
             } catch (Exception ex) {
                 handleError(ex);
+            }
+        } catch(InvocationTargetException e) {
+            if (e.getTargetException() instanceof RedirectException) {
+                RedirectException target = (RedirectException)e.getTargetException();
+                response.addHeader("Location", target.getUrl());
+                response.setStatus(target.getStatusCode());
+            } else if (e.getTargetException() instanceof NotFoundException) {
+                try {
+                    handleNotFound(e.getTargetException().getMessage());
+                } catch (Exception ex) {
+                    handleError(ex);
+                }
+            } else {
+                handleError(e);
             }
         } catch(Exception ex) {
             handleError(ex);

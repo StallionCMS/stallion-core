@@ -1,4 +1,4 @@
-{% extends "stallion:semipublic/semipublic-base.jinja" %}
+{% extends "stallion:public/semipublic-base.jinja" %}
 {% block extra_head %}
 <style>
   #st-login-form input[type="password"], #st-login-form input[type="name"], #st-login-form input[type="email"] { width: 100%; }
@@ -8,7 +8,8 @@
   #semipublic-page #main-column {
     max-width: 600px;
     border: 1px solid #999;
-    padding: 4em;
+    padding: 2em 4em 2em 4em;
+    border-radius: 4px;
   }
   @media only screen and (max-width: 480px) {
   #semipublic-page #main-column {

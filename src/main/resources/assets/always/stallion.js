@@ -16,6 +16,9 @@ if (window.$ && !window.jQuery) {
             console.log('an element', ele);
             var name = ele.getAttribute('name');
             console.log(name, ele);
+            if (!name) {
+                return;
+            }
             if (ele.getAttribute("type") === 'checkbox') {
                 data[name] = $(ele).is(":checked");
             } else {
@@ -48,7 +51,10 @@ if (window.$ && !window.jQuery) {
                 console.log('Button .st-button-submit not found, or spinner already running, aborting stallion.request');
                 return;
             }
+            $(req.form).find('.st-success').hide();
+            $(req.form).find('.st-error').hide();
         }
+        
 
         if (!req.error) {
             req.error = st.defaultRequestErrorHandler;
@@ -92,7 +98,7 @@ if (window.$ && !window.jQuery) {
             if (!o.message) {
                 o.message = 'Error processing request';
             }
-            req.error(o);
+            req.error(o, req.form, xhr);
 
         });
 
@@ -100,8 +106,15 @@ if (window.$ && !window.jQuery) {
     };
 
     st.tryMakeSpinner = function(form) {
-
-        var $btn = $('#' + form.getAttribute('id') + ' .st-button-submit');
+        
+        var $form = $(form);
+        var $btn = $form.find(' .st-button-submit');
+        if (!$btn.length) {
+            $btn = $form.find('.pure-button-primary[type="submit"]');
+        }
+        if (!$btn.length) {
+            $btn = $form.find('type=["submit"]');
+        }
         if (!$btn.length) {
             return null;
         }
@@ -151,14 +164,14 @@ if (window.$ && !window.jQuery) {
         return qs;
     };
     
-    st.defaultRequestErrorHandler = function(o) {
-        if (o.form) {
-            var $errorWrap = $('#' + o.form.getAttribute('id') + ' .st-error-wrap');
+    st.defaultRequestErrorHandler = function(o, form, xhr) {
+        if (form) {
+            var $form = $(form);
+            var $errorWrap = $form.find('.st-error-wrap');
             if (!$errorWrap.length) {
-                var $form = $('#' + o.form.getAttribute('id'));
                 var $node = $('<div></div>');
                 $node.addClass('st-error-wrap');
-                $form.appendChild($node);
+                $form.prepend($node);
                 $errorWrap = $node;
             }
             $errorWrap.html("<div style='' class='alert alert-danger st-error pre-fade'>" + o.message + "</div>");

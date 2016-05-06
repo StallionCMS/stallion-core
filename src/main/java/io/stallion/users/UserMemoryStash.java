@@ -61,16 +61,7 @@ public class UserMemoryStash<T extends IUser> extends LocalMemoryStash<T> {
         if (user == null) {
             return false;
         }
-        if (user.isPredefined()) {
-            return true;
-        }
-        if (empty(user.getFilePath())) {
-            return false;
-        }
-        if (user.getFilePath().contains("/app-data")) {
-            return false;
-        }
-        return true;
+        return user.isPredefined();
     }
 
 

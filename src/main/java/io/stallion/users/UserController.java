@@ -202,6 +202,10 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         return addSessionCookieForUser(user, rememberMe);
     }
 
+    public void logoutCurrentUser() {
+
+    }
+
     /**
      * Returns a user if the login information is valid, throws a ClientException exception otherwise.
      *
@@ -229,10 +233,13 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         }
 
         if (empty(user.getBcryptedPassword())) {
-            throw new ClientException("Password never confiruged for this user. Did you originally login with Google or Facebook?");
+            throw new ClientException("Password never confiruged for this user. Did you originally login with Google or Facebook? Otherwise, click on the password reset link to choose a new password.");
         }
 
         boolean valid = BCrypt.checkpw(password, user.getBcryptedPassword());
+
+
+
         if (!valid) {
             markFailed(username);
             throw new ClientException(err, 403);
@@ -247,6 +254,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
      */
     public void markFailed(String username) {
         Integer failures = or((Integer)LocalMemoryCache.get(PROBLEM_LOG_CACHE_BUCKET, request().getActualIp()), 0);
+        Log.fine("Mark login failed {0} {1} failCount={2}", username, request().getActualIp(), failures + 1);
         LocalMemoryCache.set(PROBLEM_LOG_CACHE_BUCKET, request().getActualIp(), failures + 1, PROBLEM_LOG_DURATION_SECONDS);
 
         if (!empty(username)) {
@@ -328,7 +336,11 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         return sendEmailVerifyEmail(user, returnUrl);
     }
 
+    public boolean sendEmailVerifyEmail(T user) {
+        return sendEmailVerifyEmail(user, "");
+    }
     public boolean sendEmailVerifyEmail(T user, String returnUrl) {
+
         if (user == null) {
             return false;
         }
@@ -574,8 +586,10 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
             try {
                 url = url + "?verifyToken=" + URLEncoder.encode(token, "UTF-8") +
-                        "&email=" + URLEncoder.encode(user.getEmail(), "UTF-8") +
-                        "&returnUrl=" + URLEncoder.encode(returnUrl, "UTF-8");
+                        "&email=" + URLEncoder.encode(user.getEmail(), "UTF-8");
+                if (!empty(returnUrl)) {
+                    url += "&returnUrl=" + URLEncoder.encode(returnUrl, "UTF-8");
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

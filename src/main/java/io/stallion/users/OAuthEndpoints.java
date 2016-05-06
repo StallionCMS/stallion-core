@@ -67,7 +67,7 @@ public class OAuthEndpoints {
         ctx.put("client", OAuthClientController.instance().clientForFullId(clientFullId));
         ctx.put("scopesDescription", description);
         ctx.put("scopes", set(scopes));
-        String html = TemplateRenderer.instance().renderTemplate("stallion:semipublic/oauth.jinja");
+        String html = TemplateRenderer.instance().renderTemplate("stallion:public/oauth.jinja");
         return html;
     }
 

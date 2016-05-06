@@ -19,13 +19,12 @@ package io.stallion.users;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.Context;
-import io.stallion.assets.AssetsController;
 import io.stallion.assets.BundleFile;
-import io.stallion.assets.BundleHandler;
 import io.stallion.assets.DefinedBundle;
 import io.stallion.dal.filtering.FilterChain;
 import io.stallion.dal.filtering.Pager;
 import io.stallion.exceptions.*;
+import io.stallion.requests.ParamsValidator;
 import io.stallion.restfulEndpoints.*;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -50,36 +49,90 @@ public class UsersApiResource implements EndpointResource {
     @GET
     @Path("/login")
     @Produces("text/html")
-    public Object loginScreen() {
-        URL url = getClass().getResource("/templates/semipublic/login.jinja");
-        String html = TemplateRenderer.instance().renderTemplate(url.toString());
+    public Object loginScreen(@QueryParam("email") String email) {
+        URL url = getClass().getResource("/templates/public/login.jinja");
+        email = or(email, "");
+        Map ctx = null;
+        try {
+            ctx = map(
+                    val("allowReset", settings().getUsers().getPasswordResetEnabled()),
+                    val("allowRegister", settings().getUsers().getNewAccountsAllowCreation()),
+                    val("returnUrl", URLEncoder.encode((or(request().getParameter("stReturnUrl"), "")).replace("\"", ""), "UTF-8")),
+                    val("email", email));
+        } catch (UnsupportedEncodingException e) {
+           throw new RuntimeException(e);
+        }
+        String html = TemplateRenderer.instance().renderTemplate(url.toString(), ctx);
         return html;
+    }
+
+    @GET
+    @Path("/logoff")
+    @Produces("text/html")
+    public Object logoff() {
+        UserController.instance().logoff();
+        throw new RedirectException(Settings.instance().getUsers().getLoginPage(), 302);
     }
 
     @POST
     @JsonView(RestrictedViews.Owner.class)
+    @Produces("application/json")
     @Path("/submit-login")
     public Object login(@BodyParam("username") String username, @BodyParam("password") String password, @BodyParam("rememberMe") Boolean rememberMe) {
-        IUser user = UserController.instance().forUniqueKey("username", username);
-        String err = "User not found or password invalid";
-        if (user == null) {
-            throw new ClientException(err, 403);
-        }
-
-        boolean valid = BCrypt.checkpw(password, user.getBcryptedPassword());
-        if (!valid) {
-            throw new ClientException(err, 403);
-        }
-        String cookie = UserController.instance().userToCookieString(user, rememberMe);
-        int expires = (int)((mils() + (86400*30*1000))/1000);
-        if (rememberMe) {
-            Context.getResponse().addCookie(UserController.USER_COOKIE_NAME, cookie, expires);
-        } else {
-            Context.getResponse().addCookie(UserController.USER_COOKIE_NAME, cookie);
-        }
-        return user;
+        return UserController.instance().loginUser(username, password, rememberMe);
     }
 
+    @GET
+    @Produces("text/html")
+    @Path("/register")
+    @MinRole(Role.ANON)
+    public String registerPage() {
+        if (!settings().getUsers().getNewAccountsAllowCreation()) {
+            throw new ClientException("The default new account creation endpoint is not enabled for this site.");
+        }
+        Map ctx = map();
+        return TemplateRenderer.instance().renderTemplate("stallion:/public/register.jinja", ctx);
+    }
+
+    @POST
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Member.class)
+    @Path("/do-register")
+    public Object doRegister(@BodyParam("displayName") String displayName, @BodyParam("username") String email, @BodyParam("password") String password, @BodyParam("passwordConfirm") String passwordConfirm, @BodyParam("returnUrl") String returnUrl) {
+        if (!settings().getUsers().getNewAccountsAllowCreation()) {
+            throw new ClientException("The default new account creation endpoint is not enabled for this site.");
+        }
+        new ParamsValidator()
+                .add("displayName", displayName)
+                .addEmail("username", email)
+                .add("password", password, 6)
+                .add("passwordConfirm", password, 6)
+                .validate();
+        IUser existing = UserController.instance().forEmail(email);
+        if (existing != null) {
+            throw new ClientException("A user with that email address already exists.");
+        }
+        User user = new User()
+                .setDisplayName(displayName)
+                .setUsername(email)
+                .setRole(Role.valueOf(settings().getUsers().getNewAccountsRole().toUpperCase()))
+                .setEmail(email);
+
+        if (!settings().getUsers().getNewAccountsRequireValidEmail() && settings().getUsers().getNewAccountsAutoApprove() == true) {
+            user.setApproved(true);
+        }
+        Boolean requireValidEmail = false;
+        if (settings().getUsers().getNewAccountsRequireValidEmail()) {
+            requireValidEmail = true;
+        }
+        UserController.instance().hydratePassword(user, password, passwordConfirm);
+        IUser u = UserController.instance().createUser(user);
+        UserController.instance().addSessionCookieForUser(user, true);
+        if (requireValidEmail) {
+            UserController.instance().sendEmailVerifyEmail(user, or(returnUrl, ""));
+        }
+        return map(val("user", u), val("requireValidEmail", requireValidEmail));
+    }
 
 
     @POST
@@ -90,6 +143,17 @@ public class UsersApiResource implements EndpointResource {
         return true;
     }
 
+    @GET
+    @Path("/verify-email")
+    @Produces("text/html")
+    public Object verifyEmailAddress( @QueryParam("email") String email, @QueryParam("returnUrl") String returnUrl, @QueryParam("alreadySent") Boolean alreadySent) {
+
+        email = or(email, Context.getUser().getEmail());
+        alreadySent = or(alreadySent, false);
+        Map ctx = map(val("email", Sanitize.stripAll(email)), val("alreadySent", alreadySent));
+        String html = TemplateRenderer.instance().renderTemplate("stallion:/public/verify-email-address.jinja", ctx);
+        return html;
+    }
 
     @GET
     @Path("/verify-email-address")
@@ -99,7 +163,7 @@ public class UsersApiResource implements EndpointResource {
         // For security, only verify an email address if we are logged in as that user
         boolean requiresLogin = false;
 
-        if (!getUser().isAuthorized()) {
+        if (empty(getUser().getId())) {
             requiresLogin = true;
         } else {
             IUser associatedUser = UserController.instance().forEmail(email);
@@ -134,12 +198,16 @@ public class UsersApiResource implements EndpointResource {
         IUser user = UserController.instance().forUniqueKey("email", email);
         if (user.getEmailVerified()) {
             ctx.put("verified", true);
+            if (!user.getApproved()) {
+                ctx.put("requiresApproval", true);
+            }
+
         }
 
         returnUrl = or(returnUrl, Settings.instance().getSiteUrl());
         ctx.put("returnUrl", Sanitize.stripAll(returnUrl));
         ctx.put("email", Sanitize.stripAll(email));
-        URL url = getClass().getResource("/templates/semipublic/verify-email-address.jinja");
+        URL url = getClass().getResource("/templates/public/verify-email-address.jinja");
         String html = TemplateRenderer.instance().renderTemplate(url.toString(), ctx);
         return html;
     }
@@ -157,7 +225,7 @@ public class UsersApiResource implements EndpointResource {
                 ctx.put("tokenVerified", verified);
             }
         }
-        URL url = getClass().getResource("/templates/semipublic/reset-password.jinja");
+        URL url = getClass().getResource("/templates/public/reset-password.jinja");
         String html = TemplateRenderer.instance().renderTemplate(url.toString(), ctx);
         return html;
     }
@@ -165,8 +233,11 @@ public class UsersApiResource implements EndpointResource {
 
     @POST
     @Path("/send-reset-email")
-    @Produces("text/html")
+    @Produces("application/json")
     public Object sendResetEmail(@BodyParam("email") String email, @BodyParam("returnUrl") String returnUrl) {
+        if (!settings().getUsers().getPasswordResetEnabled()) {
+            throw new ClientException("Password reset has been disabled. Please contact an administrator to reset your password.");
+        }
         IUser user = UserController.instance().forEmail(email);
         if (user == null) {
             user = UserController.instance().forUsername(email);
@@ -179,7 +250,7 @@ public class UsersApiResource implements EndpointResource {
     @POST
     @Path("/do-password-reset")
     @Produces("application/json")
-    public Object sendResetEmail(
+    public Object doPasswordReset(
             @BodyParam("resetToken") String resetToken,
             @BodyParam("email") String email,
             @BodyParam("password") String password,
@@ -200,7 +271,7 @@ public class UsersApiResource implements EndpointResource {
     @Path("/new")
     @Produces("text/html")
     public Object newAccount() {
-        URL url = getClass().getResource("/templates/semipublic/login.jinja");
+        URL url = getClass().getResource("/templates/public/login.jinja");
         String html = TemplateRenderer.instance().renderTemplate(url.toString());
         return html;
     }
@@ -245,7 +316,7 @@ public class UsersApiResource implements EndpointResource {
         UserController.instance().createUser(user);
 
         Map<String, Object> ctx = map(val("verifyEmailSent", false), val("pendingAdminApproval", false));
-        if (!settings().getUsers().getNewAccountsAutoApprove() && !settings().getUsers().getNewAccountsAutoApproveIfEmailValid()) {
+        if (!settings().getUsers().getNewAccountsAutoApprove()) {
             ctx.put("pendingAdminApproval", true);
         }
 
@@ -445,14 +516,15 @@ public class UsersApiResource implements EndpointResource {
     public static void register() {
         if (Settings.instance().getUsers().getEnableDefaultEndpoints()) {
             EndpointsRegistry.instance().addResource("/st-admin/users", new UsersApiResource());
+
+            DefinedBundle.register(new DefinedBundle(
+                    "userAdminStylesheets", ".css",
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
+            ));
+            DefinedBundle.register(new DefinedBundle(
+                    "userAdminJavascripts", ".js",
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js")
+            ));
         }
-        DefinedBundle.register(new DefinedBundle(
-                "userAdminStylesheets", ".css",
-                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
-        ));
-        DefinedBundle.register(new DefinedBundle(
-                "userAdminJavascripts", ".js",
-                new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js")
-        ));
     }
 }

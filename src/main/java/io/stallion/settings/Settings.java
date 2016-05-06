@@ -43,7 +43,7 @@ public class Settings implements ISettings {
     private EmailSettings email = null;
     private CustomSettings custom = null;
     private CloudStorageSettings cloudStorage = null;
-    private StyleSettings style = null;
+    private StyleSettings styles = null;
 
     private OAuthSettings oAuth;
 
@@ -59,18 +59,10 @@ public class Settings implements ISettings {
     private String metaDescription = null;
     @SettingMeta(val="Stallion")
     private String metaGenerator = null;
-    @SettingMeta(val="", help="The URL of your logo. Used for built-in screens. If not an absolute URL, will be relative to the assets folder. Default is 'logo.png'")
-    private String logoUrl;
-    @SettingMeta(val="app-screens.css", help="The URL of a css file that will be included in buil-in, public facing screens, such as login, OAuth approval, etc. Edit the file to customize background colors, font-families, etc. If a relative URL, will be relative to the assets folder.")
-    private String builtinScreensCssFile;
-    @SettingMeta(val="#FFFFFF", help="The background color of built-in screens, such as login, password-reset. Your logo will go over this color.")
-    private String builtinScreensBackgroundColor;
-    @SettingMeta(val="#F9F9F9", help="The background of the main column on built-in screens. Body text will go over this color.")
-    private String builtinScreensBoxColor;
-    @SettingMeta(val="#333333", help="The color for h1's on built-in screens.")
-    private String builtinScreensHeaderColor;
-    @SettingMeta(val="#999999", help="A color that will be added as highlight on built-in screens")
-    private String builtinScreensTrimColor;
+    @SettingMeta(val="", help = "The email address users of the site should contact in case of problems. This will be publicly viewable.")
+    private String supportEmail;
+
+
 
     // File system info
     @SettingMeta()
@@ -672,12 +664,12 @@ public class Settings implements ISettings {
         this.cloudStorage = cloudStorage;
     }
 
-    public StyleSettings getStyle() {
-        return style;
+    public StyleSettings getStyles() {
+        return styles;
     }
 
-    public void setStyle(StyleSettings style) {
-        this.style = style;
+    public void setStyles(StyleSettings style) {
+        this.styles = style;
     }
 
     public Integer getNodeNumber() {
@@ -732,6 +724,15 @@ public class Settings implements ISettings {
 
     public Settings setoAuth(OAuthSettings oAuth) {
         this.oAuth = oAuth;
+        return this;
+    }
+
+    public String getSupportEmail() {
+        return supportEmail;
+    }
+
+    public Settings setSupportEmail(String supportEmail) {
+        this.supportEmail = supportEmail;
         return this;
     }
 

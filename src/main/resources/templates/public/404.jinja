@@ -1,0 +1,13 @@
+{% extends "stallion:semipublic/semipublic-single-box-page.jinja" %}
+{% block main_column %}
+<div id="layout" class="pure-g">
+    <div class="pad pure-u-1" style="text-align:center;">
+        <h1 class="st-splash-header">No page found at this location.</h1>
+        <h3><a href="/">Return to the home page</a></h3>
+    </div>
+</div><!-- pure-g -->
+{% endblock %}
+
+{% block pre_end_body %}
+<script src='{{ assets.resource("admin/screens/login-screen.js", "stallion") }}' type="text/javascript"></script>
+{% endblock %}

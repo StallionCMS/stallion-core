@@ -18,4 +18,7 @@
 package io.stallion.settings.childSections;
 
 public interface SettingsSection {
+    public default void postLoad() {
+
+    }
 }

@@ -1,2 +1,32 @@
+{% macro button(label, link) -%}
+<a style="color: #555; text-decoration: none; border-radius: 3px; font-size: 16px; padding: 4px 8px 4px 8px; border: 1px solid #bbb; background-color: #EEEEEE; " href="{{ link }}">{{ label }}</a>
+{%- endmacro %}
+{% macro buttonSmall(label, link) -%}
+<a style="color: #555; text-decoration: none; border-radius: 2px; font-size: 12px; padding: 2px 6px 2px 6px; border: 1px solid #bbb; background-color: #EEEEEE;" href="{{ link }}">{{ label }}</a>
+{%- endmacro %}
+{% macro buttonLarge(label, link) -%}
+<a style="color: #555; text-decoration: none; border-radius: 4px; font-size: 22px; padding: 6px 12px 6px 12px; border: 1px solid #bbb; background-color: #EEEEEE; " href="{{ link }}">{{ label }}</a>
+{%- endmacro %}
+{% macro buttonPrimary(label, link) -%}
+<a style="color: #FFF; text-decoration: none; border-radius: 3px; font-size: 16px; padding: 4px 8px 4px 8px; background-color: {{ styleSettings.primaryButtonColor }};" href="{{ link }}">{{ label }}</a>
+{%- endmacro %}
+{% macro buttonPrimaryLarge(label, link) -%}
+<a style="color: #FFF; text-decoration: none; border-radius: 4px; font-size: 22px; padding: 4px 10px 4px 10px; background-color: {{ styleSettings.primaryButtonColor }};" href="{{ link }}">{{ label }}</a>
+{%- endmacro %}
+<style>
+    a { color:  {{ styleSettings.linkColor }}; }
+    body, html, div, p, td { color: #555; font-family: {{ styleSettings.bodyFont }}; }
+    h1, h2, h3, h4 { font-weight: 300; font-family: {{ styleSettings.headerFont }}; }
+</style>
+<div style="height: 1em; margin-bottom:2em; width: 100%; background-color: {{ styleSettings.highlightColor }};"></div>
 {% block main %}
 {% endblock %}
+<div style="height: 1em; margin-top:2em; width: 100%; background-color: {{ styleSettings.highlightColor }};"></div>
+<div style="background-color: {{ styleSettings.backgroundColor }}; padding: 1em 2em; text-align: center;">
+    {% if styleSettings.logoImage %}
+        <p><a href="{{ site.url }}"><img alt="{{ site.name }}" src="{{ styleSettings.logoImageUrl }}" style="max-height: 60px;"></a></p>
+    {% else %}
+        <h2><a href="{{ site.url }}" style="color: {{ styleSettings.logoTextColor }}">{{ site.name }}</a></h2>
+    {% endif %}
+    <p> {{ styleSettings.footer }}</p>
+</div>

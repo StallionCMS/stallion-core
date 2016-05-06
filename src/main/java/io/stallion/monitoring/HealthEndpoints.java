@@ -193,4 +193,12 @@ public class HealthEndpoints {
         checkSecret(secret);
         throw new WebException("A forced exception!", 500);
     }
+
+    @GET
+    @Produces("text/html")
+    @Path("/_st/health/force-exception-get")
+    public String forceExceptionGet(@QueryParam("secret") String secret) {
+        checkSecret(secret);
+        throw new WebException("A forced exception!", 500);
+    }
 }

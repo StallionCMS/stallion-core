@@ -74,6 +74,15 @@ public class StyleSettings implements SettingsSection {
 
             url = url.replace("{port}", Settings.instance().getPort().toString());
         }
+        if (!url.contains("//")) {
+            if (!url.startsWith("/")) {
+                url = "/st-assets/" + url;
+            }
+        }
+        if (!url.contains("://")) {
+            url = Settings.instance().getSiteUrl() + url;
+        }
+
         return url;
     }
 

@@ -145,6 +145,7 @@ public class SettingsLoader  {
                 }
                 assignDefaultsFromAnnotations(value);
                 field.setAccessible(isAccessible);
+                ((SettingsSection)value).postLoad();
                 continue;
             }
             SettingMeta[] metas = field.getAnnotationsByType(SettingMeta.class);

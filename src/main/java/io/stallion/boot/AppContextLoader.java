@@ -26,6 +26,7 @@ import io.stallion.dal.db.DB;
 import io.stallion.dal.base.Tickets;
 import io.stallion.dal.file.TextItemController;
 import io.stallion.dal.filtering.FilterCache;
+import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherRunner;
 import io.stallion.fileSystem.FileSystemWatcherService;
@@ -50,6 +51,8 @@ import io.stallion.templating.TemplateRenderer;
 import io.stallion.users.User;
 import io.stallion.users.UserController;
 import io.stallion.users.UsersApiResource;
+
+import java.io.File;
 
 import static io.stallion.utils.Literals.*;
 
@@ -81,6 +84,10 @@ public class AppContextLoader {
     public static AppContextLoader loadWithSettingsOnly(CommandOptionsBase options) {
         if (_app == null) {
             _app = new AppContextLoader();
+        }
+        File confFile = new File(options.getTargetPath() + "/conf/stallion.toml");
+        if (!confFile.exists()) {
+             throw new CommandException("Cannot load site because conf file is missing. You either targetted the wrong directory, or need to create a site first. Looked for the conf file at " + confFile.getAbsolutePath());
         }
 
         Settings.init(options.getEnv(), options);

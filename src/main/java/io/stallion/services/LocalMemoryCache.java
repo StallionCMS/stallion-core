@@ -74,7 +74,7 @@ public class LocalMemoryCache {
         if (manager == null) {
             return null;
         }
-        if (!manager.cacheExists(key)) {
+        if (!manager.cacheExists(bucket)) {
             return null;
         }
         Element element = manager.getCache(bucket).get(key);
