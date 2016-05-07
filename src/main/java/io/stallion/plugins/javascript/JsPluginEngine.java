@@ -101,13 +101,13 @@ public class JsPluginEngine {
 
         String stallionSharedJs = IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"));
         classFilter.setDisabled(true); // Turn off white-listing while loading stallion_shared, since we need access to more classes
+        SandboxedContext ctx = new SandboxedContext(folder, box, pluginSettings);
+        scriptEngine.put("myContext", ctx);
         scriptEngine.eval("load(" + JSON.stringify(map(val("script", stallionSharedJs), val("name", "stallion_shared.js"))) + ");");
         classFilter.setDisabled(false); // Turn whitelisting back on
         scriptEngine.put("stallionClassLoader", new SandboxedClassLoader(box));
         //scriptEngine.eval("Java = {extend: Java.extend, type: function(className) { return stallionClassLoader.loadClass(className).static;  }}");
         //scriptEngine.eval("Packages = undefined;java = undefined;");
-        SandboxedContext ctx = new SandboxedContext(folder, box, pluginSettings);
-        scriptEngine.put("myContext", ctx);
         scriptEngine.eval("load(\"" + fullPath + "\");");
 
         Log.info("Loaded js plugin {0}", fullPath);

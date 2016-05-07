@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
  * Add this to a model property getter if by default the property can be set via a RESTful API
  * request.
  */
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Setable {
     Class<? extends SettableOptions.BaseSettable> value();

@@ -21,9 +21,9 @@ import io.stallion.Context;
 import io.stallion.dal.base.*;
 import io.stallion.dal.filtering.FilterChain;
 import io.stallion.dal.filtering.MySqlFilterChain;
+import io.stallion.requests.IRequest;
 import io.stallion.requests.JobRequest;
 import io.stallion.requests.TaskRequest;
-import io.stallion.requests.RequestProcessor;
 import io.stallion.utils.DateUtils;
 
 import javax.servlet.http.Cookie;
@@ -161,7 +161,7 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
             return true;
         }
         // The current user
-        Cookie postBackCookie = Context.getRequest().getCookie(RequestProcessor.RECENT_POSTBACK_COOKIE);
+        Cookie postBackCookie = Context.getRequest().getCookie(IRequest.RECENT_POSTBACK_COOKIE);
         if (postBackCookie != null && !empty(postBackCookie.getValue())) {
             Long t = Long.parseLong(postBackCookie.getValue());
             if (t != null && t > (mils() - 15000)) {

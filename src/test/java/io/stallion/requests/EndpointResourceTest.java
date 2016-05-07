@@ -15,14 +15,9 @@
  *
  */
 
-package io.stallion.tests.unit.rest;
+package io.stallion.requests;
 
-import io.stallion.requests.RouteResult;
-import io.stallion.requests.RoutesRegistry;
-import io.stallion.requests.StRequest;
-import io.stallion.requests.StResponse;
 import io.stallion.restfulEndpoints.ResourceToEndpoints;
-import io.stallion.requests.RequestProcessor;
 import io.stallion.restfulEndpoints.RestEndpointBase;
 import io.stallion.restfulEndpoints.JavaRestEndpoint;
 import io.stallion.testing.AppIntegrationCaseBase;

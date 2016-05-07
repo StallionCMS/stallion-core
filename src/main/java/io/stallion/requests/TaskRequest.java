@@ -50,10 +50,6 @@ public class TaskRequest implements IRequest {
         return "";
     }
 
-    @Override
-    public IRequest setHandled(Boolean val) {
-        return this;
-    }
 
     @Override
     public String getRemoteAddr() {

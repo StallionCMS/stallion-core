@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static io.stallion.utils.Literals.empty;
 
@@ -90,9 +91,17 @@ public class ResourceToEndpoints {
                 for (Annotation anno: param.getAnnotations()) {
                     Log.finer("Param Annotation is: {0}, {1}", anno, anno.getClass().getName());
                     if (BodyParam.class.isInstance(anno)) {
+                        BodyParam bodyAnno = (BodyParam)(anno);
                         arg.setType("BodyParam");
                         arg.setName(((BodyParam) anno).value());
                         arg.setAnnotationClass(BodyParam.class);
+                        arg.setRequired(bodyAnno.required());
+                        arg.setEmailParam(bodyAnno.isEmail());
+                        arg.setMinLength(bodyAnno.minLength());
+                        arg.setAllowEmpty(bodyAnno.allowEmpty());
+                        if (!empty(bodyAnno.validationPattern())) {
+                            arg.setValidationPattern(Pattern.compile(bodyAnno.validationPattern()));
+                        }
                     } else if (ObjectParam.class.isInstance(anno)) {
                         ObjectParam oParam = (ObjectParam)anno;
                         arg.setType("ObjectParam");

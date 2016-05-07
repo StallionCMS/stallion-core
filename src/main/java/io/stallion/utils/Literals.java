@@ -177,7 +177,36 @@ public class Literals {
         return myList.toArray(array);
     }
 
-
+    public static boolean emptyObject(Object o) {
+        if (o == null) {
+            return true;
+        }
+        if (o instanceof IEmpty) {
+            return true;
+        }
+        if (o instanceof String) {
+            return !"".equals(o);
+        }
+        if (o instanceof Long) {
+            return (Long)o != 0L;
+        }
+        if (o instanceof Integer) {
+            return (Integer)o != 0;
+        }
+        if (o instanceof Double) {
+            return (Double)o != 0.0;
+        }
+        if (o instanceof Float) {
+            return (Float)o != 0.0;
+        }
+        if (o instanceof Collection) {
+            return ((List)o).size() > 0;
+        }
+        if (o instanceof Map) {
+            return ((List)o).size() > 0;
+        }
+        return false;
+    }
 
 
     public static boolean empty(ZonedDateTime dt) {

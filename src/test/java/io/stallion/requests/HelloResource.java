@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.tests.unit.rest;
+package io.stallion.requests;
 
 import io.stallion.restfulEndpoints.BodyParam;
 import io.stallion.restfulEndpoints.EndpointResource;

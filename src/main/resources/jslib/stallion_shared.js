@@ -127,11 +127,14 @@ var stallionGetSurroundingLines = function(file, lineno) {
     return newLines.join('\n');
 };
 
+(function() {
+var JsFileReader = Packages.io.stallion.plugins.javascript.JsFileReader;
+var pluginFolder = myContext.pluginFolder;
 loadjs = function(a, b, c) {
     var source = '';
     var fileName = '';
     if (typeof(a) === typeof("")) {
-        source = javaToJsHelpers.readFileToString(a);
+        source = JsFileReader.readToString(a, pluginFolder);
         fileName = a;
     } else {
         source = a.script;
@@ -143,6 +146,8 @@ loadjs = function(a, b, c) {
 };
 
 load = loadjs;
+
+})();
 
 (function() {
 

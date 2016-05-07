@@ -110,7 +110,7 @@ public class AMinimalSiteTest extends AppIntegrationCaseBase {
         response = client.get("/exception-generating-page");
         Log.finer("500 result: {0}", response.getContent());
         assertEquals(500, response.getStatus());
-        Assert.assertTrue(response.getContent().contains("<h1>There was an error trying to handle your request</h1>"));
+        Assert.assertTrue(response.getContent().contains("There was an error trying to handle your request"));
     }
 
 

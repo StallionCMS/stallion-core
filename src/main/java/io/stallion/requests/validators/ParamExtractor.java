@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.utils;
+package io.stallion.requests.validators;
 
 import io.stallion.exceptions.ClientException;
 
@@ -43,7 +43,7 @@ import static io.stallion.Context.*;
  *
  * You do:
  *
- * RequiredWrapper&lt;String&gt; params = new RequiredWrapper(request().getBodyMap(), "Required post body parameter {0} was not found.");
+ * ParamExtractor&lt;String&gt; params = new ParamExtractor(request().getBodyMap(), "Required post body parameter {0} was not found.");
  * String code = params.get("code");
  * String redirectUri = params.get("redirect_uri");
  *
@@ -51,11 +51,11 @@ import static io.stallion.Context.*;
  *
  * @param <T>
  */
-public class RequiredParamWrapper<T> {
+public class ParamExtractor<T> {
     private Map<Object, T> map;
     private String messageTemplate;
 
-    public RequiredParamWrapper(Map<Object, T> map) {
+    public ParamExtractor(Map<Object, T> map) {
         this(map, null);
     }
 
@@ -65,7 +65,7 @@ public class RequiredParamWrapper<T> {
      * @param map
      * @param messageTemplate - Formatted using MessageFormat use {0} for the parameter name.
      */
-    public RequiredParamWrapper(Map map, String messageTemplate) {
+    public ParamExtractor(Map map, String messageTemplate) {
         this.map = map;
         if (empty(messageTemplate)) {
             messageTemplate = "Could not find required parameter: {0}";
@@ -80,8 +80,8 @@ public class RequiredParamWrapper<T> {
      * @param <T>
      * @return
      */
-    public <T> RequiredParamWrapper<T> fromRequest() {
-        return new RequiredParamWrapper<T>(request().getBodyMap(), "Required POST body parameter {0} was not found.");
+    public <T> ParamExtractor<T> fromRequest() {
+        return new ParamExtractor<T>(request().getBodyMap(), "Required POST body parameter {0} was not found.");
     }
 
     /**

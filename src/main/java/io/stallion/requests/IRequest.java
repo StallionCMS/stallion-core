@@ -31,6 +31,9 @@ import java.util.Set;
 import static io.stallion.utils.Literals.empty;
 
 public interface IRequest {
+    public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";
+
+
     /**
      * Get the full, externally facing URL used to intiate this request.
      *
@@ -66,8 +69,7 @@ public interface IRequest {
      */
     public String getQueryString();
 
-    @Deprecated
-    public IRequest setHandled(Boolean val);
+
 
     /**
      * Get the RemoteAddr field from the underlying HttpServletRequest object,

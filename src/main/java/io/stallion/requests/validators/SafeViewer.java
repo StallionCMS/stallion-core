@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.requests;
+package io.stallion.requests.validators;
 
 import io.stallion.dal.base.Model;
 import io.stallion.reflection.PropertyUtils;

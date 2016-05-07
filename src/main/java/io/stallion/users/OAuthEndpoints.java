@@ -23,7 +23,7 @@ import io.stallion.restfulEndpoints.BodyParam;
 import io.stallion.restfulEndpoints.MinRole;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
-import io.stallion.utils.RequiredParamWrapper;
+import io.stallion.requests.validators.ParamExtractor;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.*;
@@ -180,8 +180,8 @@ public class OAuthEndpoints {
     }
 
     public Object authorizationCodeGrantToken() {
-        RequiredParamWrapper<String> params =
-                new RequiredParamWrapper(request().getBodyMap(),
+        ParamExtractor<String> params =
+                new ParamExtractor(request().getBodyMap(),
                 "Required post body parameter {0} was not found.");
         String code = params.get("code");
         String redirectUri = params.get("redirect_uri");
@@ -224,8 +224,8 @@ public class OAuthEndpoints {
     }
 
     public Object passwordGrantToken() {
-        RequiredParamWrapper<String> params =
-                new RequiredParamWrapper(request().getBodyMap(),
+        ParamExtractor<String> params =
+                new ParamExtractor(request().getBodyMap(),
                         "Required post body paramater {0} was not found.");
         String password = params.get("password");
         String username = params.get("username");

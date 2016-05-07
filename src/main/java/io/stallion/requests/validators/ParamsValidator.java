@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.requests;
+package io.stallion.requests.validators;
 
 import io.stallion.exceptions.ClientException;
 import io.stallion.reflection.PropertyUtils;
@@ -23,9 +23,26 @@ import io.stallion.reflection.PropertyUtils;
 import java.util.List;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
-
+/**
+ * Validates a bunch of variables and raises an informative exception if any are invalid.
+ *
+ * Example usage:
+ *
+ * @POST
+ * public String newThing(@BodyParam("email") String email, @BodyParam("name") String name, @BodyParam String nickName) {
+ *     new ParamsValidator()
+ *         .add("name", name, 1)
+ *         .addEmail("email", email)
+ *         .optional("nickName", nickName)
+ *         .validate();
+ *
+ * }
+ *
+ *
+ *
+ */
+@Deprecated
 public class ParamsValidator {
     List<OneParam> params = list();
 

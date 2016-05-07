@@ -49,10 +49,6 @@ public class SandboxedRequest implements IRequest {
         return request.getQueryString();
     }
 
-    @Override
-    public IRequest setHandled(Boolean val) {
-        return this;
-    }
 
     @Override
     public String getRemoteAddr() {

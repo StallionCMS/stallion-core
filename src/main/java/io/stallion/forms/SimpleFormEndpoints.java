@@ -19,6 +19,7 @@ package io.stallion.forms;
 
 import io.stallion.dal.base.SettableOptions;
 import io.stallion.exceptions.ClientException;
+import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.ObjectParam;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.utils.Encrypter;
@@ -35,8 +36,11 @@ public class SimpleFormEndpoints {
 
     @POST
     @Path("/contacts/submit-form")
-    public Boolean submitForm(@ObjectParam(targetClass = SimpleFormSubmission.class, restricted = SettableOptions.Createable.class) SimpleFormSubmission submission) {
-
+    public Boolean submitForm(@ObjectParam(targetClass = SimpleFormSubmission.class) SimpleFormSubmission rawSubmission) {
+        SimpleFormSubmission submission = SafeMerger
+                .nonEmpty("antiSpamToken", "pageUrl", "data")
+                .withOptional("email", "pageTitle", "formId")
+                .merge(rawSubmission);
 
         /* The Anti-spam token is an encrypted token with a milliseconds timestamp and a randomly generated key
            This prevents a spammer from simply hitting this endpoint over and over again with a script. A given
@@ -47,9 +51,7 @@ public class SimpleFormEndpoints {
            parsing out the spam token single every time. We would have to implement IP address throttling or
            captchas to fix that.
          */
-        if (empty(submission.getAntiSpamToken())) {
-            throw new ClientException("Missing anti-spam token");
-        }
+
         String token = Encrypter.decryptString(settings().getAntiSpamSecret(), submission.getAntiSpamToken());
         if (empty(token) || !token.contains("|")) {
             throw new ClientException("Anti-spam token is not in the correct format");

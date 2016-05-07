@@ -55,10 +55,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 import static io.stallion.utils.Literals.*;
@@ -68,10 +65,10 @@ import static io.stallion.utils.Literals.*;
  * sending data to the Stallion response.
  *
  */
-public class RequestProcessor {
+class RequestProcessor {
     private StRequest request;
     private StResponse response;
-    public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";
+
 
     public RequestProcessor(StRequest request, StResponse response) {
         this.request = request;
@@ -94,9 +91,8 @@ public class RequestProcessor {
             // Defaults
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(200);
-            request.setHandled(true);
             if (!"get".equals(request.getMethod().toLowerCase())) {
-                response.addCookie(RECENT_POSTBACK_COOKIE, String.valueOf(mils()), 15);
+                response.addCookie(IRequest.RECENT_POSTBACK_COOKIE, String.valueOf(mils()), 15);
             }
 
             // trigger PreRequest hooks
@@ -334,6 +330,9 @@ public class RequestProcessor {
             if (arg.getTargetClass() != null && val != null && !"ObjectParam".equals(arg.getType())) {
                 val = PropertyUtils.transform(val, arg.getTargetClass());
             }
+            if ("BodyParam".equals(arg.getType())) {
+                validateRequestArgument(arg, val);
+            }
             methodArgs.add(val);
         }
         Log.finest("PositionalArguments: count={0} values={1}", methodArgs.size(), methodArgs);
@@ -394,6 +393,40 @@ public class RequestProcessor {
         }
 
         return responseObjectToString(out, endpoint);
+    }
+
+    private void validateRequestArgument(RequestArg arg, Object value) {
+        if ((arg.isRequired() || !arg.isAllowEmpty()) && value == null) {
+            throw new ClientException("Body field " + arg.getName() + " must be provided.");
+        }
+        if (!arg.isAllowEmpty()) {
+            if (emptyObject(value)) {
+                throw new ClientException("Body field " + arg.getName() + " must be non-empty.");
+            }
+        }
+        if (arg.getMinLength() > 0) {
+            if (value instanceof String) {
+                if (((String) value).length() < arg.getMinLength()) {
+                    throw new ClientException("Field " + arg.getName() + " must have at least " + arg.getMinLength() + " characters.");
+                }
+            } else if (value instanceof Collection) {
+                if (((Collection) value).size() < arg.getMinLength()) {
+                    throw new ClientException("Field " + arg.getName() + " must have at least " + arg.getMinLength() + " entries.");
+                }
+            }
+        }
+        if (arg.isEmailParam()) {
+            String email = (String)value;
+            if (!GeneralUtils.isValidEmailAddress(email)) {
+                throw new ClientException("Field " + arg.getName() + " must be a valid email address.");
+            }
+        }
+        if (arg.getValidationPattern() != null) {
+            String s = (String)value;
+            if (!arg.getValidationPattern().matcher(s).matches()) {
+                throw new ClientException("Field " + arg.getName() + " does not pass validation.");
+            }
+        }
     }
 
     String responseObjectToString(Object obj, RestEndpointBase endpoint) throws Exception {

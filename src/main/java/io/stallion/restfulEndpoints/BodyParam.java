@@ -25,6 +25,8 @@ import java.lang.annotation.RetentionPolicy;
 public @interface BodyParam {
     public String value();
     public boolean required() default false;
+    public boolean allowEmpty() default false;
     public boolean isEmail() default false;
     public int minLength() default 0;
+    public String validationPattern() default "";
 }

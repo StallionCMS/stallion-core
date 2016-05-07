@@ -55,7 +55,7 @@ public class UserSettings implements SettingsSection {
     private Boolean newAccountsAllowCreation;
     @SettingMeta(valBoolean = true)
     private Boolean newAccountsRequireValidEmail;
-    @SettingMeta()
+    @SettingMeta(val="MEMBER")
     private String newAccountsRole;
     @SettingMeta(val = "")
     private String newAccountsDomainRestricted;

@@ -92,7 +92,7 @@ public class StandardModelController<T extends Model> implements ModelController
      * @return
      */
     public T newModel(Map o) {
-        return newModel(o, null);
+        return newModel(o, new String[]{});
     }
 
     public T newModel(Map o, String ...fields) {

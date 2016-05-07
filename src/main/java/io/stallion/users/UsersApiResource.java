@@ -24,14 +24,14 @@ import io.stallion.assets.DefinedBundle;
 import io.stallion.dal.filtering.FilterChain;
 import io.stallion.dal.filtering.Pager;
 import io.stallion.exceptions.*;
-import io.stallion.requests.ParamsValidator;
+import io.stallion.requests.validators.ParamsValidator;
 import io.stallion.restfulEndpoints.*;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
+import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.Sanitize;
 import io.stallion.utils.json.RestrictedViews;
 import org.apache.commons.lang3.StringUtils;
-import org.mindrot.jbcrypt.BCrypt;
 
 import javax.ws.rs.*;
 
@@ -58,7 +58,7 @@ public class UsersApiResource implements EndpointResource {
                     val("allowReset", settings().getUsers().getPasswordResetEnabled()),
                     val("allowRegister", settings().getUsers().getNewAccountsAllowCreation()),
                     val("returnUrl", URLEncoder.encode((or(request().getParameter("stReturnUrl"), "")).replace("\"", ""), "UTF-8")),
-                    val("email", email));
+                    val("email", Sanitize.escapeHtmlAttribute(email)));
         } catch (UnsupportedEncodingException e) {
            throw new RuntimeException(e);
         }
@@ -78,7 +78,7 @@ public class UsersApiResource implements EndpointResource {
     @JsonView(RestrictedViews.Owner.class)
     @Produces("application/json")
     @Path("/submit-login")
-    public Object login(@BodyParam("username") String username, @BodyParam("password") String password, @BodyParam("rememberMe") Boolean rememberMe) {
+    public Object login(@BodyParam("username") String username, @BodyParam("password") String password, @BodyParam(value = "rememberMe", allowEmpty = true) Boolean rememberMe) {
         return UserController.instance().loginUser(username, password, rememberMe);
     }
 
@@ -98,16 +98,10 @@ public class UsersApiResource implements EndpointResource {
     @Produces("application/json")
     @JsonView(RestrictedViews.Member.class)
     @Path("/do-register")
-    public Object doRegister(@BodyParam("displayName") String displayName, @BodyParam("username") String email, @BodyParam("password") String password, @BodyParam("passwordConfirm") String passwordConfirm, @BodyParam("returnUrl") String returnUrl) {
+    public Object doRegister(@BodyParam("displayName") String displayName, @BodyParam("username") String email, @BodyParam("password") String password, @BodyParam("passwordConfirm") String passwordConfirm, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
         if (!settings().getUsers().getNewAccountsAllowCreation()) {
             throw new ClientException("The default new account creation endpoint is not enabled for this site.");
         }
-        new ParamsValidator()
-                .add("displayName", displayName)
-                .addEmail("username", email)
-                .add("password", password, 6)
-                .add("passwordConfirm", password, 6)
-                .validate();
         IUser existing = UserController.instance().forEmail(email);
         if (existing != null) {
             throw new ClientException("A user with that email address already exists.");
@@ -138,7 +132,7 @@ public class UsersApiResource implements EndpointResource {
     @POST
     @Path("/send-verify-email")
     @Produces("text/html")
-    public Object sendVerifyEmail(@BodyParam("email") String email, @BodyParam("returnUrl") String returnUrl) {
+    public Object sendVerifyEmail(@BodyParam("email") String email, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
         UserController.instance().sendEmailVerifyEmail(email, returnUrl);
         return true;
     }
@@ -265,28 +259,16 @@ public class UsersApiResource implements EndpointResource {
         return true;
     }
 
-
-
-    @GET
-    @Path("/new")
-    @Produces("text/html")
-    public Object newAccount() {
-        URL url = getClass().getResource("/templates/public/login.jinja");
-        String html = TemplateRenderer.instance().renderTemplate(url.toString());
-        return html;
-    }
+    /*
 
     @POST
     @Path("/create-new-account")
     @Produces("application/json")
-    public Object createNewAccount(@BodyParam("displayName") String displayName, @BodyParam("email") String email, @BodyParam("password") String password, @BodyParam("passwordConfirm") String passwordConfirm) {
+    public Object createNewAccount(@BodyParam("displayName") String displayName, @BodyParam(value = "email", isEmail = true) String email, @BodyParam(value = "password", minLength = 6) String password, @BodyParam(value = "passwordConfirm", minLength = 6) String passwordConfirm) {
         if (!settings().getUsers().getNewAccountsAllowCreation()) {
             throw new ClientException("User creation is disabled for this application.");
         }
 
-        if (empty(email) || !email.contains("@")) {
-            throw new ClientException("Email is missing or not valid");
-        }
         String domain = StringUtils.split(email, "@", 2)[1];
         if (!empty(settings().getUsers().getNewAccountsDomainRestricted())) {
             if (!settings().getUsers().getNewAccountsDomainRestricted().equals(domain)) {
@@ -333,7 +315,7 @@ public class UsersApiResource implements EndpointResource {
 
     }
 
-
+         */
 
     @GET
     @Path("/current-user-info")

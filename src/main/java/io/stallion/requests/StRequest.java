@@ -123,13 +123,6 @@ public class StRequest implements IRequest {
     }
 
     @Override
-    public StRequest setHandled(Boolean val) {
-
-        baseRequest.setHandled(val);
-        return this;
-    }
-
-    @Override
     public String getRemoteAddr() {
         return request.getRemoteAddr();
     }
