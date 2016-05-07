@@ -65,7 +65,7 @@ public class JavaSiteTests extends AppIntegrationCaseBase {
         MockResponse response = client.post("/_stx/java-site/hello/creatify", pojo);
         Assert.assertEquals(200, response.getStatus());
         Log.finer("Response: {0}", response.getContent());
-        // Status field should be dropped, because it does not have the @Creatable annotation
+        // Status field should be dropped, because it was not settable
         assertResponseDoesNotContain(response, "fake-status-zzzxxx");
         ExamplePojo actual = responseToObject(response);
         assertEquals("new", actual.getStatus());

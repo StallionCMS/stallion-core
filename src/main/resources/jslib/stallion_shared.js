@@ -167,8 +167,8 @@ load = loadjs;
     stallion.Encrypter = Java.type("io.stallion.utils.Encrypter");
     stallion.SimpleTemplate = Java.type("io.stallion.utils.SimpleTemplate");
     stallion.GeneralUtils = Java.type("io.stallion.utils.GeneralUtils");
-    stallion.SafeMerger = Java.type('io.stallion.requests.SafeMerger');
-    stallion.SafeViewer = Java.type('io.stallion.requests.SafeViewer');
+    stallion.SafeMerger = Java.type('io.stallion.requests.validators.SafeMerger');
+    stallion.SafeViewer = Java.type('io.stallion.requests.validators.SafeViewer');
     stallion.Literals = Java.type('io.stallion.utils.Literals');
     stallion.Set = stallion.Literals.set;
     

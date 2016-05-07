@@ -43,10 +43,16 @@ public class SafeMerger {
         return merger;
     }
 
+    public static SafeMerger optional(String...fieldNames) {
+        SafeMerger merger = new SafeMerger().withOptional(fieldNames);
+        return merger;
+    }
+
+
     public SafeMerger withNonNull(String...fieldNames) {
         for (String field: fieldNames) {
             params.add(
-                    new OneParam().setRequired(true)
+                    new OneParam().setFieldName(field).setRequired(true)
             );
         }
         return this;
@@ -54,35 +60,35 @@ public class SafeMerger {
 
     public SafeMerger withNonEmpty(String...fieldNames) {
         for (String field: fieldNames) {
-            params.add(new OneParam().setRequired(true).setNonEmpty(true));
+            params.add(new OneParam().setFieldName(field).setRequired(true).setNonEmpty(true));
         }
         return this;
     }
 
     public SafeMerger withEmail(String...fieldNames) {
         for (String field: fieldNames) {
-            params.add(new OneParam().setEmail(true));
+            params.add(new OneParam().setFieldName(field).setEmail(true));
         }
         return this;
     }
 
     public SafeMerger withMinLength(int minLength, String...fieldNames) {
         for (String field: fieldNames) {
-            params.add(new OneParam().setRequired(true).setMinLength(minLength));
+            params.add(new OneParam().setFieldName(field).setRequired(true).setMinLength(minLength));
         }
         return this;
     }
 
     public SafeMerger withPatterns(Pattern pattern, String ...fieldNames) {
         for (String field: fieldNames) {
-            params.add(new OneParam().setRequired(true).setPattern(pattern));
+            params.add(new OneParam().setFieldName(field).setRequired(true).setPattern(pattern));
         }
         return this;
     }
 
     public SafeMerger withOptional(String...fieldNames) {
         for (String field: fieldNames) {
-            params.add(new OneParam().setRequired(false));
+            params.add(new OneParam().setFieldName(field).setRequired(false));
         }
         return this;
     }

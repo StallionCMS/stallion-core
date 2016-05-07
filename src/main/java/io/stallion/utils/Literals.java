@@ -185,25 +185,25 @@ public class Literals {
             return true;
         }
         if (o instanceof String) {
-            return !"".equals(o);
+            return "".equals(o);
         }
         if (o instanceof Long) {
-            return (Long)o != 0L;
+            return (Long)o == 0L;
         }
         if (o instanceof Integer) {
-            return (Integer)o != 0;
+            return (Integer)o == 0;
         }
         if (o instanceof Double) {
-            return (Double)o != 0.0;
+            return (Double)o == 0.0;
         }
         if (o instanceof Float) {
-            return (Float)o != 0.0;
+            return (Float)o == 0.0;
         }
         if (o instanceof Collection) {
-            return ((List)o).size() > 0;
+            return ((List)o).size() == 0;
         }
         if (o instanceof Map) {
-            return ((List)o).size() > 0;
+            return ((List)o).size() == 0;
         }
         return false;
     }
