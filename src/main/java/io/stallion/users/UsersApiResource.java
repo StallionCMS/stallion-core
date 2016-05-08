@@ -505,7 +505,8 @@ public class UsersApiResource implements EndpointResource {
             ));
             DefinedBundle.register(new DefinedBundle(
                     "userAdminJavascripts", ".js",
-                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js")
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js"),
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-table-riot.tag.js").setProcessor("riot")
             ));
         }
     }

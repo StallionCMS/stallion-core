@@ -61,6 +61,8 @@ public class Settings implements ISettings {
     private String metaGenerator = null;
     @SettingMeta(val="", help = "The email address users of the site should contact in case of problems. This will be publicly viewable.")
     private String supportEmail;
+    @SettingMeta(valLong = 1430510589000L)
+    private Long appCreatedMillis;
 
 
 
@@ -770,4 +772,12 @@ public class Settings implements ISettings {
         return this;
     }
 
+    public Long getAppCreatedMillis() {
+        return appCreatedMillis;
+    }
+
+    public Settings setAppCreatedMillis(Long appCreatedMillis) {
+        this.appCreatedMillis = appCreatedMillis;
+        return this;
+    }
 }

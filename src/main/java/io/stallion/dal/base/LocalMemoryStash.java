@@ -296,10 +296,9 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
     @Override
     public void loadAll()  {
         Log.fine("Load all from {0}. ", getBucket());
-        List items = this.getPersister().fetchAll();
-        for(Object item: items) {
-            T displayable = (T)item;
-            loadItem(displayable);
+        List<T> items = this.getPersister().fetchAll();
+        for(T item: items) {
+            loadItem(item);
         }
     }
 

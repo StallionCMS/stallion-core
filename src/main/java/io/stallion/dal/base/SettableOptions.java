@@ -19,7 +19,7 @@ package io.stallion.dal.base;
 
 import static io.stallion.utils.Literals.*;
 
-
+@Deprecated
 public class SettableOptions {
     public static class BaseSettable {};
     public static class Immutable extends BaseSettable{};

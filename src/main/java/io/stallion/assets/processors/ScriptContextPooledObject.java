@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.assets;
+package io.stallion.assets.processors;
 
 import org.apache.commons.pool2.BaseObjectPool;
 

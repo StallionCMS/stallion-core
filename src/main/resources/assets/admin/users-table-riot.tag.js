@@ -215,6 +215,7 @@
          return false;
      };
 
+     /** Sends the target user a password reset email so they can reset their own password. */
      forcePasswordReset = function(evt) {
          stallion.request({
              url: '/st-admin/users/force-password-reset/' + self.opts.userId,

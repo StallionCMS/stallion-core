@@ -17,15 +17,18 @@
 
 package io.stallion.dal.base;
 
+import io.stallion.services.Log;
 import io.stallion.settings.Settings;
+import io.stallion.utils.DateUtils;
 
+import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This generates unique IDs (unique within a particular stallion application) based on the current time.
  * This is used in file based systems.
  *
- * Generates a unique ticket based on a counter, the current time in epoch seconds, and the node number.
+ * Generates a unique ticket based on a counter, the current time rounded to nearest 10 seconds, and the node number.
  * This will create duplicates if you need to generate more than 10,000 tickets in a second.
  * This will also exceed the MAX_SAFE_INTEGER value for javascript around the year 2248.
  *
@@ -33,6 +36,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TimebasedTickets implements Tickets {
     private AtomicInteger i = new AtomicInteger();
+    private Long baseSeconds = null;
+    private static int loadedCount = 0;
+
+    public TimebasedTickets() {
+        // If we reload tickets during a test, we need to start with a higher increment or else
+        // we will generate the same IDs over again. If we run more than 100 test cases with
+        // full app context reloads in a single
+        // second, then we might get duplicate IDs, but that is probably impossible
+        loadedCount++;
+        i.set(loadedCount * 1000);
+    }
+
+
+
 
     /**
      *
@@ -41,9 +58,20 @@ public class TimebasedTickets implements Tickets {
      */
     @Override
     public Long nextId() {
-        if (i.get() > 9000) {
+        Integer counter = i.incrementAndGet();
+        if (counter > 99500) {
             i.set(0);
         }
-        return ((System.currentTimeMillis() / 1000) * 100000) + i.incrementAndGet() * 10 + Settings.instance().getNodeNumber();
+        Long currentSeconds = System.currentTimeMillis() / 1000;
+        Long sec = currentSeconds - getBaseSeconds();
+        Long ticket = ((sec) * 1000000) + (counter * 10) + Settings.instance().getNodeNumber();
+        return ticket;
+    }
+
+    private Long getBaseSeconds() {
+        if (baseSeconds == null) {
+            baseSeconds = Settings.instance().getAppCreatedMillis() / 1000;
+        }
+        return baseSeconds;
     }
 }

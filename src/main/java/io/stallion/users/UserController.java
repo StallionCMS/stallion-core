@@ -611,6 +611,10 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         public String getSubject() {
             return "Verify your email address.";
         }
+
+        public String getUniqueKey() {
+            return truncate(GeneralUtils.slugify(getSubject()), 150) + "-" + user.getEmail() + "-" + minuteStamp + getEmailType();
+        }
     }
 
     public class ResetEmailEmailer extends ContactableEmailer {
@@ -647,5 +651,11 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         public String getSubject() {
             return "Reset your password for " + Settings.instance().getSiteName();
         }
+
+
+        public String getUniqueKey() {
+            return truncate(GeneralUtils.slugify(getSubject()), 150) + "-" + user.getEmail() + "-" + minuteStamp + getEmailType();
+        }
+
     }
 }

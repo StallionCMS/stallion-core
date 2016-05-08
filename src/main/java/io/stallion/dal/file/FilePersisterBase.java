@@ -29,6 +29,7 @@ import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -270,8 +271,7 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
 
     /**
      * Derives a Long id by hashing the file path and then taking the first 8 bytes
-     * of the path. If there are a hundred thousand files, the chance of a single
-     * collision will be 1 in one hundred million.
+     * of the path.
      *
      * This is used if the model object doesn't have a defined id field.
      *
@@ -284,10 +284,12 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
         path = StringUtils.stripStart(path, "/");
         path = getBucket() + "-----" + path;
         // Derive a long id by hashing the file path
-        // If there are a hundred thousand files, the chance of a single collision will be 1 in one hundred million
-        byte[] bs = Arrays.copyOfRange(DigestUtils.md5(path), 0, 8);
-        ByteBuffer bb = ByteBuffer.wrap(bs);
-        Long l = bb.getLong();
+        byte[] bs = Arrays.copyOfRange(DigestUtils.md5(path), 0, 6);
+        bs = ArrayUtils.addAll(new byte[]{0,0}, bs);
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.put(bs);
+        buffer.flip();//need flip
+        Long l = buffer.getLong();
         if (l < 0) {
             l = -l;
         }

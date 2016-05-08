@@ -58,8 +58,10 @@ public abstract class ContactableEmailer<T extends Contactable> {
     protected String template;
     protected URL templateUrl;
     protected String weekStamp;
+    protected String hourStamp;
     protected String dayStamp;
     protected Sandbox sandbox;
+    protected String minuteStamp;
 
 
     private Map<String, Object> context = map();
@@ -77,10 +79,12 @@ public abstract class ContactableEmailer<T extends Contactable> {
         ZonedDateTime now = DateUtils.utcNow();
         weekStamp = now.format(DateTimeFormatter.ofPattern("YYYY-w"));
         dayStamp = now.format(DateTimeFormatter.ofPattern("YYYY-MM-dd"));
+        minuteStamp = now.format(DateTimeFormatter.ofPattern("YYYY-MM-dd HHmm"));
+        hourStamp = now.format(DateTimeFormatter.ofPattern("YYYY-MM-dd HH"));
         context.put("weekStamp", weekStamp);
         context.put("dayStamp", dayStamp);
-        context.put("hourStamp",
-                now.format(DateTimeFormatter.ofPattern("YYYY-MM-dd HH")));
+        context.put("minuteStamp", minuteStamp);
+        context.put("hourStamp", hourStamp);
         context.put("qaPrefix", "");
         context.put("envPrefix", "");
         context.put("env", settings().getEnv());
@@ -339,7 +343,7 @@ public abstract class ContactableEmailer<T extends Contactable> {
      * @return
      */
     public String getUniqueKey() {
-        return truncate(GeneralUtils.slugify(getSubject()), 150) + "-" + user.getId() + "-" + weekStamp + getEmailType();
+        return truncate(GeneralUtils.slugify(getSubject()), 150) + "-" + user.getEmail() + "-" + weekStamp + getEmailType();
     }
 
 

@@ -187,7 +187,8 @@ public class BundleFile {
         return processor;
     }
 
-    public void setProcessor(String processor) {
+    public BundleFile setProcessor(String processor) {
         this.processor = processor;
+        return this;
     }
 }

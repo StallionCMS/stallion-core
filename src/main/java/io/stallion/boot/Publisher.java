@@ -185,6 +185,7 @@ class Publisher implements StallionRunAction<PublishingCommandOptions> {
                 val("log_level", Log.getLogLevel().toString().toLowerCase()),
                 val("host", host),
                 val("env", deployEnv),
+                val("site_url", Settings.instance().getSiteUrl()),
                 val("redirect_to_ssl", redirectToSsl),
                 val("redirect_to_primary", redirectToPrimary),
                 val("alias_domains", config.getAliasDomains()),

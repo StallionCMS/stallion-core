@@ -15,28 +15,26 @@
  *
  */
 
-package io.stallion.assets;
+package io.stallion.assets.processors;
 
-import io.stallion.utils.ResourceHelpers;
 import jdk.nashorn.api.scripting.JSObject;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 
-import javax.script.*;
-
+import javax.script.Invocable;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
-
-public class ReactJsxCompiler {
+public class RiotCompiler {
 
     private static boolean loaded = false;
     private static ScriptEngine nashorn;
-    private static ReactScriptContextFactory contextFactory;
+    private static RiotScriptContextFactory contextFactory;
     private static ObjectPool<ScriptContext> pool;
     private static final ReentrantLock lock = new ReentrantLock();
 
@@ -52,7 +50,7 @@ public class ReactJsxCompiler {
             if (locked) {
                 ScriptEngineManager mgr = new ScriptEngineManager();
                 nashorn = mgr.getEngineByName("nashorn");
-                contextFactory = new ReactScriptContextFactory(nashorn);
+                contextFactory = new RiotScriptContextFactory(nashorn);
                 pool = new GenericObjectPool(contextFactory);
                 loaded = true;
             }
@@ -66,14 +64,13 @@ public class ReactJsxCompiler {
     public static String transform(String source)  {
         try {
             load();
-            String code = "/*Error compiling react code*/";
+            String code = "/*Error compiling riotjs code*/";
             ScriptContext ctx = pool.borrowObject();
             try {
-                JSObject jsxTransformer = (JSObject) nashorn.eval("JSXTransformer", ctx);
+                JSObject riot = (JSObject) nashorn.eval("riot.util.compiler", ctx);
                 Invocable invocable = (Invocable) nashorn;
-                String componentName = "Component";
-                ScriptObjectMirror jsxMirror = (ScriptObjectMirror) invocable.invokeMethod(jsxTransformer, "transform", source);
-                code = (String) jsxMirror.getMember("code");
+                code = (String) invocable.invokeMethod(riot, "compile", source);
+
             } finally {
                 pool.returnObject(ctx);
             }

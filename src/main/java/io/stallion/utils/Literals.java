@@ -203,7 +203,7 @@ public class Literals {
             return ((List)o).size() == 0;
         }
         if (o instanceof Map) {
-            return ((List)o).size() == 0;
+            return ((Map)o).size() == 0;
         }
         return false;
     }

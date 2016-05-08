@@ -21,8 +21,6 @@ import org.kohsuke.args4j.Option;
 
 
 class PublishingCommandOptions extends CommandOptionsBase {
-    @Option(name="-env", usage="The environment you are running in. The file settings.(env).toml will be merged into your settings.")        // no usage
-    private String env = "local";
 
     @Option(name="-user", usage="The name of the unix user with whom to connect to the server")
     private String user;
@@ -48,15 +46,6 @@ class PublishingCommandOptions extends CommandOptionsBase {
         return this;
     }
 
-    @Override
-    public String getEnv() {
-        return env;
-    }
-
-    @Override
-    public void setEnv(String env) {
-        this.env = env;
-    }
 }
 
 

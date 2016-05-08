@@ -35,7 +35,7 @@ public class RequestArg {
     private boolean allowEmpty = true;
 
 
-    private Class<? extends SettableOptions.BaseSettable> settableAllowedForClass = null;
+
 
     public Class getTargetClass() {
         return targetClass;
@@ -74,13 +74,6 @@ public class RequestArg {
     }
 
 
-    public Class<? extends SettableOptions.BaseSettable> getSettableAllowedForClass() {
-        return settableAllowedForClass;
-    }
-
-    public void setSettableAllowedForClass(Class<? extends SettableOptions.BaseSettable> settableAllowedForClass) {
-        this.settableAllowedForClass = settableAllowedForClass;
-    }
 
     public Class getAnnotationClass() {
         return annotationClass;

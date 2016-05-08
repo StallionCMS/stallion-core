@@ -20,6 +20,7 @@ package io.stallion.requests.validators;
 
 import io.stallion.exceptions.ClientException;
 import io.stallion.reflection.PropertyUtils;
+import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.Sanitize;
 
 import java.util.Collection;
@@ -33,6 +34,11 @@ import static io.stallion.utils.Literals.list;
 public class SafeMerger {
     private List<OneParam> params = list();
 
+    public static SafeMerger with() {
+        return new SafeMerger();
+    }
+
+    /*
     public static SafeMerger nonEmpty(String...fieldNames) {
         SafeMerger merger = new SafeMerger().withNonEmpty(fieldNames);
         return merger;
@@ -47,9 +53,10 @@ public class SafeMerger {
         SafeMerger merger = new SafeMerger().withOptional(fieldNames);
         return merger;
     }
+    */
 
 
-    public SafeMerger withNonNull(String...fieldNames) {
+    public SafeMerger nonNull(String...fieldNames) {
         for (String field: fieldNames) {
             params.add(
                     new OneParam().setFieldName(field).setRequired(true)
@@ -58,37 +65,44 @@ public class SafeMerger {
         return this;
     }
 
-    public SafeMerger withNonEmpty(String...fieldNames) {
+    public SafeMerger nonEmpty(String...fieldNames) {
         for (String field: fieldNames) {
             params.add(new OneParam().setFieldName(field).setRequired(true).setNonEmpty(true));
         }
         return this;
     }
 
-    public SafeMerger withEmail(String...fieldNames) {
+    public SafeMerger email(String...fieldNames) {
         for (String field: fieldNames) {
             params.add(new OneParam().setFieldName(field).setEmail(true));
         }
         return this;
     }
 
-    public SafeMerger withMinLength(int minLength, String...fieldNames) {
+    public SafeMerger minLength(int minLength, String...fieldNames) {
         for (String field: fieldNames) {
             params.add(new OneParam().setFieldName(field).setRequired(true).setMinLength(minLength));
         }
         return this;
     }
 
-    public SafeMerger withPatterns(Pattern pattern, String ...fieldNames) {
+    public SafeMerger patterns(Pattern pattern, String ...fieldNames) {
         for (String field: fieldNames) {
             params.add(new OneParam().setFieldName(field).setRequired(true).setPattern(pattern));
         }
         return this;
     }
 
-    public SafeMerger withOptional(String...fieldNames) {
+    public SafeMerger optional(String...fieldNames) {
         for (String field: fieldNames) {
             params.add(new OneParam().setFieldName(field).setRequired(false));
+        }
+        return this;
+    }
+
+    public SafeMerger optionalEmail(String...fieldNames) {
+        for (String field: fieldNames) {
+            params.add(new OneParam().setFieldName(field).setRequired(false).setNonEmpty(false).setEmail(true));
         }
         return this;
     }
@@ -138,9 +152,11 @@ public class SafeMerger {
             }
             return;
         }
-        if (param.isNonEmpty()) {
-            if (emptyObject(val)) {
+        if (emptyObject(val))  {
+            if (param.isNonEmpty()) {
                 errors.add("Field " + param.getFieldName() + " must not be empty.");
+                return;
+            } else if (!param.isRequired()) {
                 return;
             }
         }
@@ -159,7 +175,7 @@ public class SafeMerger {
         }
         if (param.isEmail()) {
             String valString = (String)val;
-            if (valString.length() < 3 || !valString.contains("@") || valString.contains(" ")) {
+            if (!GeneralUtils.isValidEmailAddress(valString)) {
                 errors.add("Field " + param.getFieldName() + " must be a valid email address. Passed in value - " + Sanitize.stripAll(valString) + " - is not valid.");
                 return;
             }

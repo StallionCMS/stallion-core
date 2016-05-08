@@ -374,20 +374,24 @@ public class BundleHandler {
     public String getDebugUrl(BundleFile bf) {
         String url = bf.getDebugUrl();
         if (url.startsWith("http://") || url.startsWith("https://")) {
-            return appendCacheBusting(
+            url = appendCacheBusting(
                     bf.getDebugUrl(),
                     DigestUtils.md5Hex(url));
         } else if (empty(bf.getPluginName())) {
-            return appendCacheBusting(
+            url = appendCacheBusting(
                     baseUrl + "/st-assets/" + url,
                     getFileTimeStamp(url));
         } else {
             // Register this path as an allowed resource path
             addAllowedPath(bf.getPluginName(), url);
-            return appendCacheBusting(
+            url = appendCacheBusting(
                     baseUrl + "/st-resource/" + bf.getPluginName() + "/" + url,
                     startTime.toString());
         }
+        if (!empty(bf.getProcessor()) && !url.contains("processor=")) {
+            url += "&processor=" + bf.getProcessor();
+        }
+        return url;
     }
 
     public String appendCacheBusting(String url, String cacheBust) {

@@ -15,15 +15,29 @@
  *
  */
 
-package io.stallion.restfulEndpoints;
+package io.stallion.assets.processors;
 
-import io.stallion.dal.base.SettableOptions;
+import io.stallion.services.Log;
+import io.stallion.testing.AppIntegrationCaseBase;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.*;
 
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ObjectParam {
-    String name() default "";
-    Class targetClass() default Object.class;
+
+public class TestRiotCompiler extends AppIntegrationCaseBase{
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        startApp("/a_minimal_site");
+    }
+
+
+    @Test
+    public void testCompile() throws Exception {
+        RiotCompiler.load();
+        String source = RiotCompiler.transform("<comment>\n<h1>Hello {name}</h1>\n<script>var self = this;\nself.name = 'Peter';</script>\n</comment>");
+        Log.info(source);
+        assertContains(source, "riot.tag2('comment'");
+    }
 }

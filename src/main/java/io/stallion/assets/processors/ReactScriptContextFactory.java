@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.assets;
+package io.stallion.assets.processors;
 
 import io.stallion.utils.ResourceHelpers;
 import org.apache.commons.pool2.BasePooledObjectFactory;

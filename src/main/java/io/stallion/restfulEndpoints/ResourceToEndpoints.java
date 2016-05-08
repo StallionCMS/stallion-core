@@ -106,10 +106,11 @@ public class ResourceToEndpoints {
                         ObjectParam oParam = (ObjectParam)anno;
                         arg.setType("ObjectParam");
                         arg.setName("noop");
-                        arg.setTargetClass(oParam.targetClass());
-
-                        arg.setSettableAllowedForClass(oParam.restricted());
-
+                        if (oParam.targetClass() == null || oParam.targetClass().equals(Object.class)) {
+                            arg.setTargetClass(param.getType());
+                        } else {
+                            arg.setTargetClass(oParam.targetClass());
+                        }
                         arg.setAnnotationClass(ObjectParam.class);
                     } else if (MapParam.class.isInstance(anno)) {
                         arg.setType("MapParam");

@@ -38,8 +38,10 @@ public class SimpleFormEndpoints {
     @Path("/contacts/submit-form")
     public Boolean submitForm(@ObjectParam(targetClass = SimpleFormSubmission.class) SimpleFormSubmission rawSubmission) {
         SimpleFormSubmission submission = SafeMerger
+                .with()
                 .nonEmpty("antiSpamToken", "pageUrl", "data")
-                .withOptional("email", "pageTitle", "formId")
+                .optionalEmail("email")
+                .optional("pageTitle", "formId")
                 .merge(rawSubmission);
 
         /* The Anti-spam token is an encrypted token with a milliseconds timestamp and a randomly generated key

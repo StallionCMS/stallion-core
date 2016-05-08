@@ -170,6 +170,7 @@ class Publisher(object):
         self.redirect_to_ssl = conf.get('redirect_to_ssl', False)
         self.redirect_to_primary = conf.get('redirect_to_primary', False)
         self.executable_name = conf['executable_name']
+        self.site_url = conf['site_url']
 
 
     def publish(self):
@@ -423,6 +424,7 @@ respawn limit 3 60
         #urls = ['/st-admin/health/warmup'] + self.check_urls
         urls = self.check_urls or ['/']
         max_tries = 20
+        asset_urls = set()
         for url in urls:
             url = 'http://localhost:%s' % self.port + url
             for x in range(0, max_tries + 1):
@@ -435,7 +437,8 @@ respawn limit 3 60
                     o = !curl -v $url
                     assert '< HTTP/1.1 200 OK' in o, "200 OK not found in curl result for %s" % url
                     if '/st-admin/health/warmup' in url:
-                        assert 'Stallion-health: OK' in o, "Stallion-health: OK not found in curl result for /st-admin/health/warmup"        
+                        assert 'Stallion-health: OK' in o, "Stallion-health: OK not found in curl result for /st-admin/health/warmup"
+                    self.find_asset_urls_in_source(o, asset_urls)
                     break
                 except AssertionError:
                     if x == max_tries:
@@ -443,20 +446,25 @@ respawn limit 3 60
                         raise
                     info('Curl of %s not loading yet, waiting 3 seconds to retry' % url)
                     time.sleep(3)
-        url = 'http://localhost:%s' % self.port + "/"
-        o = !curl -v $url
         good("New Stallion instance is operational and healthy")
         info("Pre-fetching assets")
-        for path in re.findall('/st-assets/[^"\'\s]+', unicode(o)):
-            if ".css" not in path and ".js" not in path:
-                continue
-            asset_url = 'http://localhost:%s' % self.port + path
+        for asset_url in asset_urls:
             info("Pre-fetch asset " + asset_url)
             o = !curl -v $asset_url
-            if '< HTTP/1.1 200 OK' not in o:
-                sys.stderr.write(unicode(o))
+            content = "\n".join(o)
+            if 'HTTP/1.1 200 OK' not in content:
+                sys.stderr.write(content)
                 raise AssertionError("200 OK not found in curl result for %s" % asset_url)
         good("All assets preloaded")
+
+    def find_asset_urls_in_source(self, source, asset_urls):
+        source = unicode(source)
+        for path in re.findall('/st-assets/[^"\'\s]+', source):
+            if ".css" not in path and ".js" not in path:
+                continue
+            asset_urls.add('http://localhost:%s' % self.port + path)
+
+
 
 
     def swap_active(self):
@@ -504,10 +512,28 @@ respawn limit 3 60
             self._write('old', self.active)
         self._write('active', self.deploying)
         !nginx -s reload
+        succeeded = False
+        site_url = "http://"
+        if self.redirect_to_ssl and self.ssl_key:
+            site_url = "https://"
+        paths = self.check_urls or ['/']
+        site_url += self.domain + paths[0]
+        info("Fetching url via nginx " + site_url)
+        for x in range(0, 10):
+            debug("Fetching live url " + site_url)
+            o = !curl -v $site_url
+            if '< HTTP/1.1 200 OK' not in o:
+                if x == 9:
+                    sys.stderr.write(unicode(o))
+                    raise AssertionError("200 OK not found in curl result for %s" % site_url)
+            time.sleep(.2)
         good("New Stallion instance is now live!")
             
     def cleanup(self):
+        info("sleep for 5 seconds before tearing down previous version")
+        time.sleep(5)
         info("Stoping previous instance and cleaning up lock files")
+
         old = self._read('old')
         active = self._read('active')
         if old:
