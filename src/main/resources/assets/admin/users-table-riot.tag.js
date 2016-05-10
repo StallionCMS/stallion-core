@@ -34,7 +34,7 @@
             </tr>
         </tbody>
         <tbody if={!loading && users.length > 0}>
-            <tr each={user in users}  class="clickable-row user-row" onclick={rowClick} data-user-id="{user.id}">
+            <tr each={user in users}  class="clickable-row user-row user-row-{user.id}" onclick={rowClick} data-user-id="{user.id}">
                 <td>{user.username}</td>
                 <td>{user.displayName}</td>
                 <td>{user.email}</td>
@@ -157,6 +157,7 @@
                     </div>
                     
                     <button type="submit" class="st-button-submit  pure-button pure-button-primary">Save changes</button>
+                    <button onclick="this.form.submited=this.value;" value="save-and-return" type="submit" class="st-button-submit st-submit-and-return  pure-button pure-button-primary">Save and return</button>
                 </fieldset>
             </form>        
         </div>
@@ -198,7 +199,10 @@
      submit = function(evt) {
          evt.stopPropagation();
          evt.preventDefault();
-         
+         var returnAfter = false;
+         if (evt.target.submited === 'save-and-return') {
+             returnAfter = true;
+         }
          var data = self.getFormData();
          console.log('form submit', data, self.updateUserForm);
          stallion.request({
@@ -210,6 +214,9 @@
                  self.opts.formData = $.extend({}, user);
                  self.user = user;
                  self.update();
+                 if (returnAfter) {
+                     window.location.hash = "/";
+                 }
              }
          });
          return false;

@@ -89,6 +89,11 @@ if (window.$ && !window.jQuery) {
             if (spinner) {
                 spinner.clear();
             }
+            // Don't give an error message for cases where the error happens from navigating away from the page
+            // before we have finished a request.
+            if (xhr.readyState != 4) {
+                return;
+            }
             var o;
             try {
                 o = JSON.parse(xhr.responseText);
@@ -98,6 +103,7 @@ if (window.$ && !window.jQuery) {
             if (!o.message) {
                 o.message = 'Error processing request';
             }
+
             req.error(o, req.form, xhr);
 
         });

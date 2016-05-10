@@ -228,7 +228,7 @@ public class UsersApiResource implements EndpointResource {
     @POST
     @Path("/send-reset-email")
     @Produces("application/json")
-    public Object sendResetEmail(@BodyParam("email") String email, @BodyParam("returnUrl") String returnUrl) {
+    public Object sendResetEmail(@BodyParam("email") String email, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
         if (!settings().getUsers().getPasswordResetEnabled()) {
             throw new ClientException("Password reset has been disabled. Please contact an administrator to reset your password.");
         }

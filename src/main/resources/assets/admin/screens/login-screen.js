@@ -120,7 +120,8 @@
             data: data,
             form: formEle,
             success: function(o) {
-                window.location.href = stallion.queryParams().stReturnUrl;
+                var returnUrl = stallion.queryParams().stReturnUrl || stallion.queryParams().returnUrl || "/";
+                window.location.href = returnUrl;
             }
         });
 

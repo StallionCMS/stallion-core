@@ -6,7 +6,7 @@
         <form id="st-login-form" class="st-form pure-form pure-form-stacked">
             <fieldset>
                 {% if user.username %}
-
+                   <div class="logged-in-as-box">
                    <small>You are currently logged in as <em>{{ user.username }}</em> with role level <em>{{ user.role.toString().toLowerCase() }}</em>. <a href="/st-admin/users/logoff">Logoff</a></small>
                    {% if not user.approved %}
                        {% if not user.emailVerified %}
@@ -15,6 +15,7 @@
                        <br><b><small>Your account is pending administrative approval.</small></b>
                        {% endif %}
                    {% endif %}
+                   </div>
                 {% endif %}
                 <div class="st-bottom-space">
                     <label for="email">Username/Email</label>

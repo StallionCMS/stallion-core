@@ -45,7 +45,7 @@ public class UserSettings implements SettingsSection {
     }
 
 
-    @SettingMeta
+    @SettingMeta(valBoolean = true)
     private Boolean newAccountsAutoApprove;
     @SettingMeta(valBoolean = true)
     private Boolean passwordResetEnabled;

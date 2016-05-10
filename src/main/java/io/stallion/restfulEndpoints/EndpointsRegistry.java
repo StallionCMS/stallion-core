@@ -19,6 +19,7 @@ package io.stallion.restfulEndpoints;
 
 import io.stallion.exceptions.UsageException;
 import io.stallion.monitoring.HealthEndpoints;
+import io.stallion.monitoring.SeleniumEndpoints;
 import io.stallion.sitemaps.SiteMapEndpoints;
 import io.stallion.services.Log;
 
@@ -46,6 +47,7 @@ public class EndpointsRegistry {
 
     public static void registerDefaultEndpoints() {
         _instance.addResource("", new HealthEndpoints());
+        _instance.addResource("", new SeleniumEndpoints());
         //_instance.addResource("", new SiteMapEndpoints());
         SiteMapEndpoints.registerEndpoints();
     }
