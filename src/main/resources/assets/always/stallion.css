@@ -29,7 +29,7 @@
 .pre-fade {
     opacity: 0;
 }
-.st-form .st-field {
+.st-form .st-field, .pure-form-group {
     margin-bottom: 1em;
 }
 .st-form .st-field label {

@@ -61,8 +61,8 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="5">
-                    <label><input type="checkbox" id="include-deleted" onclick={includeDeleted}> Show deleted users?</label>
+                <td colspan="6">
+                    <label><input type="checkbox" id="include-deleted" onclick={includeDeleted} > Show deleted users?</label>
                 </td>
             </tr>
         </tfoot>
@@ -123,29 +123,29 @@
             <h3>Edit user: {user.email} - {user.displayName}</h3>
             <form id="st-update-user-form" name="updateUserForm" class="pure-form pure-form-stacked" onsubmit={submit}>
                 <fieldset>
-                    <div>
+                    <div class="st-bottom-space">
                         <label for="displayName">Display Name</label>
-                        <input name="displayName" type="text">
+                        <input name="displayName" type="text" class="pure-input-1">
                     </div>
-                    <div>
+                    <div class="st-bottom-space">
                         <label for="givenName">Given Name</label>
-                        <input name="givenName" type="text">
-                    </div>
-                    <div>
+                        <input name="givenName" type="text" class="pure-input-1">
+                    </div class="st-bottom-space">
+                    <div class="st-bottom-space">
                         <label for="familyName">Family Name</label>
-                        <input name="familyName" type="text">
+                        <input name="familyName" type="text" class="pure-input-1">
                     </div>
-                    <div>
+                    <div class="st-bottom-space">
                         <label for="email">Email</label>
-                        <input name="email" type="email" placeholder="Email">
+                        <input name="email" type="email" placeholder="Email" class="pure-input-1">
                     </div>
-                    <div>
+                    <div class="st-bottom-space">
                         <label for="email">Username</label>
-                        <input name="username" type="text">
+                        <input name="username" type="text" class="pure-input-1">
                     </div>
-                    <div>
+                    <div class="st-bottom-space">
                         <label for="state">Role</label>
-                        <select name="role">
+                        <select name="role" class="pure-input-1">
                             <option value="ANON">ANON</option>
                             <option value="CONTACT">CONTACT</option>
                             <option value="REGISTERED">REGISTERED</option>
@@ -155,9 +155,10 @@
                             <option value="ADMIN">ADMIN</option>
                         </select>
                     </div>
-                    
-                    <button type="submit" class="st-button-submit  pure-button pure-button-primary">Save changes</button>
-                    <button onclick="this.form.submited=this.value;" value="save-and-return" type="submit" class="st-button-submit st-submit-and-return  pure-button pure-button-primary">Save and return</button>
+                    <p>
+                        <button type="submit" class="st-button-submit  pure-button pure-button-primary">Save changes</button>
+                        <button onclick="this.form.submited=this.value;" value="save-and-return" type="submit" class="st-button-submit st-submit-and-return  pure-button pure-button-primary">Save and return</button>
+                   </p>
                 </fieldset>
             </form>        
         </div>

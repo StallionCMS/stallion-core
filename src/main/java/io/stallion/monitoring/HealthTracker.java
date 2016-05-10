@@ -32,6 +32,7 @@ import javax.net.ssl.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.SecureRandom;
@@ -134,6 +135,11 @@ public class HealthTracker {
     public void logException(Throwable e) {
         if (e instanceof ClientException) {
             return;
+        }
+        if (e instanceof InvocationTargetException) {
+            if (((InvocationTargetException) e).getTargetException() instanceof ClientException) {
+                return;
+            }
         }
         ExceptionInfo info = ExceptionInfo.newForException(e);
         exceptionQueue.add(info);

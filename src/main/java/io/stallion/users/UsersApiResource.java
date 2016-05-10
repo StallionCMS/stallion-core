@@ -341,7 +341,7 @@ public class UsersApiResource implements EndpointResource {
     @Produces("text/html")
     public String manageUsers() {
 
-
+        response().getMeta().setTitle("Manage Users");
         Map<String, Object> ctx = map();
         return TemplateRenderer.instance().renderTemplate("stallion:admin/admin-users.jinja", ctx);
     }
@@ -501,12 +501,14 @@ public class UsersApiResource implements EndpointResource {
 
             DefinedBundle.register(new DefinedBundle(
                     "userAdminStylesheets", ".css",
+
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/admin.css"),
                     new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
             ));
             DefinedBundle.register(new DefinedBundle(
                     "userAdminJavascripts", ".js",
                     new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js"),
-                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-table-riot.tag.js").setProcessor("riot")
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-table-riot.tag").setProcessor("riot")
             ));
         }
     }

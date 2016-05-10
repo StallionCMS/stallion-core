@@ -1,6 +1,6 @@
 {
   "deleted" : false,
-  "lastModifiedMillis" : 0,
+  "lastModifiedMillis" : 1462897719000,
   "username" : "selenium@stallion.io",
   "displayName" : "Selenium Tester",
   "givenName" : "Selenium",
@@ -15,7 +15,7 @@
   "bcryptedPassword" : "$2a$10$dF6ObJw0lsi33W3F9IPXmelNWxedc3HNlWyCFkruQUUZnFifOhA1u",
   "filePath" : "selenium-stallion-io-32328273010011.json",
   "predefined" : true,
-  "approved" : false,
+  "approved" : true,
   "emailVerified" : false,
   "resetToken" : "",
   "aliasForId" : 0,
@@ -24,7 +24,7 @@
   "totallyOptedOut" : false,
   "honorific" : "",
   "createdAt" : 1462838862104,
-  "authorized" : false,
+  "authorized" : true,
   "id" : 32328273010011,
-  "staff" : false
+  "staff" : true
 }
