@@ -30,6 +30,10 @@ public class ItemFileChangeEventHandler<T extends Model> extends BaseWatchEventH
     }
     @Override
     public void handle(String relativePath, String fullPath, WatchEvent.Kind<?> kind, WatchEvent<?> event) throws Exception {
+        relativePath = fullPath.replace(persister.getBucketFolderPath(), "");
+        if (relativePath.startsWith("/")) {
+            relativePath = relativePath.substring(1);
+        }
         this.persister.watchEventCallback(relativePath);
     }
 

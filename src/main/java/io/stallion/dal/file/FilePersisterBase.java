@@ -257,6 +257,12 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
     public void watchEventCallback(String filePath) {
         if (getFileToIdMap().containsKey(filePath)) {
             getStash().loadForId(getFileToIdMap().get(filePath));
+        } else {
+            String fullPath = getBucketFolderPath() + "/" + filePath;
+            T o = fetchOne(fullPath);
+            if (o != null) {
+                getStash().loadItem(o);
+            }
         }
     }
 

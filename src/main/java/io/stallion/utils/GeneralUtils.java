@@ -64,7 +64,8 @@ public class GeneralUtils {
     // Because probeContentType doesn't work on all platforms;
     private static final Map<String, String> mimeTypes = map(
             val("css", "text/css"),
-            val("js", "application/javascript"),
+            val("js", "text/javascript"),
+            val("tag", "text/javascript"),
             val("woff", "application/font-woff"),
             val("otf", "application/octet-stream"),
             val("eot", "application/octet-stream"),

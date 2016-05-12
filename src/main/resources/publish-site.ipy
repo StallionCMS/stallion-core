@@ -321,9 +321,10 @@ class Publisher(object):
 
     def check_for_migrations(self):
         info("Check to see if there are SQL migrations that have not been executed.")
-        cmd = u"sudo -u stallionServer {root}/{folder}/bin/stallion sql-check-migrations -targetPath={root}/{folder} -env={env}".format(
+        cmd = u"sudo -u stallionServer {root}/{folder}/bin/{executable_name} sql-check-migrations -targetPath={root}/{folder} -env={env}".format(
             root=root,
             folder=self.deploying,
+            executable_name=self.executable_name,
             env=self.env
             )
         out =!$cmd
@@ -364,12 +365,14 @@ exec sudo -u stallionServer {root}/{folder}/bin/{executable} serve -localMode=fa
             out, err = p.communicate()
             good("Server test boot was successful.")
         except Exception, e:
-            p.terminate()
             out, err = p.communicate()
             error("Error while trying to boot the server.")
             error(out or '')
             error(err or '')
+            if p.returncode == None and p.pid:
+                p.terminate()
             raise
+
         good("Stallion instance test run succeeded.")
 
 

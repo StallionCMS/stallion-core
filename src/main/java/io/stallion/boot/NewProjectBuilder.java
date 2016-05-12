@@ -135,7 +135,7 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
                 .setSiteDescription(new Prompter("What is a one or two sentence description of your site? ").prompt())
                 .setSiteUrl(new Prompter("What is the URL that this site will be publicly available at? ").prompt())
                 .setTitle(Prompter.prompt("What is the title for your site? "));
-        builder.setHighlightColor(or(new Prompter("Choose a (hex) highlight color for default pages and emails. Leave empty to default to dark grey (#2184A5) ")
+        builder.setHighlightColor(or(new Prompter("Choose a (hex) highlight color for default pages and emails. Leave empty to default to blue (#2184A5) ")
                 .setValidPattern("(#[a-fA-F0-9]{6,6}|)")
                 .setAllowEmpty(true).prompt(), "#2184A5"));
         boolean configureEmails = new Prompter("Do you want to configure email sending? Configuring email will allow " +
