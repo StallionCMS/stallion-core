@@ -21,8 +21,8 @@ import io.stallion.Context;
 import static io.stallion.Context.*;
 import static org.junit.Assert.assertEquals;
 
-import io.stallion.dal.file.TextFilePersister;
-import io.stallion.dal.file.TextItem;
+import io.stallion.dataAccess.file.TextFilePersister;
+import io.stallion.dataAccess.file.TextItem;
 import io.stallion.services.Log;
 import io.stallion.testing.MockResponse;
 import io.stallion.testing.AppIntegrationCaseBase;

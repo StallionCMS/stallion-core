@@ -18,10 +18,10 @@
 package io.stallion.asyncTasks;
 
 import io.stallion.Context;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.dal.base.NoStash;
-import io.stallion.dal.db.DB;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.NoStash;
+import io.stallion.dataAccess.db.DB;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +56,7 @@ public class AsyncTaskController extends StandardModelController<AsyncTask> {
 
 
     public static void registerDbBased() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setControllerClass(AsyncTaskController.class)
                 .setModelClass(AsyncTask.class)
                 .setBucket(BUCKET_NAME)
@@ -64,12 +64,12 @@ public class AsyncTaskController extends StandardModelController<AsyncTask> {
                 .setPersisterClass(AsyncTaskDbPersister.class)
                 .setStashClass(NoStash.class)
                 .setWritable(true);
-        Context.dal().registerDal(registration);
+        Context.dal().register(registration);
     }
 
 
     public static void registerFileBased() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setControllerClass(AsyncTaskController.class)
                 .setModelClass(AsyncTask.class)
                 .setBucket(BUCKET_NAME)
@@ -79,14 +79,14 @@ public class AsyncTaskController extends StandardModelController<AsyncTask> {
                 .setShouldWatch(true)
                 .setUseDataFolder(true);
 
-        Context.dal().registerDal(registration);
+        Context.dal().register(registration);
     }
 
     /** Registers an ephemeral version of the controller that will not actually store tasks to files.
      * Used for unittests when we don't want to store the tasks
      */
     public static void registerEphemeral() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setControllerClass(AsyncTaskController.class)
                 .setModelClass(AsyncTask.class)
                 .setPath(PATH_NAME)
@@ -95,7 +95,7 @@ public class AsyncTaskController extends StandardModelController<AsyncTask> {
                 .setShouldWatch(false)
                 .setUseDataFolder(false)
                 .setWritable(true);
-        Context.dal().registerDal(registration);
+        Context.dal().register(registration);
     }
 
 

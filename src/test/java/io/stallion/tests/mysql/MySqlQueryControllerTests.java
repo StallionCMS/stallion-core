@@ -17,11 +17,11 @@
 
 package io.stallion.tests.mysql;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.NoStash;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.NoStash;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.testing.AppIntegrationCaseBase;
 import io.stallion.testing.MockResponse;
@@ -45,8 +45,8 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
     @BeforeClass
     public static void setUpClass() throws Exception {
         startApp("/mysql_site");
-        DalRegistry.instance().registerDal(
-                new DalRegistration()
+        DataAccessRegistry.instance().register(
+                new DataAccessRegistration()
                         .setModelClass(Payment.class)
                         .setControllerClass(PaymentController.class)
                         .setStashClass(NoStash.class)
@@ -54,8 +54,8 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
                         .setPersisterClass(DbPersister.class)
                         .setTableName("stallion_test_payment")
         );
-        DalRegistry.instance().registerDal(
-                new DalRegistration()
+        DataAccessRegistry.instance().register(
+                new DataAccessRegistration()
                         .setModelClass(Picnic.class)
                         .setControllerClass(PicnicController.class)
                         .setStashClass(NoStash.class)

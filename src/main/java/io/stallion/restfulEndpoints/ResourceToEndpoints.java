@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
+import io.stallion.users.Role;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.*;
@@ -49,8 +51,34 @@ public class ResourceToEndpoints {
     public List<JavaRestEndpoint> convert(Object resource) {
         Class cls = resource.getClass();
         List<JavaRestEndpoint> endpoints = new ArrayList<>();
+
+        // Get defaults from the resource
+
+        Role defaultMinRole = Settings.instance().getUsers().getDefaultEndpointRoleObj();
+        MinRole minRoleAnno = (MinRole)cls.getAnnotation(MinRole.class);
+        if (minRoleAnno != null) {
+            defaultMinRole = minRoleAnno.value();
+        }
+
+        String defaultProduces = "text/html";
+        Produces producesAnno = (Produces)cls.getAnnotation(Produces.class);
+        if (producesAnno != null && producesAnno.value().length > 0) {
+            defaultProduces = producesAnno.value()[0];
+        }
+
+        Path pathAnno = (Path)cls.getAnnotation(Path.class);
+        if (pathAnno != null) {
+            basePath += pathAnno.value();
+        }
+
+
+
         for(Method method: cls.getDeclaredMethods()) {
             JavaRestEndpoint endpoint = new JavaRestEndpoint();
+            endpoint.setRole(defaultMinRole);
+            endpoint.setProduces(defaultProduces);
+
+
             Log.finer("Resource class method: {0}", method.getName());
             for(Annotation anno: method.getDeclaredAnnotations()) {
                 if (Path.class.isInstance(anno)) {

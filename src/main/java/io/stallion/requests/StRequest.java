@@ -41,6 +41,8 @@ import org.eclipse.jetty.server.Request;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -64,6 +66,7 @@ public class StRequest implements IRequest {
     private Map<String, String> queryParams = null;
     private Map<String, Object> items = map();
     private SandboxedRequest sandboxedRequest;
+    private String scheme;
 
 
     public StRequest() {
@@ -86,16 +89,34 @@ public class StRequest implements IRequest {
      */
     @Override
     public String requestUrl() {
-        String baseUrl = Context.getSettings().getSiteUrl();
-        if (empty(baseUrl)) {
-            String host = getHost();
-            String proto = this.request.getProtocol();
-            if (!empty(getHeader("x-forwarded-proto"))) {
-                proto = getHeader("x-forwarded-proto");
-            }
-            baseUrl = proto + "://" + host;
-        }
+        String host = getHost();
+        String proto = getScheme();
+        String baseUrl = proto + "://" + host;
         return baseUrl + this.getPath();
+    }
+
+
+
+    @Override
+    public String getScheme() {
+        String baseUrl = Context.getSettings().getSiteUrl();
+        if (empty(scheme)) {
+            //
+            scheme = this.request.getScheme();
+            if (!empty(getHeader("x-forwarded-proto"))) {
+                scheme = getHeader("x-forwarded-proto");
+            }
+        }
+        if (empty(scheme)) {
+            int i = baseUrl.indexOf("://");
+            if (i > -1) {
+                scheme = baseUrl.substring(0, i);
+            }
+        }
+        if (empty(scheme)){
+            scheme = "http";
+        }
+        return scheme;
     }
 
     @Override
@@ -124,7 +145,11 @@ public class StRequest implements IRequest {
 
     @Override
     public String getRemoteAddr() {
-        return request.getRemoteAddr();
+        if (request != null) {
+            return request.getRemoteAddr();
+        } else {
+            return "0.0.0.0";
+        }
     }
 
     @Override

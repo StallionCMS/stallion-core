@@ -17,14 +17,14 @@
 
 package io.stallion.tests.mysql;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.StandardModelController;
 
 
 public class HouseController extends StandardModelController<House> {
 
     public static HouseController instance() {
-        return (HouseController)DalRegistry.instance().get("stallion_test_house");
+        return (HouseController) DataAccessRegistry.instance().get("stallion_test_house");
     }
 
 

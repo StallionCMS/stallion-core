@@ -18,11 +18,11 @@
 package io.stallion.forms;
 
 import io.stallion.Context;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
-import io.stallion.dal.file.JsonFilePersister;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.settings.Settings;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class SimpleFormSubmissionController extends StandardModelController<Simp
     }
 
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setControllerClass(SimpleFormSubmissionController.class)
                 .setModelClass(SimpleFormSubmission.class);
         if (DB.instance() == null) {
@@ -58,8 +58,8 @@ public class SimpleFormSubmissionController extends StandardModelController<Simp
                     .setBucket("simple_form_submissions")
                     .setPersisterClass(DbPersister.class);
         }
-        Context.dal().registerDal(registration);
-        Context.dal().registerDal(registration);
+        Context.dal().register(registration);
+        Context.dal().register(registration);
     }
 
 

@@ -19,7 +19,7 @@ package io.stallion.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.stallion.Context;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.Model;
 import io.stallion.services.Log;
 import io.stallion.users.Role;
 import io.stallion.utils.json.JSON;
@@ -27,7 +27,6 @@ import io.stallion.utils.json.RestrictedViews;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.HtmlSanitizer;
 import org.owasp.html.PolicyFactory;
 
 

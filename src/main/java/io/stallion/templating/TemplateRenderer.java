@@ -19,7 +19,7 @@ package io.stallion.templating;
 
 import io.stallion.Context;
 import io.stallion.assets.AssetsController;
-import io.stallion.dal.base.ModelController;
+import io.stallion.dataAccess.ModelController;
 import io.stallion.exceptions.UsageException;
 import io.stallion.exceptions.WebException;
 import io.stallion.fileSystem.FileSystemWatcherService;

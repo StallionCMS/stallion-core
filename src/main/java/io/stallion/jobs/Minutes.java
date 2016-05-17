@@ -18,15 +18,5 @@
 package io.stallion.jobs;
 
 class Minutes extends BaseTimings {
-    private Boolean randomMinute = false;
-    private Boolean everyMinute = false;
-
-    public Boolean getRandomMinute() {
-        return randomMinute;
-    }
-
-    public void setRandomMinute(Boolean randomMinute) {
-        this.randomMinute = randomMinute;
-    }
 
 }

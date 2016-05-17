@@ -21,11 +21,11 @@ import io.stallion.assets.DefinedBundle;
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.base.Tickets;
-import io.stallion.dal.file.TextItemController;
-import io.stallion.dal.filtering.FilterCache;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.Tickets;
+import io.stallion.dataAccess.file.TextItemController;
+import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherRunner;
@@ -164,7 +164,7 @@ public class AppContextLoader {
         // Data sources
         DB.load();
         FilterCache.load();
-        DalRegistry.load();
+        DataAccessRegistry.load();
         AssetsController.load();
         DefinedBundle.load();
         TemplateRenderer.load();
@@ -239,7 +239,7 @@ public class AppContextLoader {
 
         RoutesRegistry.shutdown();
 
-        DalRegistry.shutdown();
+        DataAccessRegistry.shutdown();
         SiteMapController.shutdown();
 
         DB.shutdown();
@@ -335,13 +335,13 @@ public class AppContextLoader {
 
     @Deprecated
     public TextItemController getPageController() {
-        return DalRegistry.instance().getPages();
+        return DataAccessRegistry.instance().getPages();
     }
 
 
     @Deprecated
     public TextItemController getPostController() {
-        return DalRegistry.instance().getPosts();
+        return DataAccessRegistry.instance().getPosts();
     }
 
     @Deprecated
@@ -351,13 +351,13 @@ public class AppContextLoader {
 
 
     @Deprecated
-    public DalRegistry getDal() {
-        return DalRegistry.instance();
+    public DataAccessRegistry getDal() {
+        return DataAccessRegistry.instance();
     }
 
     @Deprecated
-    public DalRegistry dal() {
-        return DalRegistry.instance();
+    public DataAccessRegistry dal() {
+        return DataAccessRegistry.instance();
     }
 
     @Deprecated
@@ -398,7 +398,7 @@ public class AppContextLoader {
 
     @Deprecated
     public Tickets getTickets() {
-        return DalRegistry.instance().getTickets();
+        return DataAccessRegistry.instance().getTickets();
     }
 
     @Deprecated

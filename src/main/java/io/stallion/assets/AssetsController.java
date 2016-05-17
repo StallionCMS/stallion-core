@@ -194,7 +194,7 @@ public class AssetsController {
      * @param preProcessorName
      * @param path
      */
-    public void externalPreProcessIfNecessary(String preProcessorName, String path) {
+    public void externalPreprocessIfNecessary(String preProcessorName, String path) {
         // Only pre-process if we are in bundle debug mode and local mode
         if (!settings().getBundleDebug() || !settings().getLocalMode()) {
             return;
@@ -259,6 +259,9 @@ public class AssetsController {
     }
 
     public String convertUsingProcessorNoCache(String processor, String path, String source) {
+        if (empty(processor)) {
+            return source;
+        }
         if ("angularHtml".equals(processor)) {
             Log.fine("Convert asset using angular");
             return AngularCompiler.htmlToJs(source, path);

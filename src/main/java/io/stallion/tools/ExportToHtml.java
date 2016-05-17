@@ -27,6 +27,7 @@ import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.testing.MockRequest;
 import io.stallion.testing.MockResponse;
+import io.stallion.utils.DateUtils;
 import jodd.jerry.Jerry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -66,28 +67,40 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
 
     @Override
     public void execute(ServeCommandOptions options) throws Exception {
-        Log.info("EXECUTE ACTION!!");
-        String exportFolder = Settings.instance().getTargetFolder() + "/export";
+        Log.info("EXECUTE EXPORT ACTION!!");
+        String exportFolder = Settings.instance().getTargetFolder() + "/export-" + DateUtils.formatNow("yyyy-MM-dd-HH-mm-ss");
         File export = new File(exportFolder);
         if (!export.exists()) {
             export.mkdirs();
         }
+        FileUtils.copyDirectory(new File(Settings.instance().getTargetFolder() + "/assets"), new File(exportFolder + "/st-assets"));
+
+
+
         Set<String> assets = new HashSet<>();
+
+        Set<String> allUrlPaths = new HashSet<>();
+
         for(SiteMapItem item: SiteMapController.instance().getAllItems()) {
             String uri = item.getPermalink();
             Log.info("URI {0}", uri);
             if (!uri.contains("://")) {
-                 uri = "http://localhost" + uri;
+                uri = "http://localhost" + uri;
             }
             URL url = new URL(uri);
+            allUrlPaths.add(url.getPath());
+        }
 
-            Log.info("Export page {0}", url.getPath());
-            MockRequest request = new MockRequest(url.getPath(), "GET");
+        allUrlPaths.addAll(ExporterRegistry.instance().exportAll());
+
+
+        for(String path: allUrlPaths) {
+            Log.info("Export page {0}", path);
+            MockRequest request = new MockRequest(path, "GET");
             MockResponse response = new MockResponse();
             RequestHandler.instance().handleStallionRequest(request, response);
             response.getContent();
 
-            String path = url.getPath();
             if (!path.contains(".")) {
                 if (!path.endsWith("/")) {
                     path += "/";
@@ -104,6 +117,7 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
             FileUtils.write(file, html);
             assets.addAll(findAssetsInHtml(response.getContent()));
         }
+
         for (String src: assets) {
             Log.info("Asset src: {0}", src);
 

@@ -17,7 +17,6 @@
 
 package io.stallion.forms;
 
-import io.stallion.dal.base.SettableOptions;
 import io.stallion.exceptions.ClientException;
 import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.ObjectParam;

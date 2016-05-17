@@ -17,8 +17,9 @@
 
 package io.stallion.forms;
 
-import io.stallion.dal.base.*;
-import io.stallion.dal.file.ModelWithFilePath;
+import io.stallion.dataAccess.AlternativeKey;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.file.ModelWithFilePath;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 

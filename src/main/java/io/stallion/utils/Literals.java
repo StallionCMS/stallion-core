@@ -68,7 +68,7 @@ public class Literals {
             if (empty((String)obj)) {
                 return defaultVal;
             }
-        } else if (empty(obj)) {
+        } else if (emptyObject(obj)) {
             return defaultVal;
         }
         return obj;
@@ -177,6 +177,16 @@ public class Literals {
         return myList.toArray(array);
     }
 
+    public static boolean emptyInstance(Object o) {
+        if (o == null) {
+            return true;
+        }
+        if (o instanceof IEmpty) {
+            return true;
+        }
+        return false;
+    }
+
     public static boolean emptyObject(Object o) {
         if (o == null) {
             return true;
@@ -215,11 +225,13 @@ public class Literals {
         }
         return false;
     }
-    public static boolean empty(Object a) {
-        if (a == null) {
+
+
+    public static boolean empty(Object[] objects) {
+        if (objects == null) {
             return true;
         }
-        if (a instanceof IEmpty) {
+        if (objects.length == 0){
             return true;
         }
         return false;
@@ -321,7 +333,7 @@ public class Literals {
     }
 
     public static <T> List<T> filterEmpty(Collection<T> things) {
-        return filter(things, e->!empty(e));
+        return filter(things, e->!emptyObject(e));
     }
 
     /**

@@ -19,9 +19,9 @@ package io.stallion.plugins.javascript;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.MappedModel;
-import io.stallion.dal.base.ModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.ModelController;
 import io.stallion.utils.GeneralUtils;
 
 
@@ -47,7 +47,7 @@ public abstract class BaseJavascriptModel extends MappedModel {
     @JsonIgnore
     @Override
     public ModelController getController() {
-        return DalRegistry.instance().get(getBucketName());
+        return DataAccessRegistry.instance().get(getBucketName());
     }
 
     public BaseJavascriptModel() {

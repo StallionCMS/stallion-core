@@ -33,7 +33,10 @@ public class UserSettings implements SettingsSection {
     private String verifyEmailPage;
 
     @SettingMeta(valBoolean = true)
-    private Boolean syncUsersToMemory;
+    private Boolean syncAllUsersToMemory;
+
+    @SettingMeta(valInt = 10000)
+    private Integer limitSyncUsersToMemoryToCount;
 
 
     public String getFullLoginUrl() {
@@ -57,12 +60,18 @@ public class UserSettings implements SettingsSection {
     private Boolean newAccountsRequireValidEmail;
     @SettingMeta(val="MEMBER")
     private String newAccountsRole;
+    @SettingMeta(val="ANON")
+    private String defaultEndpointRole;
+
     @SettingMeta(val = "")
     private String newAccountsDomainRestricted;
 
     public void postLoad() {
         if (Role.valueOf(newAccountsRole.toUpperCase())  == null) {
             throw new ConfigException("Invalid role for stallion.toml settings users.newAccountsRole: " + newAccountsRole);
+        }
+        if (Role.valueOf(defaultEndpointRole.toUpperCase())  == null) {
+            throw new ConfigException("Invalid role for stallion.toml settings users.defaultEndpointRole: " + newAccountsRole);
         }
     }
 
@@ -156,13 +165,34 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
-
-    public Boolean getSyncUsersToMemory() {
-        return syncUsersToMemory;
+    public Boolean getSyncAllUsersToMemory() {
+        return syncAllUsersToMemory;
     }
 
-    public UserSettings setSyncUsersToMemory(Boolean syncUsersToMemory) {
-        this.syncUsersToMemory = syncUsersToMemory;
+    public UserSettings setSyncAllUsersToMemory(Boolean syncAllUsersToMemory) {
+        this.syncAllUsersToMemory = syncAllUsersToMemory;
+        return this;
+    }
+
+    public Integer getLimitSyncUsersToMemoryToCount() {
+        return limitSyncUsersToMemoryToCount;
+    }
+
+    public UserSettings setLimitSyncUsersToMemoryToCount(Integer limitSyncUsersToMemoryToCount) {
+        this.limitSyncUsersToMemoryToCount = limitSyncUsersToMemoryToCount;
+        return this;
+    }
+
+    public String getDefaultEndpointRole() {
+        return defaultEndpointRole;
+    }
+    public Role getDefaultEndpointRoleObj() {
+        return Role.valueOf(defaultEndpointRole);
+    }
+
+
+    public UserSettings setDefaultEndpointRole(String defaultEndpointRole) {
+        this.defaultEndpointRole = defaultEndpointRole;
         return this;
     }
 }

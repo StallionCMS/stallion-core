@@ -17,7 +17,7 @@
 
 package io.stallion.tests.mysql;
 
-import io.stallion.dal.base.ModelBase;
+import io.stallion.dataAccess.ModelBase;
 
 import javax.persistence.Column;
 import javax.persistence.Table;

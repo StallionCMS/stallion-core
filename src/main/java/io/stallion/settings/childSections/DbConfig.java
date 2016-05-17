@@ -64,7 +64,7 @@ public class DbConfig implements SettingsSection {
         return this;
     }
 
-    @SettingMeta(val = "io.stallion.dal.db.DB")
+    @SettingMeta(val = "io.stallion.dataAccess.db.DB")
     private String dbAccessorClass;
 
     public String getDriverClass() {

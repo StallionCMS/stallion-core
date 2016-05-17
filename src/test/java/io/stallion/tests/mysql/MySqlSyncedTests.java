@@ -19,11 +19,11 @@ package io.stallion.tests.mysql;
 
 import io.stallion.boot.AppContextLoader;
 import io.stallion.boot.SqlMigrateCommandOptions;
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
-import io.stallion.dal.db.SqlMigrationAction;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.dataAccess.db.SqlMigrationAction;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
@@ -88,8 +88,8 @@ public class MySqlSyncedTests extends AppIntegrationCaseBase {
     public static void setUpClass() throws Exception {
         setupMysql();
         startApp("/mysql_site");
-        DalRegistry.instance().registerDal(
-                new DalRegistration()
+        DataAccessRegistry.instance().register(
+                new DataAccessRegistration()
                         .setModelClass(House.class)
                         .setControllerClass(HouseController.class)
                         .setWritable(true)

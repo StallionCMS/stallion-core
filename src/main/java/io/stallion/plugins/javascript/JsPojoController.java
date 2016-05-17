@@ -17,11 +17,8 @@
 
 package io.stallion.plugins.javascript;
 
-import io.stallion.dal.base.Model;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.dal.filtering.FilterChain;
-
-import java.util.Map;
+import io.stallion.dataAccess.Model;
+import io.stallion.dataAccess.StandardModelController;
 
 
 public class JsPojoController<T extends Model> extends StandardModelController<T> {

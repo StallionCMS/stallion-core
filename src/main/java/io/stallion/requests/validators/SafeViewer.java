@@ -17,7 +17,7 @@
 
 package io.stallion.requests.validators;
 
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.Model;
 import io.stallion.reflection.PropertyUtils;
 
 import java.util.ArrayList;

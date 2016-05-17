@@ -17,8 +17,6 @@
 
 package io.stallion.restfulEndpoints;
 
-import io.stallion.dal.base.SettableOptions;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

@@ -18,8 +18,8 @@
 package io.stallion;
 
 import io.stallion.boot.AppContextLoader;
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.db.DB;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.requests.*;
 import io.stallion.restfulEndpoints.RestEndpointBase;
@@ -28,6 +28,7 @@ import io.stallion.templating.TemplateRenderer;
 import io.stallion.users.*;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.emptyInstance;
 
 /**
  * A static helper class providing short-cut access to the most common services and data objects running
@@ -74,8 +75,11 @@ public class Context {
         return PluginRegistry.instance();
     }
 
-    public static DalRegistry dal() { return DalRegistry.instance(); }
-    public static DalRegistry getDal() { return DalRegistry.instance(); }
+    public static DataAccessRegistry dal() { return DataAccessRegistry.instance(); }
+    public static DataAccessRegistry getDal() { return DataAccessRegistry.instance(); }
+
+    public static DataAccessRegistry dataAccess() { return DataAccessRegistry.instance(); }
+    public static DataAccessRegistry getDataAccess() { return DataAccessRegistry.instance(); }
 
     /**
      * Alias for getRequest();
@@ -142,7 +146,7 @@ public class Context {
                 return false;
             }
         }
-        if (!empty(endpoint.getRole())) {
+        if (!emptyInstance(endpoint.getRole())) {
             // User does not have role, deny
             if (!getUser().isInRole(endpoint.getRole())) {
                 return false;

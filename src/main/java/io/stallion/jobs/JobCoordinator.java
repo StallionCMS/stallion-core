@@ -17,13 +17,17 @@
 
 package io.stallion.jobs;
 
+import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
+
 import static io.stallion.utils.Literals.*;
 
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -93,6 +97,11 @@ public class JobCoordinator extends Thread {
 
     @Override
     public void run() {
+
+        if (Settings.instance().getLocalMode() && "prod".equals(Settings.instance().getEnv()) || "qa".equals(Settings.instance().getEnv())) {
+            Log.info("Running localMode, environment is QA or PROD, thus not running jobs. Do not want to run production jobs locally!");
+            return;
+        }
 
         while (!shouldShutDown) {
             try {
@@ -186,6 +195,31 @@ public class JobCoordinator extends Thread {
             // Return the job to the queue so it will run again the future
             putIntoQueue(definition, now);
         }
+    }
+
+    public void forceRunJob(String jobName, boolean forceEvenIfLocked) {
+        JobDefinition jobDefinition = null;
+        for(JobDefinition def: queue) {
+            if (jobName.equals(def.getName())) {
+                jobDefinition = def;
+                break;
+            }
+        }
+        if (jobDefinition == null) {
+            throw new CommandException("Job not found: " + jobName);
+        }
+        Class<? extends Job> jobClass = jobDefinition.getJobClass();
+        Job job = null;
+        try {
+            job = jobClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        JobInstanceDispatcher dispatcher = new JobInstanceDispatcher(jobDefinition, job);
+
+        dispatcher.run();
     }
 
     /**

@@ -141,6 +141,8 @@ public class AsyncFileCoordinator extends AsyncCoordinator {
             Log.warn("Task is already locked {0} {1} currentThread={2} lockUid={3}", task.getId(), task.getLockedAt(), Thread.currentThread().getId(), task.getLockUuid());
             return null;
         }
+
+
         Log.finer("Queue size is {0}", getTaskQueue().size());
         boolean locked = lockTaskForExecution(task);
         if (!locked) {

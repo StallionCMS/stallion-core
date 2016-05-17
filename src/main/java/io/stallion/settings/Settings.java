@@ -18,6 +18,7 @@
 package io.stallion.settings;
 
 import io.stallion.boot.CommandOptionsBase;
+import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.RouteDefinition;
@@ -44,7 +45,7 @@ public class Settings implements ISettings {
     private CustomSettings custom = null;
     private CloudStorageSettings cloudStorage = null;
     private StyleSettings styles = null;
-
+    private CorsSettings cors = null;
     private OAuthSettings oAuth;
 
 
@@ -103,6 +104,8 @@ public class Settings implements ISettings {
     private Boolean bundleDebug;
 
     // Routes and rewrites
+    @SettingMeta(val="SAMEORIGIN")
+    private String xFrameOptions;
     @SettingMeta(cls=ArrayList.class)
     private List<RouteDefinition> routes = new ArrayList<>();
     @SettingMeta(cls=HashMap.class)
@@ -116,6 +119,8 @@ public class Settings implements ISettings {
     @SettingMeta(cls=ArrayList.class)
     private List<SecondaryDomain> secondaryDomains;
     private Map<String, SecondaryDomain> secondaryDomainByDomain  = map();
+    @SettingMeta(cls=ArrayList.class)
+    private List<AssetPreprocessorConfig> assetPreprocessors;
 
     // Web Serving
     @SettingMeta(valInt=8090)
@@ -134,9 +139,12 @@ public class Settings implements ISettings {
     // Email
 
     // Publishing
-    @SettingMeta(cls=ArrayList.class)
-    private List<PublishingConfig> publishing;
+    //@SettingMeta(cls=ArrayList.class)
+    //private List<PublishingConfig> publishing;
 
+
+    @SettingMeta(cls=ArrayList.class)
+    private List<DeploymentsConfig> deployments;
 
 
     // Time
@@ -377,6 +385,16 @@ public class Settings implements ISettings {
 
     public void setEmail(EmailSettings email) {
         this.email = email;
+    }
+
+
+    public CorsSettings getCors() {
+        return cors;
+    }
+
+    public Settings setCors(CorsSettings cors) {
+        this.cors = cors;
+        return this;
     }
 
     public String getDataDirectory() {
@@ -738,6 +756,8 @@ public class Settings implements ISettings {
         return this;
     }
 
+
+    /*
     public List<PublishingConfig> getPublishing() {
         return publishing;
     }
@@ -771,6 +791,7 @@ public class Settings implements ISettings {
         }
         return this;
     }
+    */
 
     public Long getAppCreatedMillis() {
         return appCreatedMillis;
@@ -778,6 +799,68 @@ public class Settings implements ISettings {
 
     public Settings setAppCreatedMillis(Long appCreatedMillis) {
         this.appCreatedMillis = appCreatedMillis;
+        return this;
+    }
+
+    public List<AssetPreprocessorConfig> getAssetPreprocessors() {
+        return assetPreprocessors;
+    }
+
+    public Settings setAssetPreprocessors(List assetPreProcessors) {
+        this.assetPreprocessors = convertMapListToObjects(assetPreProcessors, AssetPreprocessorConfig.class);
+        for (AssetPreprocessorConfig config: this.assetPreprocessors) {
+            if (empty(config.getCommand()) || empty(config.getName()) || empty(config.getExtension())) {
+                throw new ConfigException("Asset Pre-processors must have a valid command, name, and extension");
+            }
+        }
+        return this;
+    }
+
+    protected List convertMapListToObjects(List maps, Class targetClass) {
+        if (maps.size() == 0) {
+            return maps;
+        }
+        if (targetClass.isAssignableFrom(maps.get(0).getClass())) {
+            return maps;
+        }
+        List items = new ArrayList<>();
+        for (Object o: maps) {
+            Map<String, Object> map = (Map<String, Object>)o;
+            try {
+                Object instance = targetClass.newInstance();
+                for(Map.Entry<String, Object> e: map.entrySet()) {
+                    Object value = e.getValue();
+                    if (e.getKey().equals("basePort") && e.getValue() instanceof Long) {
+                        value = Math.toIntExact((Long)value);
+                    }
+                    PropertyUtils.setProperty(instance, e.getKey(), value);
+                }
+                items.add(instance);
+
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return items;
+    }
+
+    public String getxFrameOptions() {
+        return xFrameOptions;
+    }
+
+    public Settings setxFrameOptions(String xFrameOptions) {
+        this.xFrameOptions = xFrameOptions;
+        return this;
+    }
+
+    public List<DeploymentsConfig> getDeployments() {
+        return deployments;
+    }
+
+    public Settings setDeployments(List<DeploymentsConfig> deployments) {
+        this.deployments = deployments;
         return this;
     }
 }

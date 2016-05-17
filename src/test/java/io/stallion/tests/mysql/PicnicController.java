@@ -17,12 +17,12 @@
 
 package io.stallion.tests.mysql;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.StandardModelController;
 
 
 public class PicnicController extends StandardModelController<Picnic> {
     public static PicnicController instance() {
-        return (PicnicController)DalRegistry.instance().get("stallion_test_picnic");
+        return (PicnicController) DataAccessRegistry.instance().get("stallion_test_picnic");
     }
 }

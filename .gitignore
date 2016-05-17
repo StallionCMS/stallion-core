@@ -24,4 +24,5 @@ cms.iml
 build.ipy
 /notes
 makedocs.ipy
+.sass-cache
 src/test/resources/a_minimal_site/app-data/

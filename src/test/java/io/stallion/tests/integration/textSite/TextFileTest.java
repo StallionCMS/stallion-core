@@ -18,8 +18,8 @@
 package io.stallion.tests.integration.textSite;
 
 import io.stallion.Context;
-import io.stallion.dal.file.TextItem;
-import io.stallion.dal.file.TextItemController;
+import io.stallion.dataAccess.file.TextItem;
+import io.stallion.dataAccess.file.TextItemController;
 import io.stallion.services.Log;
 import io.stallion.testing.MockResponse;
 import io.stallion.testing.AppIntegrationCaseBase;

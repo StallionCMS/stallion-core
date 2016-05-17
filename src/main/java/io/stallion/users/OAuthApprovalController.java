@@ -18,13 +18,13 @@
 package io.stallion.users;
 
 import io.stallion.Context;
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.LocalMemoryStash;
-import io.stallion.dal.base.NoStash;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.LocalMemoryStash;
+import io.stallion.dataAccess.NoStash;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.exceptions.ClientException;
 import io.stallion.requests.StRequest;
 import io.stallion.settings.Settings;
@@ -41,7 +41,7 @@ import static io.stallion.utils.Literals.*;
 public class OAuthApprovalController extends StandardModelController<OAuthApproval> {
 
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("oauth_approvals")
                 .setControllerClass(OAuthApprovalController.class)
                 .setModelClass(OAuthApproval.class)
@@ -62,7 +62,7 @@ public class OAuthApprovalController extends StandardModelController<OAuthApprov
     }
 
     public static OAuthApprovalController instance() {
-        return (OAuthApprovalController)DalRegistry.instance().get("oauth_approvals");
+        return (OAuthApprovalController) DataAccessRegistry.instance().get("oauth_approvals");
     }
 
     public boolean checkHeaderAndAuthorizeUserForRequest(StRequest request) {
@@ -124,13 +124,13 @@ public class OAuthApprovalController extends StandardModelController<OAuthApprov
     }
 
     public OAuthApproval checkGrantApprovalForUser(GrantType grantType, IUser user, String fullClientId, Set<String> scopes, boolean isScoped, String redirectUri, String providedCode) {
-        if (empty(user) || !user.isAuthorized() || empty(user.getId())) {
+        if (emptyInstance(user) || !user.isAuthorized() || empty(user.getId())) {
             throw new ClientException("You are not logged in with a valid user.");
         }
 
         OAuthClient client = OAuthClientController.instance().clientForFullId(fullClientId);
 
-        if (empty(client) || client.getFullClientId().equals(fullClientId) || client.isDisabled() || client.getDeleted()) {
+        if (emptyInstance(client) || client.getFullClientId().equals(fullClientId) || client.isDisabled() || client.getDeleted()) {
             throw new ClientException("Invalid client id");
         }
         if (!client.hasGrantType(grantType)) {

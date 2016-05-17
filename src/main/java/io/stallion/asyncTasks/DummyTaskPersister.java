@@ -17,7 +17,7 @@
 
 package io.stallion.asyncTasks;
 
-import io.stallion.dal.base.DummyPersister;
+import io.stallion.dataAccess.DummyPersister;
 
 
 public class DummyTaskPersister extends DummyPersister implements AsyncTaskPersister {
@@ -38,4 +38,8 @@ public class DummyTaskPersister extends DummyPersister implements AsyncTaskPersi
     }
 
 
+    @Override
+    public void deleteOldTasks() {
+
+    }
 }

@@ -17,9 +17,9 @@
 
 package io.stallion.tests.mysql;
 
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.db.Converter;
-import io.stallion.dal.db.converters.JsonSetConverter;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.db.Converter;
+import io.stallion.dataAccess.db.converters.JsonSetConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -106,7 +106,7 @@ public class Picnic extends ModelBase {
     }
 
     @Column
-    @Converter(name="io.stallion.dal.db.converters.JsonListConverter")
+    @Converter(name="io.stallion.dataAccess.db.converters.JsonListConverter")
     public List<String> getDishes() {
         return dishes;
     }
@@ -117,7 +117,7 @@ public class Picnic extends ModelBase {
     }
 
     @Column
-    @Converter(name="io.stallion.dal.db.converters.JsonMapConverter")
+    @Converter(name="io.stallion.dataAccess.db.converters.JsonMapConverter")
     public Map<String, Object> getExtra() {
         return extra;
     }

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.stallion.dal.base.AlternativeKey;
-import io.stallion.dal.base.ModelBase;
+import io.stallion.dataAccess.AlternativeKey;
+import io.stallion.dataAccess.ModelBase;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;

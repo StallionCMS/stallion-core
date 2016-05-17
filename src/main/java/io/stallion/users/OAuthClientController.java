@@ -17,13 +17,13 @@
 
 package io.stallion.users;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.LocalMemoryStash;
-import io.stallion.dal.base.NoStash;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.LocalMemoryStash;
+import io.stallion.dataAccess.NoStash;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,11 +37,11 @@ public class OAuthClientController extends StandardModelController<OAuthClient> 
     private Map<Long, OAuthClient> builtinClientsById = map();
 
     public static OAuthClientController instance() {
-        return (OAuthClientController)DalRegistry.instance().get("oauth_clients");
+        return (OAuthClientController) DataAccessRegistry.instance().get("oauth_clients");
     }
 
     public static void register() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setBucket("oauth_clients")
                 .setControllerClass(OAuthClientController.class)
                 .setModelClass(OAuthClient.class)
@@ -58,7 +58,7 @@ public class OAuthClientController extends StandardModelController<OAuthClient> 
                     .setShouldWatch(false);
 
         }
-        DalRegistry.instance().registerDal(registration);
+        DataAccessRegistry.instance().register(registration);
 
         // Add in the default clients...
         if (!empty(Settings.instance().getoAuth().getClients())) {

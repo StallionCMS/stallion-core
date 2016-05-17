@@ -18,10 +18,10 @@
 package io.stallion.tests.integration.filePersistenceSite;
 
 import io.stallion.Context;
-import io.stallion.dal.base.MappedModel;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.ModelController;
-import io.stallion.dal.file.TextItem;
+import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.ModelController;
+import io.stallion.dataAccess.file.TextItem;
 import io.stallion.testing.AppIntegrationCaseBase;
 import io.stallion.utils.DateUtils;
 import org.junit.*;

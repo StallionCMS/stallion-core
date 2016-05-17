@@ -18,7 +18,6 @@
 package io.stallion.tests.integration.javaSite;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import static io.stallion.dal.base.SettableOptions.*;
 
 import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.EndpointResource;

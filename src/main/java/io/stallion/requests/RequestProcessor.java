@@ -21,10 +21,10 @@ import io.stallion.Context;
 import io.stallion.assets.AssetsController;
 import io.stallion.assets.BundleHandler;
 import io.stallion.assets.DefinedBundle;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.Displayable;
-import io.stallion.dal.base.DisplayableModelController;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.Displayable;
+import io.stallion.dataAccess.DisplayableModelController;
+import io.stallion.dataAccess.Model;
 import io.stallion.exceptions.*;
 import io.stallion.hooks.HookRegistry;
 import io.stallion.plugins.javascript.JsEndpoint;
@@ -80,6 +80,8 @@ class RequestProcessor {
         try {
             Context.setRequest(request);
             Context.setResponse(response);
+            // Check CORS
+            new CorsResponseHandler().handleIfNecessary(request, response);
             // Authorize via cookie?
             if (UserController.instance() != null) {
                 UserController.instance().checkCookieAndAuthorizeForRequest(request);
@@ -132,11 +134,13 @@ class RequestProcessor {
         } catch(Exception ex) {
             handleError(ex);
         }
+
         HookRegistry.instance().dispatch(
                 PostRequestHookHandler.class,
                 new RequestInfoHolder()
                         .setRequest(request)
                         .setResponse(response));
+        XFrameOptionsHandler.handle(request, response);
 
         Log.info("status={0} {1}={2}", response.getStatus(), request.getMethod(), request.getPath());
 
@@ -181,6 +185,11 @@ class RequestProcessor {
         if (redirectUrl != null) {
             throw new RedirectException(redirectUrl, 301);
         }
+
+        if (request.getPath().equals("/favicon.ico") && new File(Settings.instance().getTargetFolder() + "/assets/favicon.ico").exists()) {
+            throw new RedirectException("/st-assets/favicon.ico", 301);
+        }
+
 
         markHandled(404, "No route matches");
         throw new NotFoundException("The page you requested could not be found.");
@@ -253,6 +262,7 @@ class RequestProcessor {
         String output = ((DisplayableModelController)baseItem.getController()).render(item, ctx);
         sendContentResponse(output);
     }
+
 
 
     /*******************************************
@@ -328,7 +338,11 @@ class RequestProcessor {
                     val = arg.getDefaultValue();
             }
             if (arg.getTargetClass() != null && val != null && !"ObjectParam".equals(arg.getType())) {
-                val = PropertyUtils.transform(val, arg.getTargetClass());
+                try {
+                    val = PropertyUtils.transform(val, arg.getTargetClass());
+                } catch (Exception e) {
+                    throw new ClientException("The argument: " + arg + " could not be coerced to type " + arg.getTargetClass().getSimpleName(), 400);
+                }
             }
             if ("BodyParam".equals(arg.getType())) {
                 validateRequestArgument(arg, val);
@@ -356,7 +370,12 @@ class RequestProcessor {
                     throw new UsageException("Passed in " + methodArgs.size() + " arguments to the method " + javaMethod.getName() + " but the method only accepts " + paramTypes.length + " arguments.");
                 }
                 Class type = paramTypes[x];
-                Object transformed = PropertyUtils.transform(arg, type);
+                Object transformed;
+                try {
+                    transformed = PropertyUtils.transform(arg, type);
+                } catch (Exception e) {
+                    throw new ClientException("The argument: " + arg + " could not be coerced to type " + type.getSimpleName(), 400);
+                }
                 //Log.info("Coercering arg {0} {1} to type {2} result is {3}:{4}", x, arg, type.getSimpleName(), transformed.getClass().getSimpleName(), transformed);
                 coercedArgs.add(transformed);
                 x++;
@@ -525,7 +544,8 @@ class RequestProcessor {
         String fullPath = Settings.instance().getTargetFolder() + "/assets/" + path;
         Log.fine("Asset path={0} fullPath={1}", path, fullPath);
         File file = new File(fullPath);
-        if (!file.isFile()) {
+        String preProcessor = request.getParameter("preprocessor");
+        if (!file.isFile() && empty(preProcessor)) {
             notFound("Asset for path " + path + " is not found.");
         }
         if (!empty(request.getParameter("processor"))) {
@@ -534,8 +554,8 @@ class RequestProcessor {
             markHandled(200, "folder-asset-with-processor");
             sendContentResponse(contents, file.lastModified(), fullPath);
         } else {
-            if (!empty(request.getParameter("externalPreProcessor"))) {
-                AssetsController.instance().externalPreProcessIfNecessary(request.getParameter("externalPreProcessor"), path);
+            if (!empty(preProcessor)) {
+                AssetsController.instance().externalPreprocessIfNecessary(preProcessor, path);
             }
             markHandled(200, "folder-asset");
             sendAssetResponse(file);
@@ -778,9 +798,7 @@ class RequestProcessor {
         return context;
     }
 
-    static class ResponseComplete extends RuntimeException {
 
-    }
 
 
 

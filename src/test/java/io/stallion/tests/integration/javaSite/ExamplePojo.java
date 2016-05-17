@@ -18,8 +18,7 @@
 package io.stallion.tests.integration.javaSite;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import static io.stallion.dal.base.SettableOptions.*;
-import io.stallion.dal.base.ModelBase;
+import io.stallion.dataAccess.ModelBase;
 
 import io.stallion.utils.json.RestrictedViews;
 

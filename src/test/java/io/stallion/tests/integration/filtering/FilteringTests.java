@@ -17,11 +17,11 @@
 
 package io.stallion.tests.integration.filtering;
 
-import io.stallion.dal.file.TextItem;
-import io.stallion.dal.file.TextItemController;
-import io.stallion.dal.filtering.FilterGroup;
-import io.stallion.dal.filtering.FilterOperator;
-import io.stallion.dal.filtering.Or;
+import io.stallion.dataAccess.file.TextItem;
+import io.stallion.dataAccess.file.TextItemController;
+import io.stallion.dataAccess.filtering.FilterGroup;
+import io.stallion.dataAccess.filtering.FilterOperator;
+import io.stallion.dataAccess.filtering.Or;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
 import io.stallion.utils.DateUtils;

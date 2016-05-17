@@ -17,16 +17,13 @@
 
 package io.stallion.tests.unit;
 
-import io.stallion.dal.db.SqlGenerationAction;
-import io.stallion.dal.db.SqlMigrationAction;
+import io.stallion.dataAccess.db.SqlMigrationAction;
 import io.stallion.services.Log;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 import static org.junit.Assert.assertEquals;
 
 

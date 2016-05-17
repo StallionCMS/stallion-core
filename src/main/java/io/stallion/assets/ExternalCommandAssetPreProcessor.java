@@ -21,9 +21,12 @@ import io.stallion.exceptions.AppException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.settings.Settings;
 import io.stallion.utils.ProcessHelper;
+import io.stallion.utils.SimpleTemplate;
 import org.apache.commons.io.FilenameUtils;
+import org.parboiled.common.FileUtils;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +44,8 @@ public class ExternalCommandAssetPreProcessor {
     private String name;
     private String extension;
     private String[] commandArgs;
+
+
 
     /**
      * Finds the original file based on the processedFile path. If the original has new changes,
@@ -71,17 +76,12 @@ public class ExternalCommandAssetPreProcessor {
             throw new UsageException("Empty pre-processor command field");
         }
         ProcessHelper.CommandResult result;
-        if (!empty(getCommandArgs())) {
-            List<String> args = Arrays.asList(getCommandArgs());
-            args.add(0, command);
-            args.add(original.getAbsolutePath());
-            args.add(compiled.getAbsolutePath());
-            String[] argsArray = asArray(args, String.class);
-            result = ProcessHelper.run(argsArray);
-        } else {
-            result = ProcessHelper.run(command, original.getAbsolutePath(), compiled.getAbsolutePath());
-        }
-
+        String[] argsArray = new SimpleTemplate(command)
+                .put("original", original.getAbsolutePath())
+                .put("compiled", compiled.getAbsolutePath())
+                .render()
+                .split(" ");
+        result = new ProcessHelper().setInheritIO(false).setShowDotsWhileWaiting(false).run(argsArray);
         if (!result.succeeded()) {
             if (Settings.instance().getDebug() == true) {
                 throw new UsageException("Could not pre-process file " + original + "\n\n\n" + result.getOut() + "\n\n\n" + result.getErr() + "\n\n");
@@ -89,6 +89,7 @@ public class ExternalCommandAssetPreProcessor {
                 throw new AppException("Could not pre-process file " + original);
             }
         }
+
     }
 
     public String getCommand() {
@@ -114,6 +115,11 @@ public class ExternalCommandAssetPreProcessor {
     }
 
     public ExternalCommandAssetPreProcessor setExtension(String extension) {
+        if (extension != null) {
+            if (extension.startsWith(".")) {
+                extension = extension.substring(1);
+            }
+        }
         this.extension = extension;
         return this;
     }

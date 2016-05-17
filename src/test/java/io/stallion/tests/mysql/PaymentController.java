@@ -17,12 +17,12 @@
 
 package io.stallion.tests.mysql;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.StandardModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.StandardModelController;
 
 
 public class PaymentController extends StandardModelController<Payment> {
     public static PaymentController instance() {
-        return (PaymentController)DalRegistry.instance().get("stallion_test_payment");
+        return (PaymentController) DataAccessRegistry.instance().get("stallion_test_payment");
     }
 }

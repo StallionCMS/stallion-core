@@ -25,7 +25,7 @@
 
 package io.stallion.reflection;
 
-import io.stallion.dal.base.MappedModel;
+import io.stallion.dataAccess.MappedModel;
 import io.stallion.plugins.javascript.BaseJavascriptModel;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;

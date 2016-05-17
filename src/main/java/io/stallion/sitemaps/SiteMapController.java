@@ -17,7 +17,7 @@
 
 package io.stallion.sitemaps;
 
-import io.stallion.dal.base.Displayable;
+import io.stallion.dataAccess.Displayable;
 import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.settings.SecondaryDomain;
 

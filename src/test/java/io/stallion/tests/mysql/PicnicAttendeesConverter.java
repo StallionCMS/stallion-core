@@ -18,13 +18,12 @@
 package io.stallion.tests.mysql;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.stallion.dal.db.converters.JsonAttributeConverter;
+import io.stallion.dataAccess.db.converters.JsonAttributeConverter;
 import io.stallion.utils.json.JSON;
 
 import java.util.List;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class PicnicAttendeesConverter implements JsonAttributeConverter<List<PicnicAttendence>> {

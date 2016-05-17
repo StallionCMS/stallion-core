@@ -17,7 +17,7 @@
 
 package io.stallion.restfulEndpoints;
 
-import io.stallion.dal.base.Displayable;
+import io.stallion.dataAccess.Displayable;
 import io.stallion.exceptions.UsageException;
 
 import java.util.Collection;

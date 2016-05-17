@@ -25,6 +25,7 @@ import java.util.ArrayList;
 class BaseTimings extends ArrayList<Integer> {
     private boolean unset = true;
     private boolean every = false;
+    private boolean random = false;
 
     public void verifyAndUpdateUnset() throws ConfigException{
         if (unset == true) {
@@ -45,5 +46,14 @@ class BaseTimings extends ArrayList<Integer> {
 
     public void setEvery(boolean every) {
         this.every = every;
+    }
+
+    public boolean isRandom() {
+        return random;
+    }
+
+    public BaseTimings setRandom(boolean random) {
+        this.random = random;
+        return this;
     }
 }

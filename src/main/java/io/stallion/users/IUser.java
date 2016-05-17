@@ -19,13 +19,12 @@ package io.stallion.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
-import io.stallion.dal.base.Model;
-import io.stallion.dal.file.ModelWithFilePath;
+import io.stallion.dataAccess.Model;
+import io.stallion.dataAccess.file.ModelWithFilePath;
 import io.stallion.email.Contactable;
 import io.stallion.utils.json.RestrictedViews;
 
 import java.lang.String;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface IUser extends Contactable, Model, ModelWithFilePath {

@@ -18,8 +18,8 @@
 package io.stallion.tests.integration.filePersistenceSite;
 
 import io.stallion.Context;
-import io.stallion.dal.base.MappedModel;
-import io.stallion.dal.base.ModelController;
+import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.ModelController;
 
 import java.util.*;
 

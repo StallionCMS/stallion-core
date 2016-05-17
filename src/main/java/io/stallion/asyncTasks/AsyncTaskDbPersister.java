@@ -17,10 +17,12 @@
 
 package io.stallion.asyncTasks;
 
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
 import io.stallion.utils.DateUtils;
+import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.UUID;
@@ -40,12 +42,16 @@ public class AsyncTaskDbPersister extends DbPersister<AsyncTask> implements Asyn
         if (depth > 10) {
             return null;
         }
+        String localMode = "";
+        if (Settings.instance().getLocalMode()) {
+            localMode = or(System.getenv("USER"), GeneralUtils.slugify(Settings.instance().getTargetFolder()));
+        }
         // Do not execute tasks that are more than 2 days stale
         Long minTime = now - 86400 * 2 * 1000;
         AsyncTask task = DB.instance().queryForOne(
                 AsyncTask.class,
-                "SELECT * FROM stallion_async_tasks WHERE lockUuid='' AND executeAt>? AND completedAt=0 ORDER BY executeAt ASC",
-                minTime);
+                "SELECT * FROM stallion_async_tasks WHERE lockUuid='' AND executeAt>? AND completedAt=0 AND localMode=? ORDER BY executeAt ASC",
+                minTime, localMode);
 
         if (task == null) {
             return null;
@@ -95,4 +101,12 @@ public class AsyncTaskDbPersister extends DbPersister<AsyncTask> implements Asyn
     public boolean lockForProcessing(AsyncTask task) {
         return false;
     }
+
+
+    @Override
+    public void deleteOldTasks() {
+        Long before = DateUtils.utcNow().minusDays(40).toInstant().toEpochMilli();
+        DB.instance().execute("DELETE FROM `stallion_async_tasks` WHERE completedAt > 0 AND completedAt<? ", before);
+    }
+
 }

@@ -46,6 +46,11 @@ public class TaskRequest implements IRequest {
     }
 
     @Override
+    public String getScheme() {
+        return "";
+    }
+
+    @Override
     public String getQueryString() {
         return "";
     }

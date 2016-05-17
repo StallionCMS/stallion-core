@@ -17,21 +17,13 @@
 
 package io.stallion.requests;
 
-import io.stallion.dal.base.Setable;
-import io.stallion.dal.base.SettableOptions;
 import io.stallion.exceptions.ClientException;
 import io.stallion.exceptions.JsonMappingException;
-import io.stallion.reflection.PropertyUtils;
-import io.stallion.requests.StRequest;
 import io.stallion.restfulEndpoints.RequestArg;
 
 import static io.stallion.utils.Literals.*;
 
-import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
-
-import java.lang.reflect.Method;
-import java.util.Map;
 
 class RequestObjectConverter {
     private RequestArg arg;

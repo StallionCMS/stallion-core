@@ -120,10 +120,10 @@ var endpoints = {
 
 stallion.registerEndpoints(endpoints);
 
-var TomlItem = Java.type('io.stallion.dal.file.TomlItem');
-var TomlItemController = Java.type('io.stallion.dal.file.TomlItemController');
-var TomlPersister = Java.type('io.stallion.dal.file.TomlPersister');
-var JsonFilePersister = Java.type('io.stallion.dal.file.JsonFilePersister');
+var TomlItem = Java.type('io.stallion.dataAccess.file.TomlItem');
+var TomlItemController = Java.type('io.stallion.dataAccess.file.TomlItemController');
+var TomlPersister = Java.type('io.stallion.dataAccess.file.TomlPersister');
+var JsonFilePersister = Java.type('io.stallion.dataAccess.file.JsonFilePersister');
 
 var tomlThings = stallion
     .modelRegistration()

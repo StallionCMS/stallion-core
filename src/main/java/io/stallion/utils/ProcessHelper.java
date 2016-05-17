@@ -60,7 +60,7 @@ public class ProcessHelper {
     public CommandResult run() {
 
         String cmdString = String.join(" ", args);
-        System.console().printf("----- Execute command: %s ----\n", cmdString);
+        System.out.printf("----- Execute command: %s ----\n", cmdString);
         ProcessBuilder pb = new ProcessBuilder(args);
         if (!empty(directory)) {
             pb.directory(new File(directory));
@@ -91,7 +91,7 @@ public class ProcessHelper {
             while (p.isAlive()) {
                 p.waitFor(1000, TimeUnit.MILLISECONDS);
                 if (showDotsWhileWaiting == true) {
-                    System.console().printf(".");
+                    System.out.printf(".");
                 }
             }
 
@@ -126,7 +126,7 @@ public class ProcessHelper {
         if (quietMode == true) {
 
         }
-        System.console().printf(msg + "\n");
+        System.out.printf(msg + "\n");
     }
 
     public static class CommandResult {

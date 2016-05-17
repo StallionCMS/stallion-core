@@ -31,7 +31,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <pluginBooterClass>{{ config.packageName }}.{{ config.pluginTitleCase }}Booter</pluginBooterClass>
+                            <pluginBooterClass>{{ config.packageName }}.{{ config.pluginTitleCase }}Plugin</pluginBooterClass>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>
                     </archive>
@@ -50,6 +50,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <!-- or whatever version you use -->
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <staleMillis>1</staleMillis>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>

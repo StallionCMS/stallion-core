@@ -301,10 +301,10 @@ public abstract class ContactableEmailer<T extends Contactable> {
      * @return
      */
     public String getFromAddress() {
-        if (empty(Context.getSettings().getEmail())) {
+        if (emptyInstance(Context.getSettings().getEmail())) {
             throw new ConfigException("Email settings are null, and no override for the from email address was set.");
         }
-        if (!empty(Context.getSettings().getEmail().getDefaultFromAddress())) {
+        if (!emptyInstance(Context.getSettings().getEmail().getDefaultFromAddress())) {
             return Context.getSettings().getEmail().getDefaultFromAddress();
         }
         if (Settings.instance().getEmail().getAdminEmails().size() > 0) {

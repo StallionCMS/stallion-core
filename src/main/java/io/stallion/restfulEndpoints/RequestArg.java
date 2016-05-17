@@ -17,8 +17,6 @@
 
 package io.stallion.restfulEndpoints;
 
-import io.stallion.dal.base.SettableOptions;
-
 import java.util.regex.Pattern;
 
 

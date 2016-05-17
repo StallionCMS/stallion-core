@@ -93,7 +93,7 @@ public class ParamExtractor<T> {
      */
     public T get(Object key) {
         T value = map.getOrDefault(key, null);
-        if (empty(value)) {
+        if (emptyObject(value)) {
             throw new ClientException(MessageFormat.format(messageTemplate, key));
         }
         return value;

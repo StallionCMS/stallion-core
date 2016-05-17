@@ -19,7 +19,7 @@ package io.stallion.forms;
 
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.AsyncTaskHandlerBase;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.Model;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.users.User;

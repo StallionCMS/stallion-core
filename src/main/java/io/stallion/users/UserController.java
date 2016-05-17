@@ -18,11 +18,12 @@
 package io.stallion.users;
 
 import io.stallion.Context;
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.*;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
-import io.stallion.dal.file.JsonFilePersister;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.email.ContactableEmailer;
 import io.stallion.exceptions.ClientException;
 import io.stallion.requests.StRequest;
@@ -55,11 +56,11 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
 
     public static <Y  extends IUser> UserController<Y> instance() {
-        return (UserController<Y>)DalRegistry.instance().get("users");
+        return (UserController<Y>) DataAccessRegistry.instance().get("users");
     }
 
     public static void load() {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setStashClass(UserMemoryStash.class)
                 .setControllerClass(UserController.class)
                 .setModelClass(User.class);
@@ -83,8 +84,12 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
                     .setTableName("stallion_users")
                     .setBucket("users")
                     .setPersisterClass(DbPersister.class);
+            if (!Settings.instance().getUsers().getSyncAllUsersToMemory()) {
+                registration.setStashClass(UserPartialStash.class);
+            }
+
         }
-        Context.dal().registerDal(registration);
+        Context.dal().register(registration);
 
     }
 

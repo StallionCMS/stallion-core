@@ -17,14 +17,12 @@
 
 package io.stallion.users;
 
-import io.stallion.dal.base.LocalMemoryStash;
-import io.stallion.dal.filtering.FilterCache;
+import io.stallion.dataAccess.LocalMemoryStash;
+import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.services.Log;
 
 import java.io.File;
 import java.util.List;
-
-import static io.stallion.utils.Literals.*;
 
 
 public class UserMemoryStash<T extends IUser> extends LocalMemoryStash<T> {
@@ -86,7 +84,7 @@ public class UserMemoryStash<T extends IUser> extends LocalMemoryStash<T> {
 
         T original = itemByPrimaryKey.getOrDefault(item.getId(), null);
         if (original != null) {
-            syncAllFields(item);
+            sync(item);
         } else {
             registerItem(item);
         }

@@ -44,6 +44,7 @@ import static io.stallion.Context.*;
 
 public class HealthEndpoints {
 
+
     @GET
     @Path("/_st/health/check-health")
     public HealthInfo checkHealth(@QueryParam("secret") String secret, @QueryParam("failOnWarnings") Boolean failOnWarnings, @QueryParam("sections") String sections) {

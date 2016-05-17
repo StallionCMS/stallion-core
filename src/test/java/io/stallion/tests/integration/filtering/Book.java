@@ -17,18 +17,17 @@
 
 package io.stallion.tests.integration.filtering;
 
-import io.stallion.dal.base.AlternativeKey;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.UniqueKey;
-import io.stallion.dal.db.Converter;
-import io.stallion.dal.db.converters.JsonListConverter;
+import io.stallion.dataAccess.AlternativeKey;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.UniqueKey;
+import io.stallion.dataAccess.db.Converter;
+import io.stallion.dataAccess.db.converters.JsonListConverter;
 
 import javax.persistence.Column;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class Book extends ModelBase {

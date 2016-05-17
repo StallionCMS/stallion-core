@@ -188,7 +188,7 @@ public class OAuthEndpoints {
         String fullClientId = params.get("client_id");
         String clientSecret = params.get("client_secret");
         OAuthClient client = OAuthClientController.instance().clientForFullId(fullClientId);
-        if (empty(client)) {
+        if (emptyInstance(client)) {
             throw new ClientException("Client not found with id :'" + fullClientId + "'");
         }
         if (client.hasGrantType(GrantType.CODE)) {
@@ -201,7 +201,7 @@ public class OAuthEndpoints {
             throw new ClientException("The URI '" + redirectUri + "' was not on the allowed list.");
         }
         OAuthApproval token = OAuthApprovalController.instance().forUniqueKey("code", code);
-        if (empty(token)) {
+        if (emptyInstance(token)) {
             throw new ClientException("No valid token found for code: '" + code + "'");
         }
         if (token.isVerified()) {
@@ -231,7 +231,7 @@ public class OAuthEndpoints {
         String username = params.get("username");
         String clientId = params.get("clientId");
         OAuthClient client = OAuthClientController.instance().forUniqueKey("clientKey", clientId);
-        if (empty(client)) {
+        if (emptyInstance(client)) {
             throw new ClientException("Client not found with id :'" + clientId + "'");
         }
         if (client.hasGrantType(GrantType.PASSWORD)) {

@@ -49,7 +49,7 @@ nginx_non_ssl = """\
 
 server {
     listen 80;
-    server_name %(domain)s %(alias_domains)s %(secondary_domains)s;
+    server_name %(domain)s %(alias_domains)s;
     location / {
         proxy_pass http://%(instance)s;
         proxy_set_header X-Forwarded-Host $host;
@@ -89,7 +89,7 @@ nginx_ssl = """\
 
 server {
     listen 443;
-    server_name %(domain)s %(alias_domains)s %(secondary_domains)s;
+    server_name %(domain)s %(alias_domains)s;
     ssl on;
     ssl_certificate %(ssl_crt)s;
     ssl_certificate_key %(ssl_key)s;
@@ -162,15 +162,15 @@ class Publisher(object):
         self.base_port = conf['base_port']
         self.domain = conf['domain']
         self.alias_domains = conf.get('alias_domains', [])
-        self.secondary_domains = conf.get('secondary_domains', [])
+        self.redirect_domains = conf.get('redirect_domains', [])
         self.check_urls = conf.get('check_urls', [])
         self.host = conf.get('host', '')
         self.ssl_crt = conf.get('ssl_crt', '')
         self.ssl_key = conf.get('ssl_key', '')
         self.redirect_to_ssl = conf.get('redirect_to_ssl', False)
-        self.redirect_to_primary = conf.get('redirect_to_primary', False)
         self.executable_name = conf['executable_name']
         self.site_url = conf['site_url']
+        self.full_rebuild = conf['full_rebuild']
 
 
     def publish(self):
@@ -182,10 +182,10 @@ class Publisher(object):
             self.full_deploy()
             return
         change_info = self.detect_changes(self.active)
-        if change_info.total_changed == 0:
+        if not self.full_rebuild and change_info.total_changed == 0:
             good("No files have been changed. Exiting deploy.")
             return
-        if change_info.total_changed < 20 and not change_info.requires_full_deploy:
+        if not self.full_rebuild and change_info.total_changed < 20 and not change_info.requires_full_deploy:
             self.quick_update()    
             return
         info("%s files to update. Running full deploy" % change_info.total_changed)
@@ -478,24 +478,21 @@ respawn limit 3 60
             domain=self.domain,
             port=self.port,
             alias_domains=' '.join(self.alias_domains),
-            secondary_domains=' '.join(self.secondary_domains),
+            redirect_domains=' '.join(self.redirect_domains),
             redirect_domains='',
             ssl_key=self.ssl_key,
             ssl_crt=self.ssl_crt
             )
-        if self.redirect_to_primary:
-            params['redirect_domains'] = params['alias_domains']
-            params['alias_domains'] = ''
         conf = nginx_upstream % params
         if self.redirect_to_ssl and self.ssl_key:
             conf += nginx_non_ssl_redirect_to_ssl % params
         else:
             conf += nginx_non_ssl % params
-        if self.redirect_to_primary:
+        if self.redirect_domains:
             conf += nginx_non_ssl_redirect_to_primary % params
         if self.ssl_key:
             conf += nginx_ssl % params
-            if self.redirect_to_primary:
+            if self.redirect_domains:
                 conf += nginx_ssl_redirect_to_primary % params
 
         deploying_path = '/etc/nginx/sites-available/stallion---%s-%s.conf' % (self.deploying, self.domain)

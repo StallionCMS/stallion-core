@@ -19,7 +19,7 @@ package io.stallion.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.stallion.Context;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.Model;
 import io.stallion.services.Log;
 import io.stallion.users.Role;
 import io.stallion.utils.json.JSON;

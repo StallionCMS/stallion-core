@@ -17,9 +17,10 @@
 
 package io.stallion.asyncTasks;
 
-import io.stallion.dal.base.Model;
-import io.stallion.dal.file.ItemFileChangeEventHandler;
-import io.stallion.dal.file.JsonFilePersister;
+import io.stallion.dataAccess.Model;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.file.ItemFileChangeEventHandler;
+import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.fileSystem.FileSystemWatcherService;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,7 +171,28 @@ public class AsyncTaskFilePersister extends JsonFilePersister implements AsyncTa
         }
         return path;
     }
-    
+
+    @Override
+    public void deleteOldTasks() {
+        File dir = new File(getBucketFolderPath() + "/completed");
+        Long before = DateUtils.utcNow().minusDays(40).toInstant().toEpochMilli();
+        for(File f: dir.listFiles()) {
+            if (!f.isFile() || f.isHidden()) {
+                 continue;
+            }
+            if (f.getName().startsWith(".") || f.getName().startsWith("~") || f.getName().startsWith("#")) {
+                continue;
+            }
+            if (f.getName().endsWith(".json")) {
+                continue;
+            }
+            if (f.lastModified() < before) {
+                f.delete();
+            }
+        }
+
+    }
+
     @Override
     public String relativeFilePathForObj(Model model) {
         AsyncTask task = (AsyncTask)model;

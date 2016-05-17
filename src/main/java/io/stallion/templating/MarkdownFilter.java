@@ -28,7 +28,7 @@ import static io.stallion.Context.*;
 public class MarkdownFilter implements Filter {
     @Override
     public Object filter(Object o, JinjavaInterpreter jinjavaInterpreter, String... strings) {
-        if (empty(o) || !(o instanceof String)) {
+        if (o == null || !(o instanceof String) || ((String) o).length() == 0) {
             return o;
         }
         return Markdown.instance().process(o.toString());

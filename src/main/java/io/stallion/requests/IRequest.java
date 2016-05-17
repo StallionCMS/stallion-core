@@ -24,6 +24,8 @@ import io.stallion.users.IUser;
 import javax.servlet.http.Cookie;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +51,16 @@ public interface IRequest {
         return requestUrl();
     }
 
+    public String getScheme();
+
+
+    public default URI getRequestUri() {
+        try {
+            return new URI(requestUrl());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     /**

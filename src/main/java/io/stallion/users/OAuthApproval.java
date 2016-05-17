@@ -17,10 +17,10 @@
 
 package io.stallion.users;
 
-import io.stallion.dal.base.AlternativeKey;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.UniqueKey;
-import io.stallion.dal.db.Converter;
+import io.stallion.dataAccess.AlternativeKey;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.UniqueKey;
+import io.stallion.dataAccess.db.Converter;
 
 import javax.persistence.Column;
 
@@ -144,7 +144,7 @@ public class OAuthApproval extends ModelBase {
     }
 
     @Column
-    @Converter(name="io.stallion.dal.db.converters.JsonSetConverter")
+    @Converter(name="io.stallion.dataAccess.db.converters.JsonSetConverter")
     public Set<String> getScopes() {
         return scopes;
     }

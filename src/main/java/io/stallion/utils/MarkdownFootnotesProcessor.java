@@ -93,7 +93,7 @@ class MarkdownFootnotesProcessor {
             String name = names.get(i);
             int num = i + 1;
             Footnote footnote = footnoteByName.getOrDefault(name, null);
-            if (empty(footnote)) {
+            if (emptyInstance(footnote)) {
                 continue;
             }
             /**

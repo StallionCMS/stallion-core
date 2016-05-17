@@ -18,9 +18,9 @@
 package io.stallion.boot;
 
 import com.mashape.unirest.http.Unirest;
-import io.stallion.dal.db.SqlCheckNeedsMigrationAction;
-import io.stallion.dal.db.SqlGenerationAction;
-import io.stallion.dal.db.SqlMigrationAction;
+import io.stallion.dataAccess.db.SqlCheckNeedsMigrationAction;
+import io.stallion.dataAccess.db.SqlGenerationAction;
+import io.stallion.dataAccess.db.SqlMigrationAction;
 import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.plugins.PluginRegistry;
@@ -53,7 +53,7 @@ public class Booter {
     private static final List<StallionRunAction> builtinActions = Literals.list(
             new StallionServer(),
             new UserAdder(),
-            new Publisher(),
+            new Deployer(),
             new PluginTestsRunAction(),
             new ScriptExecBase(),
             new NewProjectBuilder(),
@@ -63,7 +63,8 @@ public class Booter {
             new SqlMigrationAction()  ,
             new SqlCheckNeedsMigrationAction(),
             new SqlGenerationAction(),
-            new InteractiveJavascriptRunAction()
+            new InteractiveJavascriptRunAction(),
+            new ForceTaskAction()
     );
 
     public void boot(String[] args) throws Exception {

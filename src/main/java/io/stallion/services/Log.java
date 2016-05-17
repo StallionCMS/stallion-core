@@ -170,6 +170,19 @@ public class Log {
 
     }
 
+    public static void warning(String message, Object ... args) {
+        if (getLogLevel().intValue() > Level.WARNING.intValue()) {
+            return;
+        }
+        Throwable t = new Throwable();
+        StackTraceElement stackTraceElement = t.getStackTrace()[1];
+        String clz = stackTraceElement.getClassName().replace("io.stallion.", "");
+        String method = stackTraceElement.getMethodName() + ":" + t.getStackTrace()[1].getLineNumber();
+        logger.logp(Level.WARNING, clz, method, message, args);
+
+    }
+
+
 
     public static void warn(String message, Object ... args) {
         if (getLogLevel().intValue() > Level.WARNING.intValue()) {

@@ -17,9 +17,13 @@
 
 package io.stallion.asyncTasks;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.db.DB;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
+import io.stallion.jobs.JobCoordinator;
+import io.stallion.jobs.JobDefinition;
+import io.stallion.jobs.Schedule;
 import io.stallion.plugins.javascript.JsAsyncTaskHandler;
 import io.stallion.services.Log;
 import static io.stallion.utils.Literals.*;
@@ -45,6 +49,7 @@ public abstract class AsyncCoordinator extends Thread {
     private boolean triggerShutDown = false;
     private boolean synchronousMode = false;
     private List<ClassLoader> extraClassLoaders = list();
+
 
     public static AsyncCoordinator instance() {
         return INSTANCE;
@@ -107,6 +112,7 @@ public abstract class AsyncCoordinator extends Thread {
      * Actually start the loop to poll for tasks and execute them.
      */
     public static void startup() {
+
         if (INSTANCE.synchronousMode) {
             return;
         }
@@ -114,7 +120,18 @@ public abstract class AsyncCoordinator extends Thread {
             throw new RuntimeException("You cannot start the AsyncCoordinator twice!");
         }
         Log.fine("Starting async coordinator.");
+
+
         INSTANCE.start();
+
+        // Register the cleanup job
+        JobCoordinator.instance().registerJob(
+                new JobDefinition()
+                        .setJobClass(CleanupOldTasksJob.class)
+                .setSchedule(Schedule.daily())
+                .setAlertThresholdMinutes(50 * 60)
+                .setName("cleanup-completed-tasks")
+        );
 
     }
 
@@ -250,6 +267,37 @@ public abstract class AsyncCoordinator extends Thread {
      */
     public abstract boolean markCompleted(AsyncTask task);
 
+
+    /**
+     * Directly, synchronously execute the task with the given ID, regardless
+     * of whether it has errored out or is scheduled for the future.
+     *
+     * @param taskId
+     * @param force -- if true, will run the job even if it is locked
+     */
+    public void runTaskForId(Long taskId, boolean force) {
+        AsyncTask task = AsyncTaskController.instance().forId(taskId);
+        if (task == null) {
+            throw new NotFoundException("Task not found for id " + taskId);
+        }
+        if (task.getLockedAt() > 0) {
+            Log.warn("Task is already locked {0} {1} currentThread={2} lockUid={3}", task.getId(), task.getLockedAt(), Thread.currentThread().getId(), task.getLockUuid());
+            if (!force) {
+                return;
+            }
+        }
+        boolean locked = getTaskPersister().lockForProcessing(task);
+        if (!locked) {
+            Log.warn("Unable to lock task! {0}", task.getId());
+            if (!force) {
+                return;
+            }
+        }
+        AsyncTaskExecuteRunnable runnable = new AsyncTaskExecuteRunnable(task);
+        runnable.run(true);
+    }
+
+
     /**
      * Mark the task as failed.
      *
@@ -332,7 +380,7 @@ public abstract class AsyncCoordinator extends Thread {
         for(AsyncTaskExecuteRunnable runnable: INSTANCE.threads) {
             runnable.setTriggerShutdown(true);
         }
-        DalRegistry.instance().deregister("async_tasks");
+        DataAccessRegistry.instance().deregister("async_tasks");
         INSTANCE.pool.shutdown();
         INSTANCE = null;
     }

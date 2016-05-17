@@ -171,22 +171,87 @@ if (window.$ && !window.jQuery) {
     };
     
     st.defaultRequestErrorHandler = function(o, form, xhr) {
-        if (form) {
-            var $form = $(form);
-            var $errorWrap = $form.find('.st-error-wrap');
+        st.showError(o.message, form);
+    };
+
+    st.showError = function(msg, target) {
+        if (target) {
+            var $target = $(target);
+            var $errorWrap = $target.find('.st-error-wrap');
             if (!$errorWrap.length) {
                 var $node = $('<div></div>');
                 $node.addClass('st-error-wrap');
-                $form.prepend($node);
+                $target.prepend($node);
                 $errorWrap = $node;
             }
-            $errorWrap.html("<div style='' class='alert alert-danger st-error pre-fade'>" + o.message + "</div>");
+            $errorWrap.html("<div style='' class='alert alert-danger st-error pre-fade'>" + msg + "</div>");
             setTimeout(function() {
                 $('.st-error.pre-fade').removeClass('pre-fade');
             }, 30);       
             
         } else {
-            alert(o.message);
+            var top = calcTopForMessageFixed();
+            var $div = $('<div class="alert alert-danger st-error st-message-fixed pre-fade"></div>')
+                .css({right: '20px', top: top + 'px', position: 'fixed'})
+                .html(msg);
+            $(document.body).append($div);
+            setTimeout(function() {
+                $('.st-error.pre-fade').removeClass('pre-fade');
+            }, 30);       
+            setTimeout(function() { $div.fadeOut(2000); }, 4000);
+        }
+
+    };
+
+    function calcTopForMessageFixed() {
+        var top = $(window).height();
+        // If there is no HTML5 doctype, then window.height is the document height, and we do not want to use it, need to put
+        // it in the top right corner instead
+        if (($(document).height() - 100) < top && top > 700) {
+            top = 100;
+        }
+        console.log('top ', top);
+        $others = $('.st-message-fixed');
+        if ($others.length) {
+            var minTop = top;
+            $others.each(function(ele) {
+                var eleTop = parseInt($(ele).css('top'), 10);
+                if (eleTop < minTop) {
+                    minTop = eleTop;
+                }
+            });
+            top = minTop;
+        }
+        top = top - 100;
+        console.log('top again ', top);
+        if (top < 0) {
+            top = 0;
+        }
+        return top;
+    }
+
+    st.showSuccess = function(msg, target) {
+        var $target = null;
+        if (target) {
+            $target = $(target);
+            var $successWrap = $target.find('.st-success-wrap');
+            if (!$successWrap.length) {
+                var $node = $('<div></div>');
+                $node.addClass('st-success-wrap');
+                $target.prepend($node);
+                $successWrap = $node;
+            }
+            $successWrap.html("<div style='' class='alert alert-success st-success pre-fade'>" + msg + "</div>");
+            setTimeout(function() {
+                $('.st-success.pre-fade').removeClass('pre-fade');
+            }, 30);       
+        } else {
+            var top = calcTopForMessageFixed();            
+            var $div = $('<div class="alert alert-success st-success st-message-fixed"></div>')
+                .css({right: '20px', top: top + 'px', position: 'fixed'})
+                .html(msg);
+            $(document.body).append($div);
+            setTimeout(function() { $div.fadeOut(2000); }, 4000);
         }
     };
     
