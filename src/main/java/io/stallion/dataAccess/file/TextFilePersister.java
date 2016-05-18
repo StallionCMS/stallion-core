@@ -398,7 +398,7 @@ public class TextFilePersister<T extends TextItem> extends FilePersisterBase<T> 
             item.setAuthor(value.toString());
         } else if (key.equals("tags")) {
             if (value instanceof List) {
-                item.setTags((List<String>)value);
+                item.setTags((List<String>) value);
             } else {
                 ArrayList<String> tags = new ArrayList<String>();
                 for (String tag : value.toString().split("(;|,)")) {
@@ -407,7 +407,8 @@ public class TextFilePersister<T extends TextItem> extends FilePersisterBase<T> 
                 item.setTags(tags);
 
             }
-
+        } else if (key.equals("contentType")) {
+            item.setContentType(value.toString());
         } else {
             item.put(key, value);
         }

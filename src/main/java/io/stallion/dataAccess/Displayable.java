@@ -35,6 +35,7 @@ public interface Displayable {
     public String getPermalink();
     public String getRelCanonical();
     public String getMetaKeywords();
+    public String getContentType();
     public String getMetaDescription();
     public String getTitleTag();
     public String getTitle();

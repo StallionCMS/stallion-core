@@ -25,6 +25,7 @@ import io.stallion.plugins.PluginRegistry;
 import io.stallion.requests.RequestHandler;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.restfulEndpoints.SlugRegistry;
+import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.eclipse.jetty.server.Server;
 import sun.misc.Signal;
@@ -62,15 +63,17 @@ public class ForceTaskAction implements StallionRunAction<ForceActionOptions> {
     public void execute(ForceActionOptions options) throws Exception {
 
         if (options.getTaskId() > 0L) {
+            Log.info("Run AsyncTask with id {0}", options.getTaskId());
             AsyncCoordinator.instance().runTaskForId(options.getTaskId(), options.getForce());
             return;
         }
 
         if (!empty(options.getJobName())) {
+            Log.info("Force run job with name {0}", options.getJobName());
             JobCoordinator.instance().forceRunJob(options.getJobName(), options.getForce());
         }
 
         AsyncCoordinator.gracefulShutdown();
-
+        JobCoordinator.shutdown();
     }
 }

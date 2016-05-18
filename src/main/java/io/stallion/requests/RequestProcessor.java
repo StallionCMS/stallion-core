@@ -258,6 +258,9 @@ class RequestProcessor {
         if (!empty(item.getRelCanonical())) {
             response.getMeta().setCanonicalUrl(item.getRelCanonical());
         }
+        if (!empty(item.getContentType())) {
+            response.setContentType(item.getContentType());
+        }
         markHandled(200, "slug->displayableItemController for id={0} slug={1} controller={2}", baseItem.getId(), item.getSlug(), baseItem.getController().getClass().getName());
         String output = ((DisplayableModelController)baseItem.getController()).render(item, ctx);
         sendContentResponse(output);

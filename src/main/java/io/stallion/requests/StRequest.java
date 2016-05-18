@@ -99,18 +99,23 @@ public class StRequest implements IRequest {
 
     @Override
     public String getScheme() {
-        String baseUrl = Context.getSettings().getSiteUrl();
-        if (empty(scheme)) {
-            //
+        if (empty(scheme) && this.request != null) {
+
             scheme = this.request.getScheme();
             if (!empty(getHeader("x-forwarded-proto"))) {
                 scheme = getHeader("x-forwarded-proto");
             }
         }
         if (empty(scheme)) {
-            int i = baseUrl.indexOf("://");
-            if (i > -1) {
-                scheme = baseUrl.substring(0, i);
+            String baseUrl = "";
+            if (Context.getSettings() != null ) {
+                baseUrl = Context.getSettings().getSiteUrl();
+            }
+            if (baseUrl != null) {
+                int i = baseUrl.indexOf("://");
+                if (i > -1) {
+                    scheme = baseUrl.substring(0, i);
+                }
             }
         }
         if (empty(scheme)){

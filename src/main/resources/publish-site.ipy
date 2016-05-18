@@ -32,7 +32,7 @@ nginx_non_ssl_redirect_to_ssl = """
 
 server {
     listen 80;
-    server_name %(domain)s %(alias_domains)s %(secondary_domains)s %(redirect_domains)s;
+    server_name %(domain)s %(alias_domains)s %(redirect_domains)s;
 
     location ~ /.well-known {
        try_files $uri $uri/ =404;
@@ -479,7 +479,6 @@ respawn limit 3 60
             port=self.port,
             alias_domains=' '.join(self.alias_domains),
             redirect_domains=' '.join(self.redirect_domains),
-            redirect_domains='',
             ssl_key=self.ssl_key,
             ssl_crt=self.ssl_crt
             )

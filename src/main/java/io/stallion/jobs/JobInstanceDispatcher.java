@@ -17,6 +17,7 @@
 
 package io.stallion.jobs;
 
+import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -44,6 +45,9 @@ class JobInstanceDispatcher implements Runnable {
             // Run the job
             job.execute();
             status.setCompletedAt(DateUtils.mils());
+            Long nextCompleteBy = DateUtils.mils() + (definition.getAlertThresholdMinutes() * 60 * 1000);
+            Log.info("Threshold minutes: {0} next complete by: {1}", definition.getAlertThresholdMinutes(), nextCompleteBy);
+            status.setShouldSucceedBy(nextCompleteBy);
         } catch (Exception e) {
             status.setError(e.toString() + ": " + e.getMessage() + "\n" + ExceptionUtils.getStackTrace(e));
             status.setFailedAt(DateUtils.mils());
