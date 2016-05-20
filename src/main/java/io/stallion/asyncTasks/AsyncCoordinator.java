@@ -129,7 +129,7 @@ public abstract class AsyncCoordinator extends Thread {
                 new JobDefinition()
                         .setJobClass(CleanupOldTasksJob.class)
                 .setSchedule(Schedule.daily())
-                .setAlertThresholdMinutes(50 * 60)
+                .setAlertThresholdMinutes(30 * 60)
                 .setName("cleanup-completed-tasks")
         );
 

@@ -24,7 +24,7 @@ import java.time.ZonedDateTime;
 public class JobDefinition implements Comparable<JobDefinition> {
     private String name;
     private Schedule schedule;
-    private int alertThresholdMinutes;
+    private int alertThresholdMinutes = 75;
     private String className;
     private Class<? extends Job> jobClass;
 
@@ -48,6 +48,13 @@ public class JobDefinition implements Comparable<JobDefinition> {
         return this;
     }
 
+    /**
+     * The number of minutes after which the jobs was supposed to run at which
+     * we return errors in the healthcheck endpoint because the job has not finished
+     * running. Default to 75 minutes.
+     *
+     * @return
+     */
     public int getAlertThresholdMinutes() {
         return alertThresholdMinutes;
     }

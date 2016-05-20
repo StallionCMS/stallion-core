@@ -21,6 +21,8 @@ import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.time.ZonedDateTime;
+
 /**
  * Handles the actually running of a Job on a different thread, with reporting
  * of errors and bookeeping.
@@ -45,7 +47,8 @@ class JobInstanceDispatcher implements Runnable {
             // Run the job
             job.execute();
             status.setCompletedAt(DateUtils.mils());
-            Long nextCompleteBy = DateUtils.mils() + (definition.getAlertThresholdMinutes() * 60 * 1000);
+            ZonedDateTime nextRunAt = definition.getSchedule().nextAt(DateUtils.utcNow().plusMinutes(3));
+            Long nextCompleteBy = nextRunAt.plusMinutes(definition.getAlertThresholdMinutes()).toInstant().toEpochMilli();
             Log.info("Threshold minutes: {0} next complete by: {1}", definition.getAlertThresholdMinutes(), nextCompleteBy);
             status.setShouldSucceedBy(nextCompleteBy);
         } catch (Exception e) {

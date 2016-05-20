@@ -483,16 +483,19 @@ respawn limit 3 60
             ssl_crt=self.ssl_crt
             )
         conf = nginx_upstream % params
-        if self.redirect_to_ssl and self.ssl_key:
-            conf += nginx_non_ssl_redirect_to_ssl % params
-        else:
-            conf += nginx_non_ssl % params
-        if self.redirect_domains:
-            conf += nginx_non_ssl_redirect_to_primary % params
+        # Handle SSL traffic, if applicable
         if self.ssl_key:
             conf += nginx_ssl % params
             if self.redirect_domains:
                 conf += nginx_ssl_redirect_to_primary % params
+        # Handle non-SSL traffic
+        if self.ssl_key and self.redirect_to_ssl:
+            conf += nginx_non_ssl_redirect_to_ssl % params
+        else:
+            conf += nginx_non_ssl % params
+            if self.redirect_domains:
+                conf += nginx_non_ssl_redirect_to_primary % params
+
 
         deploying_path = '/etc/nginx/sites-available/stallion---%s-%s.conf' % (self.deploying, self.domain)
         active_path = '/etc/nginx/sites-available/stallion---%s-%s.conf' % (self.active, self.domain)
@@ -505,6 +508,7 @@ respawn limit 3 60
         if not _exit_code == 0:
             if self.active:
                 # reset back to the active conf
+                !unlink -s $enabled_path
                 !ln -s $active_path $enabled_path
             raise AssertionError('nginx config test failed!')
         if self.active:
