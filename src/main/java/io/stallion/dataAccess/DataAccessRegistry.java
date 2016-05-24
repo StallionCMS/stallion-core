@@ -279,7 +279,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
         // Add the controller to the DalRegistry lookup table
         internalMap.put(controller.getBucket(), controller);
         // Add the model to the DalRegistry lookup table
-        Log.info("Register model class name {0}", registration.getModelClass().getCanonicalName());
+        Log.info("Register model {0}", registration.getModelClass().getCanonicalName());
         modelClassToBucketName.put(registration.getModelClass().getCanonicalName(), registration.getBucket());
 
         // Load all the items into the local stash

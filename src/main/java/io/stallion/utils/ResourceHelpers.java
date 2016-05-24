@@ -152,8 +152,8 @@ public class ResourceHelpers {
             paths.add(System.getProperty("user.home") + "/st/core/src/main/resources" + relativePath);
             paths.add(System.getProperty("user.home") + "/stallion/core/src/main/resources" + relativePath);
         } else {
-            paths.add(System.getProperty("user.home") + "/st/plugins/" + pluginName + "/src/main/resources" + relativePath);
-            paths.add(System.getProperty("user.home") + "/stallion/plugins/" + pluginName + "/src/main/resources" + relativePath);
+            paths.add(System.getProperty("user.home") + "/st/" + pluginName + "/src/main/resources" + relativePath);
+            paths.add(System.getProperty("user.home") + "/stallion/" + pluginName + "/src/main/resources" + relativePath);
         }
         boolean isText = true;
 

@@ -30,8 +30,6 @@ public class ScriptOptions extends CommandOptionsBase {
     @Option(name="-env", usage="The environment you are running in. The file settings.(env).toml will be merged into your settings.")        // no usage
     private String env = "local";
 
-    @Option(name="-devMode", usage="Set to 'true' if you want to use the development URL for resource assets")
-    private boolean devMode = false;
 
     @Option(name="--", handler= StopOptionHandler.class)
     private List<String> stopOptions = new ArrayList<>();
@@ -42,17 +40,6 @@ public class ScriptOptions extends CommandOptionsBase {
 
     public void setStopOptions(List<String> stopOptions) {
         this.stopOptions = stopOptions;
-    }
-
-
-    @Override
-    public boolean isDevMode() {
-        return devMode;
-    }
-
-    @Override
-    public void setDevMode(boolean devMode) {
-        this.devMode = devMode;
     }
 
     @Override

@@ -83,6 +83,53 @@ public class Literals {
         return "";
     }
 
+    /**
+     * Imitation of Python's [2:-7] syntax that never throws errors while slicing
+     * and that accepts negative indexes
+     *
+     * @param s
+     * @param start
+     * @param end
+     * @return
+     */
+    public static String slice(String s, int start, int end) {
+        if (end < 0) {
+            end = s.length() + end;
+        }
+        if (start < 0) {
+            start = s.length() + start;
+        }
+        if (end < start) {
+            return "";
+        }
+        if (end > s.length()) {
+            end = s.length();
+        }
+        return s.substring(start, end);
+    }
+
+    public static <T extends List> T slice(T l, int start, int end) {
+        if (end < 0) {
+            end = l.size() + end;
+        }
+        if (start < 0) {
+            start = l.size() + start;
+        }
+        if (end > l.size()) {
+            end = l.size();
+        }
+        if (start > l.size() || start > end){
+            return (T)l.subList(0, 0);
+        }
+        if (end < start) {
+            end = start;
+        }
+
+        return (T)l.subList(start, end);
+    }
+
+
+
     public static <T extends List> T truncate(T l, int length){
         if (l.size() < length) {
             return l;
@@ -97,6 +144,13 @@ public class Literals {
         return s.substring(0, length);
     }
 
+    /**
+     * A truncat the tries to truncate on a sentence or word boundary.
+     *
+     * @param s
+     * @param length
+     * @return
+     */
     public static String truncateSmart(String s, int length) {
         if (s.length() < length) {
             return s;

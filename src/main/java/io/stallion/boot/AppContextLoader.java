@@ -100,6 +100,9 @@ public class AppContextLoader {
         if (Settings.instance().getLogToFile()) {
             Log.enableFileLogger();
         }
+
+        Log.setAlwaysIncludeLineNumber(options.isLoggingAlwaysIncludesLineNumber());
+
         if (!Settings.instance().getLogToConsole()) {
              Log.disableConsoleHandler();
         }
