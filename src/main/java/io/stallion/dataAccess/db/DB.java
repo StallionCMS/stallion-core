@@ -18,14 +18,15 @@
 package io.stallion.dataAccess.db;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import io.stallion.dataAccess.AlternativeKey;
 import io.stallion.dataAccess.DynamicModelDefinition;
 import io.stallion.dataAccess.Tickets;
 import io.stallion.dataAccess.UniqueKey;
 import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.db.converters.*;
-import io.stallion.dataAccess.db.mysql.MySqlTickets;
-import io.stallion.dataAccess.db.postgres.PostgresTickets;
+import io.stallion.dataAccess.db.mysql.MySqlDbImplementation;
+import io.stallion.dataAccess.db.postgres.PostgresDbImplementation;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.plugins.javascript.BaseJavascriptModel;
@@ -50,9 +51,9 @@ import javax.persistence.Table;
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.Field;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.lang.reflect.Method;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -72,7 +73,8 @@ public class DB {
     private DataSource dataSource;
     private Map<String, AttributeConverter> converters = new HashMap<String, AttributeConverter>();
     private Tickets tickets;
-    private DbTypes dbType;
+
+    private DbImplementation dbImplementation;
     private static boolean useDummyPersisterForSqlGenerationMode = false;
 
     private static DB _instance;
@@ -145,22 +147,77 @@ public class DB {
      * @param config
      */
     public void initialize(DbConfig config) {
-        if (config.getDriverClass().contains(".mysql")) {
-            this.dbType = DbTypes.MYSQL;
-        } else if (config.getDriverClass().contains(".postgres.")) {
-            this.dbType = DbTypes.POSTGRES;
-        } else {
-            throw new ConfigException("Did not recognize database.driverClass " + config.getDriverClass() + " as a valid database engine");
+        try {
+            dbImplementation = (DbImplementation)StallionClassLoader.loadClass(config.getImplementationClass()).newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
+
+        // Test out the connection. We do this directly, because if we test via the ComboPooledDataSource
+        // exceptions will make the driver hang while retrying, and will also bury the underlying cause
+
+        try {
+            Driver driver = (Driver)StallionClassLoader.loadClass(config.getDriverClass()).newInstance();
+            Properties props = new Properties();
+            props.setProperty("user", config.getUsername());
+            props.setProperty("password", config.getPassword());
+            try (Connection conn = driver.connect(config.getUrl(), props)) {
+                Statement st = conn.createStatement();
+                ResultSet results = st.executeQuery("SELECT 1 AS oneCol");
+                results.next();
+                Long i = results.getLong("oneCol");
+                assert i == 1L;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
         ComboPooledDataSource cpds = new ComboPooledDataSource();
+        /*
+        try {
+            try (Connection conn = cpds.getConnection()) {
+                Statement st = conn.createStatement();
+                ResultSet results = st.executeQuery("SELECT 1");
+                Long i = results.getLong(0);
+                assert i == 1L;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        */
         try {
             cpds.setDriverClass(config.getDriverClass()); //loads the jdbc driver
         } catch (PropertyVetoException e) {
             throw new RuntimeException(e);
         }
-        cpds.setJdbcUrl(config.getUrl());
+
+        String url = config.getUrl();
+        if (!url.contains("?")) {
+            url += "?";
+        }
+        // Assume the database server is in UTC
+        if (!url.contains("&useLegacyDatetimeCode=")) {
+            url += "&useLegacyDatetimeCode=false";
+        }
+        if (!url.contains("&serverTimezone=")) {
+            url += "&serverTimezone=UTC";
+        }
+        //&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+
+        cpds.setJdbcUrl(url);
         cpds.setUser(config.getUsername());
         cpds.setPassword(config.getPassword());
+
+
         cpds.setAcquireRetryAttempts(10);
         cpds.setAcquireRetryDelay(200);
         //cpds.setCheckoutTimeout(1);
@@ -172,7 +229,24 @@ public class DB {
         cpds.setTestConnectionOnCheckin(true);
 
         this.dataSource = cpds;
-        this.tickets = new MySqlTickets(this);
+
+
+        // Make sure the database server time is UTC and in sync with the local server time
+        // or else stop execution to prevent nasty and insiduious errors.
+        //Timestamp date = this.queryScalar(dbImplementation.getCurrentTimeStampQuery());
+        Timestamp date = this.queryScalar(dbImplementation.getCurrentTimeStampQuery());
+        ZonedDateTime now = utcNow();
+        ZonedDateTime dbTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.of("UTC"));
+
+        //LocalDateTime now = utcNow().toLocalDateTime();
+        ZonedDateTime max = now.plusMinutes(2);
+        ZonedDateTime min = now.minusMinutes(2);
+
+        //LocalDateTime dbTime = date.toLocalDateTime();
+        if (dbTime.isAfter(max) || dbTime.isBefore(min)) {
+            throw new ConfigException("The database CURRENT_TIMESTAMP() is mismatched with the server time. Db time is " + dbTime + ". Server time is "  + now + ". Make sure the database server is in UTC and that all your servers clocks are matched. ");
+        }
+
 
         // Todo: why not lazy load converters???
         registerConverter(new JsonMapConverter());
@@ -180,18 +254,7 @@ public class DB {
         registerConverter(new JsonObjectConverter());
         registerConverter(new JsonListConverter());
 
-
-        // Make sure the database server time is UTC and in sync with the local server time
-        // or else stop execution to prevent nasty and insiduious errors.
-        Timestamp date = this.queryScalar("SELECT CURRENT_TIMESTAMP();");
-
-        LocalDateTime now = utcNow().toLocalDateTime();
-        LocalDateTime max = now.plusMinutes(2);
-        LocalDateTime min = now.minusMinutes(2);
-        LocalDateTime dbTime = date.toLocalDateTime();
-        if (dbTime.isAfter(max) || dbTime.isBefore(min)) {
-            throw new ConfigException("The database CURRENT_TIMESTAMP() is mismatched with the server time. Db time is " + dbTime + ". Server time is "  + now + ". Make sure the database server is in UTC and that all your servers clocks are matched. ");
-        }
+        this.tickets = dbImplementation.initTicketsService(this);
 
     }
 
@@ -200,11 +263,7 @@ public class DB {
      * @return
      */
     public Tickets newTicketsGeneratorInstance() {
-        if (DbTypes.POSTGRES.equals(dbType)) {
-            return new PostgresTickets(this);
-        } else {
-            return new MySqlTickets(this);
-        }
+        return dbImplementation.initTicketsService(this);
     }
 
     public Class getDefaultPersisterClass() {
@@ -981,11 +1040,11 @@ public class DB {
         return tickets;
     }
 
-    /**
-     * Get the type of the database - MySql, Postgres, etc.
-     * @return
-     */
-    public DbTypes getDbType() { return dbType; }
+
+    public DbImplementation getDbImplementation() {
+        return dbImplementation;
+    }
+
 
     /**
      * If true, internally, DalRegistry.register() will never use a DbPersister, instead

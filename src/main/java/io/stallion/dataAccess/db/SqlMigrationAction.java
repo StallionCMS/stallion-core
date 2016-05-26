@@ -145,8 +145,8 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
                 Log.finer("File name starts with invalid character {0}", file.getName());
                 continue;
             }
-            if (!file.getName().contains("." + DB.instance().getDbType().toString().toLowerCase() + ".")) {
-                Log.finer("File name does not contain the name of the current database engine: \".{0}.\"", DB.instance().getDbType().toString().toLowerCase());
+            if (!file.getName().contains("." + DB.instance().getDbImplementation().getName().toLowerCase() + ".")) {
+                Log.finer("File name does not contain the name of the current database engine: \".{0}.\"", DB.instance().getDbImplementation().getName().toLowerCase());
                 continue;
             }
             if (!file.getName().contains("-")) {
@@ -176,7 +176,7 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
         List<String> files = list("00004-users", "00006-async_tasks", "00010-job_status", "00011-temp_tokens");
         for (String fileStub: files) {
             int version = Integer.parseInt(fileStub.split("-")[0]);
-            String fileName = fileStub + "." + DB.instance().getDbType().toString().toLowerCase() + ".sql";
+            String fileName = fileStub + "." + DB.instance().getDbImplementation().getName().toLowerCase() + ".sql";
             String source = ResourceHelpers.loadResource("stallion", "/sql/" + fileName);
             SqlMigration migration = new SqlMigration()
                     .setAppName("stallion")
@@ -189,13 +189,8 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
     }
 
     void createMigrationTrackingTableIfNotExists() {
-        if (DB.instance().getDbType().equals(DbTypes.MYSQL)) {
-            String sql = ResourceHelpers.loadResource("stallion", "/sql/migrations-table.mysql.sql");
-            DB.instance().execute(sql);
-        } else if (DB.instance().getDbType().equals(DbTypes.POSTGRES)) {
-            throw new ConfigException("Postgres not implemented yet.");
-        }  else {
-            throw new ConfigException("Sorry, migrations only work with MySQL and Postgres");
-        }
+        String sql = ResourceHelpers.loadResource("stallion", "/sql/migrations-table." + DB.instance().getDbImplementation().getName() + ".sql");
+        DB.instance().execute(sql);
+
     }
 }

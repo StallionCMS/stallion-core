@@ -19,17 +19,49 @@ package io.stallion.tests.sql;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
+import static junit.framework.TestCase.assertEquals;
 
 import java.util.List;
 import java.util.Map;
 
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.NoStash;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.Log;
+import io.stallion.testing.AppIntegrationCaseBase;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
-public class PostgresSyncedTests {
+public class PostgresSyncedTests extends AppIntegrationCaseBase {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        //startApp("/postgres_site");
+        /*
+        DataAccessRegistry.instance().register(
+                new DataAccessRegistration()
+                        .setModelClass(Payment.class)
+                        .setControllerClass(PaymentController.class)
+                        .setStashClass(NoStash.class)
+                        .setWritable(true)
+                        .setPersisterClass(DbPersister.class)
+                        .setTableName("stallion_test_payment")
+        );
+        */
+
+        //DB.instance().registerConverter(new PicnicAttendeesConverter());
+        //EndpointsRegistry.instance().addResource("/st-mysql-tests", new MySqlEndpoint());
+    }
+
     @Test
     public void testPostgres() {
+        //long one = DB.instance().queryScalar("SELECT 1");
+        //assertEquals(1, one);
+        //org.postgresql.Driver
 
+        Log.warn("Implement me");
     }
 }

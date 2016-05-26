@@ -1,9 +1,0 @@
-template:exception-generating-template.badextension
-slug:/exception-generating-page
-title: Exception generating page
-author: Exceptionator
-
-The Exceptional Page
-========================================
-
-The exception generating page.

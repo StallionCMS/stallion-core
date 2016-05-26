@@ -84,7 +84,7 @@ public class Picnic extends ModelBase {
     }
 
     @Column
-    @Converter(name="io.stallion.tests.mysql.PicnicAttendeesConverter")
+    @Converter(name="io.stallion.tests.sql.PicnicAttendeesConverter")
     public List<PicnicAttendence> getAttendees() {
         return attendees;
     }

@@ -24,6 +24,6 @@ route = "/template-direct"
 template = "template-direct.jinja"
 
 [database]
-url = "jdbc:postgres://localhost:3306/stallion_test?allowMultiQueries=true&autoReConnect=true"
-username = "root"
+url = "jdbc:postgresql://localhost:5432/stallion_test?allowMultiQueries=true&autoReConnect=true"
+username = "stallion"
 password = ""

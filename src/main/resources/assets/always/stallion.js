@@ -28,6 +28,10 @@ if (window.$ && !window.jQuery) {
         return data;
     };
 
+    st.testUnicode = function() {
+        console.log("This is a unicode snowman in stallion.js: ☃");
+    };
+
     var tokenRe = /\{\s*([\w\.]+)\s*\}/g;
     st.renderTemplate = function(s, ctx) {
         s = s.replace(tokenRe, function(full, token, c, d) {
@@ -595,3 +599,7 @@ Date.prototype.format = function (mask, utc) {
  if (window.riot) {
      riot.mixin('databind', RiotDataBindMixin);
  }
+
+
+
+

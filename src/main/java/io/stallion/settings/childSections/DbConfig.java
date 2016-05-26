@@ -17,7 +17,10 @@
 
 package io.stallion.settings.childSections;
 
+import io.stallion.exceptions.ConfigException;
 import io.stallion.settings.SettingMeta;
+
+import static io.stallion.utils.Literals.empty;
 
 
 public class DbConfig implements SettingsSection {
@@ -27,9 +30,34 @@ public class DbConfig implements SettingsSection {
     private String url;
     @SettingMeta
     private String password;
-    @SettingMeta(val = "com.mysql.jdbc.Driver")
+    @SettingMeta()
     private String driverClass;
+    @SettingMeta()
+    private String implementationClass;
 
+    @Override
+    public void postLoad() {
+        if (empty(driverClass) && !empty(url)) {
+
+            if (url.contains("jdbc:mysql")) {
+                driverClass = "com.mysql.jdbc.Driver";
+            } else if (url.contains("jdbc:postgresql")) {
+                driverClass = "org.postgresql.Driver";
+            } else {
+                throw new ConfigException("No database driverClass defined, and could not guess driver class from url " + url);
+            }
+        }
+        if (empty(implementationClass) && !empty(url)) {
+            if (url.contains("jdbc:mysql")) {
+                implementationClass = "io.stallion.dataAccess.db.mysql.MySqlDbImplementation";
+            } else if (url.contains("jdbc:postgresql")) {
+                implementationClass = "io.stallion.dataAccess.db.postgres.PostgresDbImplementation";
+            } else {
+                throw new ConfigException("No database implementation class defined (implements io.stallion.dataAccess.db.DbImplementation), and could not guess class from url " + url);
+            }
+
+        }
+    }
 
     public String getUsername() {
         return username;
@@ -76,4 +104,12 @@ public class DbConfig implements SettingsSection {
         return this;
     }
 
+    public String getImplementationClass() {
+        return implementationClass;
+    }
+
+    public DbConfig setImplementationClass(String implementationClass) {
+        this.implementationClass = implementationClass;
+        return this;
+    }
 }

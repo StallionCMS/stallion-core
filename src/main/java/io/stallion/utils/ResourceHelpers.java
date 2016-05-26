@@ -113,7 +113,7 @@ public class ResourceHelpers {
         if (file != null) {
             return FileUtils.readAllText(file, Charset.forName("UTF-8"));
         } else {
-            return IOUtils.toString(resourceUrl);
+            return IOUtils.toString(resourceUrl, Charset.forName("UTF-8"));
 
         }
     }

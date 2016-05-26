@@ -1,5 +1,0 @@
-[
-    {"route": "/blog", "template": "blog-listing.jade", "name": "blog-main"},
-    {"route": "/blog/:tag", "template": "blog-listing.jade", "name": "blog-by-tag"},
-    {"route": "/blog/archives/:year/:month", "template": "blog-listing.jade", "name": "blog-by-month"}
-]
