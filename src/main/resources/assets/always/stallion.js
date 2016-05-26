@@ -489,9 +489,26 @@ Date.prototype.format = function (mask, utc) {
          this.on('update', function() {
              var self = this;
              self.formData = self.opts.formData || {};
+             var seenKeys = [];
              Object.keys(self).forEach(function(key) {
+                 if (seenKeys.indexOf(key) > -1) {
+                     return;
+                 }
+                 seenKeys.push(key);
                  var ele = self[key];
                  if (!ele) {
+                     return;
+                 }
+                 var val = self.formData[key];
+                 //if (ele.length) {
+                 //    debugger;
+                 //}
+                 if ($.isArray(ele) && ele.length > 0 && ele[0].tagName) {
+                     ele.forEach(function(radio) {
+                         if (radio.value === val) {
+                             $(radio).prop('checked', true);
+                         }
+                     });
                      return;
                  }
                  var tag = ele.tagName;
@@ -502,21 +519,20 @@ Date.prototype.format = function (mask, utc) {
                  if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
                      return;
                  }
-                 var val = self.formData[ele.getAttribute('name')];
                  if (val === undefined) {
                      return;
                  }
                  var type = ele.getAttribute('type');
                  if (type === 'checkbox' || type === 'radio') {
                      if (val === true || val === ele.value) {
-                         ele.setAttribute('checked', true);
+                         ele.setAttribute('checked', 'checked');
                      } else {
                          ele.removeAttribute('checked');
                      }
                  } else if (tag === 'SELECT') {
                      var $ele = $(ele);
                      $option = $ele.find('option[value="' + val + '"]');
-                     $option.attr('selected', true);
+                     $option.attr('selected', 'selected');
                      $(ele).val(val).change();
                  } else {
                      $(ele).val(val).change();
@@ -530,6 +546,15 @@ Date.prototype.format = function (mask, utc) {
          Object.keys(self).forEach(function(key) {
              var ele = self[key];
              if (!ele) {
+                 return;
+             }
+             if ($.isArray(ele) && ele.length > 0 && ele[0].tagName) {
+                 ele.forEach(function(radio) {
+                     if ($(radio).is(':checked')) {
+                         data[key] = radio.value;
+                         return false;
+                     }
+                 });
                  return;
              }
              var tag = ele.tagName;

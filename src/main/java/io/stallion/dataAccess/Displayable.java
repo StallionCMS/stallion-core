@@ -21,7 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 
-public interface Displayable {
+public interface Displayable extends Model {
     public String getSlug();
     public String getRealHttpPath();
     public String getSlugForCssId();

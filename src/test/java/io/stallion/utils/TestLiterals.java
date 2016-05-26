@@ -18,8 +18,16 @@
 package io.stallion.utils;
 
 import io.stallion.tests.integration.filtering.Book;
+import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.junit.Test;
+import org.parboiled.common.FileUtils;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,14 +41,15 @@ public class TestLiterals {
     public void testFilterApply() {
         List<Book> books = list(new Book().setTitle("alpha"), new Book().setTitle("beta"));
 
-        books.stream().filter(b->{return !empty(b.getTitle()) && !empty(b.getAuthor());}).collect(Collectors.toList());
-        books.stream().filter(b->!empty(b.getTitle())).map(b->b.getTitle()).collect(Collectors.toList());
-        apply(filter(books, b->!empty(b.getTitle())), b->b.getTitle());
+        books.stream().filter(b -> {
+            return !empty(b.getTitle()) && !empty(b.getAuthor());
+        }).collect(Collectors.toList());
+        books.stream().filter(b -> !empty(b.getTitle())).map(b -> b.getTitle()).collect(Collectors.toList());
+        apply(filter(books, b -> !empty(b.getTitle())), b -> b.getTitle());
         List<String> titles = apply(
-                filter(books, b->!empty(b.getTitle())),
-                b->b.getTitle()
+                filter(books, b -> !empty(b.getTitle())),
+                b -> b.getTitle()
         );
-
 
     }
 }

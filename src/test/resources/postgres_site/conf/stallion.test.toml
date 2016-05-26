@@ -1,0 +1,11 @@
+cdnUrl = "http://localhost:{port}/testing"
+siteName = "The quite overriden site name"
+
+[custom]
+bar = "notoverriden"
+foobar = "testoverriden"
+
+[email]
+host = ""
+username = "noop"
+password = "overridePassword"

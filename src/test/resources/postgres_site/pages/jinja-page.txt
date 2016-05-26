@@ -1,0 +1,9 @@
+template:inner-page.jinja
+slug:/jinja-page
+title: JInja page
+author: Maestro
+
+The jinja page
+========================================
+
+This is a page written using jinja. This is the page content.

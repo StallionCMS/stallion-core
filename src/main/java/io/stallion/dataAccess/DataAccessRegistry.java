@@ -150,7 +150,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
     }
 
 
-    public DataAccessRegistry registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller) {
+    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller) {
         return registerDbModel(model, controller, true);
     }
 
@@ -163,7 +163,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
      * @param syncToMemory - defaults true
      * @return
      */
-    public DataAccessRegistry registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, boolean syncToMemory) {
+    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, boolean syncToMemory) {
         Table anno = model.getAnnotation(Table.class);
         if (anno == null) {
             throw new UsageException("A @Table annotation is required on the model " + model.getCanonicalName() + " in order to register it.");
@@ -176,8 +176,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
                 .setControllerClass(controller)
                 .setSyncAllToMemory(syncToMemory)
                 .setModelClass(model);
-        register(registration);
-        return this;
+        return register(registration);
     }
 
     /**
@@ -192,7 +191,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
      *
      * @param registration
      */
-    public void register(DataAccessRegistration registration) {
+    public ModelController register(DataAccessRegistration registration) {
 
         // Validation, de-duping, and normalization
         if (StringUtils.isEmpty(registration.getPath()) && StringUtils.isEmpty(registration.getTableName()) && empty(registration.getBucket())) {
@@ -295,6 +294,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
                 throw new RuntimeException(e);
             }
         }
+        return controller;
     }
 
     @Deprecated

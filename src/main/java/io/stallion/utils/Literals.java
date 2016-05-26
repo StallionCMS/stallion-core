@@ -311,11 +311,11 @@ public class Literals {
         return false;
     }
 
-    public static boolean empty(String a) {
+    public static boolean empty(CharSequence a) {
         if (a == null) {
             return true;
         }
-        if ("".equals(a)) {
+        if (a.length() == 0) {
             return true;
         }
         return false;
