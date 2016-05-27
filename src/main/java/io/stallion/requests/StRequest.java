@@ -17,8 +17,11 @@
 
 package io.stallion.requests;
 
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +53,9 @@ import java.util.*;
 import static io.stallion.utils.Literals.*;
 
 public class StRequest implements IRequest {
+    private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
+
+
     private HttpServletRequest request;
     private Request baseRequest;
     private String path;
@@ -80,6 +86,29 @@ public class StRequest implements IRequest {
         this.query = request.getQueryString();
     }
 
+
+    @Override
+    public void setAsMultiPartRequest() {
+        if (request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) {
+            baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+        }
+    }
+
+    public HttpServletRequest getHttpServletRequest() {
+        return this.request;
+    }
+
+
+
+    public Part getPart(String name) {
+        try {
+            return request.getPart(name);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Gets the absolute url of the original request.

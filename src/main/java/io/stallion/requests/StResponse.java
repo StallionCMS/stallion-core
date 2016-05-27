@@ -19,6 +19,7 @@ package io.stallion.requests;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,6 +37,11 @@ public class StResponse {
 
     public StResponse(HttpServletResponse response) {
         this.response = response;
+    }
+
+
+    public HttpServletResponse getHttpServletResponse() {
+        return this.response;
     }
 
     public StResponse setContentType(String contentType) {

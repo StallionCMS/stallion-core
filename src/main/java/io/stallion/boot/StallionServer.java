@@ -29,6 +29,7 @@ import org.eclipse.jetty.server.Server;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
+import javax.servlet.MultipartConfigElement;
 import java.text.MessageFormat;
 
 
@@ -64,6 +65,7 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
         // Start the server
         Server server = new Server(Settings.instance().getPort());
         server.setHandler(RequestHandler.instance());
+
 
         server.start();
 

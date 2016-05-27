@@ -20,8 +20,12 @@ package io.stallion.requests;
 import io.stallion.plugins.javascript.Sandbox;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
+import org.eclipse.jetty.server.Request;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
@@ -35,6 +39,18 @@ import static io.stallion.utils.Literals.empty;
 public interface IRequest {
     public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";
 
+
+    public default void setAsMultiPartRequest() {
+
+    }
+
+    public default Part getPart(String name) {
+        return null;
+    }
+
+    public default HttpServletRequest getHttpServletRequest() {
+        return null;
+    }
 
     /**
      * Get the full, externally facing URL used to intiate this request.

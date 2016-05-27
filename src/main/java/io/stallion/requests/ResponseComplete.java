@@ -21,5 +21,5 @@ import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 
-class ResponseComplete extends RuntimeException {
+public class ResponseComplete extends RuntimeException {
 }
