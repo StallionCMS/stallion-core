@@ -18,9 +18,9 @@
 package io.stallion.plugins;
 
 import io.stallion.boot.StallionRunAction;
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.DalRegistration;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.hooks.HookRegistry;
 import io.stallion.hooks.ChainedHook;
 import io.stallion.hooks.HookHandler;
@@ -103,12 +103,12 @@ public abstract class StallionJavaPlugin {
     public void registerModels(Class<? extends ModelBase> ...models) throws Exception {
         for(Class model: models) {
             Log.finer("Register model {0}", model.getName());
-            DalRegistration registration = new DalRegistration()
+            DataAccessRegistration registration = new DataAccessRegistration()
                     .setPath(model.getName())
                     .setModelClass(model)
                     .setNameSpace("st-" + getPluginName())
                     .setUseDataFolder(true);
-            DalRegistry.instance().registerDal(registration);
+            DataAccessRegistry.instance().register(registration);
         }
     }
 

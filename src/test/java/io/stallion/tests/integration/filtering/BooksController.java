@@ -17,12 +17,11 @@
 
 package io.stallion.tests.integration.filtering;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.DummyPersister;
-import io.stallion.dal.base.LocalMemoryStash;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.services.Log;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.DummyPersister;
+import io.stallion.dataAccess.LocalMemoryStash;
+import io.stallion.dataAccess.StandardModelController;
 import io.stallion.settings.Settings;
 
 import java.time.ZoneId;
@@ -30,16 +29,15 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class BooksController extends StandardModelController<Book> {
     public static BooksController instance() {
-        return (BooksController)DalRegistry.instance().get("books");
+        return (BooksController) DataAccessRegistry.instance().get("books");
     }
     public static void register() {
-        DalRegistry.instance().registerDal(
-                new DalRegistration()
+        DataAccessRegistry.instance().register(
+                new DataAccessRegistration()
                         .setBucket("books")
                         .setModelClass(Book.class)
                         .setControllerClass(BooksController.class)

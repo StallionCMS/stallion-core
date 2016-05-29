@@ -53,7 +53,7 @@ public class EmailTests extends AppIntegrationCaseBase {
         Stubbing.stub(EmailSender.class, "executeSend", new StubHandler() {
             @Override
             public Object execute(Object... params) throws Exception {
-                MimeMessage message = (MimeMessage)params[0];
+                MimeMessage message = (MimeMessage)params[1];
                 assertEquals(user.getEmail(), message.getAllRecipients()[0].toString());
                 assertTrue(message.getContent().toString().contains("displayName=" + user.getDisplayName()));
                 assertEquals("Hello, " + user.getDisplayName(), message.getSubject());

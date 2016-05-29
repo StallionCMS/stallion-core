@@ -127,11 +127,14 @@ var stallionGetSurroundingLines = function(file, lineno) {
     return newLines.join('\n');
 };
 
+(function() {
+var JsFileReader = Packages.io.stallion.plugins.javascript.JsFileReader;
+var pluginFolder = myContext.pluginFolder;
 loadjs = function(a, b, c) {
     var source = '';
     var fileName = '';
     if (typeof(a) === typeof("")) {
-        source = javaToJsHelpers.readFileToString(a);
+        source = JsFileReader.readToString(a, pluginFolder);
         fileName = a;
     } else {
         source = a.script;
@@ -143,6 +146,8 @@ loadjs = function(a, b, c) {
 };
 
 load = loadjs;
+
+})();
 
 (function() {
 
@@ -162,8 +167,8 @@ load = loadjs;
     stallion.Encrypter = Java.type("io.stallion.utils.Encrypter");
     stallion.SimpleTemplate = Java.type("io.stallion.utils.SimpleTemplate");
     stallion.GeneralUtils = Java.type("io.stallion.utils.GeneralUtils");
-    stallion.SafeMerger = Java.type('io.stallion.requests.SafeMerger');
-    stallion.SafeViewer = Java.type('io.stallion.requests.SafeViewer');
+    stallion.SafeMerger = Java.type('io.stallion.requests.validators.SafeMerger');
+    stallion.SafeViewer = Java.type('io.stallion.requests.validators.SafeViewer');
     stallion.Literals = Java.type('io.stallion.utils.Literals');
     stallion.Set = stallion.Literals.set;
     
@@ -205,10 +210,10 @@ load = loadjs;
 
     var DateTimeFormatter = Java.type("java.time.format.DateTimeFormatter");
 
-    var DalRegistration = Java.type('io.stallion.dal.base.DalRegistration');
-    var DalRegistry = Java.type('io.stallion.dal.DalRegistry');
-    var DynamicModelDefinition = Java.type('io.stallion.dal.base.DynamicModelDefinition');
-    var Col = Java.type("io.stallion.dal.db.Col");                                                                         var DbColumnConverter = Java.type("io.stallion.dal.db.DbColumnConverter");
+    var DataAccessRegistration = Java.type('io.stallion.dataAccess.DataAccessRegistration');
+    var DataAccessRegistry = Java.type('io.stallion.dataAccess.DataAccessRegistry');
+    var DynamicModelDefinition = Java.type('io.stallion.dataAccess.DynamicModelDefinition');
+    var Col = Java.type("io.stallion.dataAccess.db.Col");                                                                         var DbColumnConverter = Java.type("io.stallion.dataAccess.db.DbColumnConverter");
 
     var StallionJSON = Java.type('io.stallion.utils.json.JSON');
     var StallionUtils = Java.type('io.stallion.utils.GeneralUtils');
@@ -467,8 +472,8 @@ load = loadjs;
                 }
 
                 // Don't re-register a model that has already been registered
-                if (DalRegistry.instance().containsKey(o.bucket)) {
-                    return DalRegistry.instance().get(o.bucket);
+                if (DataAccessRegistry.instance().containsKey(o.bucket)) {
+                    return DataAccessRegistry.instance().get(o.bucket);
                 }
 
                 javaToJsHelpers.isClass(o.persister);
@@ -479,7 +484,7 @@ load = loadjs;
 
 
 
-                var registration = new DalRegistration()
+                var registration = new DataAccessRegistration()
                      .setPersisterClass(o.persister || null)
                      .setBucket(o.bucket || '')
                      .setPath(o.path || '')
@@ -512,8 +517,8 @@ load = loadjs;
                         o.controllerExtensions
                         ));
 
-                DalRegistry.instance().registerDal(registration);
-                var controller = DalRegistry.instance().get(registration.getBucket());
+                DataAccessRegistry.instance().register(registration);
+                var controller = DataAccessRegistry.instance().get(registration.getBucket());
                 return controller;
             }
         };

@@ -17,26 +17,21 @@
 
 package io.stallion.plugins.javascript;
 
-import io.stallion.dal.db.DB;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.settings.Settings;
 import io.stallion.utils.json.JSON;
-import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.internal.objects.Global;
 import jdk.nashorn.internal.runtime.*;
 import jdk.nashorn.internal.runtime.options.Options;
 import jline.console.ConsoleReader;
 import org.apache.commons.io.IOUtils;
 
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.*;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class JavascriptShell {

@@ -19,6 +19,7 @@ package io.stallion.assets;
 
 import io.stallion.exceptions.UsageException;
 import io.stallion.settings.Settings;
+import io.stallion.settings.childSections.AssetPreprocessorConfig;
 
 import java.io.File;
 import java.util.Map;
@@ -52,13 +53,34 @@ public class ExternalCommandPreProcessorRegistry {
 
     private Map<String, ExternalCommandAssetPreProcessor> preProcessorByName = map();
 
+
+    public boolean hasPreProcessor(String name) {
+        return preProcessorByName.containsKey(name);
+    }
+
     public void registerDefaults() {
+
         registerPreProcessor(
                 new ExternalCommandAssetPreProcessor()
-                        .setName("sass")
+                        .setName("sass {original} {compiled}")
                         .setExtension("sass")
                         .setCommand("sass")
         );
+        if (!Settings.isNull()) {
+            for(AssetPreprocessorConfig config: Settings.instance().getAssetPreprocessors()) {
+                String[] args = new String[]{};
+                if (!empty(config.getCommandArgs())) {
+                    args = config.getCommandArgs().split(" ");
+                }
+                registerPreProcessor(
+                        new ExternalCommandAssetPreProcessor()
+                                .setCommand(config.getCommand())
+                                .setExtension(config.getExtension())
+                                .setCommandArgs(args)
+                                .setName(config.getName())
+                );
+            }
+        }
     }
 
     public void registerPreProcessor(ExternalCommandAssetPreProcessor preProcessor) {
@@ -70,6 +92,7 @@ public class ExternalCommandPreProcessorRegistry {
             if (empty(preProcessor.getExtension())) {
                 throw new UsageException("Empty preprocessor extension");
             }
+
             preProcessorByName.put(preProcessor.getName(), preProcessor);
         }
     }

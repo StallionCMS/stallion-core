@@ -20,7 +20,7 @@ package io.stallion.services;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.stallion.dal.base.ModelBase;
+import io.stallion.dataAccess.ModelBase;
 import io.stallion.utils.json.JSON;
 
 import javax.persistence.Column;

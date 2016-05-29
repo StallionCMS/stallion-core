@@ -68,7 +68,7 @@ public class Literals {
             if (empty((String)obj)) {
                 return defaultVal;
             }
-        } else if (empty(obj)) {
+        } else if (emptyObject(obj)) {
             return defaultVal;
         }
         return obj;
@@ -82,6 +82,53 @@ public class Literals {
         }
         return "";
     }
+
+    /**
+     * Imitation of Python's [2:-7] syntax that never throws errors while slicing
+     * and that accepts negative indexes
+     *
+     * @param s
+     * @param start
+     * @param end
+     * @return
+     */
+    public static String slice(String s, int start, int end) {
+        if (end < 0) {
+            end = s.length() + end;
+        }
+        if (start < 0) {
+            start = s.length() + start;
+        }
+        if (end < start) {
+            return "";
+        }
+        if (end > s.length()) {
+            end = s.length();
+        }
+        return s.substring(start, end);
+    }
+
+    public static <T extends List> T slice(T l, int start, int end) {
+        if (end < 0) {
+            end = l.size() + end;
+        }
+        if (start < 0) {
+            start = l.size() + start;
+        }
+        if (end > l.size()) {
+            end = l.size();
+        }
+        if (start > l.size() || start > end){
+            return (T)l.subList(0, 0);
+        }
+        if (end < start) {
+            end = start;
+        }
+
+        return (T)l.subList(start, end);
+    }
+
+
 
     public static <T extends List> T truncate(T l, int length){
         if (l.size() < length) {
@@ -97,6 +144,13 @@ public class Literals {
         return s.substring(0, length);
     }
 
+    /**
+     * A truncat the tries to truncate on a sentence or word boundary.
+     *
+     * @param s
+     * @param length
+     * @return
+     */
     public static String truncateSmart(String s, int length) {
         if (s.length() < length) {
             return s;
@@ -177,7 +231,46 @@ public class Literals {
         return myList.toArray(array);
     }
 
+    public static boolean emptyInstance(Object o) {
+        if (o == null) {
+            return true;
+        }
+        if (o instanceof IEmpty) {
+            return true;
+        }
+        return false;
+    }
 
+    public static boolean emptyObject(Object o) {
+        if (o == null) {
+            return true;
+        }
+        if (o instanceof IEmpty) {
+            return true;
+        }
+        if (o instanceof String) {
+            return "".equals(o);
+        }
+        if (o instanceof Long) {
+            return (Long)o == 0L;
+        }
+        if (o instanceof Integer) {
+            return (Integer)o == 0;
+        }
+        if (o instanceof Double) {
+            return (Double)o == 0.0;
+        }
+        if (o instanceof Float) {
+            return (Float)o == 0.0;
+        }
+        if (o instanceof Collection) {
+            return ((List)o).size() == 0;
+        }
+        if (o instanceof Map) {
+            return ((Map)o).size() == 0;
+        }
+        return false;
+    }
 
 
     public static boolean empty(ZonedDateTime dt) {
@@ -186,11 +279,13 @@ public class Literals {
         }
         return false;
     }
-    public static boolean empty(Object a) {
-        if (a == null) {
+
+
+    public static boolean empty(Object[] objects) {
+        if (objects == null) {
             return true;
         }
-        if (a instanceof IEmpty) {
+        if (objects.length == 0){
             return true;
         }
         return false;
@@ -216,11 +311,11 @@ public class Literals {
         return false;
     }
 
-    public static boolean empty(String a) {
+    public static boolean empty(CharSequence a) {
         if (a == null) {
             return true;
         }
-        if ("".equals(a)) {
+        if (a.length() == 0) {
             return true;
         }
         return false;
@@ -292,7 +387,7 @@ public class Literals {
     }
 
     public static <T> List<T> filterEmpty(Collection<T> things) {
-        return filter(things, e->!empty(e));
+        return filter(things, e->!emptyObject(e));
     }
 
     /**

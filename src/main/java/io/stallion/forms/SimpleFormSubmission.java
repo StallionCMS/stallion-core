@@ -17,8 +17,9 @@
 
 package io.stallion.forms;
 
-import io.stallion.dal.base.*;
-import io.stallion.dal.file.ModelWithFilePath;
+import io.stallion.dataAccess.AlternativeKey;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.file.ModelWithFilePath;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 
@@ -39,7 +40,6 @@ public class SimpleFormSubmission extends ModelBase implements ModelWithFilePath
 
 
     @AlternativeKey
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     public String getEmail() {
         return email;
     }
@@ -58,7 +58,6 @@ public class SimpleFormSubmission extends ModelBase implements ModelWithFilePath
         return this;
     }
 
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     public Map<String, Object> getData() {
         return data;
     }
@@ -77,7 +76,6 @@ public class SimpleFormSubmission extends ModelBase implements ModelWithFilePath
         return this;
     }
 
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     public String getPageUrl() {
         return pageUrl;
     }
@@ -88,7 +86,6 @@ public class SimpleFormSubmission extends ModelBase implements ModelWithFilePath
         return this;
     }
 
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     public String getPageTitle() {
         return pageTitle;
     }
@@ -112,17 +109,14 @@ public class SimpleFormSubmission extends ModelBase implements ModelWithFilePath
         return DateUtils.formatLocalDate(getSubmittedAt(), "YYYY-mm-dd-HHmmss-") + GeneralUtils.slugify(getEmail()) + "---" + getId() + ".json";
     }
 
-
     public String getFilePath() {
         return filePath;
     }
 
-    @Override
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
-    @Setable(value=SettableOptions.Immutable.class, creatable = true)
     public String getAntiSpamToken() {
         return antiSpamToken;
     }

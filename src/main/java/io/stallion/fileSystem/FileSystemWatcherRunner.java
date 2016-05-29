@@ -116,7 +116,7 @@ public class FileSystemWatcherRunner implements Runnable {
 
     private void doRun() {
         while (shouldRun) {
-            Log.info("Running the file system watcher!!!!");
+            Log.fine("Running the file system watcher.");
             WatchKey key;
             try {
                 key = watcher.take();

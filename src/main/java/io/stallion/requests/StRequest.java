@@ -17,8 +17,11 @@
 
 package io.stallion.requests;
 
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +44,8 @@ import org.eclipse.jetty.server.Request;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -48,6 +53,9 @@ import java.util.*;
 import static io.stallion.utils.Literals.*;
 
 public class StRequest implements IRequest {
+    private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
+
+
     private HttpServletRequest request;
     private Request baseRequest;
     private String path;
@@ -64,6 +72,7 @@ public class StRequest implements IRequest {
     private Map<String, String> queryParams = null;
     private Map<String, Object> items = map();
     private SandboxedRequest sandboxedRequest;
+    private String scheme;
 
 
     public StRequest() {
@@ -78,6 +87,29 @@ public class StRequest implements IRequest {
     }
 
 
+    @Override
+    public void setAsMultiPartRequest() {
+        if (request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) {
+            baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+        }
+    }
+
+    public HttpServletRequest getHttpServletRequest() {
+        return this.request;
+    }
+
+
+
+    public Part getPart(String name) {
+        try {
+            return request.getPart(name);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Gets the absolute url of the original request.
      * Reconstructs the URL using the x-forwarded-host, if necessary,
@@ -86,16 +118,39 @@ public class StRequest implements IRequest {
      */
     @Override
     public String requestUrl() {
-        String baseUrl = Context.getSettings().getSiteUrl();
-        if (empty(baseUrl)) {
-            String host = getHost();
-            String proto = this.request.getProtocol();
-            if (!empty(getHeader("x-forwarded-proto"))) {
-                proto = getHeader("x-forwarded-proto");
-            }
-            baseUrl = proto + "://" + host;
-        }
+        String host = getHost();
+        String proto = getScheme();
+        String baseUrl = proto + "://" + host;
         return baseUrl + this.getPath();
+    }
+
+
+
+    @Override
+    public String getScheme() {
+        if (empty(scheme) && this.request != null) {
+
+            scheme = this.request.getScheme();
+            if (!empty(getHeader("x-forwarded-proto"))) {
+                scheme = getHeader("x-forwarded-proto");
+            }
+        }
+        if (empty(scheme)) {
+            String baseUrl = "";
+            if (Context.getSettings() != null ) {
+                baseUrl = Context.getSettings().getSiteUrl();
+            }
+            if (baseUrl != null) {
+                int i = baseUrl.indexOf("://");
+                if (i > -1) {
+                    scheme = baseUrl.substring(0, i);
+                }
+            }
+        }
+        if (empty(scheme)){
+            scheme = "http";
+        }
+        return scheme;
     }
 
     @Override
@@ -123,15 +178,12 @@ public class StRequest implements IRequest {
     }
 
     @Override
-    public StRequest setHandled(Boolean val) {
-
-        baseRequest.setHandled(val);
-        return this;
-    }
-
-    @Override
     public String getRemoteAddr() {
-        return request.getRemoteAddr();
+        if (request != null) {
+            return request.getRemoteAddr();
+        } else {
+            return "0.0.0.0";
+        }
     }
 
     @Override

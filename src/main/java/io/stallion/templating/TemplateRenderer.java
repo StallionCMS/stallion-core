@@ -19,8 +19,9 @@ package io.stallion.templating;
 
 import io.stallion.Context;
 import io.stallion.assets.AssetsController;
-import io.stallion.dal.base.ModelController;
+import io.stallion.dataAccess.ModelController;
 import io.stallion.exceptions.UsageException;
+import io.stallion.exceptions.WebException;
 import io.stallion.fileSystem.FileSystemWatcherService;
 import io.stallion.hooks.HookRegistry;
 
@@ -36,6 +37,7 @@ import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,12 +84,22 @@ public class TemplateRenderer {
         if (getJinjaTemplating().templateExists("404.jinja")) {
             return renderTemplate("404.jinja", context);
         } else {
-            URL url = getClass().getClassLoader().getResource("templates/404.jinja");
+            URL url = getClass().getClassLoader().getResource("templates/public/404.jinja");
             return renderTemplate(url.toString(), context);
         }
     }
 
     public String render500Html(Exception e) {
+        String friendlyMessage = "There was an error trying to handle your request.";
+        if (e instanceof WebException) {
+            friendlyMessage = ((WebException)e).getMessage();
+        } else if (e instanceof InvocationTargetException) {
+            if (((InvocationTargetException) e).getTargetException() != null) {
+                if (((InvocationTargetException) e).getTargetException() instanceof WebException) {
+                    friendlyMessage = ((InvocationTargetException) e).getTargetException().getMessage();
+                }
+            }
+        }
         String error = "";
         if (Context.getSettings().getDebug()) {
             error += "\nStacktrace-----------------------------------\n\n";
@@ -99,10 +111,11 @@ public class TemplateRenderer {
         try {
             Map<String, Object> context = getErrorContext();
             context.put("errorDebugMessage", error);
-            if (getJinjaTemplating().templateExists("templates/500.jinja")) {
-                return renderTemplate("templates/500.jinja", context);
+            context.put("friendlyMessage", friendlyMessage);
+            if (getJinjaTemplating().templateExists("templates/public/500.jinja")) {
+                return renderTemplate("templates/public/500.jinja", context);
             } else {
-                URL url = getClass().getClassLoader().getResource("templates/500.jinja");
+                URL url = getClass().getClassLoader().getResource("templates/public/500.jinja");
                 return renderTemplate(url.toString(), context);
             }
         } catch (Exception e2) {
@@ -133,6 +146,7 @@ public class TemplateRenderer {
         context.put("files", assetsController);
         context.put("assets", assetsController);
         context.put("site", site);
+        context.put("styleSettings", Settings.instance().getStyles());
         return context;
     }
 
@@ -154,13 +168,14 @@ public class TemplateRenderer {
             context.put("user", Context.getUser());
         }
 
+
         context.put("utils", new GeneralUtils());
         context.put("dateUtils", new DateUtils());
         context.put("sanitize", new Sanitize());
 
         context.put("request", Context.request());
         context.put("now", DateUtils.localNow());
-        context.put("styleSettings", Settings.instance().getStyle());
+        context.put("styleSettings", Settings.instance().getStyles());
 
         if (Context.response() != null) {
 
@@ -225,7 +240,7 @@ public class TemplateRenderer {
         context.put("env", Settings.instance().getEnv());
         context.put("isProd", "prod".equals(Settings.instance().getEnv()));
 
-        context.put("styleSettings", Settings.instance().getStyle());
+        context.put("styleSettings", Settings.instance().getStyles());
         context.put("files", AssetsController.wrapper());
         context.put("assets", AssetsController.wrapper());
         // Request, user, both pre-inserted

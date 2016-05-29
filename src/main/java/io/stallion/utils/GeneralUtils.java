@@ -19,7 +19,7 @@ package io.stallion.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.stallion.Context;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.Model;
 import io.stallion.services.Log;
 import io.stallion.users.Role;
 import io.stallion.utils.json.JSON;
@@ -30,6 +30,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.text.Normalizer;
@@ -62,7 +64,8 @@ public class GeneralUtils {
     // Because probeContentType doesn't work on all platforms;
     private static final Map<String, String> mimeTypes = map(
             val("css", "text/css"),
-            val("js", "application/javascript"),
+            val("js", "text/javascript"),
+            val("tag", "text/javascript"),
             val("woff", "application/font-woff"),
             val("otf", "application/octet-stream"),
             val("eot", "application/octet-stream"),
@@ -102,6 +105,17 @@ public class GeneralUtils {
         }
     }
 
+    public static boolean isValidEmailAddress(String email) {
+        boolean result = true;
+        try {
+            InternetAddress emailAddr = new InternetAddress(email);
+            emailAddr.validate();
+        } catch (AddressException ex) {
+            result = false;
+        }
+        return result;
+    }
+
 
     // DEPRECATED methods
 
@@ -133,6 +147,8 @@ public class GeneralUtils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return utcNow().format(formatter);
     }
+
+
 
     /* We have to add this generic Object overload, because Method typing dispatching
     * does not work correctly when called from the templates. So instead we have to

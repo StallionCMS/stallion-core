@@ -18,9 +18,9 @@
 package io.stallion.tests.integration.javaSite;
 
 import io.stallion.Context;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.dal.file.JsonFilePersister;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.file.JsonFilePersister;
 
 public class ExamplePojoController extends StandardModelController<ExamplePojo> {
 
@@ -30,8 +30,8 @@ public class ExamplePojoController extends StandardModelController<ExamplePojo> 
     }
 
     public static void register() {
-        Context.dal().registerDal(
-                new DalRegistration()
+        Context.dal().register(
+                new DataAccessRegistration()
                         .setModelClass(ExamplePojo.class)
                         .setNameSpace("st-tests")
                         .setPath("example-pojos")

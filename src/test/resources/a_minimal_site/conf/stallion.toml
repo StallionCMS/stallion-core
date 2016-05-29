@@ -4,9 +4,14 @@ cdnUrl = "http://localhost:{port}"
 siteUrl = "http://localhost:{port}"
 siteName = "The default, not-overriden site name"
 defaultTitle = "The default page title"
+healthCheckSecret = "miuLa90ljgM5"
 
 [custom]
 bar = "notoverriden"
+
+[users]
+newAccountsRequireValidEmail = false
+newAccountsAllowCreation = true
 
 [email]
 host = "noop"

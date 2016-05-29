@@ -17,8 +17,12 @@
 
 package io.stallion.asyncTasks;
 
-import io.stallion.dal.db.DB;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
+import io.stallion.utils.GeneralUtils;
+
+import static io.stallion.utils.Literals.or;
 
 
 public class AsyncDbCoordinator extends AsyncFileCoordinator {
@@ -31,6 +35,13 @@ public class AsyncDbCoordinator extends AsyncFileCoordinator {
     @Override
     public void saveNewTask(AsyncTask task) {
         Log.info("Adding task to the database: id={0} handler={1} customKey={2}", task.getId(), task.getHandlerName(), task.getCustomKey());
+
+        // If we are running in localMode, we only want to run tasks created in localMode, we don't want to run tasks created
+        // on production on our local machine, or tasks created on our local machine on production
+        String localMode = "";
+        if (Settings.instance().getLocalMode()) {
+            task.setLocalMode(or(System.getenv("USER"), GeneralUtils.slugify(Settings.instance().getTargetFolder())));
+        }
         AsyncTaskController.instance().save(task);
     }
 

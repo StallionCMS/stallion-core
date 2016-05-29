@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
+import io.stallion.users.Role;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.*;
@@ -29,6 +31,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static io.stallion.utils.Literals.empty;
 
@@ -48,8 +51,34 @@ public class ResourceToEndpoints {
     public List<JavaRestEndpoint> convert(Object resource) {
         Class cls = resource.getClass();
         List<JavaRestEndpoint> endpoints = new ArrayList<>();
+
+        // Get defaults from the resource
+
+        Role defaultMinRole = Settings.instance().getUsers().getDefaultEndpointRoleObj();
+        MinRole minRoleAnno = (MinRole)cls.getAnnotation(MinRole.class);
+        if (minRoleAnno != null) {
+            defaultMinRole = minRoleAnno.value();
+        }
+
+        String defaultProduces = "text/html";
+        Produces producesAnno = (Produces)cls.getAnnotation(Produces.class);
+        if (producesAnno != null && producesAnno.value().length > 0) {
+            defaultProduces = producesAnno.value()[0];
+        }
+
+        Path pathAnno = (Path)cls.getAnnotation(Path.class);
+        if (pathAnno != null) {
+            basePath += pathAnno.value();
+        }
+
+
+
         for(Method method: cls.getDeclaredMethods()) {
             JavaRestEndpoint endpoint = new JavaRestEndpoint();
+            endpoint.setRole(defaultMinRole);
+            endpoint.setProduces(defaultProduces);
+
+
             Log.finer("Resource class method: {0}", method.getName());
             for(Annotation anno: method.getDeclaredAnnotations()) {
                 if (Path.class.isInstance(anno)) {
@@ -90,17 +119,26 @@ public class ResourceToEndpoints {
                 for (Annotation anno: param.getAnnotations()) {
                     Log.finer("Param Annotation is: {0}, {1}", anno, anno.getClass().getName());
                     if (BodyParam.class.isInstance(anno)) {
+                        BodyParam bodyAnno = (BodyParam)(anno);
                         arg.setType("BodyParam");
                         arg.setName(((BodyParam) anno).value());
                         arg.setAnnotationClass(BodyParam.class);
+                        arg.setRequired(bodyAnno.required());
+                        arg.setEmailParam(bodyAnno.isEmail());
+                        arg.setMinLength(bodyAnno.minLength());
+                        arg.setAllowEmpty(bodyAnno.allowEmpty());
+                        if (!empty(bodyAnno.validationPattern())) {
+                            arg.setValidationPattern(Pattern.compile(bodyAnno.validationPattern()));
+                        }
                     } else if (ObjectParam.class.isInstance(anno)) {
                         ObjectParam oParam = (ObjectParam)anno;
                         arg.setType("ObjectParam");
                         arg.setName("noop");
-                        arg.setTargetClass(oParam.targetClass());
-
-                        arg.setSettableAllowedForClass(oParam.restricted());
-
+                        if (oParam.targetClass() == null || oParam.targetClass().equals(Object.class)) {
+                            arg.setTargetClass(param.getType());
+                        } else {
+                            arg.setTargetClass(oParam.targetClass());
+                        }
                         arg.setAnnotationClass(ObjectParam.class);
                     } else if (MapParam.class.isInstance(anno)) {
                         arg.setType("MapParam");

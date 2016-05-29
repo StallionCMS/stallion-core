@@ -36,6 +36,7 @@ public class Log {
     private static Logger logger;
     private static Handler handler;
     private static Handler fileHandler;
+    private static boolean alwaysIncludeLineNumber = true;
 
     static {
         logger = Logger.getLogger("stallion");
@@ -81,6 +82,8 @@ public class Log {
         System.out.println("----->  Logging to file " + logPath + " at level " + logger.getLevel() + " ---->");
     }
 
+
+
     public static void setLogLevel(Level level) {
         handler.setLevel(level);
         logger.setLevel(level);
@@ -122,11 +125,15 @@ public class Log {
             return;
         }
         //System.out.println(message);
-        Throwable t = new Throwable();
-        t.getStackTrace()[2].toString();
-        String clz = t.getStackTrace()[2].getClassName().replace("io.stallion.", "");
-        String method = t.getStackTrace()[2].getMethodName();
-        logger.logp(Level.FINE, clz, method, message, args);
+        if (alwaysIncludeLineNumber) {
+            Throwable t = new Throwable();
+            t.getStackTrace()[2].toString();
+            String clz = t.getStackTrace()[2].getClassName().replace("io.stallion.", "");
+            String method = t.getStackTrace()[2].getMethodName();
+            logger.logp(Level.FINE, clz, method, message, args);
+        } else {
+            logger.logp(Level.FINE, "", "", message, args);
+        }
 
     }
 
@@ -136,6 +143,7 @@ public class Log {
         }
 
         //System.out.println(message);
+
         Throwable t = new Throwable();
         t.getStackTrace()[2].toString();
         String clz = t.getStackTrace()[2].getClassName().replace("io.stallion.", "");
@@ -161,14 +169,32 @@ public class Log {
         if (getLogLevel().intValue() > Level.INFO.intValue()) {
             return;
         }
+        // Info statements don't include the class and line number, since that kills performance
         //System.out.println(message);
+        if (alwaysIncludeLineNumber) {
+            Throwable t = new Throwable();
+            StackTraceElement stackTraceElement = t.getStackTrace()[1];
+            String clz = stackTraceElement.getClassName().replace("io.stallion.", "");
+            String method = stackTraceElement.getMethodName() + ":" + t.getStackTrace()[1].getLineNumber();
+            logger.logp(Level.INFO, clz, method, message, args);
+        } else {
+            logger.logp(Level.INFO, "", "", message, args);
+        }
+
+    }
+
+    public static void warning(String message, Object ... args) {
+        if (getLogLevel().intValue() > Level.WARNING.intValue()) {
+            return;
+        }
         Throwable t = new Throwable();
         StackTraceElement stackTraceElement = t.getStackTrace()[1];
         String clz = stackTraceElement.getClassName().replace("io.stallion.", "");
         String method = stackTraceElement.getMethodName() + ":" + t.getStackTrace()[1].getLineNumber();
-        logger.logp(Level.INFO, clz, method, message, args);
+        logger.logp(Level.WARNING, clz, method, message, args);
 
     }
+
 
 
     public static void warn(String message, Object ... args) {
@@ -218,5 +244,13 @@ public class Log {
         String clz = stackTraceElement.getClassName().replace("io.stallion.", "");
         String method = stackTraceElement.getMethodName() + ":" + t.getStackTrace()[1].getLineNumber();
         logger.logp(Level.SEVERE, clz, method, message, ex);
+    }
+
+    public static boolean isAlwaysIncludeLineNumber() {
+        return alwaysIncludeLineNumber;
+    }
+
+    public static void setAlwaysIncludeLineNumber(boolean alwaysIncludeLineNumber) {
+        Log.alwaysIncludeLineNumber = alwaysIncludeLineNumber;
     }
 }

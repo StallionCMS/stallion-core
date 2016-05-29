@@ -18,10 +18,8 @@
 package io.stallion.tests.integration.javaSite;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import static io.stallion.dal.base.SettableOptions.*;
-import io.stallion.dal.base.ModelBase;
+import io.stallion.dataAccess.ModelBase;
 
-import io.stallion.dal.base.Setable;
 import io.stallion.utils.json.RestrictedViews;
 
 public class ExamplePojo extends ModelBase {
@@ -38,7 +36,7 @@ public class ExamplePojo extends ModelBase {
     private String internalSecret;
 
 
-    @Setable(value = AnyUpdateable.class, creatable = true)
+
     public String getDisplayName() {
         return displayName;
     }
@@ -47,7 +45,7 @@ public class ExamplePojo extends ModelBase {
         this.displayName = displayName;
     }
 
-    @Setable(value = AnyUpdateable.class, creatable = true)
+
     public Long getAge() {
         return age;
     }
@@ -56,7 +54,7 @@ public class ExamplePojo extends ModelBase {
         this.age = age;
     }
 
-    @Setable(value = AnyUpdateable.class, creatable = true)
+
     public String getContent() {
         return content;
     }
@@ -66,7 +64,7 @@ public class ExamplePojo extends ModelBase {
     }
 
 
-    @Setable(value = OwnerUpdateable.class)
+
     public String getStatus() {
         return status;
     }
@@ -76,7 +74,7 @@ public class ExamplePojo extends ModelBase {
     }
 
 
-    @Setable(value = OwnerUpdateable.class)
+
     public String getModeration() {
         return moderation;
     }
@@ -85,7 +83,7 @@ public class ExamplePojo extends ModelBase {
         this.moderation = moderation;
     }
 
-    @Setable(value = OwnerUpdateable.class)
+
     public Boolean getIsSpam() {
         return isSpam;
     }
@@ -94,7 +92,7 @@ public class ExamplePojo extends ModelBase {
         this.isSpam = isSpam;
     }
 
-    @Setable(value = Immutable.class, creatable = true)
+
     public String getEmail() {
         return email;
     }
@@ -103,7 +101,7 @@ public class ExamplePojo extends ModelBase {
         this.email = email;
     }
 
-    @Setable(value = Immutable.class, creatable = true)
+
     public String getUserName() {
         return userName;
     }
@@ -128,7 +126,7 @@ public class ExamplePojo extends ModelBase {
         this.updated = updated;
     }
 
-    @Setable(value = OwnerUpdateable.class)
+
     @JsonView(RestrictedViews.Owner.class)
     public String getInternalSecret() {
         return internalSecret;

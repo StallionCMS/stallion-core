@@ -18,6 +18,7 @@
 package io.stallion.settings;
 
 import io.stallion.boot.CommandOptionsBase;
+import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.RouteDefinition;
@@ -43,8 +44,8 @@ public class Settings implements ISettings {
     private EmailSettings email = null;
     private CustomSettings custom = null;
     private CloudStorageSettings cloudStorage = null;
-    private StyleSettings style = null;
-
+    private StyleSettings styles = null;
+    private CorsSettings cors = null;
     private OAuthSettings oAuth;
 
 
@@ -59,18 +60,12 @@ public class Settings implements ISettings {
     private String metaDescription = null;
     @SettingMeta(val="Stallion")
     private String metaGenerator = null;
-    @SettingMeta(val="", help="The URL of your logo. Used for built-in screens. If not an absolute URL, will be relative to the assets folder. Default is 'logo.png'")
-    private String logoUrl;
-    @SettingMeta(val="app-screens.css", help="The URL of a css file that will be included in buil-in, public facing screens, such as login, OAuth approval, etc. Edit the file to customize background colors, font-families, etc. If a relative URL, will be relative to the assets folder.")
-    private String builtinScreensCssFile;
-    @SettingMeta(val="#FFFFFF", help="The background color of built-in screens, such as login, password-reset. Your logo will go over this color.")
-    private String builtinScreensBackgroundColor;
-    @SettingMeta(val="#F9F9F9", help="The background of the main column on built-in screens. Body text will go over this color.")
-    private String builtinScreensBoxColor;
-    @SettingMeta(val="#333333", help="The color for h1's on built-in screens.")
-    private String builtinScreensHeaderColor;
-    @SettingMeta(val="#999999", help="A color that will be added as highlight on built-in screens")
-    private String builtinScreensTrimColor;
+    @SettingMeta(val="", help = "The email address users of the site should contact in case of problems. This will be publicly viewable.")
+    private String supportEmail;
+    @SettingMeta(valLong = 1430510589000L)
+    private Long appCreatedMillis;
+
+
 
     // File system info
     @SettingMeta()
@@ -109,6 +104,8 @@ public class Settings implements ISettings {
     private Boolean bundleDebug;
 
     // Routes and rewrites
+    @SettingMeta(val="SAMEORIGIN")
+    private String xFrameOptions;
     @SettingMeta(cls=ArrayList.class)
     private List<RouteDefinition> routes = new ArrayList<>();
     @SettingMeta(cls=HashMap.class)
@@ -122,6 +119,8 @@ public class Settings implements ISettings {
     @SettingMeta(cls=ArrayList.class)
     private List<SecondaryDomain> secondaryDomains;
     private Map<String, SecondaryDomain> secondaryDomainByDomain  = map();
+    @SettingMeta(cls=ArrayList.class)
+    private List<AssetPreprocessorConfig> assetPreprocessors;
 
     // Web Serving
     @SettingMeta(valInt=8090)
@@ -140,9 +139,12 @@ public class Settings implements ISettings {
     // Email
 
     // Publishing
-    @SettingMeta(cls=ArrayList.class)
-    private List<PublishingConfig> publishing;
+    //@SettingMeta(cls=ArrayList.class)
+    //private List<PublishingConfig> publishing;
 
+
+    @SettingMeta(cls=ArrayList.class)
+    private List<DeploymentsConfig> deployments;
 
 
     // Time
@@ -383,6 +385,16 @@ public class Settings implements ISettings {
 
     public void setEmail(EmailSettings email) {
         this.email = email;
+    }
+
+
+    public CorsSettings getCors() {
+        return cors;
+    }
+
+    public Settings setCors(CorsSettings cors) {
+        this.cors = cors;
+        return this;
     }
 
     public String getDataDirectory() {
@@ -672,12 +684,12 @@ public class Settings implements ISettings {
         this.cloudStorage = cloudStorage;
     }
 
-    public StyleSettings getStyle() {
-        return style;
+    public StyleSettings getStyles() {
+        return styles;
     }
 
-    public void setStyle(StyleSettings style) {
-        this.style = style;
+    public void setStyles(StyleSettings style) {
+        this.styles = style;
     }
 
     public Integer getNodeNumber() {
@@ -735,6 +747,17 @@ public class Settings implements ISettings {
         return this;
     }
 
+    public String getSupportEmail() {
+        return supportEmail;
+    }
+
+    public Settings setSupportEmail(String supportEmail) {
+        this.supportEmail = supportEmail;
+        return this;
+    }
+
+
+    /*
     public List<PublishingConfig> getPublishing() {
         return publishing;
     }
@@ -768,5 +791,76 @@ public class Settings implements ISettings {
         }
         return this;
     }
+    */
 
+    public Long getAppCreatedMillis() {
+        return appCreatedMillis;
+    }
+
+    public Settings setAppCreatedMillis(Long appCreatedMillis) {
+        this.appCreatedMillis = appCreatedMillis;
+        return this;
+    }
+
+    public List<AssetPreprocessorConfig> getAssetPreprocessors() {
+        return assetPreprocessors;
+    }
+
+    public Settings setAssetPreprocessors(List assetPreProcessors) {
+        this.assetPreprocessors = convertMapListToObjects(assetPreProcessors, AssetPreprocessorConfig.class);
+        for (AssetPreprocessorConfig config: this.assetPreprocessors) {
+            if (empty(config.getCommand()) || empty(config.getName()) || empty(config.getExtension())) {
+                throw new ConfigException("Asset Pre-processors must have a valid command, name, and extension");
+            }
+        }
+        return this;
+    }
+
+    protected List convertMapListToObjects(List maps, Class targetClass) {
+        if (maps.size() == 0) {
+            return maps;
+        }
+        if (targetClass.isAssignableFrom(maps.get(0).getClass())) {
+            return maps;
+        }
+        List items = new ArrayList<>();
+        for (Object o: maps) {
+            Map<String, Object> map = (Map<String, Object>)o;
+            try {
+                Object instance = targetClass.newInstance();
+                for(Map.Entry<String, Object> e: map.entrySet()) {
+                    Object value = e.getValue();
+                    if (e.getKey().equals("basePort") && e.getValue() instanceof Long) {
+                        value = Math.toIntExact((Long)value);
+                    }
+                    PropertyUtils.setProperty(instance, e.getKey(), value);
+                }
+                items.add(instance);
+
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return items;
+    }
+
+    public String getxFrameOptions() {
+        return xFrameOptions;
+    }
+
+    public Settings setxFrameOptions(String xFrameOptions) {
+        this.xFrameOptions = xFrameOptions;
+        return this;
+    }
+
+    public List<DeploymentsConfig> getDeployments() {
+        return deployments;
+    }
+
+    public Settings setDeployments(List<DeploymentsConfig> deployments) {
+        this.deployments = deployments;
+        return this;
+    }
 }

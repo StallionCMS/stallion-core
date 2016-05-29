@@ -1,0 +1,29 @@
+
+pageTemplate = "page.jinja"
+cdnUrl = "http://localhost:{port}"
+siteUrl = "http://localhost:{port}"
+siteName = "The default, not-overriden site name"
+defaultTitle = "The default page title"
+
+[custom]
+bar = "notoverriden"
+
+[email]
+host = ""
+username = "noop"
+password = "basedefaultPassword"
+
+
+[[routes]]
+route = "/301-this"
+destination = "http://localhost/301-endpoint"
+preempt = true
+
+[[routes]]
+route = "/template-direct"
+template = "template-direct.jinja"
+
+[database]
+url = "jdbc:postgresql://localhost:5432/stallion_test?allowMultiQueries=true&autoReConnect=true"
+username = "stallion"
+password = ""

@@ -18,8 +18,7 @@
 package io.stallion.services;
 
 import io.stallion.Context;
-import io.stallion.dal.db.DB;
-import io.stallion.services.TempToken;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.exceptions.ClientException;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;

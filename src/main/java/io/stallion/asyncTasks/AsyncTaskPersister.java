@@ -47,4 +47,9 @@ public interface AsyncTaskPersister {
      */
     public boolean lockForProcessing(AsyncTask task);
 
+    /**
+     * Delete all tasks from the database that were completed more than 40 days ago
+     */
+    public void deleteOldTasks();
+
 }

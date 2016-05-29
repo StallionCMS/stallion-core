@@ -89,7 +89,11 @@ public class JinjaResourceLocator implements ResourceLocator {
         } else if (s.contains(":")) {
             String[] parts = s.split(":", 2);
             String pluginName = parts[0];
-            String resourcePath = "/templates/" + parts[1];
+            String pathName = parts[1];
+            if (pathName.startsWith("/")) {
+                pathName = pathName.substring(1);
+            }
+            String resourcePath = "/templates/" + pathName;
             return ResourceHelpers.loadAssetResource(pluginName, resourcePath);
         }
         if (s.startsWith("/")) {

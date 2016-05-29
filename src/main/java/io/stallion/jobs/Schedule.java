@@ -26,6 +26,8 @@ import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.*;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A data structure representing the schedule for a recurring task,
@@ -195,7 +197,7 @@ public class Schedule {
      */
     public Schedule randomMinute() {
         this._minutes.verifyAndUpdateUnset();
-        this._minutes.setRandomMinute(true);
+        this._minutes.setRandom(true);
         return this;
     }
 
@@ -336,7 +338,7 @@ public class Schedule {
             if (timing.isUnset()) {
                 throw new ConfigException("You did not configure the schedule field: " + timing.getClass().getSimpleName());
             }
-            if (timing.size() == 0 && !timing.isEvery()) {
+            if (timing.size() == 0 && !timing.isEvery() && !timing.isRandom()) {
                 throw new ConfigException("Timings are not set, nor is every interval set for schedule field: " + timing.getClass().getSimpleName());
             }
         }
@@ -361,6 +363,11 @@ public class Schedule {
 
             ZonedDateTime dt = startingFrom;
             dt = dt.withSecond(0).withNano(0);
+
+            if (_minutes.isRandom()) {
+                dt.withMinute(ThreadLocalRandom.current().nextInt(0, 60));
+            }
+
 
             for(int brake=0; brake<2000; brake++) { // fake while-loop with emergency brake pattern. Worst case(s): It is February 1, task runs on January 31st, we loop 11 plus 30 times
                 Mismatched mismatched = checkMismatch(dt);
@@ -426,7 +433,8 @@ public class Schedule {
             if (!_hours.isEvery() && !_hours.contains(dt.getHour())) {
                 return Mismatched.HOUR;
             }
-            if (!_minutes.isEvery() && !_minutes.contains(dt.getMinute())) {
+
+            if (!_minutes.isRandom() && !_minutes.isEvery() && !_minutes.contains(dt.getMinute())) {
                 return Mismatched.MINUTE;
             }
 
@@ -450,6 +458,9 @@ public class Schedule {
         public int minutesToAdd(ZonedDateTime dt) {
             if (_minutes.isEvery()) {
                 return 1;
+            }
+            if (_minutes.isRandom()) {
+                return 0;
             }
             for (Integer minute: _minutes) {
                 if (minute > dt.getMinute()) {

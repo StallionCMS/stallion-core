@@ -17,8 +17,8 @@
 
 package io.stallion.tests.integration.javascriptPlugin;
 
-import io.stallion.dal.DalRegistry;
-import io.stallion.dal.base.ModelController;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.ModelController;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.javascript.TestResults;
 import io.stallion.testing.MockResponse;
@@ -45,7 +45,7 @@ public class JavascriptPluginCase extends AppIntegrationCaseBase {
 
     @Test
     public void testControllersRegistered() {
-        ModelController controller = DalRegistry.instance().get("js-toml-things");
+        ModelController controller = DataAccessRegistry.instance().get("js-toml-things");
         assertNotNull(controller);
         assertTrue(controller.filter("name", "jonas").count() > 0);
     }

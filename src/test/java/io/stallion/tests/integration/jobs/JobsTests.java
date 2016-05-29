@@ -23,6 +23,10 @@ import io.stallion.jobs.Schedule;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.testing.AppIntegrationCaseBase;
 import static org.junit.Assert.assertEquals;
+
+import io.stallion.tests.integration.jobs.ExampleJobOne;
+import io.stallion.tests.integration.jobs.ExampleJobThree;
+import io.stallion.tests.integration.jobs.ExampleJobTwo;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

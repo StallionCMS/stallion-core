@@ -17,7 +17,7 @@
 
 package io.stallion.users;
 
-import io.stallion.dal.base.ModelBase;
+import io.stallion.dataAccess.ModelBase;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -57,6 +57,7 @@ public class RequestHandler extends AbstractHandler {
         StRequest stRequest = new StRequest(path, baseRequest, request);
         StResponse stResponse = new StResponse(response);
         handleStallionRequest(stRequest, stResponse);
+        baseRequest.setHandled(true);
         if (response.getStatus() >= 400) {
             Log.info("ErrorCode={0} url={1}", response.getStatus(), stRequest.requestUrl());
         }

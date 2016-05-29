@@ -17,7 +17,7 @@
 
 package io.stallion.restfulEndpoints;
 
-import io.stallion.dal.base.SettableOptions;
+import java.util.regex.Pattern;
 
 
 public class RequestArg {
@@ -26,7 +26,14 @@ public class RequestArg {
     private Object defaultValue = null;
     private Class annotationClass;
     private Class targetClass = null;
-    private Class<? extends SettableOptions.BaseSettable> settableAllowedForClass = null;
+    private boolean required;
+    private Pattern validationPattern;
+    private boolean emailParam = false;
+    private int minLength = 0;
+    private boolean allowEmpty = true;
+
+
+
 
     public Class getTargetClass() {
         return targetClass;
@@ -65,13 +72,6 @@ public class RequestArg {
     }
 
 
-    public Class<? extends SettableOptions.BaseSettable> getSettableAllowedForClass() {
-        return settableAllowedForClass;
-    }
-
-    public void setSettableAllowedForClass(Class<? extends SettableOptions.BaseSettable> settableAllowedForClass) {
-        this.settableAllowedForClass = settableAllowedForClass;
-    }
 
     public Class getAnnotationClass() {
         return annotationClass;
@@ -79,5 +79,50 @@ public class RequestArg {
 
     public void setAnnotationClass(Class annotationClass) {
         this.annotationClass = annotationClass;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public RequestArg setRequired(boolean required) {
+        this.required = required;
+        return this;
+    }
+
+    public Pattern getValidationPattern() {
+        return validationPattern;
+    }
+
+    public RequestArg setValidationPattern(Pattern validationPattern) {
+        this.validationPattern = validationPattern;
+        return this;
+    }
+
+    public boolean isEmailParam() {
+        return emailParam;
+    }
+
+    public RequestArg setEmailParam(boolean emailParam) {
+        this.emailParam = emailParam;
+        return this;
+    }
+
+    public int getMinLength() {
+        return minLength;
+    }
+
+    public RequestArg setMinLength(int minLength) {
+        this.minLength = minLength;
+        return this;
+    }
+
+    public boolean isAllowEmpty() {
+        return allowEmpty;
+    }
+
+    public RequestArg setAllowEmpty(boolean allowEmpty) {
+        this.allowEmpty = allowEmpty;
+        return this;
     }
 }

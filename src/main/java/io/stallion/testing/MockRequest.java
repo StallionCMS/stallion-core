@@ -194,6 +194,10 @@ public class MockRequest extends StRequest {
         return queryMap;
     }
 
+    @Override
+    public String getActualIp() {
+        return "127.0.0.100";
+    }
 
     protected String dataToString() {
         try {

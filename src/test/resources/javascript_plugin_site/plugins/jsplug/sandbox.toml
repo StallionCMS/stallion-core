@@ -9,10 +9,10 @@ canWriteDb = false
 cookies = []
 headers = []
 classes = [
-    'io.stallion.dal.file.TomlItem',
-    'io.stallion.dal.file.TomlItemController',
-    'io.stallion.dal.file.TomlPersister',
-    'io.stallion.dal.file.JsonFilePersister',
+    'io.stallion.dataAccess.file.TomlItem',
+    'io.stallion.dataAccess.file.TomlItemController',
+    'io.stallion.dataAccess.file.TomlPersister',
+    'io.stallion.dataAccess.file.JsonFilePersister',
     'io.stallion.requests.PostRequestHookHandler',
     'io.stallion.plugins.javascript.JsAsyncTaskHandler',
     'io.stallion.jobs.Job',

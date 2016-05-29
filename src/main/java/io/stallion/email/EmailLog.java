@@ -17,7 +17,7 @@
 
 package io.stallion.email;
 
-import io.stallion.dal.base.ModelBase;
+import io.stallion.dataAccess.ModelBase;
 
 import javax.persistence.Column;
 import java.time.ZonedDateTime;

@@ -203,7 +203,7 @@ public class PluginRegistry {
         Log.fine("Loading jars at {0}", jarFolderPath);
         File jarFolder = new File(jarFolderPath);
         if (!jarFolder.exists() || !jarFolder.isDirectory()) {
-            Log.info("No jar folder exists at {0}. No jar plugins will be loaded.", jarFolderPath);
+            Log.fine("No jar folder exists at {0}. No jar plugins will be loaded.", jarFolderPath);
             return;
         }
         File[] files = jarFolder.listFiles();
@@ -211,7 +211,7 @@ public class PluginRegistry {
         for (int i = 0; i < files.length; i++) {
             if (files[i].getName().endsWith(".jar")) {
                 //urls.add(files[i].toURL());
-                Log.info("Loading plugin jar {0}", files[i].toURI());
+                Log.fine("Loading plugin jar {0}", files[i].toURI());
                 urls.add(files[i].toURI().toURL());
             }
         }
@@ -233,7 +233,7 @@ public class PluginRegistry {
             if (empty(pluginBooterClass)) {
                 continue;
             }
-            Log.info("Load booter class {0} for jar={1}", pluginBooterClass, jarUrl);
+            Log.fine("Load plugin class {0} from jar={1}", pluginBooterClass, jarUrl);
             Class booterClass = getClassLoader().loadClass(pluginBooterClass);
             Log.finer("Booter class was loaded from: {0} ", booterClass.getProtectionDomain().getCodeSource().getLocation());
             StallionJavaPlugin booter = (StallionJavaPlugin)booterClass.newInstance();
@@ -256,7 +256,7 @@ public class PluginRegistry {
     }
 
     public void loadPluginFromBooter(StallionJavaPlugin booter) {
-        Log.info("Load plugin from booter class: {0} plugin:{1}", booter.getClass().getName(), booter.getPluginName());
+        Log.info("Load plugin {0} from class {1}", booter.getPluginName(), booter.getClass().getName());
         if (getJavaPluginByName().containsKey(booter.getPluginName())) {
             Log.warn("Plugin already loaded, skipping {0}", booter.getPluginName());
             return;

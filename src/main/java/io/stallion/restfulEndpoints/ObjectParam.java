@@ -17,14 +17,11 @@
 
 package io.stallion.restfulEndpoints;
 
-import io.stallion.dal.base.SettableOptions;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ObjectParam {
     String name() default "";
-    Class targetClass();
-    Class<? extends SettableOptions.BaseSettable> restricted() default SettableOptions.Unrestricted.class;
+    Class targetClass() default Object.class;
 }

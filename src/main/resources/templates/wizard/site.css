@@ -6,16 +6,17 @@
 
 a {
     text-decoration: none;
-    color: rgb(61, 146, 201);
 }
 a:hover,
 a:focus {
     text-decoration: underline;
 }
 
-h3 {
-    font-weight: 100;
+h2, h3 {
+    font-weight: 400;
 }
+
+/**--highlight-color-section--*/
 
 /* LAYOUT CSS */
 .pure-img-responsive {
@@ -34,7 +35,6 @@ h3 {
 }
 
 .sidebar {
-    background: rgb(61, 79, 93);
     color: #fff;
 }
 
@@ -44,6 +44,9 @@ h3 {
 }
 .brand-title {
     text-transform: uppercase;
+}
+.brand-title a, .brand-title a:hover {
+    color: white;
 }
 .brand-tagline {
     font-weight: 300;
@@ -68,6 +71,7 @@ h3 {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     font-size: 85%;
+    width: 140px;
 }
 .nav-item a:hover,
 .nav-item a:focus {

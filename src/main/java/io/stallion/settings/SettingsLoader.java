@@ -102,10 +102,14 @@ public class SettingsLoader  {
 
         if (settings instanceof Settings) {
             // Hack because Toml doesn't know how to convert a list of class items
-            List publishing = toml.getList("publishing", Collections.emptyList());
-            if (!empty(publishing)) {
-                ((Settings)settings).setPublishing(publishing);
-            }
+            //List publishing = toml.getList("publishing", Collections.emptyList());
+            //if (!empty(publishing)) {
+            //    ((Settings)settings).setPublishing(publishing);
+            //}
+            //List preprocessors = toml.getList("assetPreprocessors", Collections.emptyList());
+            //if (!empty(preprocessors)) {
+            //    ((Settings)settings).setAssetPreprocessors(preprocessors);
+            //}
             //if (toml.get("publishing") != null) {
             //
             //}
@@ -145,6 +149,7 @@ public class SettingsLoader  {
                 }
                 assignDefaultsFromAnnotations(value);
                 field.setAccessible(isAccessible);
+                ((SettingsSection)value).postLoad();
                 continue;
             }
             SettingMeta[] metas = field.getAnnotationsByType(SettingMeta.class);

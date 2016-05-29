@@ -99,15 +99,16 @@ public class JsPluginEngine {
         folder = new File(fullPath).getParent();
         scriptEngine.put("javaToJsHelpers", new JavaToJsHelpers(box));
 
+        SandboxedContext ctx = new SandboxedContext(folder, box, pluginSettings);
+        scriptEngine.put("myContext", ctx);
         String stallionSharedJs = IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"));
         classFilter.setDisabled(true); // Turn off white-listing while loading stallion_shared, since we need access to more classes
+
         scriptEngine.eval("load(" + JSON.stringify(map(val("script", stallionSharedJs), val("name", "stallion_shared.js"))) + ");");
         classFilter.setDisabled(false); // Turn whitelisting back on
         scriptEngine.put("stallionClassLoader", new SandboxedClassLoader(box));
         //scriptEngine.eval("Java = {extend: Java.extend, type: function(className) { return stallionClassLoader.loadClass(className).static;  }}");
         //scriptEngine.eval("Packages = undefined;java = undefined;");
-        SandboxedContext ctx = new SandboxedContext(folder, box, pluginSettings);
-        scriptEngine.put("myContext", ctx);
         scriptEngine.eval("load(\"" + fullPath + "\");");
 
         Log.info("Loaded js plugin {0}", fullPath);
@@ -166,6 +167,9 @@ public class JsPluginEngine {
         String jvmNpm = IOUtils.toString(getClass().getResource("/jslib/jvm-npm.js"));
         scriptEngine.eval("load(" + JSON.stringify(map(val("script", jvmNpm), val("name", "jvm-npm.js"))) + ");");
 
+        SandboxedContext ctx = new SandboxedContext(folder, Sandbox.allPermissions(), pluginSettings);
+        scriptEngine.put("myContext", ctx);
+
         String stallionSharedJs = IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"));
         scriptEngine.eval("load(" + JSON.stringify(map(val("script", stallionSharedJs), val("name", "stallion_shared.js"))) + ");");
 
@@ -176,8 +180,6 @@ public class JsPluginEngine {
         scriptEngine.put("pluginFolder", folder);
         scriptEngine.put("jsEngine", this);
 
-        SandboxedContext ctx = new SandboxedContext(folder, Sandbox.allPermissions(), pluginSettings);
-        scriptEngine.put("myContext", ctx);
 
 
         //Global global = Context.getGlobal();

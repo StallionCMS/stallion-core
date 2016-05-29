@@ -1,0 +1,50 @@
+{% extends "stallion:public/semipublic-single-box-page.jinja" %}
+{% block main_column %}
+
+<style>
+
+</style>
+<div id="layout" class="pure-g">
+    {% if verified and not requiresApproval %}
+    <div class="pad pure-u-1">
+        <div class="st-success">Your email address {{ email }} has been verified!</div>
+        <big><a href="{{ returnUrl }}">Return to application &#187;</a></big>
+    </div>
+    {% endif %}
+    {% if verified and requiresApproval %}
+    <div class="pad pure-u-1">
+      <div class="st-success">
+        <p>Your email address {{ email }} has been verified.</p>
+        <p>Your account is now pending administrative approval.</p>
+        
+      </div>
+    </div>
+    {% endif %}
+    {% if !verified %}
+    <div class="pad pure-u-1">
+        {% if verificationFailed %}
+        <div class="st-error" role="alert">Your verification token for email {{ email }} was not valid.</div>
+        {% endif %}
+
+        <div style="{% if not alreadySent %}display: none;{% endif %}" id="verify-email-sent-box" class="st-success">A verification email has been sent to {{ email }}. It should arrive within a few minutes. If not, you can re-send it below.</div>
+
+        <h1 class="st-splash-header">Verify Email Address</h1>
+        <form id="st-email-verify-form" class="st-form pure-form pure-form-stacked">
+            <fieldset>
+                <div class="st-bottom-space">
+                    <label for="email">Email</label>
+                    <input type="email" class="pure-input-1" name="email" placeholder="Email" value="{{ email }}">
+                </div>
+                <div class="st-bottom-space">
+                    <button type="submit" class="st-button-submit pure-button pure-button-primary">Re-send Verification Email</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    {% endif %}
+</div><!-- pure-g -->
+{% endblock %}
+
+{% block pre_end_body %}
+<script src='{{ assets.resource("admin/screens/login-screen.js", "stallion") }}' type="text/javascript"></script>
+{% endblock %}

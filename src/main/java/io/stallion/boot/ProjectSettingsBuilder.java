@@ -32,6 +32,15 @@ class ProjectSettingsBuilder {
     private String siteUrl;
     private String healthCheckSecret;
 
+    private String emailUsername;
+    private String emailPassword;
+    private String adminEmail;
+    private String emailHost;
+    private Long emailPort;
+
+    private String highlightColor;
+
+
     public String getSiteName() {
         return siteName;
     }
@@ -74,6 +83,60 @@ class ProjectSettingsBuilder {
 
     public ProjectSettingsBuilder setHealthCheckSecret(String healthCheckSecret) {
         this.healthCheckSecret = healthCheckSecret;
+        return this;
+    }
+
+    public String getEmailUsername() {
+        return emailUsername;
+    }
+
+    public ProjectSettingsBuilder setEmailUsername(String emailUsername) {
+        this.emailUsername = emailUsername;
+        return this;
+    }
+
+    public String getEmailPassword() {
+        return emailPassword;
+    }
+
+    public ProjectSettingsBuilder setEmailPassword(String emailPassword) {
+        this.emailPassword = emailPassword;
+        return this;
+    }
+
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
+    public ProjectSettingsBuilder setAdminEmail(String adminEmail) {
+        this.adminEmail = adminEmail;
+        return this;
+    }
+
+    public String getEmailHost() {
+        return emailHost;
+    }
+
+    public ProjectSettingsBuilder setEmailHost(String emailHost) {
+        this.emailHost = emailHost;
+        return this;
+    }
+
+    public Long getEmailPort() {
+        return emailPort;
+    }
+
+    public ProjectSettingsBuilder setEmailPort(Long emailPort) {
+        this.emailPort = emailPort;
+        return this;
+    }
+
+    public String getHighlightColor() {
+        return highlightColor;
+    }
+
+    public ProjectSettingsBuilder setHighlightColor(String highlightColor) {
+        this.highlightColor = highlightColor;
         return this;
     }
 }

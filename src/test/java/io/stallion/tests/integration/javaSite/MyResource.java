@@ -18,8 +18,8 @@
 package io.stallion.tests.integration.javaSite;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import static io.stallion.dal.base.SettableOptions.*;
 
+import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.ObjectParam;
 import io.stallion.utils.json.RestrictedViews;
@@ -32,8 +32,9 @@ public class MyResource implements EndpointResource {
     @POST()
     @Path("/hello/creatify")
     @JsonView(RestrictedViews.Member.class)
-    public Object creatify(@ObjectParam(targetClass = ExamplePojo.class, restricted = Createable.class) ExamplePojo thing) {
-        ExamplePojo pojo = ExamplePojoController.instance().mergeWithDefaults(thing);
+    public Object creatify(@ObjectParam(targetClass = ExamplePojo.class) ExamplePojo rawThing) {
+        ExamplePojo pojo = SafeMerger.with().nonEmpty("userName", "displayName", "content", "age").optionalEmail("email").merge(rawThing);
+        //ExamplePojo pojo = ExamplePojoController.instance().mergeWithDefaults(thing);
         pojo.setUpdateMessage("This was updated by the method creatify");
         pojo.setUpdated(123456789L);
         pojo.setInternalSecret("theInternalSecret");
@@ -43,7 +44,7 @@ public class MyResource implements EndpointResource {
 
     @POST()
     @Path("/:id/updatify")
-    public Object updateForId(@PathParam("id") Long id, @ObjectParam(targetClass = ExamplePojo.class, restricted = AnyUpdateable.class) ExamplePojo thing) {
+    public Object updateForId(@PathParam("id") Long id, @ObjectParam(targetClass = ExamplePojo.class) ExamplePojo thing) {
         thing.setId(id);
 
         return thing;
@@ -52,8 +53,8 @@ public class MyResource implements EndpointResource {
 
     @POST()
     @Path("/hello/updatifyHello")
-    public Object updatify(@ObjectParam(targetClass = ExamplePojo.class, restricted = AnyUpdateable.class) ExamplePojo thing) {
-        ExamplePojo pojo = ExamplePojoController.instance().mergeWithDefaults(thing);
+    public Object updatify(@ObjectParam(targetClass = ExamplePojo.class) ExamplePojo thing) {
+        ExamplePojo pojo = SafeMerger.with().optional("displayName", "age", "content").merge(thing);
         pojo.setUpdateMessage("This was updated by the method updatify");
         pojo.setUpdated(123456789L);
         pojo.setInternalSecret("theInternalSecret");
@@ -63,8 +64,8 @@ public class MyResource implements EndpointResource {
     @POST()
     @Path("/hello/moderatify")
     @JsonView(RestrictedViews.Owner.class)
-    public Object moderatify(@ObjectParam(targetClass = ExamplePojo.class, restricted = OwnerUpdateable.class) ExamplePojo thing) {
-        ExamplePojo pojo = ExamplePojoController.instance().mergeWithDefaults(thing);
+    public Object moderatify(@ObjectParam ExamplePojo thing) {
+        ExamplePojo pojo = SafeMerger.with().optional("displayName", "age", "content", "userName", "email", "status").merge(thing);
         pojo.setUpdateMessage("This was updated by the method moderatify");
         pojo.setUpdated(123456789L);
         pojo.setInternalSecret("theInternalSecret");

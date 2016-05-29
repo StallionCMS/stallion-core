@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.emptyInstance;
 
 
 public class DateUtils {
@@ -125,7 +126,7 @@ public class DateUtils {
     public static ZoneId currentUserTimeZoneId() {
         if (!empty(Context.getUser().getTimeZoneId())) {
             return ZoneId.of(Context.getUser().getTimeZoneId());
-        } else if (!empty(Settings.instance().getTimeZoneId())) {
+        } else if (!emptyInstance(Settings.instance().getTimeZoneId())) {
             return Settings.instance().getTimeZoneId();
         } else {
             return ZoneId.of("UTC");

@@ -20,22 +20,50 @@ healthCheckSecret = "{{ builder.healthCheckSecret }}"
 
 # Email settings, for sending outbound emails
 # Exceptions, comments, form submissions, etc, will be sent to this address
+{% if builder.emailHost %}
+[email]
+host = "{{ builder.emailHost }}"
+port = {{ builder.emailPort }}
+username = "{{ builder.emailUsername }}"
+password = "{{ builder.emailPassword }}"
+# The email addresses where exceptions and other alerts and notifications will be sent to.
+adminEmails = ["{{ builder.adminEmail }}"]
+{% else %}
 #[email]
 #host = "smtp.myserver.org"
 #username = "myusername"
 #password = "mypassword"
 # The email addresses where exceptions and other alerts and notifications will be sent to.
 #adminEmails = ["myaddress@mydomain.org"]
+{% endif %}
+
+# Define styles for all the builtin screens and emails, such as the login page, the password reset emails, etc.
+[styles]
+highlightColor = "{{ builder.highlightColor }}"
+#logoImage = "/st-assets/images/logo.png"
+#backgroundColor = "#F9F9F9"
+#mainBodyColor = "#FFFFFF"
+#linkColor = "#993333"
+#logoTextColor = "#993333"
+#primaryButtonColor = "#993333"
+#headerFont = "'Helvetica Neue', Helvetica, Arial, sans-serif"
+#bodyFont = "'Helvetica Neue', Helvetica, Arial, sans-serif"
+#customCss = ""
+#footer = "Copyright 2016 My Company Inc."
 
 
 # Define server information for where you want to publish your site.
 # All servers must be configured first using the ops scripts
 # This information is used with the >stallion publish command
-#[publishing]
+# If you have multiple environments -- dev/qa/staging/prod -- create a [[publishing]] section for each environment
+# If you have multiple nodes for a given environment, add each host to the hosts = [] array.
+#[[publishing]]
+## The environment this section represents
+#env = "prod"
 ## The SSH user on the server
 #user = "sshuser"
-## The host that you will SSH into
-#host = "www.myserver.org"
+## The hosts to deploy to
+#hosts = ["primary-node.myserver.org"]
 ## The folder where this site will be located
 #rootFolder = "/srv/myapp"
 ## URLS to check to make sure the app is running, once deployed

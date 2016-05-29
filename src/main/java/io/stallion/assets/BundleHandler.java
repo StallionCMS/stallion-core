@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static io.stallion.utils.Literals.*;
@@ -251,7 +252,8 @@ public class BundleHandler {
         String fullPath = basePath + path;
         String contents = null;
         try {
-            contents = IOUtils.toString(new FileReader(fullPath));
+            contents = FileUtils.readFileToString(new File(fullPath), Charset.forName("UTF-8"));
+            //contents = IOUtils.toString(new FileReader(fullPath)., );
         } catch (IOException e) {
             throw new UsageException("Bundle file does not exist: " + fullPath);
         }
@@ -274,35 +276,6 @@ public class BundleHandler {
         } catch (IOException e) {
             throw new WebException("Error loading resource " + bundleFile.getLiveUrl() + " plugin: " + bundleFile.getPluginName() , 500, e);
         }
-    }
-
-    /**
-     * Get the source content from the resourceUrl
-     *
-     * In dev mode, we try to load off the editable, file-system version, rather than the installed compilation.
-     * That allows us to see changes instantly, rather than needing to re-compile everything.
-     *
-     * @param resourceUrl
-     * @return
-     * @throws IOException
-     */
-    protected String resourceUrlToContent(URL resourceUrl) throws IOException {
-        if (!Settings.instance().getDevMode()) {
-            return IOUtils.toString(resourceUrl);
-        }
-
-        // If the resourceUrl points to a local file, and the file exists in the file system, then use that file
-
-
-        // If we have a stallionDevelopmentHomeDirectory, guess the URL based on that
-
-
-        // Otherwise, guess the URL from ~/st, ~/stallion
-
-
-        // All else fails, just return it based on the resource
-
-        return IOUtils.toString(resourceUrl);
     }
 
     /**
@@ -374,20 +347,24 @@ public class BundleHandler {
     public String getDebugUrl(BundleFile bf) {
         String url = bf.getDebugUrl();
         if (url.startsWith("http://") || url.startsWith("https://")) {
-            return appendCacheBusting(
+            url = appendCacheBusting(
                     bf.getDebugUrl(),
                     DigestUtils.md5Hex(url));
         } else if (empty(bf.getPluginName())) {
-            return appendCacheBusting(
+            url = appendCacheBusting(
                     baseUrl + "/st-assets/" + url,
                     getFileTimeStamp(url));
         } else {
             // Register this path as an allowed resource path
             addAllowedPath(bf.getPluginName(), url);
-            return appendCacheBusting(
+            url = appendCacheBusting(
                     baseUrl + "/st-resource/" + bf.getPluginName() + "/" + url,
                     startTime.toString());
         }
+        if (!empty(bf.getProcessor()) && !url.contains("processor=")) {
+            url += "&processor=" + bf.getProcessor();
+        }
+        return url;
     }
 
     public String appendCacheBusting(String url, String cacheBust) {

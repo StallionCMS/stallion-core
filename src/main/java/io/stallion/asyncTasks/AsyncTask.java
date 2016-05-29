@@ -18,8 +18,8 @@
 package io.stallion.asyncTasks;
 
 import io.stallion.Context;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.UniqueKey;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.UniqueKey;
 import io.stallion.plugins.javascript.JsAsyncTaskHandler;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
@@ -46,6 +46,7 @@ public class AsyncTask extends ModelBase implements Comparable<AsyncTask> {
     private int tryCount = 0;
     private String errorMessage = "";
     private String dataJson = "";
+    private String localMode = "";
 
 
     public static AsyncTaskController controller() {
@@ -345,5 +346,14 @@ public class AsyncTask extends ModelBase implements Comparable<AsyncTask> {
     @Override
     public int compareTo(AsyncTask o) {
         return Long.compare(this.getExecuteAt(), o.getExecuteAt());
+    }
+
+    public String getLocalMode() {
+        return localMode;
+    }
+
+    public AsyncTask setLocalMode(String localMode) {
+        this.localMode = localMode;
+        return this;
     }
 }

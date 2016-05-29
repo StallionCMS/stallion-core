@@ -32,7 +32,7 @@ nginx_non_ssl_redirect_to_ssl = """
 
 server {
     listen 80;
-    server_name %(domain)s %(alias_domains)s %(secondary_domains)s %(redirect_domains)s;
+    server_name %(domain)s %(alias_domains)s %(redirect_domains)s;
 
     location ~ /.well-known {
        try_files $uri $uri/ =404;
@@ -49,7 +49,7 @@ nginx_non_ssl = """\
 
 server {
     listen 80;
-    server_name %(domain)s %(alias_domains)s %(secondary_domains)s;
+    server_name %(domain)s %(alias_domains)s;
     location / {
         proxy_pass http://%(instance)s;
         proxy_set_header X-Forwarded-Host $host;
@@ -89,7 +89,7 @@ nginx_ssl = """\
 
 server {
     listen 443;
-    server_name %(domain)s %(alias_domains)s %(secondary_domains)s;
+    server_name %(domain)s %(alias_domains)s;
     ssl on;
     ssl_certificate %(ssl_crt)s;
     ssl_certificate_key %(ssl_key)s;
@@ -162,14 +162,15 @@ class Publisher(object):
         self.base_port = conf['base_port']
         self.domain = conf['domain']
         self.alias_domains = conf.get('alias_domains', [])
-        self.secondary_domains = conf.get('secondary_domains', [])
+        self.redirect_domains = conf.get('redirect_domains', [])
         self.check_urls = conf.get('check_urls', [])
         self.host = conf.get('host', '')
         self.ssl_crt = conf.get('ssl_crt', '')
         self.ssl_key = conf.get('ssl_key', '')
         self.redirect_to_ssl = conf.get('redirect_to_ssl', False)
-        self.redirect_to_primary = conf.get('redirect_to_primary', False)
         self.executable_name = conf['executable_name']
+        self.site_url = conf['site_url']
+        self.full_rebuild = conf['full_rebuild']
 
 
     def publish(self):
@@ -181,10 +182,10 @@ class Publisher(object):
             self.full_deploy()
             return
         change_info = self.detect_changes(self.active)
-        if change_info.total_changed == 0:
+        if not self.full_rebuild and change_info.total_changed == 0:
             good("No files have been changed. Exiting deploy.")
             return
-        if change_info.total_changed < 20 and not change_info.requires_full_deploy:
+        if not self.full_rebuild and change_info.total_changed < 20 and not change_info.requires_full_deploy:
             self.quick_update()    
             return
         info("%s files to update. Running full deploy" % change_info.total_changed)
@@ -320,9 +321,10 @@ class Publisher(object):
 
     def check_for_migrations(self):
         info("Check to see if there are SQL migrations that have not been executed.")
-        cmd = u"sudo -u stallionServer {root}/{folder}/bin/stallion sql-check-migrations -targetPath={root}/{folder} -env={env}".format(
+        cmd = u"sudo -u stallionServer {root}/{folder}/bin/{executable_name} sql-check-migrations -targetPath={root}/{folder} -env={env}".format(
             root=root,
             folder=self.deploying,
+            executable_name=self.executable_name,
             env=self.env
             )
         out =!$cmd
@@ -363,12 +365,14 @@ exec sudo -u stallionServer {root}/{folder}/bin/{executable} serve -localMode=fa
             out, err = p.communicate()
             good("Server test boot was successful.")
         except Exception, e:
-            p.terminate()
             out, err = p.communicate()
             error("Error while trying to boot the server.")
             error(out or '')
             error(err or '')
+            if p.returncode == None and p.pid:
+                p.terminate()
             raise
+
         good("Stallion instance test run succeeded.")
 
 
@@ -423,6 +427,7 @@ respawn limit 3 60
         #urls = ['/st-admin/health/warmup'] + self.check_urls
         urls = self.check_urls or ['/']
         max_tries = 20
+        asset_urls = set()
         for url in urls:
             url = 'http://localhost:%s' % self.port + url
             for x in range(0, max_tries + 1):
@@ -435,7 +440,8 @@ respawn limit 3 60
                     o = !curl -v $url
                     assert '< HTTP/1.1 200 OK' in o, "200 OK not found in curl result for %s" % url
                     if '/st-admin/health/warmup' in url:
-                        assert 'Stallion-health: OK' in o, "Stallion-health: OK not found in curl result for /st-admin/health/warmup"        
+                        assert 'Stallion-health: OK' in o, "Stallion-health: OK not found in curl result for /st-admin/health/warmup"
+                    self.find_asset_urls_in_source(o, asset_urls)
                     break
                 except AssertionError:
                     if x == max_tries:
@@ -443,20 +449,25 @@ respawn limit 3 60
                         raise
                     info('Curl of %s not loading yet, waiting 3 seconds to retry' % url)
                     time.sleep(3)
-        url = 'http://localhost:%s' % self.port + "/"
-        o = !curl -v $url
         good("New Stallion instance is operational and healthy")
         info("Pre-fetching assets")
-        for path in re.findall('/st-assets/[^"\'\s]+', unicode(o)):
-            if ".css" not in path and ".js" not in path:
-                continue
-            asset_url = 'http://localhost:%s' % self.port + path
+        for asset_url in asset_urls:
             info("Pre-fetch asset " + asset_url)
             o = !curl -v $asset_url
-            if '< HTTP/1.1 200 OK' not in o:
-                sys.stderr.write(unicode(o))
+            content = "\n".join(o)
+            if 'HTTP/1.1 200 OK' not in content:
+                sys.stderr.write(content)
                 raise AssertionError("200 OK not found in curl result for %s" % asset_url)
         good("All assets preloaded")
+
+    def find_asset_urls_in_source(self, source, asset_urls):
+        source = unicode(source)
+        for path in re.findall('/st-assets/[^"\'\s]+', source):
+            if ".css" not in path and ".js" not in path:
+                continue
+            asset_urls.add('http://localhost:%s' % self.port + path)
+
+
 
 
     def swap_active(self):
@@ -467,25 +478,24 @@ respawn limit 3 60
             domain=self.domain,
             port=self.port,
             alias_domains=' '.join(self.alias_domains),
-            secondary_domains=' '.join(self.secondary_domains),
-            redirect_domains='',
+            redirect_domains=' '.join(self.redirect_domains),
             ssl_key=self.ssl_key,
             ssl_crt=self.ssl_crt
             )
-        if self.redirect_to_primary:
-            params['redirect_domains'] = params['alias_domains']
-            params['alias_domains'] = ''
         conf = nginx_upstream % params
-        if self.redirect_to_ssl and self.ssl_key:
+        # Handle SSL traffic, if applicable
+        if self.ssl_key:
+            conf += nginx_ssl % params
+            if self.redirect_domains:
+                conf += nginx_ssl_redirect_to_primary % params
+        # Handle non-SSL traffic
+        if self.ssl_key and self.redirect_to_ssl:
             conf += nginx_non_ssl_redirect_to_ssl % params
         else:
             conf += nginx_non_ssl % params
-        if self.redirect_to_primary:
-            conf += nginx_non_ssl_redirect_to_primary % params
-        if self.ssl_key:
-            conf += nginx_ssl % params
-            if self.redirect_to_primary:
-                conf += nginx_ssl_redirect_to_primary % params
+            if self.redirect_domains:
+                conf += nginx_non_ssl_redirect_to_primary % params
+
 
         deploying_path = '/etc/nginx/sites-available/stallion---%s-%s.conf' % (self.deploying, self.domain)
         active_path = '/etc/nginx/sites-available/stallion---%s-%s.conf' % (self.active, self.domain)
@@ -498,16 +508,35 @@ respawn limit 3 60
         if not _exit_code == 0:
             if self.active:
                 # reset back to the active conf
+                !unlink -s $enabled_path
                 !ln -s $active_path $enabled_path
             raise AssertionError('nginx config test failed!')
         if self.active:
             self._write('old', self.active)
         self._write('active', self.deploying)
         !nginx -s reload
+        succeeded = False
+        site_url = "http://"
+        if self.redirect_to_ssl and self.ssl_key:
+            site_url = "https://"
+        paths = self.check_urls or ['/']
+        site_url += self.domain + paths[0]
+        info("Fetching url via nginx " + site_url)
+        for x in range(0, 10):
+            debug("Fetching live url " + site_url)
+            o = !curl -v $site_url
+            if '< HTTP/1.1 200 OK' not in o:
+                if x == 9:
+                    sys.stderr.write(unicode(o))
+                    raise AssertionError("200 OK not found in curl result for %s" % site_url)
+            time.sleep(.2)
         good("New Stallion instance is now live!")
             
     def cleanup(self):
+        info("sleep for 5 seconds before tearing down previous version")
+        time.sleep(5)
         info("Stoping previous instance and cleaning up lock files")
+
         old = self._read('old')
         active = self._read('active')
         if old:

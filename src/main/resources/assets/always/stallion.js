@@ -16,6 +16,9 @@ if (window.$ && !window.jQuery) {
             console.log('an element', ele);
             var name = ele.getAttribute('name');
             console.log(name, ele);
+            if (!name) {
+                return;
+            }
             if (ele.getAttribute("type") === 'checkbox') {
                 data[name] = $(ele).is(":checked");
             } else {
@@ -23,6 +26,10 @@ if (window.$ && !window.jQuery) {
             }
         });
         return data;
+    };
+
+    st.testUnicode = function() {
+        console.log("This is a unicode snowman in stallion.js: ☃");
     };
 
     var tokenRe = /\{\s*([\w\.]+)\s*\}/g;
@@ -48,7 +55,10 @@ if (window.$ && !window.jQuery) {
                 console.log('Button .st-button-submit not found, or spinner already running, aborting stallion.request');
                 return;
             }
+            $(req.form).find('.st-success').hide();
+            $(req.form).find('.st-error').hide();
         }
+        
 
         if (!req.error) {
             req.error = st.defaultRequestErrorHandler;
@@ -83,6 +93,11 @@ if (window.$ && !window.jQuery) {
             if (spinner) {
                 spinner.clear();
             }
+            // Don't give an error message for cases where the error happens from navigating away from the page
+            // before we have finished a request.
+            if (xhr.readyState != 4) {
+                return;
+            }
             var o;
             try {
                 o = JSON.parse(xhr.responseText);
@@ -92,7 +107,8 @@ if (window.$ && !window.jQuery) {
             if (!o.message) {
                 o.message = 'Error processing request';
             }
-            req.error(o);
+
+            req.error(o, req.form, xhr);
 
         });
 
@@ -100,8 +116,15 @@ if (window.$ && !window.jQuery) {
     };
 
     st.tryMakeSpinner = function(form) {
-
-        var $btn = $('#' + form.getAttribute('id') + ' .st-button-submit');
+        
+        var $form = $(form);
+        var $btn = $form.find(' .st-button-submit');
+        if (!$btn.length) {
+            $btn = $form.find('.pure-button-primary[type="submit"]');
+        }
+        if (!$btn.length) {
+            $btn = $form.find('type=["submit"]');
+        }
         if (!$btn.length) {
             return null;
         }
@@ -151,23 +174,88 @@ if (window.$ && !window.jQuery) {
         return qs;
     };
     
-    st.defaultRequestErrorHandler = function(o) {
-        if (o.form) {
-            var $errorWrap = $('#' + o.form.getAttribute('id') + ' .st-error-wrap');
+    st.defaultRequestErrorHandler = function(o, form, xhr) {
+        st.showError(o.message, form);
+    };
+
+    st.showError = function(msg, target) {
+        if (target) {
+            var $target = $(target);
+            var $errorWrap = $target.find('.st-error-wrap');
             if (!$errorWrap.length) {
-                var $form = $('#' + o.form.getAttribute('id'));
                 var $node = $('<div></div>');
                 $node.addClass('st-error-wrap');
-                $form.appendChild($node);
+                $target.prepend($node);
                 $errorWrap = $node;
             }
-            $errorWrap.html("<div style='' class='alert alert-danger st-error pre-fade'>" + o.message + "</div>");
+            $errorWrap.html("<div style='' class='alert alert-danger st-error pre-fade'>" + msg + "</div>");
             setTimeout(function() {
                 $('.st-error.pre-fade').removeClass('pre-fade');
             }, 30);       
             
         } else {
-            alert(o.message);
+            var top = calcTopForMessageFixed();
+            var $div = $('<div class="alert alert-danger st-error st-message-fixed pre-fade"></div>')
+                .css({right: '20px', top: top + 'px', position: 'fixed'})
+                .html(msg);
+            $(document.body).append($div);
+            setTimeout(function() {
+                $('.st-error.pre-fade').removeClass('pre-fade');
+            }, 30);       
+            setTimeout(function() { $div.fadeOut(2000); }, 4000);
+        }
+
+    };
+
+    function calcTopForMessageFixed() {
+        var top = $(window).height();
+        // If there is no HTML5 doctype, then window.height is the document height, and we do not want to use it, need to put
+        // it in the top right corner instead
+        if (($(document).height() - 100) < top && top > 700) {
+            top = 100;
+        }
+        console.log('top ', top);
+        $others = $('.st-message-fixed');
+        if ($others.length) {
+            var minTop = top;
+            $others.each(function(ele) {
+                var eleTop = parseInt($(ele).css('top'), 10);
+                if (eleTop < minTop) {
+                    minTop = eleTop;
+                }
+            });
+            top = minTop;
+        }
+        top = top - 100;
+        console.log('top again ', top);
+        if (top < 0) {
+            top = 0;
+        }
+        return top;
+    }
+
+    st.showSuccess = function(msg, target) {
+        var $target = null;
+        if (target) {
+            $target = $(target);
+            var $successWrap = $target.find('.st-success-wrap');
+            if (!$successWrap.length) {
+                var $node = $('<div></div>');
+                $node.addClass('st-success-wrap');
+                $target.prepend($node);
+                $successWrap = $node;
+            }
+            $successWrap.html("<div style='' class='alert alert-success st-success pre-fade'>" + msg + "</div>");
+            setTimeout(function() {
+                $('.st-success.pre-fade').removeClass('pre-fade');
+            }, 30);       
+        } else {
+            var top = calcTopForMessageFixed();            
+            var $div = $('<div class="alert alert-success st-success st-message-fixed"></div>')
+                .css({right: '20px', top: top + 'px', position: 'fixed'})
+                .html(msg);
+            $(document.body).append($div);
+            setTimeout(function() { $div.fadeOut(2000); }, 4000);
         }
     };
     
@@ -405,9 +493,26 @@ Date.prototype.format = function (mask, utc) {
          this.on('update', function() {
              var self = this;
              self.formData = self.opts.formData || {};
+             var seenKeys = [];
              Object.keys(self).forEach(function(key) {
+                 if (seenKeys.indexOf(key) > -1) {
+                     return;
+                 }
+                 seenKeys.push(key);
                  var ele = self[key];
                  if (!ele) {
+                     return;
+                 }
+                 var val = self.formData[key];
+                 //if (ele.length) {
+                 //    debugger;
+                 //}
+                 if ($.isArray(ele) && ele.length > 0 && ele[0].tagName) {
+                     ele.forEach(function(radio) {
+                         if (radio.value === val) {
+                             $(radio).prop('checked', true);
+                         }
+                     });
                      return;
                  }
                  var tag = ele.tagName;
@@ -418,21 +523,20 @@ Date.prototype.format = function (mask, utc) {
                  if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
                      return;
                  }
-                 var val = self.formData[ele.getAttribute('name')];
                  if (val === undefined) {
                      return;
                  }
                  var type = ele.getAttribute('type');
                  if (type === 'checkbox' || type === 'radio') {
                      if (val === true || val === ele.value) {
-                         ele.setAttribute('checked', true);
+                         ele.setAttribute('checked', 'checked');
                      } else {
                          ele.removeAttribute('checked');
                      }
                  } else if (tag === 'SELECT') {
                      var $ele = $(ele);
                      $option = $ele.find('option[value="' + val + '"]');
-                     $option.attr('selected', true);
+                     $option.attr('selected', 'selected');
                      $(ele).val(val).change();
                  } else {
                      $(ele).val(val).change();
@@ -446,6 +550,15 @@ Date.prototype.format = function (mask, utc) {
          Object.keys(self).forEach(function(key) {
              var ele = self[key];
              if (!ele) {
+                 return;
+             }
+             if ($.isArray(ele) && ele.length > 0 && ele[0].tagName) {
+                 ele.forEach(function(radio) {
+                     if ($(radio).is(':checked')) {
+                         data[key] = radio.value;
+                         return false;
+                     }
+                 });
                  return;
              }
              var tag = ele.tagName;
@@ -486,3 +599,7 @@ Date.prototype.format = function (mask, utc) {
  if (window.riot) {
      riot.mixin('databind', RiotDataBindMixin);
  }
+
+
+
+

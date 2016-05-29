@@ -18,11 +18,11 @@
 package io.stallion.jobs;
 
 import io.stallion.Context;
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.StandardModelController;
-import io.stallion.dal.db.DB;
-import io.stallion.dal.db.DbPersister;
-import io.stallion.dal.file.JsonFilePersister;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.dataAccess.file.JsonFilePersister;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -39,7 +39,7 @@ public class JobStatusController extends StandardModelController<JobStatus> {
     }
 
     public static void selfRegister()  {
-        DalRegistration registration = new DalRegistration()
+        DataAccessRegistration registration = new DataAccessRegistration()
                 .setControllerClass(JobStatusController.class)
                 .setModelClass(JobStatus.class)
                 .setPath("job-status")
@@ -54,7 +54,7 @@ public class JobStatusController extends StandardModelController<JobStatus> {
                     .setPath("")
                     .setTableName("stallion_job_status");
         }
-        Context.dal().registerDal(registration);
+        Context.dal().register(registration);
 
     }
 

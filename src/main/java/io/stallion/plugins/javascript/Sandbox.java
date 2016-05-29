@@ -56,13 +56,13 @@ public class Sandbox {
         Toml boxToml = new Toml().read(file);
         Sandbox box = boxToml.to(Sandbox.class);
         Toml users = boxToml.getTable("users");
-        if (empty(users)) {
+        if (emptyInstance(users)) {
             box.setUsers(new Users());
         } else {
             box.setUsers(users.to(Users.class));
         }
         Toml whitelist = boxToml.getTable("whitelist");
-        if (empty(whitelist)) {
+        if (emptyInstance(whitelist)) {
             box.setWhitelist(new Whitelist());
         } else {
             box.setWhitelist(whitelist.to(Whitelist.class));

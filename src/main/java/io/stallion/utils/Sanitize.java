@@ -19,7 +19,7 @@ package io.stallion.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.stallion.Context;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.Model;
 import io.stallion.services.Log;
 import io.stallion.users.Role;
 import io.stallion.utils.json.JSON;
@@ -34,6 +34,32 @@ import java.util.regex.Pattern;
 
 
 public class Sanitize {
+
+    public static final PolicyFactory
+            COMMENTS_BOX_POLICY = new HtmlPolicyBuilder()
+            .allowStandardUrlProtocols()
+            // Allow title="..." on any element.
+            .allowAttributes("title").globally()
+            // Allow href="..." on <a> elements.
+            .allowAttributes("href", "data-mentioned-contact").onElements("a")
+            // Defeat link spammers.
+            .requireRelNofollowOnLinks()
+            .allowAttributes("lang").matching(Pattern.compile("[a-zA-Z]{2,20}"))
+            .globally()
+            // The align attribute on <p> elements can have any value below.
+            .allowAttributes("align")
+            .matching(true, "center", "left", "right", "justify", "char")
+            .onElements("p")
+            // These elements are allowed.
+            .allowElements(
+                    "a", "p", "i", "b", "em", "blockquote", "code", "strong",
+                    "br", "ul", "ol", "li")
+            // Custom slashdot tags.
+            // These could be rewritten in the sanitizer using an ElementPolicy.
+            .allowElements("quote", "ecode")
+
+            .toFactory();
+
 
     public static final  PolicyFactory
             STANDARD_POLICY = new HtmlPolicyBuilder()
@@ -103,6 +129,20 @@ public class Sanitize {
         return stripTagsPattern.matcher(s).replaceAll("");
     }
 
+    /** Standard policy for a blog comment box. Mostly the same as the standard policy, except stripts out divs too.
+     *
+     *
+     * @param s
+     * @return
+     */
+    public static String commentSanitize(String s) {
+        if (s == null) {
+            return "";
+        }
+        return COMMENTS_BOX_POLICY.sanitize(s);
+    }
+
+
     /** Strips all dangerous javascript, all block HTML that could ruin the page
      *  Allows only a limited white list of tags
      * @param s
@@ -121,6 +161,10 @@ public class Sanitize {
             return "";
         }
         return STANDARD_POLICY_WITH_IMAGES.sanitize(s);
+    }
+
+    public static String escapeHtmlAttribute(String s) {
+        return s.replace("\"", "&quot;").replace("'", "&#39;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     public static String escapeXml(String s) {

@@ -12,9 +12,12 @@
 <div class="title">{{ exception.className }} <span class="message">{{ exception.message }}</span></div>
 <div class="soft">On {{ utils.formatLocalDate(exception.thrownAt) }}</div>
 <div>{{ exception.requestMethod }} {{ exception.requestUrl }}</div>
+<div>IP Address: {{ exception.actualIp }}</div>
 <code><pre>{{ exception.stackTrace }}</pre></code>
+{% if exception.requestBody %}
 <h5>Request body:</h5>
 <code><pre>{{ exception.requestBody }}</pre></code>
+{% endif %}
 <h5>Headers:</h5>
 <code><pre>{{ exception.requestHeadersString }}</pre></code>
 {% endfor %}

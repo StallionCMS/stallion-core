@@ -21,10 +21,10 @@ import io.stallion.Context;
 import io.stallion.assets.AssetsController;
 import io.stallion.assets.BundleHandler;
 import io.stallion.assets.DefinedBundle;
-import io.stallion.dal.base.ModelBase;
-import io.stallion.dal.base.Displayable;
-import io.stallion.dal.base.DisplayableModelController;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.ModelBase;
+import io.stallion.dataAccess.Displayable;
+import io.stallion.dataAccess.DisplayableModelController;
+import io.stallion.dataAccess.Model;
 import io.stallion.exceptions.*;
 import io.stallion.hooks.HookRegistry;
 import io.stallion.plugins.javascript.JsEndpoint;
@@ -48,16 +48,14 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.ServletOutputStream;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 import static io.stallion.utils.Literals.*;
@@ -67,10 +65,10 @@ import static io.stallion.utils.Literals.*;
  * sending data to the Stallion response.
  *
  */
-public class RequestProcessor {
+class RequestProcessor {
     private StRequest request;
     private StResponse response;
-    public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";
+
 
     public RequestProcessor(StRequest request, StResponse response) {
         this.request = request;
@@ -82,6 +80,8 @@ public class RequestProcessor {
         try {
             Context.setRequest(request);
             Context.setResponse(response);
+            // Check CORS
+            new CorsResponseHandler().handleIfNecessary(request, response);
             // Authorize via cookie?
             if (UserController.instance() != null) {
                 UserController.instance().checkCookieAndAuthorizeForRequest(request);
@@ -93,9 +93,8 @@ public class RequestProcessor {
             // Defaults
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(200);
-            request.setHandled(true);
             if (!"get".equals(request.getMethod().toLowerCase())) {
-                response.addCookie(RECENT_POSTBACK_COOKIE, String.valueOf(mils()), 15);
+                response.addCookie(IRequest.RECENT_POSTBACK_COOKIE, String.valueOf(mils()), 15);
             }
 
             // trigger PreRequest hooks
@@ -112,21 +111,36 @@ public class RequestProcessor {
         } catch(RedirectException e) {
             response.addHeader("Location", e.getUrl());
             response.setStatus(e.getStatusCode());
-            request.setHandled(true);
         } catch(NotFoundException e) {
             try {
                 handleNotFound(e.getMessage());
             } catch (Exception ex) {
                 handleError(ex);
             }
+        } catch(InvocationTargetException e) {
+            if (e.getTargetException() instanceof RedirectException) {
+                RedirectException target = (RedirectException)e.getTargetException();
+                response.addHeader("Location", target.getUrl());
+                response.setStatus(target.getStatusCode());
+            } else if (e.getTargetException() instanceof NotFoundException) {
+                try {
+                    handleNotFound(e.getTargetException().getMessage());
+                } catch (Exception ex) {
+                    handleError(ex);
+                }
+            } else {
+                handleError(e);
+            }
         } catch(Exception ex) {
             handleError(ex);
         }
+
         HookRegistry.instance().dispatch(
                 PostRequestHookHandler.class,
                 new RequestInfoHolder()
                         .setRequest(request)
                         .setResponse(response));
+        XFrameOptionsHandler.handle(request, response);
 
         Log.info("status={0} {1}={2}", response.getStatus(), request.getMethod(), request.getPath());
 
@@ -171,6 +185,11 @@ public class RequestProcessor {
         if (redirectUrl != null) {
             throw new RedirectException(redirectUrl, 301);
         }
+
+        if (request.getPath().equals("/favicon.ico") && new File(Settings.instance().getTargetFolder() + "/assets/favicon.ico").exists()) {
+            throw new RedirectException("/st-assets/favicon.ico", 301);
+        }
+
 
         markHandled(404, "No route matches");
         throw new NotFoundException("The page you requested could not be found.");
@@ -239,10 +258,14 @@ public class RequestProcessor {
         if (!empty(item.getRelCanonical())) {
             response.getMeta().setCanonicalUrl(item.getRelCanonical());
         }
+        if (!empty(item.getContentType())) {
+            response.setContentType(item.getContentType());
+        }
         markHandled(200, "slug->displayableItemController for id={0} slug={1} controller={2}", baseItem.getId(), item.getSlug(), baseItem.getController().getClass().getName());
         String output = ((DisplayableModelController)baseItem.getController()).render(item, ctx);
         sendContentResponse(output);
     }
+
 
 
     /*******************************************
@@ -318,7 +341,14 @@ public class RequestProcessor {
                     val = arg.getDefaultValue();
             }
             if (arg.getTargetClass() != null && val != null && !"ObjectParam".equals(arg.getType())) {
-                val = PropertyUtils.transform(val, arg.getTargetClass());
+                try {
+                    val = PropertyUtils.transform(val, arg.getTargetClass());
+                } catch (Exception e) {
+                    throw new ClientException("The argument: " + arg + " could not be coerced to type " + arg.getTargetClass().getSimpleName(), 400);
+                }
+            }
+            if ("BodyParam".equals(arg.getType())) {
+                validateRequestArgument(arg, val);
             }
             methodArgs.add(val);
         }
@@ -343,7 +373,12 @@ public class RequestProcessor {
                     throw new UsageException("Passed in " + methodArgs.size() + " arguments to the method " + javaMethod.getName() + " but the method only accepts " + paramTypes.length + " arguments.");
                 }
                 Class type = paramTypes[x];
-                Object transformed = PropertyUtils.transform(arg, type);
+                Object transformed;
+                try {
+                    transformed = PropertyUtils.transform(arg, type);
+                } catch (Exception e) {
+                    throw new ClientException("The argument: " + arg + " could not be coerced to type " + type.getSimpleName(), 400);
+                }
                 //Log.info("Coercering arg {0} {1} to type {2} result is {3}:{4}", x, arg, type.getSimpleName(), transformed.getClass().getSimpleName(), transformed);
                 coercedArgs.add(transformed);
                 x++;
@@ -380,6 +415,40 @@ public class RequestProcessor {
         }
 
         return responseObjectToString(out, endpoint);
+    }
+
+    private void validateRequestArgument(RequestArg arg, Object value) {
+        if ((arg.isRequired() || !arg.isAllowEmpty()) && value == null) {
+            throw new ClientException("Body field " + arg.getName() + " must be provided.");
+        }
+        if (!arg.isAllowEmpty()) {
+            if (emptyObject(value)) {
+                throw new ClientException("Body field " + arg.getName() + " must be non-empty.");
+            }
+        }
+        if (arg.getMinLength() > 0) {
+            if (value instanceof String) {
+                if (((String) value).length() < arg.getMinLength()) {
+                    throw new ClientException("Field " + arg.getName() + " must have at least " + arg.getMinLength() + " characters.");
+                }
+            } else if (value instanceof Collection) {
+                if (((Collection) value).size() < arg.getMinLength()) {
+                    throw new ClientException("Field " + arg.getName() + " must have at least " + arg.getMinLength() + " entries.");
+                }
+            }
+        }
+        if (arg.isEmailParam()) {
+            String email = (String)value;
+            if (!GeneralUtils.isValidEmailAddress(email)) {
+                throw new ClientException("Field " + arg.getName() + " must be a valid email address.");
+            }
+        }
+        if (arg.getValidationPattern() != null) {
+            String s = (String)value;
+            if (!arg.getValidationPattern().matcher(s).matches()) {
+                throw new ClientException("Field " + arg.getName() + " does not pass validation.");
+            }
+        }
     }
 
     String responseObjectToString(Object obj, RestEndpointBase endpoint) throws Exception {
@@ -478,7 +547,8 @@ public class RequestProcessor {
         String fullPath = Settings.instance().getTargetFolder() + "/assets/" + path;
         Log.fine("Asset path={0} fullPath={1}", path, fullPath);
         File file = new File(fullPath);
-        if (!file.isFile()) {
+        String preProcessor = request.getParameter("preprocessor");
+        if (!file.isFile() && empty(preProcessor)) {
             notFound("Asset for path " + path + " is not found.");
         }
         if (!empty(request.getParameter("processor"))) {
@@ -487,8 +557,8 @@ public class RequestProcessor {
             markHandled(200, "folder-asset-with-processor");
             sendContentResponse(contents, file.lastModified(), fullPath);
         } else {
-            if (!empty(request.getParameter("externalPreProcessor"))) {
-                AssetsController.instance().externalPreProcessIfNecessary(request.getParameter("externalPreProcessor"), path);
+            if (!empty(preProcessor)) {
+                AssetsController.instance().externalPreprocessIfNecessary(preProcessor, path);
             }
             markHandled(200, "folder-asset");
             sendAssetResponse(file);
@@ -731,9 +801,7 @@ public class RequestProcessor {
         return context;
     }
 
-    static class ResponseComplete extends RuntimeException {
 
-    }
 
 
 

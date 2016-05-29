@@ -38,6 +38,9 @@ public class CommandOptionsBase {
     private String targetPath = "";
     @Option(name="-logLevel", usage="How verbose the logging is. " + ALLOWED_LEVELS)
     private String logLevel = "";
+    @Option(name="-loggingAlwaysIncludesLineNumber", usage="If true, even FINE and INFO log statements will use the stack frame to find the log line and class")
+    private boolean loggingAlwaysIncludesLineNumber = false;
+
     @Option(name="-strictnessLevel", usage="If strict, will throw exceptions for errors such as missing templates, bad configs, etc. If lax, will eat the errors and try to keep running anyway.")
     private StrictnessLevel strictnessLevel;
     @Option(name="-autoReload", usage="If a javascript file is touched, the entire server will reload. Use this only during development")
@@ -47,7 +50,7 @@ public class CommandOptionsBase {
     private String env = "local";
 
     @Option(name="-devMode", usage="Set to 'true' if you want to use the development URL for resource assets")
-    private boolean devMode = false;
+    private Boolean devMode = false;
 
     @Argument(index = 0)
     private List<String> arguments = new ArrayList<String>();
@@ -138,13 +141,21 @@ public class CommandOptionsBase {
     }
 
 
-    public boolean isDevMode() {
+    public Boolean isDevMode() {
         return devMode;
     }
 
 
-    public void setDevMode(boolean devMode) {
+    public void setDevMode(Boolean devMode) {
         this.devMode = devMode;
     }
 
+    public boolean isLoggingAlwaysIncludesLineNumber() {
+        return loggingAlwaysIncludesLineNumber;
+    }
+
+    public CommandOptionsBase setLoggingAlwaysIncludesLineNumber(boolean loggingAlwaysIncludesLineNumber) {
+        this.loggingAlwaysIncludesLineNumber = loggingAlwaysIncludesLineNumber;
+        return this;
+    }
 }

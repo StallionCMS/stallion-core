@@ -1,7 +1,8 @@
 {% extends "stallion:email/email-base.jinja" %}
 {% block main %}
-
-<h1>Verify your email address {{ user.email }} on {{ site.name }}</h1>
-<div>Follow this link:</div>
-<h5><a href="{{ verifyUrl }}">Verify your address.</a></h5>
+{% if contact.displayName %}
+<p>Hi {{ contact.displayName }},</p>
+{% endif %}
+<p>You are required to verify your email address <em>{{ contact.email }}</em> to continue using your <em>{{ site.name }}</em> account. If you never created an account at {{ site.url }}, please ignore this email.</p>
+<p>{{ button("Click here to verify your email address", verifyUrl) }}</p>
 {% endblock %}

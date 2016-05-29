@@ -44,15 +44,19 @@ public class SandboxedRequest implements IRequest {
         return request.requestUrl();
     }
 
+
+
+    @Override
+    public String getScheme() {
+        return request.getScheme();
+    }
+
+
     @Override
     public String getQueryString() {
         return request.getQueryString();
     }
 
-    @Override
-    public IRequest setHandled(Boolean val) {
-        return this;
-    }
 
     @Override
     public String getRemoteAddr() {

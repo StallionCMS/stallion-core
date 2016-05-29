@@ -17,8 +17,8 @@
 
 package io.stallion.plugins.javascript;
 
-import io.stallion.dal.base.ModelController;
-import io.stallion.dal.base.Model;
+import io.stallion.dataAccess.ModelController;
+import io.stallion.dataAccess.Model;
 import io.stallion.exceptions.UsageException;
 
 import java.util.HashSet;

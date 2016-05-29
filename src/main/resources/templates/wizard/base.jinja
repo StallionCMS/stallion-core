@@ -3,7 +3,7 @@
 <div id="layout" class="pure-g">
   <div class="sidebar pure-u-1 pure-u-md-1-4">
     <div class="header">
-      <h1 class="brand-title">{{ site.name }}</h1>
+      <h1 class="brand-title"><a href="/">{{ site.name }}</a></h1>
       <h2 class="brand-tagline">{{ site.metaDescription }}</h2>
 
       <nav class="nav">
@@ -14,6 +14,7 @@
           <li class="nav-item">
             <a class="pure-button" href="/about">About Us</a>
           </li>
+          <!--extra-sidebar-links-->
         </ul>
       </nav>
     </div>
@@ -26,8 +27,9 @@
       <div class="footer">
         <div class="pure-menu pure-menu-horizontal">
           <ul>
-            <li class="pure-menu-item"><a href="." class="pure-menu-link">About</a></li>
-            <li class="pure-menu-item"><a href="https://stallion.io" class="pure-menu-link">Stallion CMS</a></li>
+            <li class="pure-menu-item"><a href="/" class="pure-menu-link">Home</a></li>
+            <li class="pure-menu-item"><a href="/about" class="pure-menu-link">About Us</a></li>
+            <!--extra-footer-links-->
           </ul>
         </div>
       </div>

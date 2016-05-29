@@ -17,8 +17,10 @@
 
 package io.stallion.settings.childSections;
 
+import io.stallion.exceptions.ConfigException;
 import io.stallion.settings.SettingMeta;
 import io.stallion.settings.Settings;
+import io.stallion.users.Role;
 
 import static io.stallion.utils.Literals.*;
 
@@ -29,8 +31,12 @@ public class UserSettings implements SettingsSection {
     private String passwordResetPage;
     @SettingMeta(val = "/st-admin/users/verify-email-address")
     private String verifyEmailPage;
+
     @SettingMeta(valBoolean = true)
-    private Boolean syncUsersToMemory;
+    private Boolean syncAllUsersToMemory;
+
+    @SettingMeta(valInt = 10000)
+    private Integer limitSyncUsersToMemoryToCount;
 
 
     public String getFullLoginUrl() {
@@ -41,10 +47,8 @@ public class UserSettings implements SettingsSection {
         return url;
     }
 
-    @SettingMeta
-    private Boolean newAccountsAutoApproveIfEmailValid;
 
-    @SettingMeta
+    @SettingMeta(valBoolean = true)
     private Boolean newAccountsAutoApprove;
     @SettingMeta(valBoolean = true)
     private Boolean passwordResetEnabled;
@@ -54,11 +58,22 @@ public class UserSettings implements SettingsSection {
     private Boolean newAccountsAllowCreation;
     @SettingMeta(valBoolean = true)
     private Boolean newAccountsRequireValidEmail;
-    @SettingMeta(val = "member")
+    @SettingMeta(val="MEMBER")
     private String newAccountsRole;
+    @SettingMeta(val="ANON")
+    private String defaultEndpointRole;
+
     @SettingMeta(val = "")
     private String newAccountsDomainRestricted;
 
+    public void postLoad() {
+        if (Role.valueOf(newAccountsRole.toUpperCase())  == null) {
+            throw new ConfigException("Invalid role for stallion.toml settings users.newAccountsRole: " + newAccountsRole);
+        }
+        if (Role.valueOf(defaultEndpointRole.toUpperCase())  == null) {
+            throw new ConfigException("Invalid role for stallion.toml settings users.defaultEndpointRole: " + newAccountsRole);
+        }
+    }
 
     public String getLoginPage() {
         if (empty(loginPage)) {
@@ -150,21 +165,34 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
-    public Boolean getNewAccountsAutoApproveIfEmailValid() {
-        return newAccountsAutoApproveIfEmailValid;
+    public Boolean getSyncAllUsersToMemory() {
+        return syncAllUsersToMemory;
     }
 
-    public UserSettings setNewAccountsAutoApproveIfEmailValid(Boolean newAccountsAutoApproveIfEmailValid) {
-        this.newAccountsAutoApproveIfEmailValid = newAccountsAutoApproveIfEmailValid;
+    public UserSettings setSyncAllUsersToMemory(Boolean syncAllUsersToMemory) {
+        this.syncAllUsersToMemory = syncAllUsersToMemory;
         return this;
     }
 
-    public Boolean getSyncUsersToMemory() {
-        return syncUsersToMemory;
+    public Integer getLimitSyncUsersToMemoryToCount() {
+        return limitSyncUsersToMemoryToCount;
     }
 
-    public UserSettings setSyncUsersToMemory(Boolean syncUsersToMemory) {
-        this.syncUsersToMemory = syncUsersToMemory;
+    public UserSettings setLimitSyncUsersToMemoryToCount(Integer limitSyncUsersToMemoryToCount) {
+        this.limitSyncUsersToMemoryToCount = limitSyncUsersToMemoryToCount;
+        return this;
+    }
+
+    public String getDefaultEndpointRole() {
+        return defaultEndpointRole;
+    }
+    public Role getDefaultEndpointRoleObj() {
+        return Role.valueOf(defaultEndpointRole);
+    }
+
+
+    public UserSettings setDefaultEndpointRole(String defaultEndpointRole) {
+        this.defaultEndpointRole = defaultEndpointRole;
         return this;
     }
 }

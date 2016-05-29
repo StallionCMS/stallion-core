@@ -38,6 +38,8 @@ public class ExceptionInfo {
     private String requestMethod;
     private Map<String, String> requestHeaders;
     private String requestBody = "";
+    private String remoteAddr;
+    private String actualIp;
 
     public static ExceptionInfo newForException(Throwable e) {
         ExceptionInfo info = new ExceptionInfo();
@@ -47,6 +49,8 @@ public class ExceptionInfo {
         info.stackTrace = ExceptionUtils.getStackTrace(e);
         info.requestUrl = request().requestUrl();
         info.requestMethod = request().getMethod();
+        info.remoteAddr = request().getRemoteAddr();
+        info.actualIp = request().getActualIp();
         info.requestHeaders = map();
         for(String name: Collections.list(request().getHeaderNames())) {
             info.requestHeaders.put(name, request().getHeader(name));
@@ -125,5 +129,23 @@ public class ExceptionInfo {
 
     public void setRequestBody(String requestBody) {
         this.requestBody = requestBody;
+    }
+
+    public String getRemoteAddr() {
+        return remoteAddr;
+    }
+
+    public ExceptionInfo setRemoteAddr(String remoteAddr) {
+        this.remoteAddr = remoteAddr;
+        return this;
+    }
+
+    public String getActualIp() {
+        return actualIp;
+    }
+
+    public ExceptionInfo setActualIp(String actualIp) {
+        this.actualIp = actualIp;
+        return this;
     }
 }

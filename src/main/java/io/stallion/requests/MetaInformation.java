@@ -18,7 +18,7 @@
 package io.stallion.requests;
 
 import io.stallion.Context;
-import io.stallion.dal.base.MappedModel;
+import io.stallion.dataAccess.MappedModel;
 import io.stallion.utils.rss.RssLink;
 import io.stallion.settings.Settings;
 

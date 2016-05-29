@@ -33,7 +33,7 @@ import static io.stallion.Context.*;
 public class SandboxedContext {
 
     private JsPluginSettings pluginSettings;
-    private SandboxedDal dal;
+    private SandboxedDataAccess dataAccess;
     private String pluginFolder;
     private Sandbox sandbox;
     private Site site;
@@ -42,9 +42,10 @@ public class SandboxedContext {
     public SandboxedContext(String pluginFolder, Sandbox sandbox, JsPluginSettings pluginSettings) {
         this.pluginFolder = pluginFolder;
         this.pluginSettings = pluginSettings;
-        this.dal = new SandboxedDal(sandbox);
+        this.dataAccess = new SandboxedDataAccess(sandbox);
         this.sandbox = sandbox;
         this.site = new Site();
+
         this.site
                 .setName(settings().getSiteName())
                 .setTitle(settings().getDefaultTitle())
@@ -72,8 +73,11 @@ public class SandboxedContext {
         return Context.getRequest().getSandboxedRequest(sandbox);
     }
 
-    public SandboxedDal getDal() {
-        return dal;
+    public SandboxedDataAccess getDal() {
+        return dataAccess;
+    }
+    public SandboxedDataAccess getDataAccess() {
+        return dataAccess;
     }
 
     public SandboxedResponse getResponse() {

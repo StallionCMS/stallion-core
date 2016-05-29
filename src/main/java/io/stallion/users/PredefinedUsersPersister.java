@@ -17,16 +17,16 @@
 
 package io.stallion.users;
 
-import io.stallion.dal.base.DalRegistration;
-import io.stallion.dal.base.ModelController;
-import io.stallion.dal.file.JsonFilePersister;
+import io.stallion.dataAccess.DataAccessRegistration;
+import io.stallion.dataAccess.ModelController;
+import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.settings.Settings;
 
 
 public class PredefinedUsersPersister<T extends IUser> extends JsonFilePersister<T> {
 
     public void init(ModelController<T> controller) {
-        DalRegistration registration = new DalRegistration();
+        DataAccessRegistration registration = new DataAccessRegistration();
         registration.setBucket("users");
         registration.setControllerClass(controller.getClass());
         registration.setModelClass(controller.getModelClass());

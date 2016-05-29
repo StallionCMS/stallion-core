@@ -21,8 +21,8 @@ import io.stallion.Context;
 import static io.stallion.Context.*;
 import static org.junit.Assert.assertEquals;
 
-import io.stallion.dal.file.TextFilePersister;
-import io.stallion.dal.file.TextItem;
+import io.stallion.dataAccess.file.TextFilePersister;
+import io.stallion.dataAccess.file.TextItem;
 import io.stallion.services.Log;
 import io.stallion.testing.MockResponse;
 import io.stallion.testing.AppIntegrationCaseBase;
@@ -110,7 +110,7 @@ public class AMinimalSiteTest extends AppIntegrationCaseBase {
         response = client.get("/exception-generating-page");
         Log.finer("500 result: {0}", response.getContent());
         assertEquals(500, response.getStatus());
-        Assert.assertTrue(response.getContent().contains("<h1>There was an error trying to handle your request</h1>"));
+        Assert.assertTrue(response.getContent().contains("There was an error trying to handle your request"));
     }
 
 

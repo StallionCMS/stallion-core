@@ -1,0 +1,21 @@
+{
+  "deleted" : false,
+  "isNewInsert" : false,
+  "username" : "unittests@stallion.io",
+  "displayName" : "Unittest Stallion",
+  "givenName" : "Unittest",
+  "familyName" : "Stallion",
+  "email" : "unittests@stallion.io",
+  "role" : "ADMIN",
+  "orgId" : 0,
+  "groups" : [ ],
+  "secret" : "sNKY1Iw9Xghf7LEtNSZeqNwp4oH2RtDUPrVT",
+  "encryptionSecret" : "pWleJn8udGf11hoZwhg8W1Ah2pM4U9LXoQTb",
+  "timeZoneId" : "",
+  "bcryptedPassword" : "$2a$10$RPP6pdtTfCO6CdQ7mzjv4.7endTEPIsfCE9IcCIOzv8ys443LBe56",
+  "filePath" : "stallion-unittests-3d64af66-8595-45d7-87bf-7b6309b5fede.json",
+  "authorized" : false,
+  "id" : 10200,
+  "anon" : true,
+  "staff" : false
+}

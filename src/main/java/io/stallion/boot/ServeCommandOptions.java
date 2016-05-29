@@ -20,6 +20,9 @@ package io.stallion.boot;
 import io.stallion.settings.Settings;
 import org.kohsuke.args4j.Option;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ServeCommandOptions extends CommandOptionsBase {
 
@@ -28,6 +31,7 @@ public class ServeCommandOptions extends CommandOptionsBase {
 
     @Option(name="-localMode", usage="Set to 'false' if you want to simulate a server environment, with bundled assets, logging to file instead of console, etc.")
     private String localMode = null;
+
 
     @Override
     public Settings hydrateSettings(Settings settings) {
@@ -63,4 +67,6 @@ public class ServeCommandOptions extends CommandOptionsBase {
     public void setLocalMode(String localMode) {
         this.localMode = localMode;
     }
+
+
 }

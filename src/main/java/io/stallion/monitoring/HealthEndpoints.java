@@ -44,6 +44,7 @@ import static io.stallion.Context.*;
 
 public class HealthEndpoints {
 
+
     @GET
     @Path("/_st/health/check-health")
     public HealthInfo checkHealth(@QueryParam("secret") String secret, @QueryParam("failOnWarnings") Boolean failOnWarnings, @QueryParam("sections") String sections) {
@@ -190,6 +191,14 @@ public class HealthEndpoints {
     @Produces("text/html")
     @Path("/_st/health/force-exception")
     public String forceException(@QueryParam("secret") String secret) {
+        checkSecret(secret);
+        throw new WebException("A forced exception!", 500);
+    }
+
+    @GET
+    @Produces("text/html")
+    @Path("/_st/health/force-exception-get")
+    public String forceExceptionGet(@QueryParam("secret") String secret) {
         checkSecret(secret);
         throw new WebException("A forced exception!", 500);
     }

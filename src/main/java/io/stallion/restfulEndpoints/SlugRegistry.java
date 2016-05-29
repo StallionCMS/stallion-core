@@ -17,20 +17,25 @@
 
 package io.stallion.restfulEndpoints;
 
-import io.stallion.dal.base.Displayable;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.Displayable;
+import io.stallion.dataAccess.ModelController;
 import io.stallion.exceptions.UsageException;
+import io.stallion.services.Log;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 public class SlugRegistry {
     private static SlugRegistry _instance;
 
-    private Map<String, Displayable> slugMap = new HashMap<>();
+    private Map<String, BucketThing> slugMap = new HashMap<>();
     private Map<String, String> redirectMap = new HashMap<>();
 
     public SlugRegistry() {
@@ -55,11 +60,17 @@ public class SlugRegistry {
 
 
     public Collection<Displayable> listAll() {
-        return slugMap.values();
+        List<Displayable> allThings = list();
+        for(BucketThing thing: slugMap.values()) {
+            allThings.add(
+                    (Displayable)DataAccessRegistry.instance().get(thing.getBucket()).originalForId(thing.getId())
+            );
+        }
+        return allThings;
     }
 
     public SlugRegistry addDisplayable(Displayable item) {
-        getSlugMap().put(item.getSlug(), item);
+        getSlugMap().put(item.getSlug(), new BucketThing().setBucket(item.getController().getBucket()).setId(item.getId()));
         return this;
     }
 
@@ -68,14 +79,23 @@ public class SlugRegistry {
     }
 
     public Displayable lookup(String url) {
-        return getSlugMap().get(url);
+        BucketThing thing = getSlugMap().get(url);
+        Log.info("URL={0} thingId={1} thingBucket={2}", url, thing.getId(), thing.getBucket());
+        ModelController controller = DataAccessRegistry.instance().get(thing.getBucket());
+        return (Displayable)controller.originalForId(thing.getId());
     }
+
+
 
     public Displayable lookup(String url, Displayable defaultObj) {
-        return getSlugMap().getOrDefault(url, defaultObj);
+        Displayable item = lookup(url);
+        if (item == null) {
+            return defaultObj;
+        }
+        return item;
     }
 
-    public Map<String, Displayable> getSlugMap() {
+    public Map<String, BucketThing> getSlugMap() {
         return slugMap;
     }
 
@@ -95,5 +115,28 @@ public class SlugRegistry {
             return redirectMap.get(fromUrl);
         }
         return null;
+    }
+
+    public static class BucketThing {
+        private String bucket;
+        private Long id;
+
+        public String getBucket() {
+            return bucket;
+        }
+
+        public BucketThing setBucket(String bucket) {
+            this.bucket = bucket;
+            return this;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public BucketThing setId(Long id) {
+            this.id = id;
+            return this;
+        }
     }
 }

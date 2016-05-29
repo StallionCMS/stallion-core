@@ -46,14 +46,15 @@ public class TaskRequest implements IRequest {
     }
 
     @Override
-    public String getQueryString() {
+    public String getScheme() {
         return "";
     }
 
     @Override
-    public IRequest setHandled(Boolean val) {
-        return this;
+    public String getQueryString() {
+        return "";
     }
+
 
     @Override
     public String getRemoteAddr() {
