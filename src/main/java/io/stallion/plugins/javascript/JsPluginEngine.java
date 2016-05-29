@@ -198,7 +198,7 @@ public class JsPluginEngine {
 
     }
 
-
+           /*
     private void experimentalloadUnrestrictedJavascript(String fullPath, JsPluginSettings pluginSettings) throws Exception {
         ErrorManager errors = new ErrorManager();
 
@@ -234,7 +234,7 @@ public class JsPluginEngine {
 
         global.addShellBuiltins();
 
-        ScriptFunction value = ScriptFunction.createBuiltin("calc", EvalLoop.getCalcHandle2(global, context));
+        //ScriptFunction value = ScriptFunction.createBuiltin("calc", EvalLoop.getCalcHandle2(global, context));
         global.addOwnProperty("calc", 2, value);
 
         Log.info("Load js file {0}", fullPath);
@@ -246,6 +246,7 @@ public class JsPluginEngine {
 
         Log.info("Finish loading js {0}", fullPath);
     }
+    */
 
 
     public void fileChangeCallback(String jsPath) throws Exception {
