@@ -530,7 +530,8 @@ public class FilterChain<T extends Model> implements Iterable<T> {
             }
             return cached;
         }
-        List<T> things = all();
+        process(1, 1, false);
+        List<T> things = objects;
         if (things.size() > 0) {
             T thing = things.get(0);
             setCached("first", thing);

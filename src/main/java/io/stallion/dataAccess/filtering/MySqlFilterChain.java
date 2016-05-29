@@ -63,6 +63,10 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
     @Override
     protected void process(int page, int size, boolean fetchTotalCount)  {
 
+        if (page < 1) {
+            page = 0;
+        }
+
         StringBuilder whereBuilder = new StringBuilder();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT * FROM " + table + " WHERE ");
@@ -91,19 +95,23 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         }
         sqlBuilder.append(whereBuilder.toString());
         if (!Literals.empty(getSortField())) {
-            if (!getSchema().getColumns().contains(getSortField())) {
+            if (!"id".equals(getSortField()) && !getSchema().getColumns().contains(getSortField())) {
                 throw new UsageException(MessageFormat.format("Sort field not found in schema: field={0} schema={1}", getSortField(), clazz.getName()));
             }
             sqlBuilder.append(" ORDER BY " + getSortField() + " " + getSortDirection().forSql());
         }
-        sqlBuilder.append(" LIMIT " + (page) * size + ", " + size);
+        sqlBuilder.append(" LIMIT " + (page - 1) * size + ", " + size);
 
         Object[] paramObjects = params.toArray();
         setObjects(DB.instance().query(clazz, sqlBuilder.toString(), paramObjects));
 
-        if (fetchTotalCount) {
+        if (page == 1 && getObjects().size() < size) {
+            setMatchingCount(getObjects().size());
+        } else if (fetchTotalCount) {
             String countSql = "SELECT COUNT(*) FROM " + table + " WHERE " + whereBuilder.toString();
-            setMatchingCount(DB.instance().queryScalar(countSql, paramObjects));
+            Object count = DB.instance().queryScalar(countSql, paramObjects);
+            Integer countInt = count instanceof Integer ? (Integer)count : ((Long)count).intValue();
+            setMatchingCount(countInt);
         }
 
     }
