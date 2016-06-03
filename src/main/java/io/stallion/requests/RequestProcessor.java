@@ -91,7 +91,7 @@ class RequestProcessor {
                 OAuthApprovalController.instance().checkHeaderAndAuthorizeUserForRequest(request);
             }
             // Defaults
-            response.setContentType("text/html;charset=utf-8");
+            response.setDefaultContentType("text/html;charset=utf-8");
             response.setStatus(200);
             if (!"get".equals(request.getMethod().toLowerCase())) {
                 response.addCookie(IRequest.RECENT_POSTBACK_COOKIE, String.valueOf(mils()), 15);
@@ -754,7 +754,7 @@ class RequestProcessor {
         if (request.getIsJsonRequest() != null) {
             return request.getIsJsonRequest();
         }
-        if (!StringUtils.isEmpty(response.getContentType())) {
+        if (response.isContentTypeSet() && !StringUtils.isEmpty(response.getContentType())) {
             if ("application/json".equals(response.getContentType())) {
                 return true;
             } else {

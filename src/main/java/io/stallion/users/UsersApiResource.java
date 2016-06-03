@@ -24,6 +24,7 @@ import io.stallion.assets.DefinedBundle;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.exceptions.*;
+import io.stallion.requests.validators.SafeMerger;
 import io.stallion.restfulEndpoints.*;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -124,6 +125,32 @@ public class UsersApiResource implements EndpointResource {
         }
         return map(val("user", u), val("requireValidEmail", requireValidEmail));
     }
+
+    @POST
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Member.class)
+    @MinRole(Role.ADMIN)
+    @Path("/admin-create-user")
+    public Object adminCreateUser(@ObjectParam User newUser) {
+        if (empty(newUser.getEmail())) {
+            newUser.setEmail(newUser.getUsername());
+        } else if (empty(newUser.getUsername())) {
+            newUser.setUsername(newUser.getEmail());
+        }
+        IUser user = SafeMerger.with()
+                .nonEmpty("email", "username", "displayName", "role")
+                .optional("familyName", "givenName")
+                .merge(newUser);
+        IUser existing = UserController.instance().forEmail(user.getEmail());
+        if (existing != null) {
+            throw new ClientException("A user with that email address already exists.");
+        }
+
+        user.setApproved(true);
+        UserController.instance().createUser(user);
+        return user;
+    }
+
 
 
     @POST

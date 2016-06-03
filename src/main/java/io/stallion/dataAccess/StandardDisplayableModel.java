@@ -148,6 +148,9 @@ public class StandardDisplayableModel extends MappedModel implements Displayable
      */
     public String getSlugForCssId() {
         String s = slug;
+        if (slug == null) {
+            return "";
+        }
         if (s.startsWith("/")) {
             s = s.substring(1);
         }

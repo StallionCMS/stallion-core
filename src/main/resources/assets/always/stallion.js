@@ -123,7 +123,7 @@ if (window.$ && !window.jQuery) {
             $btn = $form.find('.pure-button-primary[type="submit"]');
         }
         if (!$btn.length) {
-            $btn = $form.find('type=["submit"]');
+            $btn = $form.find('[type="submit"]');
         }
         if (!$btn.length) {
             return null;
@@ -490,9 +490,18 @@ Date.prototype.format = function (mask, utc) {
 
  var RiotDataBindMixin = {
      init: function() {
+
+
+         this.on('before-mount', function() {
+             this.formData = this.opts.formData || {};
+         });
+
          this.on('update', function() {
              var self = this;
-             self.formData = self.opts.formData || {};
+             if (self.formData === undefined) {
+                  self.formData = self.opts.formData || {};
+             }
+
              var seenKeys = [];
              Object.keys(self).forEach(function(key) {
                  if (seenKeys.indexOf(key) > -1) {
@@ -544,6 +553,10 @@ Date.prototype.format = function (mask, utc) {
              });
          });
      },
+     processForm: function() {
+         this.formData = this.getFormData();
+         return this.formData;
+     },
      getFormData: function() {
          var self = this;
          var data = {};
@@ -591,9 +604,12 @@ Date.prototype.format = function (mask, utc) {
          return data;
      },
      updateData: function(formData) {
-         this.opts.formData = formData;
-         this.update();
+         this.update({formData: formData});
+     },
+     updateFormData: function(formData) {
+         this.updateData(formData);
      }
+
  };
 
  if (window.riot) {

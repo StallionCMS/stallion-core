@@ -50,6 +50,11 @@ public class MockResponse<T> extends StResponse {
         outputStream = new MockOutputStream();
     }
 
+    @Override
+    public StResponse setDefaultContentType(String contentType) {
+        return this;
+    }
+
     public StResponse setContentType(String contentType) {
         this.contentType = contentType;
         return this;

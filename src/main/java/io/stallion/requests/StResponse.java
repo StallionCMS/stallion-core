@@ -24,12 +24,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import static io.stallion.utils.Literals.empty;
+
 public class StResponse {
     private HttpServletResponse response;
     private MetaInformation meta = new MetaInformation();
     private PerPageLiterals pageFooterLiterals = new PerPageLiterals();
     private PerPageLiterals pageHeadLiterals = new PerPageLiterals();
     private SandboxedResponse sandboxedResponse;
+    private String contentType = "";
+
 
     public StResponse() {
 
@@ -44,7 +48,18 @@ public class StResponse {
         return this.response;
     }
 
+
+    public StResponse setDefaultContentType(String contentType) {
+        response.setContentType(contentType);
+        return this;
+    }
+
+    public boolean isContentTypeSet() {
+        return !empty(contentType);
+    }
+
     public StResponse setContentType(String contentType) {
+        this.contentType = contentType;
         response.setContentType(contentType);
         return this;
     }

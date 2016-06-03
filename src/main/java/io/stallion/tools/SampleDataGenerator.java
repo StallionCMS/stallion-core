@@ -38,6 +38,7 @@ public abstract class SampleDataGenerator {
         if (seenIds.contains(id)) {
             throw new UsageException("The id " + extra + " has already been used.");
         }
+        seenIds.add(id);
         return id;
     }
 
