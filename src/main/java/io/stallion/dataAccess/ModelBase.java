@@ -40,7 +40,7 @@ public class ModelBase implements Model {
 
     // Weird name to not conflict with JPA
     @Transient
-    private Long _id;
+    private Long id;
     private Boolean deleted = false;
     private Boolean isNewInsert = false;
     private String _bucket;
@@ -53,11 +53,11 @@ public class ModelBase implements Model {
 
     @JsonView(RestrictedViews.Public.class)
     public Long getId() {
-        return _id;
+        return id;
     }
 
     public <Y extends Model> Y setId(Long id) {
-        this._id = id;
+        this.id = id;
         return (Y)this;
     }
 

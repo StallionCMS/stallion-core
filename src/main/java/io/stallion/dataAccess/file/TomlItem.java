@@ -18,9 +18,10 @@
 package io.stallion.dataAccess.file;
 
 import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.MappedModelBase;
 
 
-public class TomlItem extends MappedModel implements ModelWithFilePath {
+public class TomlItem extends MappedModelBase implements ModelWithFilePath {
     private String filePath;
 
     @Override

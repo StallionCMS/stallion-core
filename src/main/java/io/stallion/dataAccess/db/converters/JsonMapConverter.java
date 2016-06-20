@@ -23,12 +23,17 @@ import io.stallion.utils.json.JSON;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.stallion.utils.Literals.*;
+
 
 public class JsonMapConverter implements JsonAttributeConverter<Map> {
 
 
     @Override
     public Map convertToEntityAttribute(String json) {
+        if (empty(json)) {
+            return map();
+        }
         TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
         Object o = JSON.parse(json, typeRef);
         return (Map<String, Object>) o;

@@ -27,7 +27,7 @@ import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 
-public class DisplayableModelController<T extends Model> extends StandardModelController<T> {
+public class DisplayableModelController<T extends Displayable> extends StandardModelController<T> {
     private String defaultTemplate = "";
 
     @Override
@@ -43,9 +43,15 @@ public class DisplayableModelController<T extends Model> extends StandardModelCo
         return this;
     }
 
-    public String render(Displayable item, Map<String, Object> context) {
-        String template = or(getDefaultTemplate(), settings().getPageTemplate());
-        template = or(((Displayable) item).getTemplate(), template);
+    public String getTemplate(T model) {
+        if (!empty(model.getTemplate())) {
+            return model.getTemplate();
+        }
+        return getDefaultTemplate();
+    }
+
+    public String render(T item, Map<String, Object> context) {
+        String template = or(getTemplate(item), settings().getPageTemplate());
         return TemplateRenderer.instance().renderTemplate(template, context);
     }
 

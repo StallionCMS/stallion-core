@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.MappedModelBase;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.utils.GeneralUtils;
 
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 @JsonSerialize(using = JsModelSerializer.class)
-public abstract class BaseJavascriptModel extends MappedModel {
+public abstract class BaseJavascriptModel extends MappedModelBase {
     public static String table;
     public abstract Map properties();
     @JsonIgnore

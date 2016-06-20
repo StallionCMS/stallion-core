@@ -19,6 +19,7 @@ package io.stallion.tests.integration.filePersistenceSite;
 
 import io.stallion.Context;
 import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.MappedModelBase;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.dataAccess.file.TextItem;
@@ -79,9 +80,9 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
     @Test
     public void testJsonMapCrud() throws Exception {
         ModelController dossiers = Context.dal().get("dossiers");
-        List<ModelBase> items = dossiers.filter("birth_year", 1867).all();
+        List<MappedModelBase> items = dossiers.filter("birth_year", 1867).all();
         Assert.assertEquals(1, items.size());
-        MappedModel item = (MappedModel)items.get(0);
+        MappedModelBase item = (MappedModelBase)items.get(0);
         Assert.assertEquals("Harry", item.get("first_name"));
 
         Long bounty = new Date().getTime();
@@ -99,7 +100,7 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
         Assert.assertEquals(bounty, harry.get("bounty"));
 
         // Add a new dossier
-        MappedModel jesse = new MappedModel();
+        MappedModelBase jesse = new MappedModelBase();
         jesse.setId(100L);
         jesse.put("first_name", "jesse");
         jesse.put("last_name", "James");
@@ -112,7 +113,7 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
         Assert.assertEquals(2, items.size());
         items = dossiers.filter("birth_year", 1867).filter("first_name", "jesse").all();
         Assert.assertEquals(1, items.size());
-        jesse = (MappedModel)items.get(0);
+        jesse = (MappedModelBase)items.get(0);
         Assert.assertEquals("James", jesse.get("last_name"));
         Assert.assertEquals(bounty, jesse.get("bounty"));
 
@@ -122,7 +123,7 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
         Assert.assertEquals(2, items.size());
         items = dossiers.filter("birth_year", 1867).filter("first_name", "jesse").all();
         Assert.assertEquals(1, items.size());
-        jesse = (MappedModel)items.get(0);
+        jesse = (MappedModelBase)items.get(0);
         Assert.assertEquals("James", jesse.get("last_name"));
         Assert.assertEquals(bounty, jesse.get("bounty"));
 

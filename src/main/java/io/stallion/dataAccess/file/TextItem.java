@@ -17,6 +17,7 @@
 
 package io.stallion.dataAccess.file;
 
+import io.stallion.dataAccess.MappedModel;
 import io.stallion.dataAccess.StandardDisplayableModel;
 
 import java.time.LocalDateTime;
@@ -27,9 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.stallion.utils.Literals.map;
 
-public class TextItem extends StandardDisplayableModel {
 
+public class TextItem extends StandardDisplayableModel implements MappedModel {
+
+    private Map<String, Object> attributes = map();
 
     private List<String> tags = null;
     private List<StElement> elements = null;
@@ -99,4 +103,14 @@ public class TextItem extends StandardDisplayableModel {
 
 
 
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
 }

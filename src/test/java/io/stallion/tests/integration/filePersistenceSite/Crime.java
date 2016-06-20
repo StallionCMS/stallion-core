@@ -19,12 +19,13 @@ package io.stallion.tests.integration.filePersistenceSite;
 
 import io.stallion.Context;
 import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.MappedModelBase;
 import io.stallion.dataAccess.ModelController;
 
 import java.util.*;
 
 
-public class Crime extends MappedModel {
+public class Crime extends MappedModelBase {
 
     public static ModelController<Crime> dal() {
         return (ModelController<Crime>) Context.dal().get("crimes");

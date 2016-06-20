@@ -19,6 +19,7 @@ package io.stallion.requests;
 
 import io.stallion.Context;
 import io.stallion.dataAccess.MappedModel;
+import io.stallion.dataAccess.ModelBase;
 import io.stallion.utils.rss.RssLink;
 import io.stallion.settings.Settings;
 
@@ -30,7 +31,7 @@ import java.util.Set;
 import static io.stallion.utils.Literals.*;
 
 
-public class MetaInformation extends MappedModel {
+public class MetaInformation extends ModelBase {
     private String title = "";
     private String description = "";
     private String author = "";

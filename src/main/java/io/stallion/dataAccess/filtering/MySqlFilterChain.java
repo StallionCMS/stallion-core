@@ -28,6 +28,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.stallion.utils.Literals.apply;
+
 /**
  * A filter chain that generates a MySQL query, rather than operating on
  * an in memory datastructure
@@ -64,7 +66,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
     protected void process(int page, int size, boolean fetchTotalCount)  {
 
         if (page < 1) {
-            page = 0;
+            page = 1;
         }
 
         StringBuilder whereBuilder = new StringBuilder();
@@ -95,7 +97,8 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         }
         sqlBuilder.append(whereBuilder.toString());
         if (!Literals.empty(getSortField())) {
-            if (!"id".equals(getSortField()) && !getSchema().getColumns().contains(getSortField())) {
+            List<String> columnNames = apply(getSchema().getColumns(), col->col.getName());
+            if (!"id".equals(getSortField()) && !columnNames.contains(getSortField().toLowerCase())) {
                 throw new UsageException(MessageFormat.format("Sort field not found in schema: field={0} schema={1}", getSortField(), clazz.getName()));
             }
             sqlBuilder.append(" ORDER BY " + getSortField() + " " + getSortDirection().forSql());

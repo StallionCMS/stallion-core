@@ -37,34 +37,34 @@ import java.util.Set;
  * that contain the fields.
  *
  */
-public class MappedModel extends ModelBase implements Map<String, Object>  {
-    private Map<String, Object> attributes = new HashMap<String, Object>();
+public interface MappedModel extends Map<String, Object>  {
+    //private Map<String, Object> attributes = new HashMap<String, Object>();
 
-    public int size() {
+    public default int size() {
         return toCompleteMap().size();
     }
 
     @JsonIgnore
-    public boolean isEmpty() {
+    public default boolean isEmpty() {
         return toCompleteMap().isEmpty();
     }
 
 
-    public boolean containsKey(String key) {
+    public default boolean containsKey(String key) {
         return getAttributes().containsKey(key) || PropertyUtils.isReadable(this, key);
     }
 
-    public boolean containsKey(Object key) {
+    public default boolean containsKey(Object key) {
         return getAttributes().containsKey(key) || PropertyUtils.isReadable(this, key.toString());
     }
 
 
-    public boolean containsValue(Object value) {
+    public default boolean containsValue(Object value) {
         return getAttributes().containsValue(value);
     }
 
 
-    public Object get(Object key) {
+    public default Object get(Object key) {
         try {
             if (PropertyUtils.isReadable(this, key.toString())) {
 
@@ -77,7 +77,7 @@ public class MappedModel extends ModelBase implements Map<String, Object>  {
         }
     }
 
-    public Object put(String key, Object value) {
+    public default Object put(String key, Object value) {
         try {
             if (key.equals("id") || key.equals("lastModifiedMillis") && !(value instanceof Long)) {
                 if (value instanceof Double) {
@@ -107,35 +107,35 @@ public class MappedModel extends ModelBase implements Map<String, Object>  {
     }
 
 
-    public Object remove(Object obj) {
+    public default Object remove(Object obj) {
         return getAttributes().remove(obj);
     }
 
 
-    public void putAll(Map<? extends String, ? extends Object> m) {
+    public default void putAll(Map<? extends String, ? extends Object> m) {
         getAttributes().putAll(m);
     }
 
 
-    public void clear() {
+    public default void clear() {
 
     }
 
-    public Set<String> keySet() {
+    public default Set<String> keySet() {
         return toCompleteMap().keySet();
     }
 
 
-    public Collection<Object> values() {
+    public default Collection<Object> values() {
         return toCompleteMap().values();
     }
 
 
-    public Set<Map.Entry<String, Object>> entrySet() {
+    public default Set<Map.Entry<String, Object>> entrySet() {
         return toCompleteMap().entrySet();
     }
 
-    private Map<String, Object> toCompleteMap() {
+    default Map<String, Object> toCompleteMap() {
         Map map = PropertyUtils.getProperties(this, JsonIgnore.class);
         for(Map.Entry<String, Object> entry: getAttributes().entrySet()) {
             map.put(entry.getKey(), entry.getValue());
@@ -144,11 +144,8 @@ public class MappedModel extends ModelBase implements Map<String, Object>  {
     }
 
     @JsonIgnore
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
+    public Map<String, Object> getAttributes();
 
-    public void setAttributes(Map<String, Object> attributes) {
-        this.attributes = attributes;
-    }
+    public void setAttributes(Map<String, Object> attributes);
+
 }

@@ -38,7 +38,7 @@ import static io.stallion.utils.Literals.list;
 /**
  * A base class for model objects that can be rendered as web pages.
  */
-public class StandardDisplayableModel extends MappedModel implements Displayable {
+public class StandardDisplayableModel extends ModelBase implements Displayable {
     // Unfortunately these fields all have to be null, so when the object is passed in from
     // a JSON web request, we can identify which fields are set and which are not
     private String title;

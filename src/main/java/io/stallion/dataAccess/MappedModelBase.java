@@ -15,27 +15,30 @@
  *
  */
 
-package io.stallion.dataAccess.file;
+package io.stallion.dataAccess;
 
-import io.stallion.dataAccess.MappedModel;
-import io.stallion.dataAccess.MappedModelBase;
+import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.*;
+
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.stallion.services.Log;
 
 
-public class JsonItem extends MappedModelBase implements ModelWithFilePath {
-    private String filePath;
+public class MappedModelBase extends ModelBase implements MappedModel {
+    private Map<String, Object> attributes = map();
 
+    @JsonIgnore
     @Override
-    public String generateFilePath() {
-        return getId() + ".json";
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
-    @Override
-    public String getFilePath() {
-        return filePath;
-    }
 
     @Override
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
     }
 }

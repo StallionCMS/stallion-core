@@ -122,7 +122,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
             registration.setWritable(folder.getWritable());
             if (!StringUtils.isBlank(folder.getType()) && folder.getType().equals("json")) {
                 registration.setControllerClass(StandardModelController.class);
-                registration.setModelClass(MappedModel.class);
+                registration.setModelClass(MappedModelBase.class);
                 registration.setPersisterClass(JsonFilePersister.class);
             } else if (!StringUtils.isBlank(folder.getType()) && folder.getType().equals("toml")) {
                 registration.setControllerClass(TomlItemController.class);

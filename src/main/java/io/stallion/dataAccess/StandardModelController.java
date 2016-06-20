@@ -65,7 +65,7 @@ public class StandardModelController<T extends Model> implements ModelController
         this.writable = registration.isWritable();
         this.modelClass = (Class<T>)registration.getModelClass();
         if (this instanceof DisplayableModelController) {
-            DisplayableModelController<T> c = (DisplayableModelController)this;
+            DisplayableModelController c = (DisplayableModelController)this;
             c.setDefaultTemplate(or(registration.getTemplatePath(), Settings.instance().getPageTemplate()));
         }
     }
