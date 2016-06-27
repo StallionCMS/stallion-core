@@ -25,11 +25,11 @@ import io.stallion.users.Role;
 import static io.stallion.utils.Literals.*;
 
 public class UserSettings implements SettingsSection {
-    @SettingMeta(val = "/st-admin/users/login")
+    @SettingMeta(val = "/st-users/login")
     private String loginPage;
-    @SettingMeta(val = "/st-admin/users/reset-password")
+    @SettingMeta(val = "/st-users/reset-password")
     private String passwordResetPage;
-    @SettingMeta(val = "/st-admin/users/verify-email-address")
+    @SettingMeta(val = "/st-users/verify-email")
     private String verifyEmailPage;
 
     @SettingMeta(valBoolean = true)
@@ -63,6 +63,9 @@ public class UserSettings implements SettingsSection {
     @SettingMeta(val="ANON")
     private String defaultEndpointRole;
 
+    @SettingMeta(valBoolean = false)
+    private Boolean disableStLoginParam;
+
     @SettingMeta(val = "")
     private String newAccountsDomainRestricted;
 
@@ -77,7 +80,7 @@ public class UserSettings implements SettingsSection {
 
     public String getLoginPage() {
         if (empty(loginPage)) {
-            return "/st-admin/users/login";
+            return "/st-users/login";
         }
         return loginPage;
     }
@@ -193,6 +196,15 @@ public class UserSettings implements SettingsSection {
 
     public UserSettings setDefaultEndpointRole(String defaultEndpointRole) {
         this.defaultEndpointRole = defaultEndpointRole;
+        return this;
+    }
+
+    public Boolean getDisableStLoginParam() {
+        return disableStLoginParam;
+    }
+
+    public UserSettings setDisableStLoginParam(Boolean disableStLoginParam) {
+        this.disableStLoginParam = disableStLoginParam;
         return this;
     }
 }

@@ -22,7 +22,9 @@ import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.requests.RequestHandler;
+import io.stallion.restfulEndpoints.RestEndpointBase;
 import io.stallion.restfulEndpoints.SlugRegistry;
+import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 
 import org.eclipse.jetty.server.Server;
@@ -31,6 +33,7 @@ import sun.misc.SignalHandler;
 
 import javax.servlet.MultipartConfigElement;
 import java.text.MessageFormat;
+import java.util.Map;
 
 
 public class StallionServer implements StallionRunAction<ServeCommandOptions> {
@@ -78,6 +81,7 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
                 EndpointsRegistry.instance().getEndpoints().size(),
                 SlugRegistry.instance().getSlugMap().size()
         ));
+
 
         // If we are in debug mode, file system changes will send a signal, which
         // will then be caught, triggering a reload.

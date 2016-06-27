@@ -14,7 +14,7 @@
         var data = stallion.formToData(formEle);
 
         stallion.request({
-            url: '/st-admin/users/submit-login',
+            url: '/st-users/submit-login',
             method: 'POST',
             data: data,
             form: formEle,

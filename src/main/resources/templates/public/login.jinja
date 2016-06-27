@@ -7,7 +7,7 @@
             <fieldset>
                 {% if user.username %}
                    <div class="logged-in-as-box">
-                   <small>You are currently logged in as <em>{{ user.username }}</em> with role level <em>{{ user.role.toString().toLowerCase() }}</em>. <a href="/st-admin/users/logoff">Logoff</a></small>
+                   <small>You are currently logged in as <em>{{ user.username }}</em> with role level <em>{{ user.role.toString().toLowerCase() }}</em>. <a href="/st-users/logoff">Logoff</a></small>
                    {% if not user.approved %}
                        {% if not user.emailVerified %}
                        <br><b><small><a href="">You must verify your email address.</a></small></b>
@@ -37,12 +37,12 @@
         </form>
         {% if allowReset %}
         <div class="st-top-space">
-            <a href="/st-admin/users/reset-password">Forgot your password?</a>
+            <a href="/st-users/reset-password">Forgot your password?</a>
         </div>
         {% endif %}
         {% if allowRegister %}
         <div class="st-top-space">
-            <a href="/st-admin/users/register?stReturnUrl={{ returnUrl }}">Register as a new user</a>
+            <a href="/st-users/register?stReturnUrl={{ returnUrl }}">Register as a new user</a>
         </div>
         {% endif %}
     </div>

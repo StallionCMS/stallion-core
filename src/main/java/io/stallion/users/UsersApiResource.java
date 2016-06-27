@@ -41,8 +41,26 @@ import java.util.Map;
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
-
+@Path("/st-users")
 public class UsersApiResource implements EndpointResource {
+
+    public static void register() {
+        if (Settings.instance().getUsers().getEnableDefaultEndpoints()) {
+            EndpointsRegistry.instance().addResource("", new UsersApiResource());
+
+            DefinedBundle.register(new DefinedBundle(
+                    "userAdminStylesheets", ".css",
+
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/admin.css"),
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
+            ));
+            DefinedBundle.register(new DefinedBundle(
+                    "userAdminJavascripts", ".js",
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js"),
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-table-riot.tag").setProcessor("riot")
+            ));
+        }
+    }
 
     @GET
     @Path("/login")
@@ -518,22 +536,19 @@ public class UsersApiResource implements EndpointResource {
         return true;
     }
 
-
-    public static void register() {
-        if (Settings.instance().getUsers().getEnableDefaultEndpoints()) {
-            EndpointsRegistry.instance().addResource("/st-admin/users", new UsersApiResource());
-
-            DefinedBundle.register(new DefinedBundle(
-                    "userAdminStylesheets", ".css",
-
-                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/admin.css"),
-                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css")
-            ));
-            DefinedBundle.register(new DefinedBundle(
-                    "userAdminJavascripts", ".js",
-                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js"),
-                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-table-riot.tag").setProcessor("riot")
-            ));
+    @Path("/selenium/get-reset-token")
+    @GET
+    @Produces("application/json")
+    public Map getResetToken(@QueryParam("email") String email, @QueryParam("secret") String secret) {
+        if (!Settings.instance().getHealthCheckSecret().equals(secret)) {
+            throw new ClientException("Invalid or missing ?secret= query param. Secret must equal the healthCheckSecret in settings.");
         }
+        if (!email.startsWith("selenium+resettest+") || !email.endsWith("@stallion.io")) {
+            throw new ClientException("Invalid email address. Must be a stallion selenium email.");
+        }
+        IUser user = UserController.instance().forEmail(email);
+        String token = UserController.instance().makeEncryptedToken(user, "reset", user.getResetToken());
+        return map(val("resetToken", token));
     }
+
 }

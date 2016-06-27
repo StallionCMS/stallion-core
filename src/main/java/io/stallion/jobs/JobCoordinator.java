@@ -110,16 +110,11 @@ public class JobCoordinator extends Thread {
                 Log.exception(e, "Error executing jobs in the main job coordinator loop!!!");
             }
 
-            //// SLEEP UNTIL THE NEXT MINUTE
-            // round to the nearest minute, then find 1 minute from then, then sleep for the delta seconds
+
+            // Find the seconds until the next minute, sleep until 10 seconds into the next minute
             ZonedDateTime now = utcNow();
-            ZonedDateTime nextMinute = utcNow();
-            if (now.getSecond() > 30) {
-                nextMinute = now.withSecond(0).plusMinutes(2);
-            } else {
-                nextMinute = now.withSecond(0).plusMinutes(1);
-            }
-            Long waitSeconds = nextMinute.toInstant().getEpochSecond() - now.toInstant().getEpochSecond();
+            ZonedDateTime nextMinute = now.withSecond(0).plusMinutes(1);
+            Long waitSeconds = (nextMinute.toInstant().getEpochSecond() - now.toInstant().getEpochSecond()) + 10;
             try {
                 Thread.sleep(waitSeconds*1000);
             } catch (InterruptedException e) {
@@ -155,9 +150,9 @@ public class JobCoordinator extends Thread {
                 Log.finer("No job definition found");
                 return;
             }
-            // Something is wonky, put it back into the queue and keep processing
-            if (definition.getNextRunAt() == null || definition.getNextRunAt().isBefore(now)) {
-                Log.finer("Job definition is null or a previous time: {0} {1}", definition.getName(), definition.getNextRunAt());
+            // If a job is stale by more than five minutes, something is wonky, put it back into the queue and keep processing
+            if (definition.getNextRunAt() == null || definition.getNextRunAt().plusMinutes(5).isBefore(now)) {
+                Log.info("Job definition is null or a previous time: {0} {1}", definition.getName(), definition.getNextRunAt());
                 definition.setNextRunAt(definition.getSchedule().nextAt(now));
                 if (definition.getNextRunAt().isBefore(now)) {
                     Log.warn("Something is very wrong. Next run at is being calculated to be before the current time! {0} {1}", definition.getName(), definition.getNextRunAt());
@@ -317,14 +312,16 @@ public class JobCoordinator extends Thread {
             infos.add(health);
             JobStatus status = JobStatusController.instance().getOrCreateForName(job.getName());
             // TODO match the names on all these fields;
-            health.setRunningNow(status.getStartedAt() > status.getCompletedAt());
+            health.setRunningNow(status.getStartedAt() > status.getCompletedAt() && status.getStartedAt() > status.getFailedAt());
             health.setError(status.getError());
             health.setJobName(job.getName());
+            health.setLastFailedAt(status.getFailedAt());
             health.setLastFinishedAt(status.getCompletedAt());
             health.setLastRunSucceeded(status.getFailedAt()==0);
             health.setExpectCompleteBy(status.getShouldSucceedBy());
             health.setLastFinishedAt(status.getCompletedAt());
             health.setLastRunTime(status.getLastDurationSeconds());
+            health.setFailCount(status.getFailCount());
         }
         return infos;
     }

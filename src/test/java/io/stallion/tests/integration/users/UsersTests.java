@@ -53,25 +53,25 @@ public class UsersTests extends AppIntegrationCaseBase {
         //assertTrue(BCrypt.checkpw("a", hashed));
         Context.getSettings().setDevMode(true);
 
-        response = client.get("/st-admin/users/login");
+        response = client.get("/st-users/login");
         Log.finer("login html: {0}", response.getContent());
         assertEquals(200, response.getStatus());
 
-        response = client.post("/st-admin/users/submit-login",
+        response = client.post("/st-users/submit-login",
                 map(
                         val("username", "unittests@stallion.io"),
                         val("rememberMe", false),
                         val("password", "invalid")));
         assertEquals(403, response.getStatus());
 
-        response = client.post("/st-admin/users/submit-login",
+        response = client.post("/st-users/submit-login",
                 map(
                         val("username", "unittests@stallion.io"),
                         val("rememberMe", true),
                         val("password", "unitstallioncaseword")));
         assertEquals(200, response.getStatus());
 
-        MockRequest req = new MockRequest("/st-admin/users/current-user-info", "GET");
+        MockRequest req = new MockRequest("/st-users/current-user-info", "GET");
         String userCookie = response.getCookie(UserController.USER_COOKIE_NAME).getValue();
         Log.info("User cookie {0}", userCookie);
         req.setCookies(new Cookie(UserController.USER_COOKIE_NAME, userCookie));

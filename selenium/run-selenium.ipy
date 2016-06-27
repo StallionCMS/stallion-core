@@ -1,6 +1,7 @@
 #!/usr/local/bin/ipython
 
 import os
+import requests
 import subprocess
 import time
 import sys
@@ -13,7 +14,16 @@ print 'In directory ', os.getcwd()
 
 p = subprocess.Popen(['mvn', 'compile', 'exec:java', '-Dexec.mainClass=io.stallion.boot.MainRunner', '-Dexec.args=serve -autoReload -targetPath=' + app_dir + ' -logLevel=FINER  -devMode=true -env=local -localMode=true'])
 
-
+for x in xrange(0, 50):
+    try: 
+        r = requests.get('http://localhost:8090/')
+    except:
+        time.sleep(.1)
+        continue
+    print r
+    if r.status_code == 200:
+        break
+    time.sleep(.1)
 
 args = ' '. join(sys.argv[1:])
 

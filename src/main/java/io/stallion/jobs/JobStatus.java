@@ -32,6 +32,8 @@ public class JobStatus extends ModelBase {
     private String error = "";
     private long shouldSucceedBy = 0;
     private long lastDurationSeconds = 0;
+    private int failCount = 0;
+
 
     @UniqueKey
     @Column
@@ -104,5 +106,15 @@ public class JobStatus extends ModelBase {
 
     public void setLastDurationSeconds(long lastDurationSeconds) {
         this.lastDurationSeconds = lastDurationSeconds;
+    }
+
+    @Column
+    public int getFailCount() {
+        return failCount;
+    }
+
+    public JobStatus setFailCount(int failCount) {
+        this.failCount = failCount;
+        return this;
     }
 }

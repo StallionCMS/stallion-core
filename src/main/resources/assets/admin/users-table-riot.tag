@@ -95,7 +95,7 @@
 
      this.fetchData = function() {
          stallion.request({
-             url: '/st-admin/users/users-table?page=' + self.page + '&withDeleted=' + self.withDeleted,
+             url: '/st-users/users-table?page=' + self.page + '&withDeleted=' + self.withDeleted,
              success: function (o) {
                  self.pager = o;
                  self.users = o.items;
@@ -207,7 +207,7 @@
          var data = self.getFormData();
          console.log('form submit', data, self.updateUserForm);
          stallion.request({
-             url: '/st-admin/users/update-user/' + self.opts.userId,
+             url: '/st-users/update-user/' + self.opts.userId,
              method: 'POST',
              data: data,
              form: self.updateUserForm,
@@ -226,7 +226,7 @@
      /** Sends the target user a password reset email so they can reset their own password. */
      forcePasswordReset = function(evt) {
          stallion.request({
-             url: '/st-admin/users/force-password-reset/' + self.opts.userId,
+             url: '/st-users/force-password-reset/' + self.opts.userId,
              method: 'POST',
              success: function(o) {
                  self.update({resetSent: true});
@@ -237,7 +237,7 @@
 
      deleteUser = function(evt) {
          stallion.request({
-             url: '/st-admin/users/toggle-user-deleted/' + self.opts.userId,
+             url: '/st-users/toggle-user-deleted/' + self.opts.userId,
              method: 'POST',
              data: {deleted: true },
              success: function(o) {
@@ -249,7 +249,7 @@
 
      restoreUser = function(evt) {
          stallion.request({
-             url: '/st-admin/users/toggle-user-deleted/' + self.opts.userId,
+             url: '/st-users/toggle-user-deleted/' + self.opts.userId,
              method: 'POST',
              data: {deleted: false },
              success: function(o) {
@@ -261,7 +261,7 @@
  
      approveUser = function(evt) {
          stallion.request({
-             url: '/st-admin/users/toggle-user-approved/' + self.opts.userId,
+             url: '/st-users/toggle-user-approved/' + self.opts.userId,
              method: 'POST',
              data: {approved: true},
              success: function(o) {
@@ -273,7 +273,7 @@
 
      unapproveUser = function(evt) {
          stallion.request({
-             url: '/st-admin/users/toggle-user-approved/' + self.opts.userId,
+             url: '/st-users/toggle-user-approved/' + self.opts.userId,
              method: 'POST',
              data: {approved: false },
              success: function(o) {
@@ -286,7 +286,7 @@
     
      disableUser = function(evt) {
          stallion.request({
-             url: '/st-admin/users/toggle-user-disabled/' + self.opts.userId,
+             url: '/st-users/toggle-user-disabled/' + self.opts.userId,
              method: 'POST',
              data: {disabled: true},
              success: function(o) {
@@ -298,7 +298,7 @@
 
      enableUser = function(evt) {
          stallion.request({
-             url: '/st-admin/users/toggle-user-disabled/' + self.opts.userId,
+             url: '/st-users/toggle-user-disabled/' + self.opts.userId,
              method: 'POST',
              data: {disabled: false },
              success: function(o) {
@@ -313,7 +313,7 @@
 
      this.on('mount', function(){
          stallion.request({
-             url: '/st-admin/users/view-user/' + self.opts.userId,
+             url: '/st-users/view-user/' + self.opts.userId,
              success: function (user) {
                  self.loading = false;
                  self.opts.formData = $.extend({}, user);

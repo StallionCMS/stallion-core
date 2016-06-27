@@ -42,11 +42,12 @@ import java.util.jar.Manifest;
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
-public class HealthEndpoints {
+@Path("/st-internal")
+public class InternalEndpoints {
 
 
     @GET
-    @Path("/_st/health/check-health")
+    @Path("/health")
     public HealthInfo checkHealth(@QueryParam("secret") String secret, @QueryParam("failOnWarnings") Boolean failOnWarnings, @QueryParam("sections") String sections) {
         failOnWarnings = or(failOnWarnings, false);
         sections = or(sections, "all");
@@ -130,7 +131,7 @@ public class HealthEndpoints {
     }
 
     @GET
-    @Path("/_st/health/info")
+    @Path("/info")
     public SystemInformation getInfo(@QueryParam("secret") String secret) {
         checkSecret(secret);
         SystemInformation info = new SystemInformation();
@@ -173,7 +174,7 @@ public class HealthEndpoints {
     }
 
     @GET
-    @Path("/_st/health/exceptions")
+    @Path("/exceptions")
     @MinRole(value = Role.ADMIN, redirect = true)
     @Produces("text/html")
     public String viewExceptions() {
@@ -189,7 +190,7 @@ public class HealthEndpoints {
 
     @POST
     @Produces("text/html")
-    @Path("/_st/health/force-exception")
+    @Path("/force-exception")
     public String forceException(@QueryParam("secret") String secret) {
         checkSecret(secret);
         throw new WebException("A forced exception!", 500);
@@ -197,7 +198,7 @@ public class HealthEndpoints {
 
     @GET
     @Produces("text/html")
-    @Path("/_st/health/force-exception-get")
+    @Path("/force-exception-get")
     public String forceExceptionGet(@QueryParam("secret") String secret) {
         checkSecret(secret);
         throw new WebException("A forced exception!", 500);

@@ -28,7 +28,7 @@ import java.time.ZonedDateTime;
 public class ScheduleTests  {
 
     @Test
-    public void testDateFinder() {
+    public void testHourly() {
         ZonedDateTime now;
         ZonedDateTime expected;
         ZonedDateTime actual;
@@ -44,6 +44,20 @@ public class ScheduleTests  {
             now = ZonedDateTime.of(2014, 4, 1, 12, 0, 0, 0, ZoneId.of("UTC"));
             actual = schedule.nextAt(now);
             expected = ZonedDateTime.of(2014, 4, 1, 12, 17, 0, 0, ZoneId.of("UTC"));
+            Assert.assertEquals(expected, actual);
+        }
+
+        /* Every hour on the 25th minute, test not running at 5:30 AM Bug*/
+        {
+            Schedule schedule = new Schedule()
+                    .minutes(25)
+                    .everyHour()
+                    .everyDay()
+                    .everyMonth()
+                    .verify();
+            now = ZonedDateTime.of(2016, 6, 24, 4, 26, 0, 0, ZoneId.of("UTC"));
+            actual = schedule.nextAt(now);
+            expected = ZonedDateTime.of(2016, 6, 24, 5, 25, 0, 0, ZoneId.of("UTC"));
             Assert.assertEquals(expected, actual);
         }
 
@@ -64,7 +78,16 @@ public class ScheduleTests  {
             actual = schedule.nextAt(actual.plusMinutes(1));
             Assert.assertEquals(expected, actual);
 
-                    }
+        }
+
+    }
+
+    @Test
+    public void testDaily() {
+        ZonedDateTime now;
+        ZonedDateTime expected;
+        ZonedDateTime actual;
+
 
         /* Every day at 2, 10, 20 */
         {
@@ -90,6 +113,15 @@ public class ScheduleTests  {
 
 
         }
+
+    }
+
+    @Test
+    public void testWeekly() {
+        ZonedDateTime now;
+        ZonedDateTime expected;
+        ZonedDateTime actual;
+
 
         /* Every tuesday and thursday 5:30AM */
         {
@@ -137,6 +169,8 @@ public class ScheduleTests  {
 
         }
 
+
+
         /* Every other week on Wednesday at 3PM */
         {
             Schedule schedule = new Schedule()
@@ -160,6 +194,15 @@ public class ScheduleTests  {
             Assert.assertEquals(expected, actual);
 
         }
+
+    }
+
+    @Test
+    public void testMonthly() {
+        ZonedDateTime now;
+        ZonedDateTime expected;
+        ZonedDateTime actual;
+
 
         /* The 15th of the month at 5PM */
         {

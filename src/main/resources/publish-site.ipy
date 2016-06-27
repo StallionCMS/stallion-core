@@ -424,7 +424,7 @@ respawn limit 3 60
         good("Stallion started via upstart")
 
     def verify_stallion_running(self, process=None):
-        #urls = ['/st-admin/health/warmup'] + self.check_urls
+        #urls = ['/st-internal/warmup'] + self.check_urls
         urls = self.check_urls or ['/']
         max_tries = 20
         asset_urls = set()
@@ -439,8 +439,8 @@ respawn limit 3 60
                 try: 
                     o = !curl -v $url
                     assert '< HTTP/1.1 200 OK' in o, "200 OK not found in curl result for %s" % url
-                    if '/st-admin/health/warmup' in url:
-                        assert 'Stallion-health: OK' in o, "Stallion-health: OK not found in curl result for /st-admin/health/warmup"
+                    if '/st-internal/warmup' in url:
+                        assert 'Stallion-health: OK' in o, "Stallion-health: OK not found in curl result for /st-internal/warmup"
                     self.find_asset_urls_in_source(o, asset_urls)
                     break
                 except AssertionError:

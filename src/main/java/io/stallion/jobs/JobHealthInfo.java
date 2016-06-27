@@ -26,11 +26,13 @@ public class JobHealthInfo {
 
     private long lastStartedAt;
     private long lastFinishedAt;
+    private long lastFailedAt;
     private long lastRunTime;
     private boolean isRunningNow;
     private String error;
     private boolean lastRunSucceeded;
     private long expectCompleteBy;
+    private int failCount = 0;
 
 
     public long getLastStartedAt() {
@@ -95,5 +97,23 @@ public class JobHealthInfo {
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+
+    public long getLastFailedAt() {
+        return lastFailedAt;
+    }
+
+    public JobHealthInfo setLastFailedAt(long lastFailedAt) {
+        this.lastFailedAt = lastFailedAt;
+        return this;
+    }
+
+    public int getFailCount() {
+        return failCount;
+    }
+
+    public JobHealthInfo setFailCount(int failCount) {
+        this.failCount = failCount;
+        return this;
     }
 }

@@ -152,7 +152,12 @@ if (window.$ && !window.jQuery) {
     };
 
     st.getCookie = function(name) {
-        var value = "; " + document.cookie;
+        try {
+            var value = "; " + document.cookie;
+        } catch (e) {
+            console.log("error in stallion.getCookie()", e);
+            return "";
+        }
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
     };
@@ -490,13 +495,21 @@ Date.prototype.format = function (mask, utc) {
 
  var RiotDataBindMixin = {
      init: function() {
-
+         this.riotDataBindMounted = false;
 
          this.on('before-mount', function() {
-             this.formData = this.opts.formData || {};
+             if (!this.formData) {
+                 this.formData = this.opts.formData || {};
+             }
+
          });
 
-         this.on('update', function() {
+         this.on('mount', function() {
+             this.syncToDom();
+             this.riotDataBindMounted = true;
+         });
+
+         this.syncToDom = function(triggerChange) {
              var self = this;
              if (self.formData === undefined) {
                   self.formData = self.opts.formData || {};
@@ -504,6 +517,9 @@ Date.prototype.format = function (mask, utc) {
 
              var seenKeys = [];
              Object.keys(self).forEach(function(key) {
+                 if (key === 'scheduled') {
+
+                 }
                  if (seenKeys.indexOf(key) > -1) {
                      return;
                  }
@@ -513,6 +529,10 @@ Date.prototype.format = function (mask, utc) {
                      return;
                  }
                  var val = self.formData[key];
+                 if (self.tags[key] && self.tags[key].setFormData) {
+                     self.tags[key].setFormData(val);
+                     return;
+                 }
                  //if (ele.length) {
                  //    debugger;
                  //}
@@ -520,7 +540,12 @@ Date.prototype.format = function (mask, utc) {
                      ele.forEach(function(radio) {
                          if (radio.value === val) {
                              $(radio).prop('checked', true);
+                         } else if (radio.value === 'false' && val === false) {
+                             $(radio).prop('checked', true);
+                         } else if (radio.value === 'true' && val === true) {
+                             $(radio).prop('checked', true);
                          }
+                                 
                      });
                      return;
                  }
@@ -546,12 +571,19 @@ Date.prototype.format = function (mask, utc) {
                      var $ele = $(ele);
                      $option = $ele.find('option[value="' + val + '"]');
                      $option.attr('selected', 'selected');
-                     $(ele).val(val).change();
+                     $(ele).val(val);
                  } else {
-                     $(ele).val(val).change();
+                     $(ele).val(val);
                  }
+                 if (triggerChange) {
+                     $(ele).change();
+                 }
+
              });
-         });
+         };
+
+
+
      },
      processForm: function() {
          this.formData = this.getFormData();
@@ -565,6 +597,12 @@ Date.prototype.format = function (mask, utc) {
              if (!ele) {
                  return;
              }
+             if (self.tags[key] && self.tags[key].getFormData) {
+                 data[key] = self.tags[key].getFormData();
+                 return;
+             }
+
+             
              if ($.isArray(ele) && ele.length > 0 && ele[0].tagName) {
                  ele.forEach(function(radio) {
                      if ($(radio).is(':checked')) {
@@ -603,8 +641,16 @@ Date.prototype.format = function (mask, utc) {
          });
          return data;
      },
+     setFormData: function(formData) {
+         if (this.riotDataBindMounted) {
+             this.updateData(formData);
+         } else {
+             this.formData = formData;
+         }
+     },
      updateData: function(formData) {
          this.update({formData: formData});
+         this.syncToDom();
      },
      updateFormData: function(formData) {
          this.updateData(formData);
@@ -614,6 +660,7 @@ Date.prototype.format = function (mask, utc) {
 
  if (window.riot) {
      riot.mixin('databind', RiotDataBindMixin);
+     riot.mixin('bound-form', RiotDataBindMixin);
  }
 
 

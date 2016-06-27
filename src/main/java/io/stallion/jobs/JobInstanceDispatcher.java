@@ -17,6 +17,7 @@
 
 package io.stallion.jobs;
 
+import io.stallion.monitoring.HealthTracker;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -47,13 +48,21 @@ class JobInstanceDispatcher implements Runnable {
             // Run the job
             job.execute();
             status.setCompletedAt(DateUtils.mils());
+            status.setFailedAt(0);
+            status.setFailCount(0);
+            status.setError("");
             ZonedDateTime nextRunAt = definition.getSchedule().nextAt(DateUtils.utcNow().plusMinutes(3));
             Long nextCompleteBy = nextRunAt.plusMinutes(definition.getAlertThresholdMinutes()).toInstant().toEpochMilli();
             Log.info("Threshold minutes: {0} next complete by: {1}", definition.getAlertThresholdMinutes(), nextCompleteBy);
             status.setShouldSucceedBy(nextCompleteBy);
         } catch (Exception e) {
+            Log.exception(e, "Error running job " + definition.getName());
+            status.setFailCount(status.getFailCount() + 1);
             status.setError(e.toString() + ": " + e.getMessage() + "\n" + ExceptionUtils.getStackTrace(e));
             status.setFailedAt(DateUtils.mils());
+            if (HealthTracker.instance() != null) {
+                HealthTracker.instance().logException(e);
+            }
         }
         JobStatusController.instance().save(status);
     }

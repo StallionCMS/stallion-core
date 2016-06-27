@@ -42,7 +42,6 @@ import io.stallion.sitemaps.SiteMapController;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.services.Log;
-import io.stallion.uiAdmin.AdminEndpoints;
 import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.settings.Settings;
 import io.stallion.requests.RequestHandler;
@@ -176,7 +175,6 @@ public class AppContextLoader {
         // Load users, admin and other default functionality
         UserController.load();
         UsersApiResource.register();
-        AdminEndpoints.register();
         JobStatusController.selfRegister();
 
         SimpleAsyncRunner.load();

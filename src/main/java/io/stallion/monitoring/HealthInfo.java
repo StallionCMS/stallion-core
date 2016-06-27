@@ -88,6 +88,14 @@ public class HealthInfo {
                 if (!empty(info.getError())) {
                     warnings.add("Job " + info.getJobName() + " finished last run with errors.");
                 }
+                // Job has been overdue for half-a-day, give an error
+                if (info.getExpectCompleteBy() < (mils() - (42000 * 1000))) {
+                    errors.add("Job " + info.getJobName() + " has been overdue for more than a day and a half. ");
+                }
+                if (info.getFailCount() > 2) {
+                    warnings.add("Job " + info.getJobName() + " has failed more than three times in a row.");
+                }
+
             }
         }
         if (tasks != null) {

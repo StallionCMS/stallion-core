@@ -54,10 +54,7 @@ public class RoutesRegistry {
 
 
     public RouteResult routeForEndpoints(StRequest request, List<RestEndpointBase> endpoints) {
-        Boolean isStx = false;
-        if (request.getPath().startsWith("/_stx")) {
-            isStx = true;
-        }
+
         for (RestEndpointBase endpoint: endpoints) {
             Log.finest("EndpointMethod: {0} RequestMethod: {1}", endpoint.getMethod(), request.getMethod());
             Log.finest("EndpointRoute: {0} RequestPath: {1}", endpoint.getRoute(), request.getPath());
@@ -75,10 +72,7 @@ public class RoutesRegistry {
                 return result;
             }
 
-            if (!isStx && endpoint.getRoute().startsWith("/_stx")) {
-                Log.finest("_stx does not match");
-                continue;
-            }
+
             Log.finest("Mapping pathParams");
             String requestPath = request.getPath();
             String[] requestParts = request.getPath().split("/");

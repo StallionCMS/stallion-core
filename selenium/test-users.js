@@ -19,7 +19,7 @@ runner.addSuite('user-management', function() {
     */
     
     suite.testUserManagement = function() {
-        suite.login(helper.baseUrl + '/st-admin/users/manage', '.user-row');
+        suite.login(helper.baseUrl + '/st-users/manage', '.user-row');
 
         // TODO -- add the user first
         
@@ -44,7 +44,7 @@ runner.addSuite('user-management', function() {
     suite.login = function(url, selector) {
         var email = 'selenium@stallion.io';
         var password = 'Qp7c0sBMul3A';
-        
+        print('GET URL ' + url);
         driver.get(url);
         helper.waitExists('#st-login-form');
         driver.findElement(By.name('username')).sendKeys(email);
@@ -70,7 +70,7 @@ runner.addSuite('user-public-pages', function() {
     };
 
     suite.login = function(email, password, role) {
-        driver.get(helper.baseUrl + "/st-admin/users/login?stReturnUrl=/st-admin/users/login");
+        driver.get(helper.baseUrl + "/st-users/login?stReturnUrl=/st-users/login");
         driver.findElement(By.name('username')).sendKeys(email);
         driver.findElement(By.name('password')).sendKeys(password);
         driver.findElement(By.cssSelector('.st-button-submit')).click();
@@ -91,14 +91,14 @@ runner.addSuite('user-public-pages', function() {
         var user = suite.register(email);
 
         // Trigger a password reset email
-        driver.get(helper.baseUrl + "/st-admin/users/reset-password");
+        driver.get(helper.baseUrl + "/st-users/reset-password");
         driver.findElement(By.name('email')).sendKeys(user.email);
         driver.findElement(By.cssSelector('.st-button-submit')).click();
         helper.waitExists('.st-success');
         helper.waitTextExists('.st-success', 'Password reset email sent');
         
         // Get the password reset token
-        var res = Unirest.get(helper.baseUrl + "/_stx/selenium/get-reset-token")
+        var res = Unirest.get(helper.baseUrl + "/st-users/selenium/get-reset-token")
             .queryString("email", user.email)
             .queryString("secret", "miuLa90ljgM5")
             .asJson();
@@ -106,7 +106,7 @@ runner.addSuite('user-public-pages', function() {
 
 
         // Actually reset the password, we chould get sent back to the login page
-        var url = helper.baseUrl + "/st-admin/users/reset-password?resetToken=" + token + "&email=" + user.email.replace(/\+/g, "%2B") + "&returnUrl=/st-admin/users/login";
+        var url = helper.baseUrl + "/st-users/reset-password?resetToken=" + token + "&email=" + user.email.replace(/\+/g, "%2B") + "&returnUrl=/st-users/login";
         driver.get(url);
         var newPassword = 'newPassword' + mils;
         driver.findElement(By.name('password')).sendKeys(newPassword);        
@@ -117,7 +117,7 @@ runner.addSuite('user-public-pages', function() {
         
         print('logoff');
         // Log off
-        driver.get(helper.baseUrl + '/st-admin/users/logoff?t=' + mils);
+        driver.get(helper.baseUrl + '/st-users/logoff?t=' + mils);
         helper.waitExists('#st-login-form');
         helper.waitNotExists('.logged-in-as-box');
 
@@ -132,7 +132,7 @@ runner.addSuite('user-public-pages', function() {
 
     suite.testVerifyEmail = function() {
         var user = suite.register();
-        driver.get(helper.baseUrl + "/st-admin/users/verify-email");
+        driver.get(helper.baseUrl + "/st-users/verify-email");
         driver.findElement(By.cssSelector('.st-button-submit')).click();
         helper.waitExists('.st-success');
         helper.waitTextExists('.st-success', user.email);
@@ -141,7 +141,7 @@ runner.addSuite('user-public-pages', function() {
     };
 
     suite.register = function(email) {
-        driver.get(helper.baseUrl + "/st-admin/users/register?stReturnUrl=/st-admin/users/login");
+        driver.get(helper.baseUrl + "/st-users/register?stReturnUrl=/st-users/login");
         suite.counter++;
         var mils = new Date().getTime() * 100 + suite.counter;
         email = email || 'selenium+' + mils + '@stallion.io';

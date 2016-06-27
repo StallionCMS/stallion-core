@@ -99,49 +99,6 @@ public abstract class StallionJavaPlugin {
     }
 
 
-    @Deprecated
-    public void registerModels(Class<? extends ModelBase> ...models) throws Exception {
-        for(Class model: models) {
-            Log.finer("Register model {0}", model.getName());
-            DataAccessRegistration registration = new DataAccessRegistration()
-                    .setPath(model.getName())
-                    .setModelClass(model)
-                    .setNameSpace("st-" + getPluginName())
-                    .setUseDataFolder(true);
-            DataAccessRegistry.instance().register(registration);
-        }
-    }
-
-    @Deprecated
-    public void registerEndpoints(JavaRestEndpoint...endpoints) {
-        for(JavaRestEndpoint e: endpoints) {
-            EndpointsRegistry.instance().addEndpoints(endpoints);
-        }
-    }
-
-    @Deprecated
-    public void registerResources(EndpointResource...resources) {
-        ResourceToEndpoints converter = new ResourceToEndpoints("/_stx/" + getPluginName());
-        for (EndpointResource resource: resources) {
-            Log.finer("Register resource {0}", resource.getClass().getName());
-            EndpointsRegistry.instance().addEndpoints(converter.convert(resource).toArray(new RestEndpointBase[]{}));
-        }
-    }
-
-    @Deprecated
-    public void registerHookHandlers(HookHandler...hooks) {
-        for (HookHandler hookHandler: hooks) {
-            HookRegistry.instance().register(hookHandler);
-        }
-    }
-
-    @Deprecated
-    public void registerChainHandlers(ChainedHook...chains) {
-        for (ChainedHook chain: chains) {
-            HookRegistry.instance().register(chain);
-        }
-    }
-
 
     public void setPluginRegistry(PluginRegistry pluginRegistry) {
         this.pluginRegistry = pluginRegistry;

@@ -123,6 +123,7 @@ public class AssetsController {
         if (Context.getSettings().getDevMode() && !empty(developerUrl)) {
             return developerUrl;
         }
+
         if (path.startsWith("/")) {
             path = path.substring(1);
         }

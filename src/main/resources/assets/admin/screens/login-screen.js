@@ -20,13 +20,13 @@
             data.returnUrl = stallion.queryParams().stReturnUrl;
         }
         stallion.request({
-            url: '/st-admin/users/do-register',
+            url: '/st-users/do-register',
             method: 'POST',
             data: data,
             form: formEle,
             success: function(o) {
                 if (o.requireValidEmail) {
-                    window.location.href = "/st-admin/users/verify-email?alreadySent=true&stReturnlUrl=" + encodeURIComponent(stallion.queryParams().stReturnUrl || "");
+                    window.location.href = "/st-users/verify-email?alreadySent=true&stReturnlUrl=" + encodeURIComponent(stallion.queryParams().stReturnUrl || "");
                 } else if (stallion.queryParams().stReturnUrl) {
                     window.location.href = stallion.queryParams().stReturnUrl;
                 } else {
@@ -47,13 +47,13 @@
         var data = stallion.formToData(formEle);
 
         stallion.request({
-            url: '/st-admin/users/submit-login',
+            url: '/st-users/submit-login',
             method: 'POST',
             data: data,
             form: formEle,
             success: function(o) {
                 if (!o.approved && !o.emailVerified) {
-                    window.location.href = "/st-admin/users/verify-email";
+                    window.location.href = "/st-users/verify-email";
                 } else if (!o.approved) {
                     stallion.defaultRequestErrorHandler({message: "Your login was successful, but your account is pending administrative approval."}, formEle);
                 } else if (stallion.queryParams().stReturnUrl) {
@@ -73,7 +73,7 @@
         var data = stallion.formToData(formEle);
         data.returnUrl = stallion.queryParams().stReturnUrl || "";
         stallion.request({
-            url: '/st-admin/users/send-verify-email',
+            url: '/st-users/send-verify-email',
             method: 'POST',
             data: data,
             form: formEle,
@@ -94,7 +94,7 @@
         var formEle = this;
         var data = stallion.formToData(formEle);
         stallion.request({
-            url: '/st-admin/users/send-reset-email',
+            url: '/st-users/send-reset-email',
             method: 'POST',
             data: data,
             form: formEle,
@@ -115,7 +115,7 @@
         var data = stallion.formToData(formEle);
         data.resetToken = stallion.queryParams().resetToken;
         stallion.request({
-            url: '/st-admin/users/do-password-reset',
+            url: '/st-users/do-password-reset',
             method: 'POST',
             data: data,
             form: formEle,

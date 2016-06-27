@@ -149,7 +149,10 @@ class RequestProcessor {
 
     public void doProcess() throws Exception {
         // Handle login to a page
-        if ("true".equals(request.getParameter("stLogin")) && empty(Context.getUser().getId())) {
+        if ("true".equals(request.getParameter("stLogin"))
+                && empty(Context.getUser().getId())
+                && !Settings.instance().getUsers().getDisableStLoginParam()
+                ) {
             String targetUrl = Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.getRequestUrlWithQuery(), "UTF-8");
             throw new RedirectException(targetUrl, 302);
         }

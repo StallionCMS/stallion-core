@@ -50,7 +50,7 @@ import static io.stallion.utils.Literals.val;
 
 public class JsPluginEngine {
 
-    private HashMap<String, JsRegistry> jsPathToRegistry = new HashMap<>();
+
     private ScriptEngine scriptEngine;
     //private ScriptEngineManager scriptEngineManager;
     private HashSet<String> watchedPaths = new HashSet<>();
@@ -258,16 +258,6 @@ public class JsPluginEngine {
 
 
 
-
-    /* Getters and setters */
-
-    public HashMap<String, JsRegistry> getJsPathToRegistry() {
-        return jsPathToRegistry;
-    }
-
-    public void setJsPathToRegistry(HashMap<String, JsRegistry> jsPathToRegistry) {
-        this.jsPathToRegistry = jsPathToRegistry;
-    }
 
     public ScriptEngine getScriptEngine() {
         return scriptEngine;
