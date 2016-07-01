@@ -68,6 +68,7 @@ public class ModelBase implements Model {
 
 
     @Column
+    @JsonView(RestrictedViews.Member.class)
     public Boolean getDeleted() {
         return deleted;
     }

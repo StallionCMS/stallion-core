@@ -15,34 +15,20 @@
  *
  */
 
+package io.stallion.assets;
+
+import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.*;
+
+import java.util.List;
+import java.util.Map;
+
+import io.stallion.services.Log;
 
 
-.user-status span {
-    background-color: #F9F9F9;
-    padding: 1px 5px 1px 5px;
-    font-size: 12px;
-    border-radius: 4px;
-}
-.user-management-actions div {
-    margin-bottom: 1em;
-}
-.user-management-actions button {
-    width: 100%;
-    max-width: 300px;
-    border-radius: 4px;
-}
+public class ComboBundle {
+    private List<String> headStyles = list();
+    private List<String> headScripts = list();
+    private List<String> footerScripts = list();
 
-
-.view {
-  transition: all .15s ease;
-}
-.test-enter, .test-leave {
-  opacity: 0;
-  transform: translate3d(10px, 0, 0);
-}
-.v-link-active {
-  color: red;
-}
-[v-cloak] {
-  display: none;
 }

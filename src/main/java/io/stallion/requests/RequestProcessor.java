@@ -489,6 +489,8 @@ class RequestProcessor {
     public void tryRouteAssetRequest() throws Exception{
         if (request.getPath().startsWith("/st-resource/")) {
             serveResourceAsset(request.getPath().substring(13));
+        } else if (request.getPath().startsWith("/st-combo-file/")) {
+            serveComboBundleFile();
         } else if (request.getPath().startsWith("/st-assets/")) {
             if ("standard".equals(request.getQueryParams().get("stBundle"))) {
                 serveBundle(request.getPath().substring(11));
@@ -498,6 +500,23 @@ class RequestProcessor {
                 serveFolderAsset(request.getPath().substring(11));
             }
         }
+    }
+
+
+    public void serveComboBundleFile() throws Exception {
+        String path = request.getPath().replace("/st-combo-file/", "/");
+        String extension = FilenameUtils.getExtension(path);
+        path = FilenameUtils.removeExtension(path);
+        String[] parts = StringUtils.split(path, "/", 2);
+        String bundleName = parts[0];
+        path = parts[1];
+        String content = "";
+        if (extension.equals("css")) {
+            content = DefinedBundle.renderComboFile(bundleName, path, true);
+        } else {
+            content = DefinedBundle.renderComboFile(bundleName, path, false);
+        }
+        sendContentResponse(content, request.getPath());
     }
 
     public void serveResourceAsset(String path) throws Exception  {
@@ -513,6 +532,7 @@ class RequestProcessor {
         //    throw new NotFoundException("Resource path does not exist or is not public: " + path);
         //}
         path = "/assets" + path;
+
 
         if (!empty(request.getParameter("processor"))) {
             String content = ResourceHelpers.loadAssetResource(plugin, path);

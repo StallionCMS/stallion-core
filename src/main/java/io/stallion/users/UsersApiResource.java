@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.Context;
 import io.stallion.assets.BundleFile;
 import io.stallion.assets.DefinedBundle;
+import io.stallion.assets.VueBundleFile;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.exceptions.*;
@@ -59,6 +60,20 @@ public class UsersApiResource implements EndpointResource {
                     new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.js"),
                     new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-table-riot.tag").setProcessor("riot")
             ));
+
+
+
+
+            DefinedBundle.register(
+                    "user-admin-vue",
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/admin.css"),
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage.css"),
+                    new BundleFile().setPluginName("stallion").setLiveUrl("vendor/vue.min.js").setDebugUrl("vendor/vue.js"),
+                    new BundleFile().setPluginName("stallion").setLiveUrl("vendor/vue-router.min.js").setDebugUrl("vendor/vue-router.js"),
+                    new VueBundleFile().setPluginName("stallion").setLiveUrl("admin/users-table.vue"),
+                    new VueBundleFile().setPluginName("stallion").setLiveUrl("admin/users-edit.vue"),
+                    new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage-v2.js")
+            );
         }
     }
 
@@ -377,18 +392,17 @@ public class UsersApiResource implements EndpointResource {
      */
 
 
+
     @GET
     @Path("/manage")
     @MinRole(Role.ADMIN)
     @Produces("text/html")
-    public String manageUsers() {
+    public String manageUsers2() {
 
         response().getMeta().setTitle("Manage Users");
         Map<String, Object> ctx = map();
-        return TemplateRenderer.instance().renderTemplate("stallion:admin/admin-users.jinja", ctx);
+        return TemplateRenderer.instance().renderTemplate("stallion:admin/admin-users2.jinja", ctx);
     }
-
-
 
 
     @GET

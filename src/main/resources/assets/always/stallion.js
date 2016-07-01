@@ -93,7 +93,7 @@ if (window.$ && !window.jQuery) {
         if (xsrfCookie) {
             header["X-XSRF-TOKEN"] = xsrfCookie;
         }
-        $.ajax({
+        return $.ajax({
             url: req.url,
             type: method.toLowerCase(),
             data: dataString,
@@ -129,8 +129,6 @@ if (window.$ && !window.jQuery) {
             req.error(o, req.form, xhr);
 
         });
-
-        
     };
 
     st.tryMakeSpinner = function(form) {

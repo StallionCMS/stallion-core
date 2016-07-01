@@ -17,6 +17,7 @@
 
 package io.stallion.assets;
 
+import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
 
 import java.util.*;
@@ -40,6 +41,24 @@ public class DefinedBundle extends Bundle {
         bundleRegistry = map();
     }
 
+    public static String renderComboFile(String bundleName, String path, Boolean isCss) {
+        DefinedBundle bundle = getByName(bundleName);
+        for (BundleFile bf: bundle.getBundleFiles()) {
+            if (bf.getLiveUrl().equals(path)) {
+                if (bf instanceof ComboBundleFile) {
+                    if (isCss) {
+                        return ((ComboBundleFile) bf).getCss();
+                    } else {
+                        return ((ComboBundleFile) bf).getJavascript();
+                    }
+                } else {
+                    throw new UsageException("Tried to call renderComboFile on " + bundleName + ":" + path + " but the bundle file was not an instance of ComboBundleFile");
+                }
+            }
+        }
+        throw new NotFoundException("No ComboBundleFile found for bundle " + bundleName + ":" + path);
+    }
+
     public static DefinedBundle getByName(String name) {
         if ("alwaysFooterJavascripts".equals(name)) {
             return alwaysFooterJavascripts;
@@ -58,6 +77,23 @@ public class DefinedBundle extends Bundle {
 
     public static void register(DefinedBundle bundle) {
         bundleRegistry.put(bundle.getName(), bundle);
+    }
+
+    public static void register(String name, BundleFile ...files) {
+        DefinedBundle cssBundle = new DefinedBundle(name + "-css", ".css");
+        DefinedBundle jsBundle = new DefinedBundle(name + "-js", ".js");
+        for (BundleFile file: files) {
+            if (file instanceof ComboBundleFile) {
+                cssBundle.add(file);
+                jsBundle.add(file);
+            } else if (file.getLiveUrl().endsWith(".css")) {
+                cssBundle.add(file);
+            } else {
+                jsBundle.add(file);
+            }
+        }
+        register(cssBundle);
+        register(jsBundle);
     }
 
     private static void loadAlways() {
@@ -205,4 +241,6 @@ public class DefinedBundle extends Bundle {
     public void setExtension(String extension) {
         this.extension = extension;
     }
+
+
 }

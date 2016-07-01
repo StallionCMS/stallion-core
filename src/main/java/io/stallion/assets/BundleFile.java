@@ -43,6 +43,7 @@ public class BundleFile {
     private String developerUrl;
     private String assetKey;
     private String processor = null;
+    private boolean headScript = false;
 
     public BundleFile() {
 
@@ -189,6 +190,15 @@ public class BundleFile {
 
     public BundleFile setProcessor(String processor) {
         this.processor = processor;
+        return this;
+    }
+
+    public boolean isHeadScript() {
+        return headScript;
+    }
+
+    public BundleFile setHeadScript(boolean headScript) {
+        this.headScript = headScript;
         return this;
     }
 }

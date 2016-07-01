@@ -356,10 +356,20 @@ public class BundleHandler {
                     getFileTimeStamp(url));
         } else {
             // Register this path as an allowed resource path
-            addAllowedPath(bf.getPluginName(), url);
-            url = appendCacheBusting(
-                    baseUrl + "/st-resource/" + bf.getPluginName() + "/" + url,
-                    startTime.toString());
+            if (bf instanceof ComboBundleFile) {
+                String ext = ".css";
+                if (isJs) {
+                    ext = ".js";
+                }
+                url = appendCacheBusting(
+                        baseUrl + "/st-combo-file/" +  this.definedBundle.getName() + "/" + url + ext,
+                        startTime.toString()
+                );
+            } else {
+                url = appendCacheBusting(
+                        baseUrl + "/st-resource/" + bf.getPluginName() + "/" + url,
+                        startTime.toString());
+            }
         }
         if (!empty(bf.getProcessor()) && !url.contains("processor=")) {
             url += "&processor=" + bf.getProcessor();
