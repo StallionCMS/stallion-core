@@ -20,6 +20,7 @@ package io.stallion.requests;
 import io.stallion.Context;
 import io.stallion.assets.AssetsController;
 import io.stallion.assets.BundleHandler;
+import io.stallion.assets.BundleRegistry;
 import io.stallion.assets.DefinedBundle;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.Displayable;
@@ -491,6 +492,10 @@ class RequestProcessor {
             serveResourceAsset(request.getPath().substring(13));
         } else if (request.getPath().startsWith("/st-combo-file/")) {
             serveComboBundleFile();
+        } else if (request.getPath().startsWith("/st-bundle-file/")) {
+            serveBundleFile();
+        } else if (request.getPath().startsWith("/st-concatenated-bundle")) {
+            serveConcatenatedBundle();
         } else if (request.getPath().startsWith("/st-assets/")) {
             if ("standard".equals(request.getQueryParams().get("stBundle"))) {
                 serveBundle(request.getPath().substring(11));
@@ -502,6 +507,26 @@ class RequestProcessor {
         }
     }
 
+    public void serveBundleFile() throws Exception {
+        String path = request.getPath().replace("/st-bundle-file/", "");
+        String[] parts = StringUtils.splitByWholeSeparator(path, "/st-file-path/",2);
+        String bundleName = parts[0];
+        String filePath = parts[1];
+        String content = BundleRegistry.instance().getOrNotFound(bundleName).renderBundleFile(filePath);
+        sendContentResponse(content, request.getPath());
+    }
+
+
+    public void serveConcatenatedBundle() throws Exception {
+        String path = request.getPath().replace("/st-concatenated-bundle/", "");
+        int i = path.indexOf(".");
+        if (i == -1) {
+              throw new ClientException("Invalid bundle name, must contain extension: " + path);
+        }
+        String name = path.substring(0, i);
+        String content = BundleRegistry.instance().get(name).renderConcatenated(path);
+        sendContentResponse(content, request.getPath());
+    }
 
     public void serveComboBundleFile() throws Exception {
         String path = request.getPath().replace("/st-combo-file/", "/");

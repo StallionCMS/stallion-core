@@ -22,14 +22,15 @@ import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.parboiled.common.FileUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.stallion.utils.Literals.*;
@@ -63,6 +64,57 @@ public class ResourceHelpers {
             throw new RuntimeException(e);
         }
     }
+
+    public static List<String> listFilesInDirectory(String plugin, String path) {
+        String ending = "";
+        String starting = "";
+        if (path.contains("*")) {
+            String[] parts = StringUtils.split(path, "*", 2);
+            String base = parts[0];
+            if (!base.endsWith("/")) {
+                path = new File(base).getParent();
+                starting = FilenameUtils.getName(base);
+            } else {
+                path = base;
+            }
+            ending = parts[1];
+        }
+
+        List<String> filenames = new ArrayList<>();
+        try(
+                InputStream in = getResourceAsStream(plugin, path);
+                BufferedReader br = new BufferedReader( new InputStreamReader( in ) ) ) {
+            String resource;
+            while( (resource = br.readLine()) != null ) {
+                Log.info("checking resource for inclusion in directory scan: {0}", resource);
+                if (!empty(ending) && !resource.endsWith(ending)) {
+                    continue;
+                }
+                if (!empty(starting) && !resource.endsWith("starting")) {
+                    continue;
+                }
+                // Skip special files, hidden files
+                if (resource.startsWith(".") || resource.startsWith("~") || resource.startsWith("#") || resource.contains("_flymake.")) {
+                    continue;
+                }
+                Log.info("added resource during directory scan: {0}", resource);
+                filenames.add(resource);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return filenames;
+    }
+
+    private static InputStream getResourceAsStream(String plugin, String resource ) {
+        if (empty(plugin) || plugin.equals("stallion")) {
+            return ResourceHelpers.class.getResourceAsStream(resource);
+        } else {
+            return  PluginRegistry.instance().getJavaPluginByName().get(plugin).getClass().getResourceAsStream(resource);
+        }
+    }
+
+
 
     private static URL pluginPathToUrl(String pluginName, String path) throws FileNotFoundException {
         URL url = null;
@@ -115,6 +167,24 @@ public class ResourceHelpers {
         } else {
             return IOUtils.toString(resourceUrl, Charset.forName("UTF-8"));
 
+        }
+    }
+
+    public static File findDevModeFileForResource(String plugin, String resourcePath) {
+        if (!Settings.instance().getDevMode()) {
+            throw new UsageException("You can only call this method in dev mode!");
+        }
+        try {
+            if (!resourcePath.startsWith("/")) {
+                resourcePath = "/" + resourcePath;
+            }
+            // We find the URL of the root, not the actual file, since if the file was just created, we want it to be
+            // accessible even if mvn hasn't recompiled the project. This allows us to iterate more quickly.
+            URL url = pluginPathToUrl(plugin, "/");
+            url = new URL(StringUtils.stripStart(url.toString(), "/") + resourcePath);
+            return urlToFileMaybe(url, plugin);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

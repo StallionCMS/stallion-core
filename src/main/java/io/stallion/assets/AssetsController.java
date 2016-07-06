@@ -23,6 +23,7 @@ import io.stallion.Context;
 import io.stallion.assets.processors.AngularCompiler;
 import io.stallion.assets.processors.ReactJsxCompiler;
 import io.stallion.assets.processors.RiotCompiler;
+import io.stallion.exceptions.ClientException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherService;
 import io.stallion.services.Log;
@@ -159,6 +160,15 @@ public class AssetsController {
      */
     public String definedBundle(String bundleName) {
         return new BundleHandler(DefinedBundle.getByName(bundleName)).toHtml();
+    }
+
+    public String compiledBundle(String bundlePath) {
+        int i = bundlePath.indexOf(".");
+        if (i == -1) {
+            throw new ClientException("Invalid bundle name, no extension: " + bundlePath);
+        }
+        String name = bundlePath.substring(0, i);
+        return BundleRegistry.instance().getOrNotFound(name).renderHtmlIncludes(bundlePath);
     }
 
     /**

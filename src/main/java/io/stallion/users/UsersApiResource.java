@@ -19,9 +19,7 @@ package io.stallion.users;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.Context;
-import io.stallion.assets.BundleFile;
-import io.stallion.assets.DefinedBundle;
-import io.stallion.assets.VueBundleFile;
+import io.stallion.assets.*;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.exceptions.*;
@@ -62,8 +60,19 @@ public class UsersApiResource implements EndpointResource {
             ));
 
 
+            BundleRegistry.instance().register(
+                    new CompiledBundle("user-admin-vue",
+                            new ResourceBundleFile("stallion", "admin/admin.css"),
+                            new ResourceBundleFile("stallion", "admin/users-manage.css"),
+                            new ResourceBundleFile("stallion", "vendor/vue.min.js", "vendor/vue.js"),
+                            new ResourceBundleFile("stallion", "vendor/vue-router.min.js", "vendor/vue-router.js"),
+                            new VueResourceBundleFile("stallion", "admin/users-table.vue"),
+                            new VueResourceBundleFile("stallion", "admin/users-edit.vue"),
+                            new ResourceBundleFile("stallion", "admin/users-manage-v2.js")
+                    )
+            );
 
-
+            /*
             DefinedBundle.register(
                     "user-admin-vue",
                     new BundleFile().setPluginName("stallion").setLiveUrl("admin/admin.css"),
@@ -73,7 +82,7 @@ public class UsersApiResource implements EndpointResource {
                     new VueBundleFile().setPluginName("stallion").setLiveUrl("admin/users-table.vue"),
                     new VueBundleFile().setPluginName("stallion").setLiveUrl("admin/users-edit.vue"),
                     new BundleFile().setPluginName("stallion").setLiveUrl("admin/users-manage-v2.js")
-            );
+            );   */
         }
     }
 

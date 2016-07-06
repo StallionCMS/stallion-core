@@ -34,77 +34,44 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
-public class VueBundleFile extends ComboBundleFile {
+public interface VueBundleFile extends BundleFileBase {
 
-    @Override
-    protected void process() {
-        boolean debugMode = Settings.instance().getBundleDebug();
-        String url = getLiveUrl();
-        String query;
-        String rawContent = "";
+
+    public default void hydrateVueComboContent() {
+        String content = getProcessedContent();
         String css = "";
 
-        if (debugMode) {
-            url = getDebugUrl();
-        }
-        if (url.contains(":")) {
-            String[] parts = StringUtils.split(url, ":", 2);
-            setPluginName(parts[0]);
-            url = parts[1];
-        }
-        if (url.contains("?")) {
-            String[] parts = StringUtils.split(url, "?", 2);
-            url = parts[0];
-            query = parts[1];
-            setQuery(query);
-        }
-
-
-
-        try {
-            if (empty(getPluginName())) {
-                String fullPath = Settings.instance().getTargetFolder() + url;
-                rawContent = FileUtils.readFileToString(new File(fullPath), "utf-8");
-            } else {
-                rawContent = ResourceHelpers.loadAssetResource(getPluginName(), "/assets/" + url);
-            }
-        } catch (IOException e) {
-            Log.exception(e, "Error loading bundle file " + url);
-            throw new RuntimeException(e);
-        }
-        setRawContent(rawContent);
-
-        int index = rawContent.indexOf("<style>");
-        int lastIndex = rawContent.indexOf("</style>", index + 7);
+        int index = content.indexOf("<style>");
+        int lastIndex = content.indexOf("</style>", index + 7);
 
         if (index != -1 && lastIndex > index) {
-            css = rawContent.substring(index + 7, lastIndex);
+            css = content.substring(index + 7, lastIndex);
         }
         setCss(css);
 
 
-        index = rawContent.indexOf("<template>");
-        lastIndex = rawContent.lastIndexOf("</template>");
+        index = content.indexOf("<template>");
+        lastIndex = content.lastIndexOf("</template>");
         String template = "";
 
         if (index != -1 && lastIndex > index) {
-            template = rawContent.substring(index + 10, lastIndex);
+            template = content.substring(index + 10, lastIndex);
         }
 
-        index = rawContent.indexOf("<script>");
-        lastIndex = rawContent.lastIndexOf("</script>");
+        index = content.indexOf("<script>");
+        lastIndex = content.lastIndexOf("</script>");
         String script = "";
         int linesToAdd = 0;
         if (index != -1 && lastIndex > index) {
-            script = rawContent.substring(index + 8, lastIndex);
-            String before = rawContent.substring(0, index);
+            script = content.substring(index + 8, lastIndex);
+            String before = content.substring(0, index);
             linesToAdd = StringUtils.countMatches(before, "\n") - 1;
             if (linesToAdd < 0) {
                 linesToAdd = 0;
             }
         }
 
-        String tag = FilenameUtils.removeExtension(FilenameUtils.getName(url));
+        String tag = FilenameUtils.removeExtension(FilenameUtils.getName(getCurrentPath()));
         String templateJson = JSON.stringify(template.trim());
 
         script = "(function() {" +

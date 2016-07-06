@@ -1,6 +1,6 @@
 {% extends "stallion:admin/admin-base.jinja" %}
 {% block extra_head %}
-{{ assets.definedBundle("user-admin-vue-css") }}
+{{ assets.compiledBundle("user-admin-vue.css") }}
 {% endblock %}
 
 
@@ -21,6 +21,6 @@
 {% endblock %}
 
 {% block pre_end_body %}
-{{ assets.definedBundle("user-admin-vue-js") }}
+{{ assets.compiledBundle("user-admin-vue.js") }}
 {% endblock %}
 
