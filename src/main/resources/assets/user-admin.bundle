@@ -1,0 +1,10 @@
+/admin/admin.css
+/admin/users-manage.css
+always/stallion.js
+/vendor/vue.js
+/vendor/vue-router.js
+admin/users-edit.vue
+admin/users-table.vue
+/admin/users-manage-v2.js
+
+

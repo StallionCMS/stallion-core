@@ -38,6 +38,8 @@ public interface VueBundleFile extends BundleFileBase {
 
 
     public default void hydrateVueComboContent() {
+        Log.finer("Hydrate style & script for Vue file " + getCurrentPath());
+
         String content = getProcessedContent();
         String css = "";
 

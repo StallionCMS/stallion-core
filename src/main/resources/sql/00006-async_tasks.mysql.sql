@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `stallion_async_tasks` (
   `tryCount` int default 0,
   `errorMessage` longtext,
   `dataJson` longtext,
+  `localMode` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY custom_key_key (`customKey`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

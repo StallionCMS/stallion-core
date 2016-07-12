@@ -47,6 +47,7 @@ public class UsersApiResource implements EndpointResource {
         if (Settings.instance().getUsers().getEnableDefaultEndpoints()) {
             EndpointsRegistry.instance().addResource("", new UsersApiResource());
 
+            /*
             DefinedBundle.register(new DefinedBundle(
                     "userAdminStylesheets", ".css",
 
@@ -66,12 +67,12 @@ public class UsersApiResource implements EndpointResource {
                             new ResourceBundleFile("stallion", "admin/users-manage.css"),
                             new ResourceBundleFile("stallion", "vendor/vue.min.js", "vendor/vue.js"),
                             new ResourceBundleFile("stallion", "vendor/vue-router.min.js", "vendor/vue-router.js"),
-                            new VueResourceBundleFile("stallion", "admin/users-table.vue"),
-                            new VueResourceBundleFile("stallion", "admin/users-edit.vue"),
+                            new VueResourceBundleFile("stallion", "admin/*.vue"),
                             new ResourceBundleFile("stallion", "admin/users-manage-v2.js")
                     )
             );
 
+*/
             /*
             DefinedBundle.register(
                     "user-admin-vue",

@@ -18,16 +18,15 @@
 package io.stallion.requests;
 
 import io.stallion.Context;
-import io.stallion.assets.AssetsController;
-import io.stallion.assets.BundleHandler;
-import io.stallion.assets.BundleRegistry;
-import io.stallion.assets.DefinedBundle;
+import io.stallion.assetBundling.AssetHelpers;
+import io.stallion.assets.*;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.Displayable;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.Model;
 import io.stallion.exceptions.*;
 import io.stallion.hooks.HookRegistry;
+import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.javascript.JsEndpoint;
 
 import io.stallion.reflection.PropertyUtils;
@@ -51,6 +50,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -494,6 +494,8 @@ class RequestProcessor {
             serveComboBundleFile();
         } else if (request.getPath().startsWith("/st-bundle-file/")) {
             serveBundleFile();
+        } else if (request.getPath().startsWith("/st-bundle-v2/")) {
+            serveBundleV2(request.getPath());
         } else if (request.getPath().startsWith("/st-concatenated-bundle")) {
             serveConcatenatedBundle();
         } else if (request.getPath().startsWith("/st-assets/")) {
@@ -544,35 +546,52 @@ class RequestProcessor {
         sendContentResponse(content, request.getPath());
     }
 
-    public void serveResourceAsset(String path) throws Exception  {
-        String[] parts = path.split("/", 2);
+    public void serveResourceAsset(String assetPath) throws Exception  {
+        String[] parts = assetPath.split("/", 2);
         String plugin = parts[0];
-        path = parts[1];
+        assetPath = parts[1];
         if (parts.length < 2) {
-            throw new ClientException("Invalid resource path " + path);
+            throw new ClientException("Invalid resource path " + assetPath);
         }
-        path = "/" + path;
+        assetPath = "/" + assetPath;
+
+        if (request.getQueryParams().containsKey("bundlePath")) {
+            String bundlePath = AssetsController.ensureSafeAssetsPath(request.getQueryParams().get("bundlePath"));
+            URL url = ResourceHelpers.getUrlOrNotFound(plugin, bundlePath);
+            String content = null;
+            if (Settings.instance().getDevMode()) {
+                File file = ResourceHelpers.findDevModeFileForResource(plugin, bundlePath);
+                if (file != null) {
+                    content = AssetHelpers.renderDebugModeBundleFileByPath(file.getAbsolutePath(), assetPath);
+                }
+            }
+            if (empty(content)) {
+                content = AssetHelpers.renderDebugModeBundleFileByPath(url.getPath(), assetPath);
+            }
+            sendContentResponse(content, assetPath);
+        }
+
         //if (!BundleHandler.resourceIsAllowed(plugin, path)) {
         //    Log.fine("Resource {0} not on the white list!", path);
         //    throw new NotFoundException("Resource path does not exist or is not public: " + path);
         //}
-        path = "/assets" + path;
+        assetPath = AssetsController.ensureSafeAssetsPath(assetPath);
 
 
         if (!empty(request.getParameter("processor"))) {
-            String content = ResourceHelpers.loadAssetResource(plugin, path);
+            String content = ResourceHelpers.loadAssetResource(plugin, assetPath);
             //if (!empty(request.getParameter("nocache"))) {
                 //content = AssetsController.instance().convertUsingProcessorNoCache(request.getParameter("processor"), path, content);
             //} else {
-            content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), path, content);
+            content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), assetPath, content);
             //}
             markHandled(200, "resource-asset");
             sendContentResponse(content);
         } else {
             markHandled(200, "resource-asset");
-            byte[] bytes = ResourceHelpers.loadBinaryResource(plugin, path);
+            byte[] bytes = ResourceHelpers.loadBinaryResource(plugin, assetPath);
             InputStream stream = new ByteArrayInputStream(bytes);
-            sendAssetResponse(stream, 0, bytes.length, path);
+            sendAssetResponse(stream, 0, bytes.length, assetPath);
         }
     }
 
@@ -580,6 +599,16 @@ class RequestProcessor {
         BundleHandler bundleHandler = new BundleHandler(path, request.getQueryString());
         markHandled(200, "serve-bundle");
         String content = bundleHandler.toConcatenatedContent();
+        sendContentResponse(content, path);
+    }
+
+    public void serveBundleV2(String path) throws Exception {
+        path = path.replace("/st-bundle-v2/", "");
+        String[] parts = path.split("/", 2);
+        String plugin = parts[0];
+        path = parts[1];
+        path = AssetsController.ensureSafeAssetsPath(path);
+        String content = new ResourceAssetBundleRenderer(plugin, path).renderProductionContent();
         sendContentResponse(content, path);
     }
 

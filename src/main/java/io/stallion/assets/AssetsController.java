@@ -54,6 +54,19 @@ public class AssetsController {
         return _instance;
     }
 
+    public static String ensureSafeAssetsPath(String path) {
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        if (!path.startsWith("/assets/")) {
+            path = "/assets" + path;
+        }
+        if (path.contains("..")) {
+            throw new UsageException("Invalid asset path, illegal characters: " + path);
+        }
+        return path;
+    }
+
     /**
      * Get a wrapper for the asset controller with limited methods. This is used by
      * the template context and other sandboxed situations.
@@ -149,6 +162,15 @@ public class AssetsController {
      */
     public String pageHeadLiterals() {
         return Context.getResponse().getPageHeadLiterals().stringify();
+    }
+
+
+    public String assetBundle(String plugin, String path) {
+        if (Settings.instance().getBundleDebug()) {
+            return new ResourceAssetBundleRenderer(plugin, path).renderDebugHtml();
+        } else {
+            return new ResourceAssetBundleRenderer(plugin, path).renderProductionHtml();
+        }
     }
 
     /**

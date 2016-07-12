@@ -763,7 +763,7 @@ public class DB {
         if (col.getConverter() != null) {
             arg = col.getConverter().toDb(o, arg, col.getPropertyName());
         } else if (arg != null && !StringUtils.isBlank(col.getConverterClassName())) {
-            AttributeConverter converter = this.converters.get(col.getConverterClassName());
+            AttributeConverter converter = this.getConverter(col.getConverterClassName());
             arg = converter.convertToDatabaseColumn(arg);
         } else if (arg instanceof LocalDateTime) {
             arg = new Timestamp(((LocalDateTime) arg).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());

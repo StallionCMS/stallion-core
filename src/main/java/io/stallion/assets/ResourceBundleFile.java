@@ -72,8 +72,24 @@ public class ResourceBundleFile implements BundleFileBase {
 
     public void ensureHydrated() {
         if (rawContent != null && !Settings.instance().getDevMode()) {
+            Log.fine("Bundle file is already hydrated {0}", getCurrentPath());
             return;
         }
+        // Double check locking to prevent two threads from hydrating the file at the
+        // same time.
+        if (rawContent == null) {
+
+            synchronized (this) {
+                if (rawContent != null) {
+                    return;
+                }
+                doHydration();
+            }
+        } else if (Settings.instance().getDevMode()) {
+            doHydration();
+        }
+    }
+    private void doHydration() {
         String currentPath = getCurrentPath();
         if (!currentPath.startsWith("/assets/")) {
             currentPath = "/assets/" + currentPath;
@@ -87,16 +103,22 @@ public class ResourceBundleFile implements BundleFileBase {
             }
         } else {
             File file = ResourceHelpers.findDevModeFileForResource(plugin, currentPath);
-            if (!file.exists()) {
-                throw new WebException(MessageFormat.format("Could not find bundle resource file for plugin={0} path={1} filePath={2}", plugin, currentPath, file.getAbsolutePath()), 500);
+            if (file == null || !file.exists()) {
+                String absPath = "";
+                if (file != null) {
+                    absPath = file.getAbsolutePath();
+                }
+                throw new WebException(MessageFormat.format("Could not find bundle resource file for plugin={0} path={1} filePath={2}", plugin, currentPath, absPath), 500);
             }
             if (rawContent != null && loadedAt > file.lastModified()) {
+                Log.fine("Resource asset file is up to date, do not process " + file.getAbsolutePath());
                 // rawContent is up to date, return
                 return;
             }
             rawContent = FileUtils.readAllText(file, Charset.forName("UTF-8"));
             loadedAt = DateUtils.mils();
         }
+        Log.info("Raw content size is {0} for file {1}", rawContent.length(), getCurrentPath());
         hydrateCssAndJavaScriptFromRawContent();
     }
 
@@ -111,6 +133,7 @@ public class ResourceBundleFile implements BundleFileBase {
         } else if (getType().equals(AssetType.JAVA_SCRIPT)) {
             setJavascript(processedContent);
         } else {
+            Log.fine("Hydrate combo content for file {0}", getCurrentPath());
             hydrateComboContent();
         }
     }

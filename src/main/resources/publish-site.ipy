@@ -520,11 +520,12 @@ respawn limit 3 60
         if self.redirect_to_ssl and self.ssl_key:
             site_url = "https://"
         paths = self.check_urls or ['/']
-        site_url += self.domain + paths[0]
+        primary_domain = self.domain
+        site_url = 'localhost' + paths[0]
         info("Fetching url via nginx " + site_url)
         for x in range(0, 10):
             debug("Fetching live url " + site_url)
-            o = !curl -v $site_url
+            o = !curl --header 'Host: $primary_domain' -v $site_url
             if '< HTTP/1.1 200 OK' not in o:
                 if x == 9:
                     sys.stderr.write(unicode(o))

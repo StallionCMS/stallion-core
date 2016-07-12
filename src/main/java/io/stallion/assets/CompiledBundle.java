@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
@@ -173,25 +175,30 @@ public class CompiledBundle {
     }
 
 
-
+    private final Lock lock = new ReentrantLock();
 
     protected void ensureConcatenatedHydrated() {
         if (concatenatedCss != null && concatenatedHeadJavaScript != null && concatenatedJavaScript != null) {
             return;
         }
-        ensureBundleFilesHydrated();
-        StringBuilder cssBuilder = new StringBuilder();
-        StringBuilder javaScriptBuilder = new StringBuilder();
-        StringBuilder headJavaScriptBuilder = new StringBuilder();
-        for(BundleFileBase bf: expandedBundleFiles) {
-            bf.ensureHydrated();
-            cssBuilder.append(bf.getCss());
-            javaScriptBuilder.append(bf.getJavascript());
-            headJavaScriptBuilder.append(bf.getHeadJavascript());
+        synchronized (this) {
+            if (concatenatedCss != null && concatenatedHeadJavaScript != null && concatenatedJavaScript != null) {
+                return;
+            }
+            ensureBundleFilesHydrated();
+            StringBuilder cssBuilder = new StringBuilder();
+            StringBuilder javaScriptBuilder = new StringBuilder();
+            StringBuilder headJavaScriptBuilder = new StringBuilder();
+            for (BundleFileBase bf : expandedBundleFiles) {
+                bf.ensureHydrated();
+                cssBuilder.append(bf.getCss() + "\n");
+                javaScriptBuilder.append("//Source:" + bf.getCurrentPath() + "\n" + bf.getJavascript() + "\n");
+                headJavaScriptBuilder.append(bf.getHeadJavascript() + "\n");
+            }
+            concatenatedCss = cssBuilder.toString();
+            concatenatedJavaScript = javaScriptBuilder.toString();
+            concatenatedHeadJavaScript = headJavaScriptBuilder.toString();
         }
-        concatenatedCss = cssBuilder.toString();
-        concatenatedJavaScript = javaScriptBuilder.toString();
-        concatenatedHeadJavaScript = headJavaScriptBuilder.toString();
     }
 
     protected void ensureBundleFilesHydrated() {
@@ -204,9 +211,21 @@ public class CompiledBundle {
                 }
                 BundleFileBase bf = toProcess.remove(0);
                 // If this is a directory, expand and add all files
+                Log.finer("Bundle file to expand is {0}", bf.getCurrentPath());
                 if (bf.getCurrentPath().endsWith("/") || bf.getCurrentPath().contains("*") || !bf.getCurrentPath().contains(".")) {
-                    for(String path: ResourceHelpers.listFilesInDirectory(bf.getPlugin(), bf.getCurrentPath())) {
+                    String currentPath = bf.getCurrentPath();
+                    if (!currentPath.startsWith("/")) {
+                        currentPath = "/" + currentPath;
+                    }
+                    if (!currentPath.startsWith("/assets/")) {
+                        currentPath = "/assets" + currentPath;
+                    }
+                    Log.finer("Bundle file path is directory: {0}", currentPath);
+                    for(String path: ResourceHelpers.listFilesInDirectory(bf.getPlugin(), currentPath)) {
+                        Log.finer("Directory file is {0}", path);
                         BundleFileBase newBf;
+                        // Strip off the initial /assets/ part
+                        path = path.substring(8);
                         if (byPath.containsKey(path)) {
                             newBf = byPath.get(path);
                         } else if (path.endsWith(".vue")) {
@@ -214,7 +233,7 @@ public class CompiledBundle {
                         } else {
                             newBf = new ResourceBundleFile();
                         }
-                        toProcess.add(newBf
+                        toProcess.add(0, newBf
                                 .setProductionPath(path)
                                 .setJsInHead(path.contains(".head."))
                                 .setPlugin(bf.getPlugin())

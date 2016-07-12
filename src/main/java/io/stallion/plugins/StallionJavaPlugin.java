@@ -34,10 +34,16 @@ import io.stallion.services.Log;
 import java.util.Collections;
 import java.util.List;
 
+import static io.stallion.utils.Literals.list;
+
 public abstract class StallionJavaPlugin {
     private PluginRegistry pluginRegistry;
 
     public abstract String getPluginName();
+
+    public List<String> getSqlMigrations() {
+        return list();
+    }
 
     /**
      * Get a list of available actions

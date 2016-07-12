@@ -224,6 +224,7 @@ if (window.$ && !window.jQuery) {
                 $('.st-error.pre-fade').removeClass('pre-fade');
             }, 30);       
             setTimeout(function() { $div.fadeOut(2000); }, 4000);
+            setTimeout(function() { $div.remove(); }, 6000);
         }
 
     };
@@ -239,8 +240,8 @@ if (window.$ && !window.jQuery) {
         $others = $('.st-message-fixed');
         if ($others.length) {
             var minTop = top;
-            $others.each(function(ele) {
-                var eleTop = parseInt($(ele).css('top'), 10);
+            $others.each(function(i) {
+                var eleTop = parseInt($(this).css('top'), 10);
                 if (eleTop < minTop) {
                     minTop = eleTop;
                 }
@@ -277,6 +278,7 @@ if (window.$ && !window.jQuery) {
                 .html(msg);
             $(document.body).append($div);
             setTimeout(function() { $div.fadeOut(2000); }, 4000);
+            setTimeout(function() { $div.remove(); }, 6000);
         }
     };
     

@@ -17,6 +17,7 @@
 
 package io.stallion.utils;
 
+import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
@@ -29,9 +30,11 @@ import org.parboiled.common.FileUtils;
 
 import java.io.*;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import static io.stallion.utils.Literals.*;
 
@@ -52,6 +55,31 @@ public class ResourceHelpers {
         return loadResource(pluginName, path);
     }
 
+    public static boolean resourceExists(String pluginName, String path) {
+        URL url = null;
+        try {
+            url = pluginPathToUrl(pluginName, path);
+        } catch (FileNotFoundException e) {
+            return false;
+        }
+        if (url == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static URL getUrlOrNotFound(String pluginName, String path) {
+        try {
+            URL url = pluginPathToUrl(pluginName, path);
+            if (url == null) {
+                throw new NotFoundException("Resource not found: " + pluginName + ":"  + path);
+            }
+            return url;
+        } catch(FileNotFoundException e) {
+            throw new NotFoundException("Resource not found: " + pluginName + ":"  + path);
+        }
+    }
 
     public static String loadResource(String pluginName, String path) {
         try {
@@ -80,13 +108,109 @@ public class ResourceHelpers {
             ending = parts[1];
         }
 
+        Log.info("listFilesInDirectory Parsed Path {0} starting:{1} ending:{2}", path, starting, ending);
+        URL url = PluginRegistry.instance().getJavaPluginByName().get(plugin).getClass().getResource(path);
+        Log.info("URL: {0}", url);
+
         List<String> filenames = new ArrayList<>();
+        URL dirURL = getClassForPlugin(plugin).getResource(path);
+        Log.info("Dir URL is {0}", dirURL);
+        // Handle file based resource folder
+        if (dirURL != null && dirURL.getProtocol().equals("file")) {
+            String fullPath = dirURL.toString().substring(5);
+            File dir = new File(fullPath);
+            // In devMode, use the source resource folder, rather than the compiled version
+            if (Settings.instance().getDevMode()) {
+                String devPath = fullPath.replace("/target/classes/", "/src/main/resources/");
+                File devFolder = new File(devPath);
+                if (devFolder.exists()){
+                    dir = devFolder;
+                }
+            }
+            Log.info("List files from folder {0}", dir.getAbsolutePath());
+            List<String> files = list();
+            for (String name: dir.list()) {
+                if (!empty(ending) && !name.endsWith(ending)) {
+                    continue;
+                }
+                if (!empty(starting) && !name.endsWith("starting")) {
+                    continue;
+                }
+                // Skip special files, hidden files
+                if (name.startsWith(".") || name.startsWith("~") || name.startsWith("#") || name.contains("_flymake.")) {
+                    continue;
+                }
+                filenames.add(path + name);
+            }
+            return filenames;
+        }
+
+
+        if (dirURL.getProtocol().equals("jar")) {
+        /* A JAR path */
+            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
+            JarFile jar = null;
+            try {
+                jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+            Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
+            while(entries.hasMoreElements()) {
+                String name = entries.nextElement().getName();
+                Log.finer("Jar file entry: {0}", name);
+                if (name.startsWith(path)) { //filter according to the path
+                    String entry = name.substring(path.length());
+                    int checkSubdir = entry.indexOf("/");
+                    if (checkSubdir >= 0) {
+                        // if it is a subdirectory, we just return the directory name
+                        entry = entry.substring(0, checkSubdir);
+                    }
+                    if (!empty(ending) && !name.endsWith(ending)) {
+                        continue;
+                    }
+                    if (!empty(starting) && !name.endsWith("starting")) {
+                        continue;
+                    }
+                    // Skip special files, hidden files
+                    if (name.startsWith(".") || name.startsWith("~") || name.startsWith("#") || name.contains("_flymake.")) {
+                        continue;
+                    }
+                    result.add(entry);
+                }
+            }
+            return new ArrayList<>(result);
+        }
+        throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
+        /*
+        try {
+            URL url1 = getClassForPlugin(plugin).getResource(path);
+            Log.info("URL1 {0}", url1);
+            if (url1 != null) {
+                Log.info("From class folder contents {0}", IOUtils.toString(url1));
+                Log.info("From class folder contents as stream {0}", IOUtils.toString(getClassForPlugin(plugin).getResourceAsStream(path)));
+            }
+            URL url2 = getClassLoaderForPlugin(plugin).getResource(path);
+            Log.info("URL1 {0}", url2);
+            if (url2 != null) {
+                Log.info("From classLoader folder contents {0}", IOUtils.toString(url2));
+                Log.info("From classLoader folder contents as stream {0}", IOUtils.toString(getClassLoaderForPlugin(plugin).getResourceAsStream(path)));
+            }
+
+        } catch (IOException e) {
+            Log.exception(e, "error loading path " + path);
+        }
+        //  Handle jar based resource folder
         try(
                 InputStream in = getResourceAsStream(plugin, path);
                 BufferedReader br = new BufferedReader( new InputStreamReader( in ) ) ) {
             String resource;
             while( (resource = br.readLine()) != null ) {
-                Log.info("checking resource for inclusion in directory scan: {0}", resource);
+                Log.finer("checking resource for inclusion in directory scan: {0}", resource);
                 if (!empty(ending) && !resource.endsWith(ending)) {
                     continue;
                 }
@@ -97,23 +221,40 @@ public class ResourceHelpers {
                 if (resource.startsWith(".") || resource.startsWith("~") || resource.startsWith("#") || resource.contains("_flymake.")) {
                     continue;
                 }
-                Log.info("added resource during directory scan: {0}", resource);
-                filenames.add(resource);
+                Log.finer("added resource during directory scan: {0}", resource);
+                filenames.add(path + resource);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return filenames;
+        */
     }
 
     private static InputStream getResourceAsStream(String plugin, String resource ) {
+
         if (empty(plugin) || plugin.equals("stallion")) {
-            return ResourceHelpers.class.getResourceAsStream(resource);
+            return ResourceHelpers.class.getClassLoader().getResourceAsStream(resource);
         } else {
-            return  PluginRegistry.instance().getJavaPluginByName().get(plugin).getClass().getResourceAsStream(resource);
+            return  PluginRegistry.instance().getJavaPluginByName().get(plugin).getClass().getClassLoader().getResourceAsStream(resource);
         }
     }
 
+    private static ClassLoader getClassLoaderForPlugin(String plugin) {
+        if (empty(plugin) || "stallion".equals(plugin)) {
+            return ResourceHelpers.class.getClassLoader();
+        } else {
+            return PluginRegistry.instance().getJavaPluginByName().get(plugin).getClass().getClassLoader();
+        }
+    }
+
+    private static Class getClassForPlugin(String plugin) {
+        if (empty(plugin) || "stallion".equals(plugin)) {
+            return ResourceHelpers.class;
+        } else {
+            return PluginRegistry.instance().getJavaPluginByName().get(plugin).getClass();
+        }
+    }
 
 
     private static URL pluginPathToUrl(String pluginName, String path) throws FileNotFoundException {
@@ -180,8 +321,11 @@ public class ResourceHelpers {
             }
             // We find the URL of the root, not the actual file, since if the file was just created, we want it to be
             // accessible even if mvn hasn't recompiled the project. This allows us to iterate more quickly.
-            URL url = pluginPathToUrl(plugin, "/");
-            url = new URL(StringUtils.stripStart(url.toString(), "/") + resourcePath);
+            URL url = pluginPathToUrl(plugin, resourcePath);
+            // Maybe the file was just created? We'll try to find the root folder path, and then add the file path
+            if (url == null) {
+                url = new URL(StringUtils.stripStart(url.toString(), "/") + resourcePath);
+            }
             return urlToFileMaybe(url, plugin);
         } catch (IOException e) {
             throw new RuntimeException(e);

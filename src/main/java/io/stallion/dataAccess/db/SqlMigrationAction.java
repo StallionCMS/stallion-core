@@ -21,6 +21,8 @@ import io.stallion.boot.AppContextLoader;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.boot.SqlMigrateCommandOptions;
 import io.stallion.exceptions.ConfigException;
+import io.stallion.plugins.PluginRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.utils.ResourceHelpers;
 import io.stallion.utils.json.JSON;
@@ -32,6 +34,7 @@ import org.parboiled.common.FileUtils;
 import javax.script.ScriptEngine;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
@@ -173,18 +176,32 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
 
     public List<SqlMigration> getDefaultMigrations() {
         List<SqlMigration> migrations = list();
-        List<String> files = list("00004-users", "00006-async_tasks", "00010-job_status", "00011-temp_tokens");
-        for (String fileStub: files) {
-            int version = Integer.parseInt(fileStub.split("-")[0]);
-            String fileName = fileStub + "." + DB.instance().getDbImplementation().getName().toLowerCase() + ".sql";
-            String source = ResourceHelpers.loadResource("stallion", "/sql/" + fileName);
-            SqlMigration migration = new SqlMigration()
-                    .setAppName("stallion")
-                    .setFilename(fileName)
-                    .setSource(source)
-                    .setVersionNumber(version);
-            migrations.add(migration);
+        Map<String, List<String>> pluginMigrations = map();
+        pluginMigrations.put("stallion", list("00004-users", "00006-async_tasks", "00010-job_status", "00011-temp_tokens"));
+        for (StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
+            pluginMigrations.put(plugin.getPluginName(), plugin.getSqlMigrations());
         }
+        for (Map.Entry<String, List<String>> entry: pluginMigrations.entrySet()) {
+            for (String fileStub: entry.getValue()) {
+                Log.info("fileStub: {0}", fileStub);
+                int version = Integer.parseInt(fileStub.split("\\-")[0]);
+                String fileName = fileStub + "." + DB.instance().getDbImplementation().getName().toLowerCase() + ".sql";
+                if (!ResourceHelpers.resourceExists(entry.getKey(), "/sql/" + fileName)) {
+                    fileName = fileStub + "." + DB.instance().getDbImplementation().getName().toLowerCase() + ".js";
+                }
+                if (!ResourceHelpers.resourceExists(entry.getKey(), "/sql/" + fileName)) {
+                    throw new ConfigException("The sql migration file /sql/" + fileName + " does not exist in plugin " + entry.getKey());
+                }
+                String source = ResourceHelpers.loadResource(entry.getKey(), "/sql/" + fileName);
+                SqlMigration migration = new SqlMigration()
+                        .setAppName(entry.getKey())
+                        .setFilename(fileName)
+                        .setSource(source)
+                        .setVersionNumber(version);
+                migrations.add(migration);
+            }
+        }
+
         return migrations;
     }
 
