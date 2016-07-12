@@ -69,7 +69,9 @@ public class GeneralUtils {
             val("woff", "application/font-woff"),
             val("otf", "application/octet-stream"),
             val("eot", "application/octet-stream"),
-            val("ttf", "application/octet-stream")
+            val("ttf", "application/octet-stream"),
+            val("map", "application/json"),
+            val("json", "application/json")
     );
 
     /**

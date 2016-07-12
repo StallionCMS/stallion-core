@@ -47,7 +47,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
+                <version>1.5.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -59,7 +59,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>2.10.4</version>
                 <configuration>
                     <top><![CDATA[<link rel="stylesheet" href="/st-assets/css/javadoc.css"><div class="stallion-logo-bar-top"><a target="_top" href="https://stallion.io"><img class="logo-100" src="/st-assets/stallion-rearing-white-100.png"> <span class="logo-text">Stallion: The Blazing Fast, Rock Solid CMS</span></a></div>]]></top>
                     <footer><![CDATA[<script src="/st-assets/js/javadoc.js"></script>]]></footer>
@@ -96,7 +96,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -121,6 +121,13 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.4</version>
+            </extension>
+        </extensions>
     </build>
 
     <dependencies>
@@ -129,27 +136,27 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0</version>
+            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.4.1.1</version>
+            <version>2.8.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.4.1.1</version>
+            <version>2.8.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.4.1</version>
+            <version>2.8.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.2.0.M0</version>
+            <version>9.3.10.v20160621</version>
         </dependency>
 
         <dependency>
@@ -161,18 +168,18 @@
         <dependency>
             <groupId>com.hubspot.jinjava</groupId>
             <artifactId>jinjava</artifactId>
-            <version>2.1.7</version>
+            <version>2.1.10</version>
         </dependency>
 
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.1</version>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+            <version>2.5</version>
         </dependency>
 
         <dependency>
@@ -183,22 +190,22 @@
         <dependency>
             <groupId>org.apache.xbean</groupId>
             <artifactId>xbean-classloader</artifactId>
-            <version>3.18</version>
+            <version>4.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.0</version>
+            <version>4.1</version>
         </dependency>
         <dependency>
             <groupId>com.moandjiezana.toml</groupId>
             <artifactId>toml4j</artifactId>
-            <version>0.5.1</version>
+            <version>0.6.0</version>
         </dependency>
         <dependency>
             <groupId>args4j</groupId>
             <artifactId>args4j</artifactId>
-            <version>2.0.29</version>
+            <version>2.33</version>
         </dependency>
 
 
@@ -209,15 +216,15 @@
             <version>0.9.1.2</version>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.36</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>1.4.6</version>
         </dependency>
         <!-- http://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4.1208.jre7</version>
+            <version>9.4.1208</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/sax/sax -->
         <dependency>
@@ -240,13 +247,13 @@
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.5.2</version>
+            <version>1.5.5</version>
         </dependency>
 
         <dependency>
             <groupId>com.mashape.unirest</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>1.3.27</version>
+            <version>1.4.9</version>
         </dependency>
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -261,7 +268,7 @@
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
-            <version>2.12</version>
+            <version>2.14.2</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
@@ -271,7 +278,7 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
-            <version>2.6.10</version>
+            <version>2.6.11</version>
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
@@ -281,18 +288,18 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
+            <version>1.7.21</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.6.4</version>
+            <version>1.7.21</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.10.9</version>
+            <version>1.11.15</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -302,7 +309,7 @@
         <dependency>
             <groupId>org.jodd</groupId>
             <artifactId>jodd-lagarto</artifactId>
-            <version>3.6.7</version>
+            <version>3.7.1</version>
         </dependency>
         <dependency>
             <groupId>net.east301</groupId>
@@ -312,7 +319,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
-            <version>4.0.3.RELEASE</version>
+            <version>4.1.1.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>io.stallion</groupId>
@@ -330,5 +337,14 @@
             </snapshots>
         </repository>
     </repositories>
-
+    <distributionManagement>
+        <downloadUrl>http://mvn.stallion.io/repo</downloadUrl>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>stallion-repo</id>
+            <name>Stallion Software Maven Repository</name>
+            <url>scp://mvn.stallion.io/usr/share/maven-repo/</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
 </project>

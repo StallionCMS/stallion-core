@@ -40,7 +40,11 @@ public class DbConfig implements SettingsSection {
         if (empty(driverClass) && !empty(url)) {
 
             if (url.contains("jdbc:mysql")) {
-                driverClass = "com.mysql.jdbc.Driver";
+                // Since MySql driver is GPL, have to package the maria db driver
+                //driverClass = "com.mysql.jdbc.Driver";
+                driverClass = "org.mariadb.jdbc.Driver";
+            } else if (url.contains("jdbc:mariadb")) {
+                driverClass = "org.mariadb.jdbc.Driver";
             } else if (url.contains("jdbc:postgresql")) {
                 driverClass = "org.postgresql.Driver";
             } else {
@@ -48,7 +52,7 @@ public class DbConfig implements SettingsSection {
             }
         }
         if (empty(implementationClass) && !empty(url)) {
-            if (url.contains("jdbc:mysql")) {
+            if (url.contains("jdbc:mysql") || url.contains("jdbc:mariadb")) {
                 implementationClass = "io.stallion.dataAccess.db.mysql.MySqlDbImplementation";
             } else if (url.contains("jdbc:postgresql")) {
                 implementationClass = "io.stallion.dataAccess.db.postgres.PostgresDbImplementation";

@@ -513,7 +513,7 @@ public class BundleHandler {
                     fileContents = "";
                 } else {
                     try {
-                        fileContents = FileUtils.readFileToString(f);
+                        fileContents = FileUtils.readFileToString(f, "UTF-8");
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

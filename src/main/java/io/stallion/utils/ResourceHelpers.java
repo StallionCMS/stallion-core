@@ -257,7 +257,7 @@ public class ResourceHelpers {
     }
 
 
-    private static URL pluginPathToUrl(String pluginName, String path) throws FileNotFoundException {
+    public static URL pluginPathToUrl(String pluginName, String path) throws FileNotFoundException {
         URL url = null;
         if ("stallion".equals(pluginName) || empty(pluginName)) {
             url = ResourceHelpers.class.getResource(path);

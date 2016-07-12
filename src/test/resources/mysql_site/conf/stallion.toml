@@ -24,6 +24,6 @@ route = "/template-direct"
 template = "template-direct.jinja"
 
 [database]
-url = "jdbc:mysql://localhost:3306/stallion_test?allowMultiQueries=true&autoReConnect=true"
+url = "jdbc:mariadb://localhost:3306/stallion_test?allowMultiQueries=true&autoReConnect=true"
 username = "root"
 password = ""

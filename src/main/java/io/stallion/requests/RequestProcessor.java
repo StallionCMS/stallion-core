@@ -46,6 +46,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletOutputStream;
+import javax.xml.ws.Response;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -119,7 +120,9 @@ class RequestProcessor {
                 handleError(ex);
             }
         } catch(InvocationTargetException e) {
-            if (e.getTargetException() instanceof RedirectException) {
+            if (e.getTargetException() instanceof ResponseComplete){
+                // Do nothing, response completed successfully
+            } else if (e.getTargetException() instanceof RedirectException) {
                 RedirectException target = (RedirectException)e.getTargetException();
                 response.addHeader("Location", target.getUrl());
                 response.setStatus(target.getStatusCode());
@@ -589,13 +592,14 @@ class RequestProcessor {
             sendContentResponse(content);
         } else {
             markHandled(200, "resource-asset");
-            byte[] bytes = ResourceHelpers.loadBinaryResource(plugin, assetPath);
-            InputStream stream = new ByteArrayInputStream(bytes);
-            sendAssetResponse(stream, 0, bytes.length, assetPath);
+            URL url = ResourceHelpers.pluginPathToUrl(plugin, assetPath);
+            new ServletFileSender(request, response).sendResource(url, assetPath);
+            complete();
         }
     }
 
     public void serveBundle(String path)  throws Exception {
+
         BundleHandler bundleHandler = new BundleHandler(path, request.getQueryString());
         markHandled(200, "serve-bundle");
         String content = bundleHandler.toConcatenatedContent();
@@ -642,63 +646,25 @@ class RequestProcessor {
         }
     }
 
-    public void sendContentResponse(String content, String fullPath) throws Exception {
+    public void sendContentResponse(String content, String fullPath)  {
         sendContentResponse(content, 0, fullPath);
     }
 
-    public void sendContentResponse(String content, long modifyTime, String fullPath) throws Exception {
-        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-        InputStream stream = new ByteArrayInputStream(bytes);
-        sendAssetResponse(stream, modifyTime, bytes.length, fullPath);
+    public void sendContentResponse(String content, long modifyTime, String fullPath)  {
+        new ServletFileSender(request, response).sendContentResponse(content, modifyTime, fullPath);
+        complete();
     }
 
-    public void sendByteResponse(Byte[] bytes, long modifyTime, String fullPath) {
-
-    }
-
-    public void sendAssetResponse(File file) throws Exception {
-        sendAssetResponse(new FileInputStream(file), file.lastModified(), file.length(), file.getAbsolutePath());
-    }
-
-    public void sendAssetResponse(InputStream stream, long modifyTime, long contentLength, String fullPath) throws Exception {
-
-        // Set the caching headers
-        Long duration = 60 * 60 * 24 * 365 * 10L; // 10 years
-        Long durationMils = duration  * 1000;
-        response.addHeader("Cache-Control", "max-age=" + duration);
-        response.setDateHeader("Expires", System.currentTimeMillis() + durationMils);
-        if (modifyTime > 0) {
-            response.setDateHeader("Last-Modified", modifyTime);
-        }
-
-        // Set the Content-type
-        String contentType = GeneralUtils.guessMimeType(fullPath);
-        if (empty(contentType)) {
-            contentType = Files.probeContentType(FileSystems.getDefault().getPath(fullPath));
-        }
-        response.setContentType(contentType);
-
-        Integer BUFF_SIZE = 1024;
-        byte[] buffer = new byte[BUFF_SIZE];
-        ServletOutputStream os = response.getOutputStream();
-        response.setContentLength((int)contentLength);
-
+    public void sendAssetResponse(File file) {
         try {
-            int byteRead = 0;
-            while(true) {
-                byteRead = stream.read(buffer);
-                if (byteRead == -1) {
-                    break;
-                }
-                os.write(buffer, 0, byteRead);
-            }
-            os.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            os.close();
-            stream.close();
+            sendAssetResponse(new FileInputStream(file), file.lastModified(), file.length(), file.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    public void sendAssetResponse(InputStream stream, long modifyTime, long contentLength, String fullPath)  {
+        new ServletFileSender(request, response).sendAssetResponse(stream, modifyTime, contentLength, fullPath);
         complete();
     }
 

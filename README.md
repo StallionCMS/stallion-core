@@ -1,3 +1,5 @@
+[![Dependency Status](https://www.versioneye.com/user/projects/578569c16edb08003d108585/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/578569c16edb08003d108585)
+
 [<img src="https://img.shields.io/aur/license/yaourt.svg?maxAge=2592000">](https://github.com/StallionCMS/stallion-core/blob/master/LICENSE)
 
 

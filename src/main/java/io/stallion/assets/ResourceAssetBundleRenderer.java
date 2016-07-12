@@ -141,7 +141,7 @@ public class ResourceAssetBundleRenderer {
         if (url == null) {
             throw new UsageException("Could not find compiled bundle for path: " + path);
         }
-        Context.response().addHeader("X-Sourcemap", "/st-resource/" + path + ".min" + extension + ".map");
+        Context.response().addHeader("X-Sourcemap", "/st-resource/" + this.plugin + path + ".min" + extension + ".map");
         try {
             return IOUtils.toString(url, "UTF-8");
         } catch (IOException e) {

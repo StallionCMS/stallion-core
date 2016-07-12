@@ -178,8 +178,10 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
         List<SqlMigration> migrations = list();
         Map<String, List<String>> pluginMigrations = map();
         pluginMigrations.put("stallion", list("00004-users", "00006-async_tasks", "00010-job_status", "00011-temp_tokens"));
-        for (StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
-            pluginMigrations.put(plugin.getPluginName(), plugin.getSqlMigrations());
+        if (PluginRegistry.instance() != null) {
+            for (StallionJavaPlugin plugin : PluginRegistry.instance().getJavaPluginByName().values()) {
+                pluginMigrations.put(plugin.getPluginName(), plugin.getSqlMigrations());
+            }
         }
         for (Map.Entry<String, List<String>> entry: pluginMigrations.entrySet()) {
             for (String fileStub: entry.getValue()) {
