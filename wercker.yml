@@ -2,6 +2,6 @@ box: maven:latest
 build:
   steps:
     - xenoterracide/maven:
-        goals: dependency:tree compile
+        goals: dependency:tree
     - xenoterracide/maven:
         goals: compile        
