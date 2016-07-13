@@ -27,10 +27,10 @@ public class ForceActionOptions extends CommandOptionsBase {
     @Option(name="-localMode", usage="Set to 'false' if you want to simulate a server environment, with bundled assets, logging to file instead of console, etc.")
     private String localMode = null;
 
-    @Option(name="-jobName", usage="The job to run", forbids="-taskId")
+    @Option(name="-jobName", usage="The job to run")
     private String jobName = "";
 
-    @Option(name="-taskId", usage="The task to run", forbids="-jobName")
+    @Option(name="-taskId", usage="The task to run")
     private Long taskId = 0L;
 
     @Option(name="-force", usage="Force to run, even if it is locked")
