@@ -1,6 +1,5 @@
 box: maven:latest
 build:
   steps:
-    - xenoterracide
-    /maven:
+    - xenoterracide/maven:
         goals: compile
