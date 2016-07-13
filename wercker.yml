@@ -1,5 +1,6 @@
 box: maven:latest
 build:
   steps:
-    - stallion-core/maven:
+    - xenoterracide
+    /maven:
         goals: compile
