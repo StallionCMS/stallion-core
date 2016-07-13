@@ -21,6 +21,8 @@ package io.stallion.utils;
 import io.stallion.exceptions.AppException;
 import io.stallion.settings.Settings;
 
+import java.nio.charset.Charset;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -30,7 +32,8 @@ import java.util.stream.Collectors;
 
 public class Literals {
 
-
+    public static final ZoneId UTC = ZoneId.of("UTC");
+    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     public static final char GSEP = Character.forDigit(29, 10);
 

@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import static org.junit.Assert.assertEquals;
+import static io.stallion.utils.Literals.*;
 
 
 public class TextFileTest extends AppIntegrationCaseBase {
@@ -63,17 +64,17 @@ public class TextFileTest extends AppIntegrationCaseBase {
         TextItemController controller = (TextItemController)Context.dal().get("pages");
 
         TextItem item = (TextItem)controller.filter("slug", "/pegdown-footnotes").all().get(0);
-        String expected = IOUtils.toString(getClass().getResource("/text_site/assets/pegdown-footnotes.txt"));
+        //String expected = IOUtils.toString(getClass().getResource("/text_site/assets/pegdown-footnotes.txt"), UTF8);
 
         assertContains(item.getContent(), "<sup id='fnref:1'><a href='#fn:1' rel='footnote'>1</a></sup>");
         assertContains(item.getContent(), "<sup id='fnref:3'><a href='#fn:3' rel='footnote'>3</a></sup>");
-        assertContains(item.getContent(), "<li id='fn:2'> <p>This is the very long one.</p><p>That&rsquo;s the second paragraph.</p> <a href='#fnref:2'>&#8617;</a></li>");
+        assertContains(item.getContent(), "<li id='fn:2'> <p>This is the very long one.</p> <p>That&rsquo;s the second paragraph.</p> <a href='#fnref:2'>&#8617;</a></li>");
         //assertContains(item.getContent(), expected);
 
         item = (TextItem)controller.filter("slug", "/footnoting").all().get(0);
         Log.info(item.getContent());
         assertContains(item.getContent(), "<sup id='fnref:3'><a href='#fn:3' rel='footnote'>3</a></sup>");
-        assertContains(item.getContent(), "<li id='fn:2'> <p>multi</p><p>Second <em>para</em>. <a href=\"http://stallion.io/\">With link</a></p><p>Third para.</p> <a href='#fnref:2'>&#8617;</a></li>");
+        assertContains(item.getContent(), "<li id='fn:2'> <p>multi</p> <p>Second <em>para</em>. <a href=\"http://stallion.io/\">With link</a></p> <p>Third para.</p> <a href='#fnref:2'>&#8617;</a></li>");
 
     }
 
