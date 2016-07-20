@@ -24,6 +24,7 @@ import io.stallion.settings.Settings;
 
 import org.junit.AfterClass;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,10 +44,15 @@ public abstract class AppIntegrationCaseBase {
     public static void startApp(String folderName, Boolean watchFolders) throws Exception {
         Log.info("setUpClass client and app");
         Settings.shutdown();
-        URL resourceUrl = AppIntegrationCaseBase.class.
-                getResource(folderName);
-        Path resourcePath = Paths.get(resourceUrl.toURI());
-        String path = resourcePath.toString();
+        String path;
+        if (new File(folderName).exists()) {
+            path = folderName;
+        } else {
+            URL resourceUrl = AppIntegrationCaseBase.class.
+                    getResource(folderName);
+            Path resourcePath = Paths.get(resourceUrl.toURI());
+            path = resourcePath.toString();
+        }
         Log.fine("--------------------------------------------------------------------------------------------------");
         Log.info("Booting app from folder: {0} ", path);
         Log.fine("--------------------------------------------------------------------------------------------------");

@@ -21,11 +21,16 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.CloudStorageSettings;
+import io.stallion.utils.GeneralUtils;
 
+import java.io.File;
 import java.lang.annotation.Documented;
 import java.sql.Date;
 import java.util.Map;
@@ -46,13 +51,39 @@ public class S3StorageService extends CloudStorageService {
         if (empty(settings.getAccessToken())) {
             throw new ConfigException("You are missing the setting accessKey in the stallion.toml section [cloudStorage]");
         }
-        if (empty(settings.getAccessToken())) {
+        if (empty(settings.getSecret())) {
             throw new ConfigException("You are missing the setting secret in the stallion.toml section [cloudStorage]");
         }
         accessToken = settings.getAccessToken();
         secret = settings.getSecret();
         AWSCredentials credentials = new BasicAWSCredentials(accessToken, secret);
         client =  new AmazonS3Client(credentials);
+    }
+
+    public void uploadFile(File file, String bucket, String fileKey, boolean isPublic) {
+        String contentType = GeneralUtils.guessMimeType(fileKey);
+        uploadFile(file, bucket, fileKey, isPublic, contentType, null);
+    }
+
+    public void uploadFile(File file, String bucket, String fileKey, boolean isPublic, String contentType, Map<String, String> headers) {
+        client.putObject(bucket, fileKey, file);
+        PutObjectRequest req = new PutObjectRequest(bucket, fileKey, file);
+        if (isPublic) {
+            req.withCannedAcl(CannedAccessControlList.PublicRead);
+        }
+        ObjectMetadata meta = new ObjectMetadata();
+
+        if (headers != null) {
+            for (String key: headers.keySet()) {
+                meta.setHeader(key, headers.get(key));
+            }
+        }
+        if (!empty(contentType)) {
+            meta.setContentType(contentType);
+        }
+        req.setMetadata(meta);
+        client.putObject(req);
+
     }
 
     public String getSignedUploadUrl(String bucket, String fileKey, String contentType, Map headers) {
@@ -69,4 +100,8 @@ public class S3StorageService extends CloudStorageService {
         return client.generatePresignedUrl(req).toString();
     }
 
+
+    public AmazonS3Client getClient() {
+        return client;
+    }
 }

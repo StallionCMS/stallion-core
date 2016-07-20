@@ -85,6 +85,14 @@ public class FilteringTests extends AppIntegrationCaseBase {
         assertEquals(67, booksController().anyOf(new Or("author", "Mark Twain"), new Or("author", "Jane Austen")).filter("publisherId", 2).count());
     }
 
+    @Test
+    public void testSearchOperations() {
+        assertEquals(167, booksController().search("twain", "author", "title").count());
+        // Charles Dickens and Emily Dickinson
+        assertEquals(333, booksController().search("dick", "author", "title").count());
+        // Author Shakespeare or title of Square
+        assertEquals(333, booksController().search("are", "author", "title").count());
+    }
 
     @Test
     public void testGrouping() {

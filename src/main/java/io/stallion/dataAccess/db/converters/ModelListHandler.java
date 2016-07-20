@@ -29,7 +29,8 @@ public class ModelListHandler<T extends Model> extends AbstractListHandler<T> im
     private Class modelClass;
     private Schema schema;
 
-    public ModelListHandler(Schema schema) {
+    public
+    ModelListHandler(Schema schema) {
         this.modelClass = schema.getClazz();
         this.schema = schema;
     }

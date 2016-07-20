@@ -94,6 +94,8 @@ public abstract class ContactableEmailer<T extends Contactable> {
         }
     }
 
+
+
     public boolean sendEmail() {
         if (user == null) {
             throw new UsageException("Tried to send email, but user is null!");
@@ -237,10 +239,10 @@ public abstract class ContactableEmailer<T extends Contactable> {
      * @param key
      * @param val
      */
-    protected void put(String key, Object val) {
+    public <Y extends ContactableEmailer> Y put(String key, Object val) {
         this.context.put(key, val);
+        return (Y)this;
     }
-
     /**
      * The type of the email, used for logging, defaults to using the
      * Java class name, can be overrident

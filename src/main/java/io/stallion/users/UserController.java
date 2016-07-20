@@ -352,14 +352,18 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         if (user.isPredefined()) {
             throw new ClientException("You cannot verify email for a builtin user. You must edit this user in your configuration files.");
         }
+        // send email
+        String token = makeVerifyEmailToken(user);
+        new VerifyEmailEmailer(user, token, returnUrl).sendEmail();
+        return true;
+    }
+
+    public String makeVerifyEmailToken(T user) {
         if (empty(user.getResetToken())) {
             user.setResetToken(GeneralUtils.randomToken(14));
             save(user);
         }
-        // send email
-        String token = makeEncryptedToken(user, "verifyEmail", user.getResetToken());
-        new VerifyEmailEmailer(user, token, returnUrl).sendEmail();
-        return true;
+        return makeEncryptedToken(user, "verifyEmail", user.getResetToken());
     }
 
     public String makeEncryptedToken(T user, String type, String value) {

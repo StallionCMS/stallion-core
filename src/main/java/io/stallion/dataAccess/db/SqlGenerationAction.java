@@ -260,7 +260,14 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
             return "int";
         } else if (column.getjType() == int.class) {
             return "int";
-
+        } else if (column.getjType() == float.class) {
+            return "float";
+        } else if (column.getjType() == Float.class) {
+            return "float";
+        } else if (column.getjType() == double.class) {
+            return "double";
+        } else if (column.getjType() == Double.class) {
+            return "double";
         } else if (column.getjType() == ZonedDateTime.class) {
             return "datetime";
         } else if (List.class.isAssignableFrom(column.getjType())) {

@@ -25,6 +25,7 @@ import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
 import io.stallion.utils.Literals;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 import java.math.BigInteger;
@@ -32,6 +33,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static io.stallion.utils.Literals.asArray;
+import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.list;
 
 /**
@@ -163,6 +165,32 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         fop.setOriginalValue(value);
         return cloneChainAndAddOperation(fop);
     }
+
+
+    /**
+     * Searches for @value in all @fields, using a case-insensitive
+     * string contains search.
+     *
+     * @param value
+     * @param value
+     * @return
+     */
+    public FilterChain<T> search(String value, String...fields) {
+        if (fields.length == 0) {
+            throw new UsageException("You must include at least one field to search");
+        }
+        if (Literals.empty(value)) {
+            throw new UsageException("value must be at least one character long");
+        }
+
+        List<Or> ors = list();
+        for (String field: fields) {
+            ors.add(new Or(field, value, FilterOperator.LIKE));
+        }
+        FilterChain<T> chain = andAnyOf(asArray(ors, Or.class));
+        return chain;
+    }
+
 
     /**
      * Excludes all matching items instead of including them.
@@ -864,13 +892,17 @@ public class FilterChain<T extends Model> implements Iterable<T> {
             return op.getTypedValue().toString().toLowerCase().equals((String) propValue.toString().toLowerCase());
         }
 
-
         if (op.getOperator().equals(FilterOperator.EQUAL)) {
             return op.getTypedValue().equals(propValue);
         }
-        if (op.getTypedValue().equals(FilterOperator.NOT_EQUAL)) {
+        if (op.getOperator().equals(FilterOperator.NOT_EQUAL)) {
             return !op.getTypedValue().equals(propValue);
         }
+
+        if (op.getOperator().equals(FilterOperator.LIKE)) {
+            return StringUtils.containsIgnoreCase(propValue.toString(), op.getTypedValue().toString());
+        }
+
         int i = op.getComparableValue().compareTo(propValue);
         if (op.getOperator().equals(FilterOperator.GREATER_THAN)) {
             return i < 0;
@@ -974,6 +1006,15 @@ public class FilterChain<T extends Model> implements Iterable<T> {
                 ov = op.getOriginalValue().toString();
             }
             builder.append(op.getFieldName() + op.getOperator() + op.getIsExclude() + Literals.GSEP + ov + Literals.GSEP);
+            if (op.isOrOperation()) {
+                for (FilterOperation subOp: op.getOrSubOperations()) {
+                    ov = "<null>";
+                    if (subOp.getOriginalValue() != null) {
+                        ov = subOp.getOriginalValue().toString();
+                    }
+                    builder.append(subOp.getFieldName() + subOp.getOperator() + subOp.getIsExclude() + Literals.GSEP + ov + Literals.GSEP);
+                }
+            }
         }
         builder.append(getIncludeDeleted());
         builder.append(getSortField());

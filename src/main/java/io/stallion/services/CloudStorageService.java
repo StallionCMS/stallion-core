@@ -21,6 +21,7 @@ import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.settings.Settings;
 
+import java.io.File;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
@@ -54,4 +55,7 @@ public abstract class CloudStorageService {
 
 
     public abstract String getSignedUploadUrl(String bucket, String fileKey, String contentType, Map headers);
+
+    public abstract void uploadFile(File file, String bucket, String fileKey, boolean isPublic);
+    public abstract void uploadFile(File file, String bucket, String fileKey, boolean isPublic, String contentType, Map<String, String> headers);
 }

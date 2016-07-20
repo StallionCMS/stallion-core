@@ -91,7 +91,11 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 addOrOperation(op, whereBuilder, params);
             } else {
                 whereBuilder.append(MessageFormat.format(" ({0} {1} ?) ", op.getFieldName(), op.getOperator().forSql()));
-                params.add(op.getOriginalValue());
+                if (op.getOperator().equals(FilterOperator.LIKE)) {
+                    params.add("%" + op.getOriginalValue().toString() + "%");
+                } else {
+                    params.add(op.getOriginalValue());
+                }
             }
             x++;
         }

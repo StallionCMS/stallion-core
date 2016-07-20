@@ -190,6 +190,7 @@ class Publisher(object):
             return
         info("%s files to update. Running full deploy" % change_info.total_changed)
         self.full_deploy()
+        self.write_runner_script()
         good("Deploy completed successfully")
         
     def unlock(self):
@@ -547,6 +548,28 @@ respawn limit 3 60
             !unlink {root}/old
         !unlink {root}/deploying
 
+    def write_runner_script(self):
+        # start the server
+        source = u"""\
+#sudo su stallionServer
+export STALLION_HOST="{host}"
+export STALLION_DOMAIN="{domain}"
+export STALLION_DEPLOY_TIME="{now_stamp}"
+exec sudo -u stallionServer {root}/{folder}/bin/{executable} $1 -targetPath={root}/{folder} -env={env} $2 $3 $4 $5 $6 $7 $8 $9 $10
+        """.format(
+                       root=root,
+                       host=self.host,
+                       domain=self.domain,
+                       executable=self.executable_name,
+                       now_stamp=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S %p'),
+                       folder=self.deploying,
+                       port=self.port,
+                       env=self.env,
+                       file_base=self.file_base)
+        server_start_path = root + "/stallion-run.sh"
+        with open(server_start_path, "w") as f:
+            f.write(source)
+        !chmod 700 $server_start_path
 
     def _mark_deploying(self):
         info("Locking for deploy")

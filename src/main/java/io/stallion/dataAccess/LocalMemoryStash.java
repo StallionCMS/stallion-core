@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 import static io.stallion.utils.Literals.set;
 
 /**
@@ -240,7 +241,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         }
         T original = itemByPrimaryKey.getOrDefault(item.getId(), null);
         if (original != null) {
-            sync(item);
+            cloneInto(item, original, null, false, list());
         } else {
             registerItem(item);
         }

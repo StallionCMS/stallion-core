@@ -498,7 +498,10 @@ public class DB {
      */
     public <T extends Model> List<T> query(Class<T> model, String sql, Object ...args) {
         QueryRunner runner = new QueryRunner(dataSource);
-        Schema schema = getSchemaForModelClass(model);
+        Schema schema = null;
+        if (Model.class.isAssignableFrom(model)) {
+            schema = getSchemaForModelClass(model);
+        }
         if (schema != null) {
             ModelListHandler<T> handler = new ModelListHandler<T>(schema);
             try {
@@ -513,6 +516,26 @@ public class DB {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    /**
+     * Find a list of objects of the given model via arbitrary SQL.
+     * Accepts any java bean, does not require a Stallion Model
+     *
+     * @param model
+     * @param sql
+     * @param args
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> queryBean(Class<T> model, String sql, Object ...args) {
+        QueryRunner runner = new QueryRunner(dataSource);
+        BeanListHandler<T> handler = new BeanListHandler(model);
+        try {
+            return runner.query(sql, handler, args);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -982,7 +1005,10 @@ public class DB {
     }
 
     public boolean tableExists(String tableName) {
-        List<Map<String, Object>> tables = DB.instance().findRecords("SHOW TABLES LIKE ?", tableName);
+        if (tableName.contains("`") || tableName.contains("'")) {
+            return false;
+        }
+        List<Map<String, Object>> tables = DB.instance().findRecords("SHOW TABLES LIKE '" + tableName + "'");
         return tables.size() > 0;
     }
 

@@ -21,10 +21,15 @@ import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Or;
 import io.stallion.exceptions.NotFoundException;
+import io.stallion.exceptions.UsageException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static io.stallion.utils.Literals.asArray;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 public interface ModelController<T extends Model> {
@@ -200,6 +205,18 @@ public interface ModelController<T extends Model> {
      * @return
      */
     public FilterChain<T> filter(String name, Object value);
+
+    /**
+     * Searches for @value in all @fields, using a case-insensitive
+     * string contains search.
+     *
+     * @param value
+     * @param value
+     * @return
+     */
+    public default FilterChain<T> search(String value, String...fields) {
+        return filterChain().search(value, fields);
+    }
 
     /**
      *

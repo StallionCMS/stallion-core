@@ -26,6 +26,7 @@ public enum FilterOperator {
     LESS_THAN_OR_EQUAL,
     GREATER_THAN,
     IN,
+    LIKE,
     GREATER_THAN_OR_EQUAL
     ;
     public static FilterOperator fromString(String op) {
@@ -35,6 +36,8 @@ public enum FilterOperator {
             case "==":
             case "===":
                 return EQUAL;
+            case "like":
+                return LIKE;
             case "!=":
             case "neq":
                 return NOT_EQUAL;
@@ -69,6 +72,8 @@ public enum FilterOperator {
                 return ">";
             case LESS_THAN_OR_EQUAL:
                 return "<=";
+            case LIKE:
+                return "LIKE";
             case IN:
                 return "in";
             case GREATER_THAN_OR_EQUAL:

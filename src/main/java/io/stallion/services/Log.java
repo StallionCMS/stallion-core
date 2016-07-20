@@ -220,7 +220,7 @@ public class Log {
      * @param args
      */
     public static void logForFrame(int frame, Level level, String message, Object ...args) {
-        if (logger.getLevel().intValue() > level.intValue()) {
+        if (getLogLevel().intValue() > level.intValue()) {
             return;
         }
         Throwable t = new Throwable();
@@ -233,11 +233,15 @@ public class Log {
 
     public static void exception(Throwable ex, String message, Object ... args) {
         HealthTracker.instance().logException(ex);
-        if (logger.getLevel().intValue() > Level.SEVERE.intValue()) {
+        if (getLogLevel().intValue() > Level.SEVERE.intValue()) {
             return;
         }
         if (args.length > 0) {
             message = MessageFormat.format(message, args);
+        }
+        // TODO: WTF -- figure out how the hell the handler got removed;
+        if (logger.getHandlers().length == 0) {
+            logger.addHandler(handler);
         }
         Throwable t = new Throwable();
         StackTraceElement stackTraceElement = t.getStackTrace()[1];
