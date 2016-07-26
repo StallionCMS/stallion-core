@@ -37,8 +37,19 @@ public class PropertyComparator<T> implements Comparator<T> {
 
     @Override
     public int compare(T o1, T o2) {
+        if (o1 == null || o2 == null) {
+            return 0;
+        }
         Comparable val1 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o1, propertyName);
         Comparable val2 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o2, propertyName);
+        if (val1 == null && val2 == null) {
+            return 0;
+        } else if (val1 == null) {
+            return 1;
+        } else if (val2 == null) {
+            return -1;
+        }
+
         return val1.compareTo(val2);
     }
 }

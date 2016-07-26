@@ -433,6 +433,9 @@ public class StandardDisplayableModel extends ModelBase implements Displayable {
     }
 
     public String getSummary() {
+        if (empty(getContent())) {
+            return "";
+        }
         int i = getContent().indexOf("<!--more-->");
         if (i > -1) {
             return getContent().substring(0, i);
