@@ -24,6 +24,8 @@ import io.stallion.services.Log;
 import java.io.File;
 import java.util.List;
 
+import static io.stallion.utils.Literals.list;
+
 
 public class UserMemoryStash<T extends IUser> extends LocalMemoryStash<T> {
     private PredefinedUsersPersister<T> predefinedUserPersister;
@@ -75,23 +77,23 @@ public class UserMemoryStash<T extends IUser> extends LocalMemoryStash<T> {
     }
 
 
-    public void loadItem(T item)  {
+    public boolean loadItem(T item)  {
         //Log.fine("Pojo item: {0}:{1}", item.getClass().getName(), item.getId());
-
+        boolean hasChanges = false;
         if (item.getId() == null) {
             Log.warn("Loading a pojo item with a null ID! bucket: {0} class:{1}", getBucket(), item.getClass().getName());
         }
 
         T original = itemByPrimaryKey.getOrDefault(item.getId(), null);
         if (original != null) {
-            sync(item);
+            hasChanges = cloneInto(item, original, null, true, list());
         } else {
             registerItem(item);
+            hasChanges = true;
         }
         getController().onPostLoadItem(item);
         registerKeys(item);
-        item = this.itemByPrimaryKey.get(item.getId());
-
+        return hasChanges;
     }
 
 

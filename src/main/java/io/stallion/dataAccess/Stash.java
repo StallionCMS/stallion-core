@@ -19,6 +19,7 @@ package io.stallion.dataAccess;
 
 import io.stallion.dataAccess.filtering.FilterChain;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -126,6 +127,9 @@ public abstract class Stash<T extends Model> {
     public abstract void sync(T obj);
 
 
+    public void syncForSave(T obj) {
+        sync(obj);
+    }
 
     /**
      * Return a cloned version of the object.
@@ -156,7 +160,7 @@ public abstract class Stash<T extends Model> {
      * Re-load the given object from the datastore into the stash
      * @param obj
      */
-    public abstract void loadItem(T obj);
+    public abstract boolean loadItem(T obj);
 
     /**
      * Load or reload the item with the given id from the datastore into the stash

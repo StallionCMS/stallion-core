@@ -24,12 +24,12 @@ import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 
-public class CloudStorageSettings {
+public class CloudStorageSettings implements SettingsSection {
     @SettingMeta
     private String accessToken;
     @SettingMeta
     private String secret;
-    @SettingMeta(val="io.stallion.services.S3StorageService")
+    @SettingMeta(val="")
     private String javaClass;
 
 

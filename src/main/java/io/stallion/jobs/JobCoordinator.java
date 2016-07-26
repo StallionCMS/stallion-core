@@ -308,6 +308,9 @@ public class JobCoordinator extends Thread {
     public List<JobHealthInfo> buildJobHealthInfos() {
         List<JobHealthInfo> infos = list();
         for(JobDefinition job: queue) {
+            if (job == null || empty(job.getName())) {
+                continue;
+            }
             JobHealthInfo health = new JobHealthInfo();
             infos.add(health);
             JobStatus status = JobStatusController.instance().getOrCreateForName(job.getName());

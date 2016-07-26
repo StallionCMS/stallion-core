@@ -112,10 +112,11 @@ public class PartialStash<T extends Model> extends Stash<T> {
      * @param copyNulls
      * @param changedKeyFields
      */
-    public void cloneInto(Object source, Object dest, Iterable<String> properties, Boolean copyNulls, List<String> changedKeyFields) {
+    public boolean cloneInto(Object source, Object dest, Iterable<String> properties, Boolean copyNulls, List<String> changedKeyFields) {
         if (changedKeyFields == null) {
             changedKeyFields = new ArrayList<String>();
         }
+        boolean hasChanges = false;
         if (properties == null){
             //properties = PropertyUtils.describe(dest).keySet();
             properties = PropertyUtils.getProperties(dest).keySet();
@@ -133,14 +134,17 @@ public class PartialStash<T extends Model> extends Stash<T> {
             Object o = PropertyUtils.getProperty(source, name);
             Object previous = PropertyUtils.getProperty(dest, name);
             if (o != null || copyNulls) {
+                if (previous == o || o != null && o.equals(previous)) {
+                    continue;
+                }
                 if (getKeyFields() != null && this.getKeyFields().contains(name) && previous != null && !previous.equals(o)) {
                     changedKeyFields.add(name);
                 }
-
+                hasChanges = true;
                 PropertyUtils.setProperty(dest, name, o);
             }
         }
-        //BeanUtils.copyProperties();
+        return hasChanges;
     }
 
 
@@ -195,22 +199,23 @@ public class PartialStash<T extends Model> extends Stash<T> {
 
 
 
-    public void loadItem(T item)  {
+    public boolean loadItem(T item)  {
         //Log.fine("Pojo item: {0}:{1}", item.getClass().getName(), item.getId());
-
+        boolean hasChanges =  false;
         if (item.getId() == null) {
             Log.warn("Loading a pojo item with a null ID! bucket: {0} class:{1}", getBucket(), item.getClass().getName());
         }
         T original = itemByPrimaryKey.getOrDefault(item.getId(), null);
         if (original != null) {
-            sync(item);
+            hasChanges = cloneInto(item, original, null, true, list());
+            item = original;
         } else {
             registerItem(item);
+            hasChanges = true;
         }
         getController().onPostLoadItem(item);
         registerKeys(item);
-        item = this.itemByPrimaryKey.get(item.getId());
-
+        return hasChanges;
     }
 
     /**

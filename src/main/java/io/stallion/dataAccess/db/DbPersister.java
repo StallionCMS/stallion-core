@@ -19,6 +19,7 @@ package io.stallion.dataAccess.db;
 
 import io.stallion.Context;
 import io.stallion.dataAccess.*;
+import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.MySqlFilterChain;
 import io.stallion.requests.IRequest;
@@ -117,7 +118,10 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
         if (!checkNeedsSync()) {
             return;
         }
-        syncFromDatabase();
+        boolean hasChanges = syncFromDatabase();
+        if (hasChanges) {
+            FilterCache.clearBucket(getBucket());
+        }
     }
 
 
@@ -126,7 +130,7 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
         return new MySqlFilterChain<T>(getTableName(), getBucket(), getModelClass());
     }
 
-    protected void syncFromDatabase() {
+    protected boolean syncFromDatabase() {
         Long now = mils();
 
         ZonedDateTime dt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(lastSyncAt), ZoneId.of("UTC"));
@@ -134,10 +138,15 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
         String formatedNow = dt.format(DateUtils.SQL_FORMAT);
         Class < T > cls = getModelClass();
         List<T> items = DB.instance().query(cls, "SELECT * FROM " + getTableName() + " WHERE row_updated_at >= ?", formatedNow);
+        boolean hasChanges = false;
         for (T item: items) {
-            getStash().loadItem(item);
+            boolean changed = getStash().loadItem(item);
+            if (changed) {
+                hasChanges = true;
+            }
         }
         lastSyncAt = now;
+        return hasChanges;
     }
 
 

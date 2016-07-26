@@ -65,8 +65,8 @@ public class NoStash<T extends Model> extends StashBase<T> {
     }
 
     @Override
-    public void loadItem(T obj) {
-        // No syncing, no loading
+    public boolean loadItem(T obj) {
+        return false;
     }
 
     @Override

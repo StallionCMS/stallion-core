@@ -115,7 +115,12 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         uniqueFields = this.keyNameToUniqueKeyToValue.keySet();
     }
 
-
+    @Override
+    public void syncForSave(T obj) {
+        T existing = this.originalForId(obj.getId());
+        List<String> changedKeyFields = new ArrayList<>();
+        cloneInto(obj, existing, null, true, changedKeyFields);
+    }
 
     @Override
     public void sync(T obj) {
@@ -159,7 +164,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         } else {
             // Yes we are actually checking to see if these are the same reference in memory
             if (existing != null && obj != existing) {
-                this.sync(obj);
+                this.syncForSave(obj);
             }
             getPersister().persist(this.forId(obj.getId()));
         }
@@ -185,8 +190,9 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
      * @param properties
      * @param copyNulls
      * @param changedKeyFields
+     * @return true if there were changes
      */
-    public void cloneInto(Object source, Object dest, Iterable<String> properties, Boolean copyNulls, List<String> changedKeyFields) {
+    public boolean cloneInto(Object source, Object dest, Iterable<String> properties, Boolean copyNulls, List<String> changedKeyFields) {
         if (changedKeyFields == null) {
             changedKeyFields = new ArrayList<String>();
         }
@@ -194,6 +200,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
             //properties = PropertyUtils.describe(dest).keySet();
             properties = PropertyUtils.getProperties(dest).keySet();
         }
+        boolean hasChanges = false;
         for(String name: properties) {
             if (name.equals("id")) {
                 continue;
@@ -207,14 +214,17 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
             Object o = PropertyUtils.getProperty(source, name);
             Object previous = PropertyUtils.getProperty(dest, name);
             if (o != null || copyNulls) {
+                if (o == previous || o != null && o.equals(previous)) {
+                    continue;
+                }
                 if (getKeyFields() != null && this.getKeyFields().contains(name) && previous != null && !previous.equals(o)) {
                     changedKeyFields.add(name);
                 }
-
+                hasChanges = true;
                 PropertyUtils.setProperty(dest, name, o);
             }
         }
-        //BeanUtils.copyProperties();
+        return hasChanges;
     }
 
     public void loadForId(Long id)  {
@@ -233,22 +243,23 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
     }
 
 
-    public void loadItem(T item)  {
+    public boolean loadItem(T item)  {
         //Log.fine("Pojo item: {0}:{1}", item.getClass().getName(), item.getId());
-
+        boolean hasChanges = false;
         if (item.getId() == null) {
             Log.warn("Loading a pojo item with a null ID! bucket: {0} class:{1}", getBucket(), item.getClass().getName());
         }
         T original = itemByPrimaryKey.getOrDefault(item.getId(), null);
         if (original != null) {
-            cloneInto(item, original, null, false, list());
+            hasChanges = cloneInto(item, original, null, false, list());
+            item = original;
         } else {
+            hasChanges = true;
             registerItem(item);
         }
         getController().onPostLoadItem(item);
         registerKeys(item);
-        item = this.itemByPrimaryKey.get(item.getId());
-
+        return hasChanges;
     }
 
     public T reloadIfNewer(T obj) {
