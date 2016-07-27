@@ -42,6 +42,14 @@ public class Schedule {
     public static final int SATURDAY = 6;
     public static final int SUNDAY = 7;
 
+    private String timeZoneId = "";
+    private Long timeZoneForUserId;
+
+    private Minutes _minutes = new Minutes();
+    private Hours _hours = new Hours();
+    private Days _days = new Days();
+    private Months _months = new Months();
+
     /**
      * Gets the next datetime matching the schedule, in the Users timezone
      *
@@ -159,13 +167,7 @@ public class Schedule {
 
     }
 
-    private String timeZoneId = "";
-    private Long timeZoneForUserId;
 
-    private Minutes _minutes = new Minutes();
-    private Hours _hours = new Hours();
-    private Days _days = new Days();
-    private Months _months = new Months();
 
     /**
      * Set which minutes of the hour the task will run at
@@ -342,6 +344,11 @@ public class Schedule {
                 throw new ConfigException("Timings are not set, nor is every interval set for schedule field: " + timing.getClass().getSimpleName());
             }
         }
+        return this;
+    }
+
+    public Schedule timezone(String timeZoneId){
+        this.timeZoneId = timeZoneId;
         return this;
     }
 
