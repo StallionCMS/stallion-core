@@ -74,13 +74,13 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
     }
 
     public void publish(DeployCommandOptions options) throws IOException, CommandException {
-        List<DeploymentsConfig> configs = Context.getSettings().getDeployments();
+        List<DeploymentsConfig> configs = Context.getSettings().getDeploymentConfigs();
 
         if (configs.size() == 0) {
             throw new UsageException("You have no publishing configs set!");
         } else if (configs.size() == 1) {
-            deployEnv = "prod";
             config = configs.get(0);
+            deployEnv = or(config.getEnv(), "prod");
         } else {
             for (DeploymentsConfig aConfig : configs) {
                 if (options.getEnv().equals(aConfig.getEnv())) {

@@ -27,6 +27,7 @@ import io.stallion.settings.childSections.*;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.Column;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -854,6 +855,12 @@ public class Settings implements ISettings {
         this.xFrameOptions = xFrameOptions;
         return this;
     }
+
+    public List<DeploymentsConfig> getDeploymentConfigs() {
+        //return convertMapListToObjects(deployments, DeploymentsConfig.class);
+        return deployments;
+    }
+
 
     public List<DeploymentsConfig> getDeployments() {
         return deployments;

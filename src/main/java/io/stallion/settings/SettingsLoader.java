@@ -79,40 +79,37 @@ public class SettingsLoader  {
 
 
         Toml toml = new Toml();
+        Toml tomlOrg = null;
         if (baseFile.exists()) {
             Log.info("Loading base settings file: {0}", baseFile.getPath());
             toml = new Toml().read(baseFile);
+            tomlOrg = toml;
         }
 
 
-        if (userFile.exists()) {
-            toml = new Toml(toml).read(userFile);
-        }
 
         if (envFile.exists()) {
             Log.finer("Env file exists {0}, merging", envFile.getPath());
             toml = new Toml(toml).read(envFile);
         }
 
-        if (envUserFile.exists()) {
-            toml = new Toml(toml).read(envUserFile);
-        }
 
         settings = toml.to(settingsClass);
 
+        // Hack because the toml library can only do one level of merging
+        // toml files. Thus, need to manually merge this third file.
+        if (envUserFile.exists()) {
+            Toml localToml = new Toml().read(envUserFile);
+            T localSettings = localToml.to(settingsClass);
+            for(Map.Entry<String, Object> entry: localToml.entrySet()) {
+                PropertyUtils.setProperty(
+                        settings, entry.getKey(),
+                        PropertyUtils.getPropertyOrMappedValue(localSettings, entry.getKey()));
+            }
+        }
+
+
         if (settings instanceof Settings) {
-            // Hack because Toml doesn't know how to convert a list of class items
-            //List publishing = toml.getList("publishing", Collections.emptyList());
-            //if (!empty(publishing)) {
-            //    ((Settings)settings).setPublishing(publishing);
-            //}
-            //List preprocessors = toml.getList("assetPreprocessors", Collections.emptyList());
-            //if (!empty(preprocessors)) {
-            //    ((Settings)settings).setAssetPreprocessors(preprocessors);
-            //}
-            //if (toml.get("publishing") != null) {
-            //
-            //}
             ((Settings)settings).setEnv(env);
             ((Settings)settings).setTargetFolder(targetFolder);
             SecretsVault.init(targetFolder);
