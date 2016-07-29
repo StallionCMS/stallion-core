@@ -27,6 +27,7 @@ public enum FilterOperator {
     GREATER_THAN,
     IN,
     LIKE,
+    ANY,
     GREATER_THAN_OR_EQUAL
     ;
     public static FilterOperator fromString(String op) {
@@ -38,6 +39,8 @@ public enum FilterOperator {
                 return EQUAL;
             case "like":
                 return LIKE;
+            case "any":
+                return ANY;
             case "!=":
             case "neq":
                 return NOT_EQUAL;
@@ -74,12 +77,14 @@ public enum FilterOperator {
                 return "<=";
             case LIKE:
                 return "LIKE";
+            case ANY:
+                return "IN";
             case IN:
-                return "in";
+                return "LIKE";
             case GREATER_THAN_OR_EQUAL:
                 return ">=";
             default:
-                throw new UsageException("Cann use FilterOperator " + this.toString() + " with SQL");
+                throw new UsageException("Can use FilterOperator " + this.toString() + " with SQL");
         }
     }
 }

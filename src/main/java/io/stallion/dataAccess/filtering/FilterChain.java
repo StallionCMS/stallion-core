@@ -642,7 +642,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         pager.setCurrentPage(page);
         pager.setItemsPerPage(size);
         pager.setHasPreviousPage(true);
-        pager.setHasNextPage(false);
+        pager.setHasNextPage(true);
         pager.setPreviousPageNumber(page - 1);
 
         Integer startingIndex = (pager.getCurrentPage() - 1) * pager.getItemsPerPage();
@@ -867,12 +867,21 @@ public class FilterChain<T extends Model> implements Iterable<T> {
             for(Object val: values) {
                 if (val.equals(op.getOriginalValue())) {
                     isIn = true;
+                    break;
                 }
             }
-            if (!isIn) {
-                return false;
+            return isIn;
+        }
+        if (op.getOperator().equals(FilterOperator.ANY)) {
+            Iterable vals = (Iterable)op.getOriginalValue();
+            boolean matches = false;
+            for (Object val: vals) {
+                if (val.equals(propValue)) {
+                    matches = true;
+                    break;
+                }
             }
-            return true;
+            return matches;
         }
 
         // Apply a bunch of heuristics to make sure we are comparing like types,
@@ -961,6 +970,14 @@ public class FilterChain<T extends Model> implements Iterable<T> {
 
         } else if (op.getOriginalValue() instanceof Integer && propValue instanceof Long) {
             op.setTypedValue(new Long((Integer) op.getOriginalValue()));
+        } else if (op.getOriginalValue() instanceof Integer && propValue instanceof Float) {
+            op.setTypedValue(((Integer) op.getOriginalValue()).floatValue());
+        } else if (op.getOriginalValue() instanceof Integer && propValue instanceof Double) {
+            op.setTypedValue(((Integer) op.getOriginalValue()).doubleValue());
+        } else if (op.getOriginalValue() instanceof Long && propValue instanceof Double) {
+            op.setTypedValue(((Long) op.getOriginalValue()).doubleValue());
+        } else if (op.getOriginalValue() instanceof Long && propValue instanceof Float) {
+            op.setTypedValue(((Long) op.getOriginalValue()).floatValue());
         } else if (propValue instanceof Boolean) {
             if (op.getOriginalValue() instanceof Integer || op.getOriginalValue() instanceof Long) {
                 if ((Integer)op.getOriginalValue() == 0) {

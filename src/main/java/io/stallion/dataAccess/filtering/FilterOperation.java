@@ -114,7 +114,9 @@ class FilterOperation {
 
     public Comparable getComparableValue() {
         if (comparableValue == null) {
-            if (getOriginalValue() instanceof Comparable) {
+            if (getTypedValue() instanceof Comparable) {
+                comparableValue  = (Comparable) getTypedValue();
+            } else if (getOriginalValue() instanceof Comparable) {
                 comparableValue = (Comparable) getOriginalValue();
             }
         }
