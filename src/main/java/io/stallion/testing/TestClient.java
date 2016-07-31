@@ -21,7 +21,9 @@ import io.stallion.Context;
 import io.stallion.requests.RequestHandler;
 import io.stallion.requests.StRequest;
 import io.stallion.boot.AppContextLoader;
+import io.stallion.restfulEndpoints.XSRFHooks;
 
+import javax.servlet.http.Cookie;
 import java.util.Map;
 
 
@@ -36,6 +38,8 @@ public class TestClient {
 
     public MockResponse get(String path) {
         MockRequest request = new MockRequest(path, "GET");
+        request.addHeader(XSRFHooks.HEADER_NAME, "someval");
+        request.setCookies(new Cookie(XSRFHooks.COOKIE_NAME, "someval"));
         MockResponse response = new MockResponse();
         RequestHandler.instance().handleStallionRequest(request, response);
         return response;
@@ -43,6 +47,9 @@ public class TestClient {
 
     public MockResponse post(String path, Object dataObject) {
         MockRequest request = new MockRequest(path, "POST").setDataObject(dataObject);
+        request.addHeader(XSRFHooks.HEADER_NAME, "someval");
+        request.setCookies(new Cookie(XSRFHooks.COOKIE_NAME, "someval"));
+
         MockResponse response = new MockResponse();
         RequestHandler.instance().handleStallionRequest(request, response);
         return response;
@@ -50,6 +57,9 @@ public class TestClient {
 
     public MockResponse put(String path, Object dataObject) {
         MockRequest request = new MockRequest(path, "PUT").setDataObject(dataObject);
+        request.addHeader(XSRFHooks.HEADER_NAME, "someval");
+        request.setCookies(new Cookie(XSRFHooks.COOKIE_NAME, "someval"));
+
         MockResponse response = new MockResponse();
         RequestHandler.instance().handleStallionRequest(request, response);
         return response;
@@ -57,6 +67,9 @@ public class TestClient {
 
     public MockResponse post(String path, Map<String, Object> data) {
         MockRequest request = new MockRequest(path, "POST").setData(data);
+        request.addHeader(XSRFHooks.HEADER_NAME, "someval");
+        request.setCookies(new Cookie(XSRFHooks.COOKIE_NAME, "someval"));
+
         MockResponse response = new MockResponse();
         RequestHandler.instance().handleStallionRequest(request, response);
         return response;
@@ -64,6 +77,9 @@ public class TestClient {
 
     public MockResponse put(String path, Map<String, Object> data) {
         MockRequest request = new MockRequest(path, "POST").setData(data);
+        request.addHeader(XSRFHooks.HEADER_NAME, "someval");
+        request.setCookies(new Cookie(XSRFHooks.COOKIE_NAME, "someval"));
+
         MockResponse response = new MockResponse();
         RequestHandler.instance().handleStallionRequest(request, response);
         return response;
@@ -71,6 +87,9 @@ public class TestClient {
 
     public MockRequest build(String path, String method) {
         MockRequest request = new MockRequest(path, method);
+        request.addHeader(XSRFHooks.HEADER_NAME, "someval");
+        request.setCookies(new Cookie(XSRFHooks.COOKIE_NAME, "someval"));
+
         return request;
     }
 

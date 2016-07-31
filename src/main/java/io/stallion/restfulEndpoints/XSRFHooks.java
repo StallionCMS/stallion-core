@@ -31,8 +31,8 @@ import static io.stallion.utils.Literals.*;
 
 
 public class XSRFHooks extends PostRequestHookHandler {
-    private static final String COOKIE_NAME = "XSRF-TOKEN";
-    private static final String HEADER_NAME = "X-XSRF-TOKEN";
+    public static final String COOKIE_NAME = "XSRF-TOKEN";
+    public static final String HEADER_NAME = "X-XSRF-TOKEN";
 
     public static boolean checkXsrfAllowed(StRequest request, RestEndpointBase endpoint) {
         if (!endpoint.shouldCheckXSRF()) {
