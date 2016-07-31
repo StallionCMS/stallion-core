@@ -149,9 +149,16 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
         }
     }
 
-
     public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller) {
-        return registerDbModel(model, controller, true);
+        return registerDbModel(model, controller, LocalMemoryStash.class);
+    }
+
+    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, boolean syncToMemory) {
+        Class<? extends Stash> cls = LocalMemoryStash.class;
+        if (!syncToMemory) {
+            cls = NoStash.class;
+        }
+        return registerDbModel(model, controller, cls);
     }
 
     /**
@@ -160,10 +167,10 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
      *
      * @param model
      * @param controller
-     * @param syncToMemory - defaults true
+     * @param stash
      * @return
      */
-    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, boolean syncToMemory) {
+    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, Class<? extends Stash> stash) {
         Table anno = model.getAnnotation(Table.class);
         if (anno == null) {
             throw new UsageException("A @Table annotation is required on the model " + model.getCanonicalName() + " in order to register it.");
@@ -174,7 +181,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
                 .setPersisterClass(DbPersister.class)
                 .setBucket(bucket)
                 .setControllerClass(controller)
-                .setSyncAllToMemory(syncToMemory)
+                .setStashClass(stash)
                 .setModelClass(model);
         return register(registration);
     }

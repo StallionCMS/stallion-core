@@ -318,6 +318,9 @@ class RequestProcessor {
 
     public String dispatchWsEndpoint(RouteResult result) throws Exception {
         RestEndpointBase endpoint = result.getEndpoint();
+        if (!XSRFHooks.checkXsrfAllowed(request, endpoint)) {
+            throw new ClientException("This request was blocked by the Cross-Site Request Forgery checker. Make sure you have a header called X-XSRF-TOKEN that matches the value of the cookie XSRF-TOKEN.");
+        }
         if (!Context.currentUserCanAccessEndpoint(endpoint)) {
             if ("text/html".equals(endpoint.getProduces()) && !Context.getUser().isAuthorized()) {
                 throw new RedirectException(Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.requestUrl(), "utf-8"), 302);

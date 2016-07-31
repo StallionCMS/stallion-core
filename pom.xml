@@ -113,7 +113,7 @@
                 <executions>
                     <execution>
                         <id>bundle-assets</id>
-                        <phase>compile</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>bundle-assets</goal>
                         </goals>

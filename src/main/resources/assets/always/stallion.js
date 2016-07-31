@@ -89,9 +89,9 @@ if (window.$ && !window.jQuery) {
             dataString = JSON.stringify(dataString);
         }
         var headers = {};
-        var xsrfCookie = st.getCookie("XSF-TOKEN");
+        var xsrfCookie = st.getCookie("XSRF-TOKEN");
         if (xsrfCookie) {
-            header["X-XSRF-TOKEN"] = xsrfCookie;
+            headers["X-XSRF-TOKEN"] = xsrfCookie; 
         }
         return $.ajax({
             url: req.url,

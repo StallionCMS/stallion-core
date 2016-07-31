@@ -21,6 +21,7 @@ import io.stallion.hooks.HookRegistry;
 import io.stallion.requests.PostRequestHookHandler;
 import io.stallion.requests.StRequest;
 import io.stallion.requests.StResponse;
+import io.stallion.settings.Settings;
 
 import javax.servlet.http.Cookie;
 
@@ -36,6 +37,12 @@ public class XSRFHooks extends PostRequestHookHandler {
     public static boolean checkXsrfAllowed(StRequest request, RestEndpointBase endpoint) {
         if (!endpoint.shouldCheckXSRF()) {
             return true;
+        }
+        // Work around for direct access of API endpoints for local testing
+        if (Settings.instance().getEnv().equals("local")) {
+            if (request.getParameter("ignoreXsrf") != null) {
+                return true;
+            }
         }
         Cookie cookie = request.getCookie(COOKIE_NAME);
         if (cookie == null || empty(cookie.getValue())) {
