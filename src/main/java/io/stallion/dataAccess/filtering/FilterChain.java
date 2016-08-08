@@ -644,15 +644,16 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         pager.setHasPreviousPage(true);
         pager.setHasNextPage(true);
         pager.setPreviousPageNumber(page - 1);
+        pager.setNextPageNumber(pager.getCurrentPage() + 1);
 
         Integer startingIndex = (pager.getCurrentPage() - 1) * pager.getItemsPerPage();
         Integer endingIndex = startingIndex + pager.getItemsPerPage();
         if (endingIndex > getMatchingCount()) {
             endingIndex = getMatchingCount();
         }
-        if (endingIndex > getMatchingCount()) {
+        if (endingIndex >= getMatchingCount()) {
             pager.setHasNextPage(false);
-            pager.setNextPageNumber(pager.getCurrentPage() + 1);
+            pager.setNextPageNumber(pager.getCurrentPage());
         }
         if (pager.getCurrentPage() <= 1) {
             pager.setHasPreviousPage(false);

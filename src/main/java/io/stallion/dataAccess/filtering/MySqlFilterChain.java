@@ -91,11 +91,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 addOrOperation(op, whereBuilder, params);
             } else {
                 whereBuilder.append(MessageFormat.format(" ({0} {1} ?) ", op.getFieldName(), op.getOperator().forSql()));
-                if (op.getOperator().equals(FilterOperator.LIKE)) {
-                    params.add("%" + op.getOriginalValue().toString() + "%");
-                } else {
-                    params.add(op.getOriginalValue());
-                }
+                params.add(formatParam(op));
             }
             x++;
         }
@@ -138,10 +134,21 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 whereBuilder.append(" NOT ");
             }
             whereBuilder.append("(`" + subOp.getFieldName() + "`" + subOp.getOperator().forSql() + " ? )");
-            params.add(subOp.getOriginalValue());
+            params.add(formatParam(subOp));
 
         }
         whereBuilder.append(")");
+    }
+
+    private Object formatParam(FilterOperation op) {
+        Object val = op.getOriginalValue();
+        if (op.getOperator().equals(FilterOperator.LIKE)) {
+            return "%" + val.toString() + "%";
+        } else if (val != null && val.getClass().isEnum()) {
+            return val.toString();
+        } else {
+            return op.getOriginalValue();
+        }
     }
 
     @Override

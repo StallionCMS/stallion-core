@@ -40,6 +40,8 @@ public class Pager<T> {
     private int nextPageNumber = 2;
     private int previousPageNumber = 0;
 
+
+
     /**
      * All the returned items.
      *
@@ -58,9 +60,7 @@ public class Pager<T> {
         return currentItems;
     }
 
-    void setCurrentItems(List<T> currentItems) {
-        this.currentItems = currentItems;
-    }
+
 
     /**
      * The total available pages of items matching the filterchain
@@ -70,9 +70,7 @@ public class Pager<T> {
         return pageCount;
     }
 
-    void setPageCount(int pageCount) {
-        this.pageCount = pageCount;
-    }
+
 
     /**
      * The current page number of data, starting at 1
@@ -82,9 +80,7 @@ public class Pager<T> {
         return currentPage;
     }
 
-    void setCurrentPage(int currentPage) {
-        this.currentPage = currentPage;
-    }
+
 
     /**
      * The number of items per page
@@ -95,9 +91,7 @@ public class Pager<T> {
         return itemsPerPage;
     }
 
-    void setItemsPerPage(int itemsPerPage) {
-        this.itemsPerPage = itemsPerPage;
-    }
+
 
     /**
      * True if there is a next page of data.
@@ -105,10 +99,6 @@ public class Pager<T> {
      */
     public boolean isHasNextPage() {
         return hasNextPage;
-    }
-
-    void setHasNextPage(boolean hasNextPage) {
-        this.hasNextPage = hasNextPage;
     }
 
     /**
@@ -119,9 +109,6 @@ public class Pager<T> {
         return hasPreviousPage;
     }
 
-    void setHasPreviousPage(boolean hasPreviousPage) {
-        this.hasPreviousPage = hasPreviousPage;
-    }
 
     /**
      * The page number for the next page
@@ -131,9 +118,6 @@ public class Pager<T> {
         return nextPageNumber;
     }
 
-    void setNextPageNumber(int nextPageNumber) {
-        this.nextPageNumber = nextPageNumber;
-    }
 
     /**
      * The page number for the previous page.
@@ -143,10 +127,45 @@ public class Pager<T> {
         return previousPageNumber;
     }
 
-    void setPreviousPageNumber(int previousPageNumber) {
-        this.previousPageNumber = previousPageNumber;
+    public Pager setCurrentItems(List<T> currentItems) {
+        this.currentItems = currentItems;
+        return this;
     }
 
+    public Pager setPageCount(int pageCount) {
+        this.pageCount = pageCount;
+        return this;
+    }
+
+    public Pager setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+        return this;
+    }
+
+    public Pager setItemsPerPage(int itemsPerPage) {
+        this.itemsPerPage = itemsPerPage;
+        return this;
+    }
+
+    public Pager setHasNextPage(boolean hasNextPage) {
+        this.hasNextPage = hasNextPage;
+        return this;
+    }
+
+    public Pager setHasPreviousPage(boolean hasPreviousPage) {
+        this.hasPreviousPage = hasPreviousPage;
+        return this;
+    }
+
+    public Pager setNextPageNumber(int nextPageNumber) {
+        this.nextPageNumber = nextPageNumber;
+        return this;
+    }
+
+    public Pager setPreviousPageNumber(int previousPageNumber) {
+        this.previousPageNumber = previousPageNumber;
+        return this;
+    }
 
     public List<Integer> getSurroundingPages() {
         List<Integer> pages = list();
