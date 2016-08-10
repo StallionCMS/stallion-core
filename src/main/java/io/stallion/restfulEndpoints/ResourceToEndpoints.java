@@ -73,6 +73,7 @@ public class ResourceToEndpoints {
 
 
 
+
         for(Method method: cls.getDeclaredMethods()) {
             JavaRestEndpoint endpoint = new JavaRestEndpoint();
             endpoint.setRole(defaultMinRole);
@@ -95,7 +96,9 @@ public class ResourceToEndpoints {
                 } else if (Produces.class.isInstance(anno)) {
                     endpoint.setProduces(((Produces) anno).value()[0]);
                 } else if (MinRole.class.isInstance(anno)) {
-                    endpoint.setRole(((MinRole)anno).value());
+                    endpoint.setRole(((MinRole) anno).value());
+                } else if (XSRF.class.isInstance(anno)) {
+                    endpoint.setCheckXSRF(((XSRF)anno).value());
                 } else if (JsonView.class.isInstance(anno)) {
                     Class[] classes = ((JsonView)anno).value();
                     if (classes == null || classes.length != 1) {

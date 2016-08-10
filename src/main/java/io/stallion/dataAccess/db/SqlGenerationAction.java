@@ -189,6 +189,9 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
                 sql.append("  KEY `" + col.getName() + "_key` (`" + col.getName() + "`),\n");
             }
         }
+        for(String def: schema.getExtraKeyDefinitions()) {
+            sql.append("    " + def + ",\n");
+        }
         String sqlString = sql.toString();
         sqlString = StringUtils.strip(StringUtils.strip(sqlString, "\n"), ",") + "\n";
         sqlString += ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
@@ -237,7 +240,7 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
     protected String dbTypeForColumn(Col column) {
         if (!empty(column.getDbType())) {
             String dbType = column.getDbType();
-            if (column.getLength() > 0 && !dbType.contains("(") && !dbType.contains("text")) {
+            if (column.getLength() > 0 && !dbType.contains("(") && !dbType.contains("text") && !dbType.contains("(")) {
                 dbType = dbType + "(" + column.getLength() + ")";
             }
             return dbType;

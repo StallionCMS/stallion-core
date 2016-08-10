@@ -17,8 +17,11 @@
 
 package io.stallion.dataAccess.db;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.stallion.utils.Literals.list;
 
 /**
  * Used internally to represent the schema of a database table. Model classes can
@@ -30,6 +33,7 @@ public class Schema {
     private String name;
     private Class clazz;
     private List<String> keyNames;
+    private List<String> extraKeyDefinitions = list();
 
     public Schema(String name, Class clazz) {
         columns = new ArrayList<Col>();
@@ -76,4 +80,12 @@ public class Schema {
     }
 
 
+    public List<String> getExtraKeyDefinitions() {
+        return extraKeyDefinitions;
+    }
+
+    public Schema setExtraKeyDefinitions(List<String> extraKeyDefinitions) {
+        this.extraKeyDefinitions = extraKeyDefinitions;
+        return this;
+    }
 }

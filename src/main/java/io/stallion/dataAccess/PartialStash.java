@@ -160,13 +160,19 @@ public class PartialStash<T extends Model> extends Stash<T> {
     public void save(T obj) {
         T existing = originalForId(obj.getId());
         if (existing != null) {
-            sync(obj);
+            syncForSave(obj);
             getPersister().persist(existing);
         } else {
             getPersister().persist(obj);
         }
     }
 
+    @Override
+    public void syncForSave(T obj) {
+        T existing = this.originalForId(obj.getId());
+        List<String> changedKeyFields = new ArrayList<>();
+        cloneInto(obj, existing, null, true, changedKeyFields);
+    }
 
     @Override
     public void hardDelete(T obj) {
@@ -175,8 +181,10 @@ public class PartialStash<T extends Model> extends Stash<T> {
 
     @Override
     public void loadAll() {
-        for(T obj: DB.instance().query(getPersister().getModelClass(), getInitialLoadSql())) {
-            loadItem(obj);
+        if (!DB.isUseDummyPersisterForSqlGenerationMode()) {
+            for (T obj : DB.instance().query(getPersister().getModelClass(), getInitialLoadSql())) {
+                loadItem(obj);
+            }
         }
     }
 
@@ -283,7 +291,9 @@ public class PartialStash<T extends Model> extends Stash<T> {
             return detach(item);
         } else {
             item = filterChain().filter("id", id).first();
-            loadItem(item);
+            if (item != null) {
+                loadItem(item);
+            }
             return item;
         }
     }

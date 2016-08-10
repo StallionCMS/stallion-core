@@ -869,6 +869,21 @@ public class DB {
             throw new UsageException("Trying to register model with database, but it has no name for the @Table annotation: " + cls.getCanonicalName());
         }
         Schema schema = new Schema(table.name(), cls);
+        Object inst = null;
+        try {
+            inst = cls.newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        ExtraKeyDefinitions keyDefinitions = (ExtraKeyDefinitions)cls.getDeclaredAnnotation(ExtraKeyDefinitions.class);
+        if (keyDefinitions != null) {
+            for(String def: keyDefinitions.value()) {
+                schema.getExtraKeyDefinitions().add(def);
+            }
+        }
+
         for(Method method: cls.getMethods()) {
             if (!method.getName().startsWith("get") && !method.getName().startsWith("is")) {
                 continue;
@@ -908,6 +923,10 @@ public class DB {
             col.setDbType(columnAnno.columnDefinition());
             col.setNullable(columnAnno.nullable());
             col.setLength(columnAnno.length());
+            // If the column cannot be null, we need a default value
+            if (!columnAnno.nullable()) {
+                col.setDefaultValue(PropertyUtils.getProperty(inst, propertyName));
+            }
 
             Converter converterAnno = method.getDeclaredAnnotation(Converter.class);
             Log.finest("Adding schema Column {0}", columnName);

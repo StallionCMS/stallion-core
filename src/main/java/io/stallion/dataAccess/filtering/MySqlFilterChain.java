@@ -22,9 +22,12 @@ import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.Schema;
 import io.stallion.dataAccess.db.SmartQueryCache;
 import io.stallion.exceptions.UsageException;
+import io.stallion.utils.DateUtils;
 import io.stallion.utils.Literals;
 
 import java.text.MessageFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +74,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
         StringBuilder whereBuilder = new StringBuilder();
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT * FROM " + table + " WHERE ");
+        sqlBuilder.append("SELECT * FROM " + table);
 
         int x = 0;
         List<Object> params = new ArrayList<>();
@@ -95,7 +98,11 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             }
             x++;
         }
-        sqlBuilder.append(whereBuilder.toString());
+        String whereSql = whereBuilder.toString();
+        if (whereSql.trim().length() > 0) {
+            sqlBuilder.append(" WHERE ");
+            sqlBuilder.append(whereSql);
+        }
         if (!Literals.empty(getSortField())) {
             List<String> columnNames = apply(getSchema().getColumns(), col->col.getName());
             if (!"id".equals(getSortField()) && !columnNames.contains(getSortField().toLowerCase())) {
@@ -144,6 +151,8 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         Object val = op.getOriginalValue();
         if (op.getOperator().equals(FilterOperator.LIKE)) {
             return "%" + val.toString() + "%";
+        } else if (val instanceof ZonedDateTime) {
+            return DateUtils.SQL_FORMAT.format(((ZonedDateTime) val).withZoneSameInstant(Literals.UTC));
         } else if (val != null && val.getClass().isEnum()) {
             return val.toString();
         } else {
