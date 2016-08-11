@@ -985,7 +985,7 @@ public class DB {
      */
     public int execute(String sql, Object...params) {
         try {
-            return DB.instance().newQuery().update(sql, params);
+            return newQuery().update(sql, params);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

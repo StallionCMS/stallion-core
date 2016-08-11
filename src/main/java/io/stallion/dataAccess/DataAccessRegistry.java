@@ -160,7 +160,9 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
         }
         return registerDbModel(model, controller, cls);
     }
-
+    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, Class<? extends Stash> stash) {
+        return registerDbModel(model, controller, stash, null);
+    }
     /**
      * Registers the given model and controller with a database persister, getting the bucket name
      * from the @Table annotation on the model.
@@ -170,16 +172,18 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
      * @param stash
      * @return
      */
-    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, Class<? extends Stash> stash) {
+    public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller, Class<? extends Stash> stash, String bucket) {
         Table anno = model.getAnnotation(Table.class);
         if (anno == null) {
             throw new UsageException("A @Table annotation is required on the model " + model.getCanonicalName() + " in order to register it.");
         }
-        String bucket = anno.name();
+        bucket = or(bucket, anno.name());
+        String table = anno.name();
         DataAccessRegistration registration = new DataAccessRegistration()
                 .setDatabaseBacked(true)
                 .setPersisterClass(DbPersister.class)
                 .setBucket(bucket)
+                .setTableName(table)
                 .setControllerClass(controller)
                 .setStashClass(stash)
                 .setModelClass(model);

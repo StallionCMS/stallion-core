@@ -74,7 +74,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
         StringBuilder whereBuilder = new StringBuilder();
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT * FROM " + table);
+        sqlBuilder.append("SELECT * FROM " + getSchema().getName());
 
         int x = 0;
         List<Object> params = new ArrayList<>();
@@ -118,7 +118,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         if (page == 1 && getObjects().size() < size) {
             setMatchingCount(getObjects().size());
         } else if (fetchTotalCount) {
-            String countSql = "SELECT COUNT(*) FROM " + table + " WHERE " + whereBuilder.toString();
+            String countSql = "SELECT COUNT(*) FROM " + getSchema().getName() + " WHERE " + whereBuilder.toString();
             Object count = DB.instance().queryScalar(countSql, paramObjects);
             Integer countInt = count instanceof Integer ? (Integer)count : ((Long)count).intValue();
             setMatchingCount(countInt);

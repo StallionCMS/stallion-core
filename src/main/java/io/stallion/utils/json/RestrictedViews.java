@@ -19,9 +19,9 @@ package io.stallion.utils.json;
 
 
 public class RestrictedViews {
-    public static class Public { }
-    public static class Member extends Public { }
-    public static class Owner extends Member { }
-    public static class Internal extends Member { }
-    public static class Unrestricted {}
+    public static interface Public { }
+    public static interface Member extends Public { }
+    public static interface Owner extends Member { }
+    public static interface Internal extends Member { }
+    public static interface Unrestricted {}
 }

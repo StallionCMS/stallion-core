@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `stallion_users` (
   `username` varchar(100) NOT NULL DEFAULT '',
   `role` varchar(20) NOT NULL DEFAULT '',
   `orgId` bigint(20) NOT NULL,
+  `createdAt` bigint(20) NOT NULL DEFAULT '0',
   `secret` varchar(50) NOT NULL DEFAULT '',
   `encryptionSecret` varchar(50) NOT NULL DEFAULT '',
   `timeZoneId` varchar(14) NOT NULL DEFAULT '',

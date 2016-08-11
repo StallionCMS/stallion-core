@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `stallion_job_status` (
   `failedAt` bigint default 0,
   `error` longtext,
   `shouldSucceedBy` bigint default 0,
+  `failCount` int default 0,
   `lastDurationSeconds` bigint default 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY name_key (`name`)
