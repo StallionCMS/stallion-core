@@ -18,6 +18,7 @@
 package io.stallion.requests;
 
 import io.stallion.plugins.javascript.Sandbox;
+import io.stallion.services.Log;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 import org.eclipse.jetty.server.Request;
@@ -28,13 +29,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 public interface IRequest {
     public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";
@@ -97,7 +102,25 @@ public interface IRequest {
      */
     public String getQueryString();
 
-
+    public default List<String> getQueryParamAsList(String key) {
+        List<String> values = list();
+        String[] pairs = getQueryString().split("&");
+        for (String pair : pairs) {
+            int idx = pair.indexOf("=");
+            if (idx < 0) {
+                continue;
+            }
+            try {
+                String name = URLDecoder.decode(pair.substring(0, idx), "UTF-8");
+                if (name.equals(key)) {
+                    values.add(URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+                }
+            } catch (UnsupportedEncodingException e) {
+                Log.exception(e, "Error parsing url {0}", getQueryString());
+            }
+        }
+        return values;
+    }
 
     /**
      * Get the RemoteAddr field from the underlying HttpServletRequest object,

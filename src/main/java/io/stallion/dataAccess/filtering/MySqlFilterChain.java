@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.stallion.utils.Literals.apply;
+import static io.stallion.utils.Literals.asArray;
 
 /**
  * A filter chain that generates a MySQL query, rather than operating on
@@ -93,14 +94,19 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (op.isOrOperation()) {
                 addOrOperation(op, whereBuilder, params);
             } else {
-                whereBuilder.append(MessageFormat.format(" ({0} {1} ?) ", op.getFieldName(), op.getOperator().forSql()));
-                params.add(formatParam(op));
+                if (op.getOperator().equals(FilterOperator.ANY)) {
+                    addInClause(whereBuilder, op, params);
+                } else {
+                    whereBuilder.append(MessageFormat.format(" ({0} {1} ?) ", op.getFieldName(), op.getOperator().forSql()));
+                    params.add(formatParam(op));
+                }
+
             }
             x++;
         }
         String whereSql = whereBuilder.toString();
         if (whereSql.trim().length() > 0) {
-            sqlBuilder.append(" WHERE ");
+            whereSql = " WHERE " + whereSql;
             sqlBuilder.append(whereSql);
         }
         if (!Literals.empty(getSortField())) {
@@ -118,7 +124,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         if (page == 1 && getObjects().size() < size) {
             setMatchingCount(getObjects().size());
         } else if (fetchTotalCount) {
-            String countSql = "SELECT COUNT(*) FROM " + getSchema().getName() + " WHERE " + whereBuilder.toString();
+            String countSql = "SELECT COUNT(*) FROM " + getSchema().getName() + whereSql;
             Object count = DB.instance().queryScalar(countSql, paramObjects);
             Integer countInt = count instanceof Integer ? (Integer)count : ((Long)count).intValue();
             setMatchingCount(countInt);
@@ -140,11 +146,39 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (subOp.getIsExclude()) {
                 whereBuilder.append(" NOT ");
             }
-            whereBuilder.append("(`" + subOp.getFieldName() + "`" + subOp.getOperator().forSql() + " ? )");
-            params.add(formatParam(subOp));
+            if (subOp.getOperator().equals(FilterOperator.ANY)) {
+                addInClause(whereBuilder, subOp, params);
+            } else {
+                whereBuilder.append("(`" + subOp.getFieldName() + "`" + subOp.getOperator().forSql() + " ? )");
+                params.add(formatParam(subOp));
+            }
+
+
 
         }
         whereBuilder.append(")");
+    }
+
+    private void addInClause(StringBuilder whereBuilder, FilterOperation op, List<Object> params) {
+        StringBuilder placeholders = new StringBuilder();
+        placeholders.append(" (");
+        Object[] inParams = null;
+        if (op.getOriginalValue() instanceof List) {
+            inParams = asArray((List)op.getOriginalValue(), Object.class);
+        } else {
+            inParams = (Object[])op.getOriginalValue();
+        }
+
+        for(int x = 0; x < inParams.length; x++) {
+            if (x >= (inParams.length - 1)) {
+                placeholders.append("?");
+            } else {
+                placeholders.append("?,");
+            }
+            params.add(inParams[x]);
+        }
+        placeholders.append(") ");
+        whereBuilder.append("(`" + op.getFieldName() + "` IN " + placeholders.toString() + ")");
     }
 
     private Object formatParam(FilterOperation op) {
