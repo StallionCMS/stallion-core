@@ -171,7 +171,7 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
             scriptsFolder.mkdir();
         }
 
-        String scriptSource = IOUtils.toString(getClass().getResource("/publish-site.ipy"));
+        String scriptSource = IOUtils.toString(getClass().getResource("/publish-site.ipy"), UTF8);
         int redirectToSsl = 0;
         int redirectToPrimary = 0;
         if (config.getRedirectToSsl()) {
@@ -200,7 +200,7 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
                 val("base_port", config.getBasePort()));
         scriptSource = scriptSource.replace("#$$$conf$$$", "conf = " + JSON.stringify(conf));
 
-        FileUtils.write(publishScript, scriptSource);
+        FileUtils.write(publishScript, scriptSource, UTF8);
 
 
         ProcessHelper.CommandResult result = ProcessHelper.run("ssh", user + "@" + host, "test -d " + wharfFolder);

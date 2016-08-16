@@ -17,9 +17,13 @@
 
 package io.stallion.dataAccess;
 
+import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.reflection.PropertyUtils;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Persister actually handles interaction with the data store. There are
@@ -99,6 +103,21 @@ public interface Persister<T extends Model> {
      * @param obj
      */
     public void persist(T obj);
+
+    /**
+     * Update the specified values. For datastores that support it, it should only save the updated
+     * values to the datastore -- not the entire object.
+     *
+     * @param obj
+     * @param values
+     */
+    public default void update(T obj, Map<String, Object> values) {
+        T clone = getStash().detach(obj);
+        for(Map.Entry<String, Object> entry: values.entrySet()) {
+            PropertyUtils.setProperty(obj, entry.getKey(), entry.getValue());
+        }
+        persist(clone);
+    }
 
     /**
      * Permanently delete the object from the datastore

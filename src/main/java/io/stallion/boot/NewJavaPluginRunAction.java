@@ -119,7 +119,7 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
 
     public void copyTemplate(String resourcePath, String relativePath, Map ctx) throws IOException  {
         String source = templating.renderTemplate(
-                IOUtils.toString(getClass().getResource(resourcePath)),
+                IOUtils.toString(getClass().getResource(resourcePath), UTF8),
                 ctx);
         File file = new File(targetFolder + "/" + relativePath);
         FileUtils.writeStringToFile(file, source, "utf-8");
@@ -127,7 +127,7 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
 
     public void copyFile(String resourcePath, String relativePath) throws IOException {
         File file = new File(targetFolder + "/" + relativePath);
-        String source = IOUtils.toString(getClass().getResource(resourcePath));
+        String source = IOUtils.toString(getClass().getResource(resourcePath), UTF8);
         FileUtils.writeStringToFile(file, source, "utf-8");
     }
 

@@ -17,6 +17,7 @@
 
 package io.stallion.sitemaps;
 
+import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.settings.SecondaryDomain;
 import io.stallion.settings.Settings;
@@ -33,7 +34,7 @@ import static io.stallion.Context.request;
 import static io.stallion.utils.Literals.*;
 
 
-public class SiteMapEndpoints {
+public class SiteMapEndpoints implements EndpointResource {
 
     @GET
     @Path("/sitemap.xml")

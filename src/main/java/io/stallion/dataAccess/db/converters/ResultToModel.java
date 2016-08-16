@@ -25,6 +25,7 @@ import io.stallion.reflection.PropertyUtils;
 
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -41,6 +42,14 @@ public interface ResultToModel<T extends Model> {
     public default T handleOneRow(ResultSet resultSet) throws SQLException {
         try {
             T obj = (T)getModelClass().newInstance();
+            try {
+                Date date = resultSet.getDate("row_updated_at");
+                if (date != null) {
+                    obj.setLastModifiedMillis(date.getTime());
+                }
+            } catch (SQLException e) {
+
+            }
             for (Col col : getSchema().getColumns()) {
                 Object value = resultSet.getObject(col.getName());
 

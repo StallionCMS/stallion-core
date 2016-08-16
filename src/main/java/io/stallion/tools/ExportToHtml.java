@@ -114,7 +114,7 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
             }
             String html = response.getContent();
             html = html.replace(Settings.instance().getSiteUrl(), "");
-            FileUtils.write(file, html);
+            FileUtils.write(file, html, UTF8);
             assets.addAll(findAssetsInHtml(response.getContent()));
         }
 
@@ -134,7 +134,7 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
             if (!folder.isDirectory()) {
                 folder.mkdirs();
             }
-            FileUtils.write(file, response.getContent());
+            FileUtils.write(file, response.getContent(), UTF8);
         }
 
     }

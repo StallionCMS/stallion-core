@@ -75,7 +75,7 @@ public class TomlPersister<T extends Model> extends FilePersisterBase<T> {
             if (isManyItemsPerFile()) {
                 try {
                     Log.finer("Load toml path {0} and items {1}", path.toString(), getItemArrayName());
-                    String toml = FileUtils.readFileToString(new File(path.toString()));
+                    String toml = FileUtils.readFileToString(new File(path.toString()), UTF8);
                     Toml t = new Toml().read(toml);
                     List<HashMap> models = t.getList(getItemArrayName());
                     long x = 0;
@@ -118,7 +118,7 @@ public class TomlPersister<T extends Model> extends FilePersisterBase<T> {
     public T doFetchOne(File file) {
         T o = null;
         try {
-            String toml = FileUtils.readFileToString(file);
+            String toml = FileUtils.readFileToString(file, UTF8);
             o = new Toml().read(toml).to(this.getModelClass());
         } catch (IOException e) {
             throw new RuntimeException(e);

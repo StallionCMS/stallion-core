@@ -27,9 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-import static io.stallion.utils.Literals.empty;
-import static io.stallion.utils.Literals.list;
-import static io.stallion.utils.Literals.set;
+import static io.stallion.utils.Literals.*;
 
 /**
  * {@inheritDoc}
@@ -162,11 +160,25 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
             registerItem(obj);
             registerKeys(obj);
         } else {
-            // Yes we are actually checking to see if these are the same reference in memory
+
+            Map<String, Object> changedValues = map();
+            // If these are not the same reference in memory, then we find the changed values,
+            // and sync values from the detached object into the permanent object
             if (existing != null && obj != existing) {
+                for (Map.Entry<String, Object> entry: PropertyUtils.getProperties(obj).entrySet()) {
+                    Object org = PropertyUtils.getPropertyOrMappedValue(existing, entry.getKey());
+                    if (org == null && entry.getValue() != null) {
+                        changedValues.put(entry.getKey(), entry.getValue());
+                    } else if (org != null && !org.equals(entry.getValue())) {
+                        changedValues.put(entry.getKey(), entry.getValue());
+                    }
+                }
                 this.syncForSave(obj);
+                getPersister().update(obj, changedValues);
+            } else {
+                getPersister().persist(obj);
             }
-            getPersister().persist(this.forId(obj.getId()));
+
         }
         FilterCache.clearBucket(getBucket());
 

@@ -34,6 +34,7 @@ import static io.stallion.utils.Literals.*;
 public class HookRegistry {
     private Map<Class<? extends HookHandler>, List<HookHandler>> hooksByClass = new HashMap<>();
     private Map<Class<? extends ChainedHook>, List<ChainedHook>> chainsByClass = new HashMap<>();
+    private Map<Class<? extends FirstValueHook>, List<FirstValueHook>> firstValueHooksByClass = new HashMap<>();
 
     private static HookRegistry _instance;
 
@@ -79,13 +80,28 @@ public class HookRegistry {
         if (base == null) {
             throw new UsageException("You tried to register a handler that does not inherit from an abstract handler class. There is no way this handler can be triggered.");
         }
-        if (!hooksByClass.containsKey(handler.getClass())) {
+        if (!chainsByClass.containsKey(handler.getClass())) {
             chainsByClass.put(base, list());
         }
         if (!chainsByClass.get(base).contains(handler)) {
             chainsByClass.get(base).add(handler);
         }
     }
+
+
+    public void register(FirstValueHook handler) {
+        Class base = getAbstractBaseClass(handler.getClass());
+        if (base == null) {
+            throw new UsageException("You tried to register a handler that does not inherit from an abstract handler class. There is no way this handler can be triggered.");
+        }
+        if (!firstValueHooksByClass.containsKey(handler.getClass())) {
+            firstValueHooksByClass.put(base, list());
+        }
+        if (!firstValueHooksByClass.get(base).contains(handler)) {
+            firstValueHooksByClass.get(base).add(handler);
+        }
+    }
+
 
     private Class getAbstractBaseClass(Class cls) {
         Class base = cls.getSuperclass();
@@ -95,6 +111,10 @@ public class HookRegistry {
         if (base.isAssignableFrom(ChainedHook.class)) {
             return null;
         }
+        if (base.isAssignableFrom(FirstValueHook.class)) {
+            return null;
+        }
+
         for (int x=0; x< 10;x++) {
             if (base == null) {
                 return null;
@@ -103,6 +123,18 @@ public class HookRegistry {
                 return base;
             }
             base = cls.getSuperclass();
+        }
+        return null;
+    }
+
+    public <T, V> T find(Class<? extends FirstValueHook<T, V>> cls, V arg) {
+        if (firstValueHooksByClass.containsKey(cls)) {
+            for (FirstValueHook<T, V> hook: firstValueHooksByClass.get(cls)) {
+                T val = hook.find(arg);
+                if (val != null) {
+                    return val;
+                }
+            }
         }
         return null;
     }

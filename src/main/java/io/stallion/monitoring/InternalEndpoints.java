@@ -26,6 +26,7 @@ import io.stallion.exceptions.WebException;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
+import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.MinRole;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -43,7 +44,7 @@ import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 @Path("/st-internal")
-public class InternalEndpoints {
+public class InternalEndpoints implements EndpointResource {
 
 
     @GET

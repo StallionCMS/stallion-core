@@ -728,6 +728,43 @@ public class DB {
     }
 
     /**
+     * Update only the passed in key values
+     *
+     * @param obj
+     * @return rows affected
+     */
+    public int update(Model obj, Map<String, Object> values) {
+        if (values.size() == 0) {
+            return 0;
+        }
+        Schema schema = getSchemaForModelClass(obj.getClass());
+        String sql = "UPDATE `" + schema.getName() + "` SET ";
+        List args = new ArrayList<>();
+        for (Col col: schema.getColumns()) {
+            if (col.getUpdateable() && values.containsKey(col.getPropertyName())) {
+                sql += "`" + col.getName() + "`" + "=?, ";
+                Object arg = values.get(col.getPropertyName());
+                arg = convertColumnArg(obj, col, arg);
+                args.add(arg);
+            }
+        }
+        if (args.size() == 0) {
+            return 0;
+        }
+        sql = StringUtils.strip(sql.trim(), ",");
+        sql += " WHERE id=?";
+        args.add(obj.getId());
+        QueryRunner run = new QueryRunner( dataSource );
+        int affected = 0;
+        try {
+            affected = run.update(sql, args.toArray());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return affected;
+    }
+
+    /**
      * Insert the object into the database.
      *
      * @param obj

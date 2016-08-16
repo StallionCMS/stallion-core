@@ -163,7 +163,23 @@ public class PartialStash<T extends Model> extends Stash<T> {
             syncForSave(obj);
             getPersister().persist(existing);
         } else {
-            getPersister().persist(obj);
+            Map<String, Object> changedValues = map();
+            // If these are not the same reference in memory, then we find the changed values,
+            // and sync values from the detached object into the permanent object
+            if (existing != null && obj != existing) {
+                for (Map.Entry<String, Object> entry: PropertyUtils.getProperties(obj).entrySet()) {
+                    Object org = PropertyUtils.getPropertyOrMappedValue(existing, entry.getKey());
+                    if (org == null && entry.getValue() != null) {
+                        changedValues.put(entry.getKey(), entry.getValue());
+                    } else if (org != null && org.equals(entry.getValue())) {
+                        changedValues.put(entry.getKey(), entry.getValue());
+                    }
+                }
+                this.syncForSave(obj);
+                getPersister().update(obj, changedValues);
+            } else {
+                getPersister().persist(obj);
+            }
         }
     }
 

@@ -38,6 +38,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Date;
 
+import static io.stallion.utils.Literals.*;
+
 
 public class AsyncTaskSlowTests extends AppIntegrationCaseBase {
 
@@ -87,7 +89,7 @@ public class AsyncTaskSlowTests extends AppIntegrationCaseBase {
                 "  \"id\" : 1001\n" +
                 "}";
         File taskFile = new File(Context.getSettings().getDataDirectory() + "/async-tasks/manualRetry/2015-01-16-0122-1273-ExampleTaskHandler-1421371347569-937506272.json");
-        FileUtils.write(taskFile, taskJson);
+        FileUtils.write(taskFile, taskJson, UTF8);
         for (int t=0; t<100;t++) {
             if (!taskFile.isFile() && coordinator.hasTaskWithId(1001L)) {
                 break;

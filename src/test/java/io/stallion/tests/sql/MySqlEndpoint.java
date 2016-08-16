@@ -17,13 +17,15 @@
 
 package io.stallion.tests.sql;
 
+import io.stallion.restfulEndpoints.EndpointResource;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 
-public class MySqlEndpoint {
+public class MySqlEndpoint implements EndpointResource {
     @GET
     @Path("/house/:id")
     public House fetchHouse(@PathParam("id") Long id) {

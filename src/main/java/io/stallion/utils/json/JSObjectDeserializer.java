@@ -45,7 +45,7 @@ class JSObjectDeserializer  extends JsonDeserializer<JSObject> {
         } else if (List.class.isInstance(obj)) {
             return new JSList((List) obj);
         } else {
-            throw new JsonMappingException("Cannot convert value to a valid JSON object", jp.getCurrentLocation());
+            throw new JsonMappingException(jp, "Cannot convert value to a valid JSON object", jp.getCurrentLocation());
         }
     }
 }

@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
@@ -87,6 +88,11 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
     @Override
     public void persist(T obj) {
         DB.instance().save(obj);
+    }
+
+    @Override
+    public void update(T obj, Map<String, Object> values) {
+        DB.instance().update(obj, values);
     }
 
     @Override

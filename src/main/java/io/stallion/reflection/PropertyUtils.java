@@ -511,6 +511,26 @@ public final class PropertyUtils {
         if ((destinationClass == float.class || destinationClass == Float.class)  &&  value.getClass() == String.class) {
             return new Float((String) value);
         }
+        if ((destinationClass == float.class || destinationClass == Float.class)  &&  value.getClass() == Integer.class) {
+            return ((Integer)value).floatValue();
+        }
+        if ((destinationClass == float.class || destinationClass == Float.class)  &&  value.getClass() == Long.class) {
+            return ((Long)value).floatValue();
+        }
+        if ((destinationClass == float.class || destinationClass == Float.class)  &&  value.getClass() == Double.class) {
+            return ((Double)value).floatValue();
+        }
+
+
+        if ((destinationClass == double.class || destinationClass == Double.class)  &&  value.getClass() == Long.class) {
+            return ((Long)value).floatValue();
+        }
+
+
+        if ((destinationClass == float.class || destinationClass == Float.class)  &&  value.getClass() == String.class) {
+            return new Float((String) value);
+        }
+
         if ((destinationClass == double.class || destinationClass == Double.class)  &&  value.getClass() == String.class) {
             return new Double((String) value);
         }

@@ -43,9 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.list;
-import static io.stallion.utils.Literals.map;
-import static io.stallion.utils.Literals.val;
+import static io.stallion.utils.Literals.*;
 
 
 public class JsPluginEngine {
@@ -101,7 +99,7 @@ public class JsPluginEngine {
 
         SandboxedContext ctx = new SandboxedContext(folder, box, pluginSettings);
         scriptEngine.put("myContext", ctx);
-        String stallionSharedJs = IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"));
+        String stallionSharedJs = IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"), UTF8);
         classFilter.setDisabled(true); // Turn off white-listing while loading stallion_shared, since we need access to more classes
 
         scriptEngine.eval("load(" + JSON.stringify(map(val("script", stallionSharedJs), val("name", "stallion_shared.js"))) + ");");
@@ -164,13 +162,13 @@ public class JsPluginEngine {
 
         scriptEngine.put("javaToJsHelpers", new JavaToJsHelpers(null));
 
-        String jvmNpm = IOUtils.toString(getClass().getResource("/jslib/jvm-npm.js"));
+        String jvmNpm = IOUtils.toString(getClass().getResource("/jslib/jvm-npm.js"), UTF8);
         scriptEngine.eval("load(" + JSON.stringify(map(val("script", jvmNpm), val("name", "jvm-npm.js"))) + ");");
 
         SandboxedContext ctx = new SandboxedContext(folder, Sandbox.allPermissions(), pluginSettings);
         scriptEngine.put("myContext", ctx);
 
-        String stallionSharedJs = IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"));
+        String stallionSharedJs = IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"), UTF8);
         scriptEngine.eval("load(" + JSON.stringify(map(val("script", stallionSharedJs), val("name", "stallion_shared.js"))) + ");");
 
 

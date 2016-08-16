@@ -84,7 +84,7 @@ public class ProcessHelper {
 
             if (!empty(input)) {
                 Log.info("Writing input to pipe {0}", input);
-                IOUtils.write(input, p.getOutputStream());
+                IOUtils.write(input, p.getOutputStream(), UTF8);
                 p.getOutputStream().flush();
             }
 

@@ -189,6 +189,9 @@ class RequestProcessor {
         if (redirectUrl == null) {
             redirectUrl = SlugRegistry.instance().returnRedirectIfExists(request.getPath());
         }
+        if (redirectUrl == null) {
+            redirectUrl = HookRegistry.instance().find(FindRedirectHook.class, request);
+        }
         if (redirectUrl != null) {
             throw new RedirectException(redirectUrl, 301);
         }
@@ -215,10 +218,19 @@ class RequestProcessor {
      * @throws Exception
      */
     public void tryRenderForSlug() throws Exception {
-        if (!SlugRegistry.instance().hasUrl(request.getPath())) {
+        Displayable item = null;
+        if (SlugRegistry.instance().hasUrl(request.getPath())) {
+            item = SlugRegistry.instance().lookup(request.getPath());
+        }
+        if (item == null) {
+            item = HookRegistry.instance().find(DisplayableBySlugHook.class, request);
+        }
+
+        if (item == null) {
             return;
         }
-        Displayable item = SlugRegistry.instance().lookup(request.getPath());
+
+
         Model baseItem = (Model)item;
 
         // Item has an override domain, but we are accessing from a different domain
@@ -318,6 +330,15 @@ class RequestProcessor {
 
     public String dispatchWsEndpoint(RouteResult result) throws Exception {
         RestEndpointBase endpoint = result.getEndpoint();
+
+        if (endpoint instanceof JavaRestEndpoint) {
+            ((JavaRestEndpoint) endpoint).getResource().preRequest(
+                    (JavaRestEndpoint)endpoint,
+                    request,
+                    response
+            );
+        }
+
         if (!XSRFHooks.checkXsrfAllowed(request, endpoint)) {
             throw new ClientException("This request was blocked by the Cross-Site Request Forgery checker. Make sure you have a header called X-XSRF-TOKEN that matches the value of the cookie XSRF-TOKEN.");
         }
@@ -396,6 +417,15 @@ class RequestProcessor {
             Object[] coercedArgsArray = coercedArgs.toArray();
             logHandled(request, "java-endpoint:{0}:{1}({2})", javaRestEndpoint.getRoute(), javaRestEndpoint.getJavaMethod().getName(), paramTypes);
             out = javaRestEndpoint.getJavaMethod().invoke(javaRestEndpoint.getResource(), coercedArgsArray);
+            if (endpoint instanceof JavaRestEndpoint) {
+                ((JavaRestEndpoint) endpoint).getResource().postRequest(
+                        (JavaRestEndpoint)endpoint,
+                        request,
+                        response,
+                        out
+                );
+            }
+
         } else {
             JsEndpoint jsEndpoint = (JsEndpoint)endpoint;
             // There has to be a better way to do this ... but I don't know what it is

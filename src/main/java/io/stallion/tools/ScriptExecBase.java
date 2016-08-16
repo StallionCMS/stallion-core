@@ -123,7 +123,7 @@ public class ScriptExecBase implements StallionRunAction<ScriptOptions> {
         if (empty(folder)) {
             folder = new File(url.toString()).getParent();
         }
-        String source = IOUtils.toString(url);
+        String source = IOUtils.toString(url, UTF8);
         List<String> args = list(path);
         if (options.getArguments().size() > 2) {
             args.addAll(options.getArguments().subList(2, options.getArguments().size()));
@@ -151,8 +151,8 @@ public class ScriptExecBase implements StallionRunAction<ScriptOptions> {
         if (scriptEngine == null) {
             ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
             scriptEngine = scriptEngineManager.getEngineByName("nashorn");
-            scriptEngine.eval(IOUtils.toString(getClass().getResource("/jslib/jvm-npm.js")));
-            scriptEngine.eval(IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js")));
+            scriptEngine.eval(IOUtils.toString(getClass().getResource("/jslib/jvm-npm.js"), UTF8));
+            scriptEngine.eval(IOUtils.toString(getClass().getResource("/jslib/stallion_shared.js"), UTF8));
             String nodePath = folder + "/node_modules";
             scriptEngine.eval("require.NODE_PATH = \"" + nodePath + "\"");
             scriptEngine.put("myContext", new SandboxedContext(plugin, Sandbox.allPermissions(), new JsPluginSettings()));
@@ -160,7 +160,7 @@ public class ScriptExecBase implements StallionRunAction<ScriptOptions> {
         if (true || newCommandOptions().isDevMode()) {
             Scanner in = new Scanner(System.in);
             while (true) {
-                source = IOUtils.toString(url);
+                source = IOUtils.toString(url, UTF8);
                 try {
                     scriptEngine.eval("load(" + JSON.stringify(map(val("script", source), val("name", url.toString()))) + ");");
                     //scriptEngine.eval(IOUtils.)

@@ -15,19 +15,18 @@
  *
  */
 
-package io.stallion.restfulEndpoints;
+package io.stallion.requests;
 
-import io.stallion.requests.IRequest;
-import io.stallion.requests.StResponse;
+import java.util.List;
+import java.util.Map;
 
-/**
- * Add this to a Java class to mark it as containing endpoints
- */
-public interface EndpointResource {
-    public default void preRequest(JavaRestEndpoint endpoint, IRequest request, StResponse response) {
+import static io.stallion.utils.Literals.*;
 
-    }
-    public default void postRequest(JavaRestEndpoint endpoint, IRequest request, StResponse response, Object out) {
+import io.stallion.hooks.ChainedHook;
+import io.stallion.hooks.FirstValueHook;
+import io.stallion.services.Log;
 
-    }
+
+public abstract class FindRedirectHook implements FirstValueHook<String, IRequest> {
+
 }

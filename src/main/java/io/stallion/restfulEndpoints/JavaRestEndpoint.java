@@ -24,16 +24,16 @@ import java.lang.reflect.Method;
  */
 public class JavaRestEndpoint extends RestEndpointBase {
 
-    private Object resource;
+    private EndpointResource resource;
     private String methodName = "";
     private Method javaMethod;
 
 
-    public Object getResource() {
+    public EndpointResource getResource() {
         return resource;
     }
 
-    public JavaRestEndpoint setResource(Object resource) {
+    public JavaRestEndpoint setResource(EndpointResource resource) {
         this.resource = resource;
         return this;
     }

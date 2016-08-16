@@ -73,7 +73,7 @@ public class SecretsVault {
             TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {};
             String json = null;
             try {
-                json = FileUtils.readFileToString(rawFile);
+                json = FileUtils.readFileToString(rawFile, UTF8);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -102,7 +102,7 @@ public class SecretsVault {
             save();
         } else {
             try {
-                String encrypted = FileUtils.readFileToString(file);
+                String encrypted = FileUtils.readFileToString(file, UTF8);
                 encrypted = encrypted.replace("\n", "");
                 secrets = decryptAndParse(encrypted);
             } catch (IOException e) {
@@ -167,7 +167,7 @@ public class SecretsVault {
         String encrypted = dumpAndEncrypt();
         File file = new File(secretsPath);
         try {
-            FileUtils.write(file, encrypted);
+            FileUtils.write(file, encrypted, UTF8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

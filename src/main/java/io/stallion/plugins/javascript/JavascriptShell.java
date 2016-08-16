@@ -124,7 +124,7 @@ public class JavascriptShell {
             SandboxedContext ctx = new SandboxedContext(Settings.instance().getTargetFolder() + "/js", Sandbox.allPermissions(), pluginSettings);
             global.put("myContext", ctx, true);
 
-            String stallionSharedJs = IOUtils.toString(JavascriptShell.class.getResource("/jslib/stallion_shared.js"));
+            String stallionSharedJs = IOUtils.toString(JavascriptShell.class.getResource("/jslib/stallion_shared.js"), UTF8);
             context.eval(global, "load(" + JSON.stringify(map(val("script", stallionSharedJs), val("name", "stallion_shared.js"))) + ");", global, "<shellboot>");
             global.put("stallionClassLoader", new UnrestrictedJsClassLoader(), true);
 

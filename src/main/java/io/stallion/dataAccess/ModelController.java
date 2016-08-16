@@ -22,14 +22,13 @@ import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Or;
 import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
+import io.stallion.reflection.PropertyUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.stallion.utils.Literals.asArray;
-import static io.stallion.utils.Literals.empty;
-import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.*;
 
 
 public interface ModelController<T extends Model> {
@@ -113,6 +112,34 @@ public interface ModelController<T extends Model> {
      * @param obj
      */
     public void save(T obj);
+
+
+    /**
+     * Update
+     */
+    public default void update(T obj, String field, Object value) {
+        updateValues(obj, map(val(field, value)));
+    }
+
+    /**
+     * Update
+     */
+    public default void updateValues(T obj, Map<String, Object> values) {
+        if (!getPersister().isDbBacked()) {
+            for(Map.Entry<String, Object> entry: values.entrySet()) {
+                PropertyUtils.setProperty(obj, entry.getKey(), entry.getValue());
+            }
+            save(obj);
+        } else {
+            getPersister().update(obj, values);
+            T original = originalForId(obj.getId());
+            for(Map.Entry<String, Object> entry: values.entrySet()) {
+                PropertyUtils.setProperty(original, entry.getKey(), entry.getValue());
+            }
+
+        }
+    }
+
 
     /**
      * Calls obj.setDeleted(true) then saves the object.

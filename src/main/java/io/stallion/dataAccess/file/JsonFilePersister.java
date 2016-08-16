@@ -45,7 +45,7 @@ public class JsonFilePersister<T extends Model> extends FilePersisterBase<T> {
     public T doFetchOne(File file) {
         T o = null;
         try {
-            String json = FileUtils.readFileToString(file);
+            String json = FileUtils.readFileToString(file, UTF8);
             o = JSON.parse(json, this.getModelClass());
         } catch (IOException e) {
             throw new RuntimeException(e);

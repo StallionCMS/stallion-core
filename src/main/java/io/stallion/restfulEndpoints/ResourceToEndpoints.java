@@ -48,7 +48,7 @@ public class ResourceToEndpoints {
         this.basePath = basePath;
     }
 
-    public List<JavaRestEndpoint> convert(Object resource) {
+    public List<JavaRestEndpoint> convert(EndpointResource resource) {
         Class cls = resource.getClass();
         List<JavaRestEndpoint> endpoints = new ArrayList<>();
 

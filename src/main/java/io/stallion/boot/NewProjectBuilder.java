@@ -152,10 +152,10 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
 
 
         String source = templating.renderTemplate(
-                IOUtils.toString(getClass().getResource("/templates/wizard/stallion.toml.jinja")),
+                IOUtils.toString(getClass().getResource("/templates/wizard/stallion.toml.jinja"), UTF8),
                 map(val("builder", builder)));
         String prodSource = templating.renderTemplate(
-                IOUtils.toString(getClass().getResource("/templates/wizard/stallion.prod.toml.jinja")),
+                IOUtils.toString(getClass().getResource("/templates/wizard/stallion.prod.toml.jinja"), UTF8),
                 map(val("builder", builder)));
         FileUtils.writeStringToFile(new File(targetFolder + "/conf/stallion.toml"), source, "UTF-8");
         FileUtils.writeStringToFile(new File(targetFolder + "/conf/stallion.prod.toml"), prodSource, "UTF-8");
@@ -222,7 +222,7 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
 
     public void copyFile(String resourcePath, String relativePath) throws IOException {
         File file = new File(targetFolder + "/" + relativePath);
-        String source = IOUtils.toString(getClass().getResource(resourcePath));
+        String source = IOUtils.toString(getClass().getResource(resourcePath), UTF8);
         FileUtils.writeStringToFile(file, source, "utf-8");
     }
 
@@ -231,7 +231,7 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         File file = new File(getTargetFolder() + "/" + relativePath);
 
         try {
-            String content = FileUtils.readFileToString(file);
+            String content = FileUtils.readFileToString(file, UTF8);
             content = content.replace(old, newString);
             FileUtils.write(file, content, Charset.forName("utf-8"));
         } catch (IOException e) {

@@ -499,7 +499,7 @@ public class BundleHandler {
         if (fileContents == null) {
             if (this.path.startsWith("stallion:")) {
                 try {
-                    fileContents = IOUtils.toString(getClass().getResourceAsStream("/assets/" + this.path.substring(9, this.path.length())));
+                    fileContents = IOUtils.toString(getClass().getResourceAsStream("/assets/" + this.path.substring(9, this.path.length())), UTF8);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

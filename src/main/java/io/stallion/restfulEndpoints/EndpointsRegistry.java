@@ -56,9 +56,9 @@ public class EndpointsRegistry {
 
 
 
-    public EndpointsRegistry addResource(String basePath, Object ...resources) {
+    public EndpointsRegistry addResource(String basePath, EndpointResource ...resources) {
         ResourceToEndpoints converter = new ResourceToEndpoints(basePath);
-        for (Object resource: resources) {
+        for (EndpointResource resource: resources) {
             Log.finer("Register resource {0}", resource.getClass().getName());
             List<? extends RestEndpointBase> endPoints = converter.convert(resource);
             addEndpoints(endPoints.toArray(new RestEndpointBase[endPoints.size()]));
