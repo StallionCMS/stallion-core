@@ -352,6 +352,18 @@
             </releases>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>stallion-repo</id>
+            <url>http://mvn.stallion.io/repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
     <distributionManagement>
         <downloadUrl>http://mvn.stallion.io/repo</downloadUrl>
         <repository>
