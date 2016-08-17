@@ -23,6 +23,7 @@ import io.stallion.boot.CommandOptionsBase;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.secrets.SecretsVault;
 import io.stallion.services.Log;
+import io.stallion.settings.childSections.SecretsSettings;
 import io.stallion.settings.childSections.SettingsSection;
 
 import java.io.File;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 
 public class SettingsLoader  {
@@ -112,7 +114,7 @@ public class SettingsLoader  {
         if (settings instanceof Settings) {
             ((Settings)settings).setEnv(env);
             ((Settings)settings).setTargetFolder(targetFolder);
-            SecretsVault.init(targetFolder, ((Settings) settings).getSecrets());
+            SecretsVault.init(targetFolder, or(((Settings) settings).getSecrets(), new SecretsSettings()));
         }
 
         if (options != null && settings instanceof  Settings) {
