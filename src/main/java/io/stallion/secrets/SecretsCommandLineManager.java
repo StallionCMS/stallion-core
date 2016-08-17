@@ -59,6 +59,12 @@ public class SecretsCommandLineManager {
     public SecretsVault loadVault(String appPath, SecretsSettings secretsSettings) {
         targetFolder = appPath;
         keyringServiceName = "Stallion Secrets Key: " + targetFolder;
+
+        if (secretsSettings == null) {
+            Log.info("secretsSettings is null");
+        } else {
+            Log.info("Secrets passphrase file is {0}", secretsSettings.getPassPhraseFile());
+        }
         password = findPasswordFromFile(secretsSettings);
 
         if (empty(password)) {
