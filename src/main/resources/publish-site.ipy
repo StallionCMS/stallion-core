@@ -3,7 +3,7 @@
 # The following line gets replaced during the upload process
 #$$$conf$$$
 
-
+from copy import copy
 from datetime import datetime
 import logging
 import os
@@ -27,6 +27,8 @@ upstream %(instance)s {
 }
 
 """
+
+
 
 nginx_non_ssl_redirect_to_ssl = """
 
@@ -56,6 +58,10 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Upstream-Forwarded-Proto $http_x_forwarded_proto;
+        proxy_read_timeout %(nginx_proxy_read_timeout)s;
+        client_max_body_size %(nginx_client_max_body_size)s;
+
     }
 
     location ~ /.well-known {
@@ -114,6 +120,8 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout %(nginx_proxy_read_timeout)s;
+        client_max_body_size %(nginx_client_max_body_size)s;
     }
 }
 """
@@ -158,6 +166,7 @@ class Publisher(object):
         self.port = None
         self.instance_name = self.slugify_re.sub('--', root).strip('-').strip('-')
         self.file_base = ''
+
         self.env = conf['env']
         self.base_port = conf['base_port']
         self.domain = conf['domain']
@@ -168,9 +177,19 @@ class Publisher(object):
         self.ssl_crt = conf.get('ssl_crt', '')
         self.ssl_key = conf.get('ssl_key', '')
         self.redirect_to_ssl = conf.get('redirect_to_ssl', False)
+        self.nginx_client_max_body_size = conf.get('nginx_client_max_body_size', '30M')
+        self.nginx_proxy_read_timeout =  conf.get('nginx_proxy_read_timeout', '3600')
         self.executable_name = conf['executable_name']
         self.site_url = conf['site_url']
         self.full_rebuild = conf['full_rebuild']
+        self.root = root
+        self.deploy_folder = root
+        self.now_stamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S %p')
+
+    def dict(self, **extra):
+        d = copy(self.__dict__)
+        d.update(extra)
+        return d
 
 
     def publish(self):
@@ -474,14 +493,10 @@ respawn limit 3 60
     def swap_active(self):
         info("Making %s the new active instance in nginx" % self.deploying)
         instance = self.domain.replace(".", "_").replace("-", "_")
-        params = dict(
+        params = self.dict(
             instance=instance,
-            domain=self.domain,
-            port=self.port,
             alias_domains=' '.join(self.alias_domains),
             redirect_domains=' '.join(self.redirect_domains),
-            ssl_key=self.ssl_key,
-            ssl_crt=self.ssl_crt
             )
         conf = nginx_upstream % params
         # Handle SSL traffic, if applicable

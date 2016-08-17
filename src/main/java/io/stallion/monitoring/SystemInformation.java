@@ -35,6 +35,8 @@ public class SystemInformation {
     private int port;
     private String env;
     private String xForwardedHost = "";
+    private String guessedHost = "";
+    private String guessedScheme = "";
 
     public String getRemoteAddr() {
         return remoteAddr;
@@ -130,5 +132,23 @@ public class SystemInformation {
 
     public void setxForwardedHost(String xForwardedHost) {
         this.xForwardedHost = xForwardedHost;
+    }
+
+    public String getGuessedHost() {
+        return guessedHost;
+    }
+
+    public SystemInformation setGuessedHost(String guessedHost) {
+        this.guessedHost = guessedHost;
+        return this;
+    }
+
+    public String getGuessedScheme() {
+        return guessedScheme;
+    }
+
+    public SystemInformation setGuessedScheme(String guessedScheme) {
+        this.guessedScheme = guessedScheme;
+        return this;
     }
 }

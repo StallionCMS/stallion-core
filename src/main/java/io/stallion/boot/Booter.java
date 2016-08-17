@@ -60,7 +60,7 @@ public class Booter {
             new NewJavaPluginRunAction(),
             new ExportToHtml(),
             new SecretsAction(),
-            new SqlMigrationAction()  ,
+            new SqlMigrationAction(),
             new SqlCheckNeedsMigrationAction(),
             new SqlGenerationAction(),
             new InteractiveJavascriptRunAction(),

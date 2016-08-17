@@ -202,7 +202,7 @@ public class AppContextLoader {
      */
     public static AppContextLoader loadAndStartForTests(String targetFolder) {
         CommandOptionsBase options = new CommandOptionsBase();
-        options.setEnv("test");
+        options.setEnv(or(System.getProperty("stallionEnv"), "test"));
         options.setTargetPath(targetFolder);
         return loadAndStartForTests(options);
     }

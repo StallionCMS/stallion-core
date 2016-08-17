@@ -48,6 +48,7 @@ public class Settings implements ISettings {
     private StyleSettings styles = null;
     private CorsSettings cors = null;
     private OAuthSettings oAuth;
+    private SecretsSettings secrets;
 
 
     // Site information
@@ -100,6 +101,9 @@ public class Settings implements ISettings {
     @SettingMeta(help="The name of the executable jar file, default is stallion.", val = "stallion")
     private String executableName;
 
+
+
+
     private String env;
     @SettingMeta()
     private Boolean bundleDebug;
@@ -130,6 +134,10 @@ public class Settings implements ISettings {
     private String cdnUrl;
     @SettingMeta(val="http://localhost:{port}")
     private String siteUrl;
+    @SettingMeta(val="25M")
+    private String nginxClientMaxBodySize;
+    @SettingMeta(val="3600")
+    private String nginxProxyReadTimeout;
 
     // Default code directories and files
     @SettingMeta(cls=ArrayList.class)
@@ -324,6 +332,9 @@ public class Settings implements ISettings {
             }
         }
 
+        if (getSecrets() == null) {
+            setSecrets(new SecretsSettings());
+        }
 
     }
 
@@ -748,6 +759,15 @@ public class Settings implements ISettings {
         return this;
     }
 
+    public SecretsSettings getSecrets() {
+        return secrets;
+    }
+
+    public Settings setSecrets(SecretsSettings secrets) {
+        this.secrets = secrets;
+        return this;
+    }
+
     public String getSupportEmail() {
         return supportEmail;
     }
@@ -868,6 +888,26 @@ public class Settings implements ISettings {
 
     public Settings setDeployments(List<DeploymentsConfig> deployments) {
         this.deployments = deployments;
+        return this;
+    }
+
+
+    public String getNginxClientMaxBodySize() {
+        return nginxClientMaxBodySize;
+    }
+
+    public Settings setNginxClientMaxBodySize(String nginxClientMaxBodySize) {
+        this.nginxClientMaxBodySize = nginxClientMaxBodySize;
+        return this;
+    }
+
+
+    public String getNginxProxyReadTimeout() {
+        return nginxProxyReadTimeout;
+    }
+
+    public Settings setNginxProxyReadTimeout(String nginxProxyReadTimeout) {
+        this.nginxProxyReadTimeout = nginxProxyReadTimeout;
         return this;
     }
 }

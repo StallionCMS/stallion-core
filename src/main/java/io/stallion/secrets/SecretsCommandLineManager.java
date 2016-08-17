@@ -19,12 +19,14 @@ package io.stallion.secrets;
 
 import io.stallion.boot.CommandOptionsBase;
 import io.stallion.services.Log;
+import io.stallion.settings.childSections.SecretsSettings;
 import io.stallion.utils.Prompter;
 import net.east301.keyring.BackendNotSupportedException;
 import net.east301.keyring.Keyring;
 import net.east301.keyring.PasswordRetrievalException;
 import net.east301.keyring.PasswordSaveException;
 import net.east301.keyring.util.LockException;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,12 +56,14 @@ public class SecretsCommandLineManager {
             "         \\\\\\ '::::' /\n" +
             "          `=':-..-'`";
 
-    public SecretsVault loadVault(String appPath) {
+    public SecretsVault loadVault(String appPath, SecretsSettings secretsSettings) {
         targetFolder = appPath;
         keyringServiceName = "Stallion Secrets Key: " + targetFolder;
+        password = findPasswordFromFile(secretsSettings);
 
-
-        password = findPasswordInKeyring();
+        if (empty(password)) {
+            password = findPasswordInKeyring();
+        }
 
         if (empty(password)) {
             password = new Prompter("What is your encryption password? If you are creating a secrets file for the first time," +
@@ -89,7 +93,7 @@ public class SecretsCommandLineManager {
         System.out.println("Welcome to the Stallion Secrets Manager.\n\n You can view your secrets, create new secrets, change secrets, delete secrets");
 
         targetFolder = options.getTargetPath();
-        loadVault(options.getTargetPath());
+        loadVault(options.getTargetPath(), null);
 
         while(true) {
             String line = new Prompter("What do you want to do? Options: new/edit/delete/list/quit ")
@@ -117,6 +121,21 @@ public class SecretsCommandLineManager {
 
     }
 
+    public String findPasswordFromFile(SecretsSettings secretsSettings) {
+        if (secretsSettings == null) {
+            return "";
+        }
+        File passPhraseFile = new File(secretsSettings.getPassPhraseFile());
+        Log.info("Looking for secrets pass phrase in file " + passPhraseFile);
+        if (!passPhraseFile.exists()) {
+            return "";
+        }
+        try {
+            return FileUtils.readFileToString(passPhraseFile, UTF8).trim();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     public String findPasswordInKeyring() {

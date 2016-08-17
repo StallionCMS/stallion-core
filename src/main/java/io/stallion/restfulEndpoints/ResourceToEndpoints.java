@@ -71,14 +71,20 @@ public class ResourceToEndpoints {
             basePath += pathAnno.value();
         }
 
-
+        Class defaultJsonViewClass = null;
+        DefaultJsonView jsonView = (DefaultJsonView)cls.getAnnotation(DefaultJsonView.class);
+        if (jsonView != null) {
+            defaultJsonViewClass = jsonView.value();
+        }
 
 
         for(Method method: cls.getDeclaredMethods()) {
             JavaRestEndpoint endpoint = new JavaRestEndpoint();
             endpoint.setRole(defaultMinRole);
             endpoint.setProduces(defaultProduces);
-
+            if (defaultJsonViewClass != null) {
+                endpoint.setJsonViewClass(defaultJsonViewClass);
+            }
 
             Log.finer("Resource class method: {0}", method.getName());
             for(Annotation anno: method.getDeclaredAnnotations()) {

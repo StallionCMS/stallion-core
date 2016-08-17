@@ -37,6 +37,23 @@ public class Literals {
 
     public static final char GSEP = Character.forDigit(29, 10);
 
+    /**
+     * Null safe check for equals.
+     *
+     * @param a
+     * @param b
+     * @return
+     */
+    public static boolean areEqual(Object a, Object b) {
+        if (a == null && b == null) {
+            return true;
+        } else if (a == null && b != null) {
+            return false;
+        } else {
+            return a.equals(b);
+        }
+    }
+
     public static String or(String obj, String defaultVal) {
         if (empty(obj)) {
             return defaultVal;
@@ -44,6 +61,8 @@ public class Literals {
             return obj;
         }
     }
+
+
 
 
     public static Long or(Long obj, Long defaultVal) {

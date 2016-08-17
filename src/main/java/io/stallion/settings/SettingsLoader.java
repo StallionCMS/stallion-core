@@ -112,7 +112,7 @@ public class SettingsLoader  {
         if (settings instanceof Settings) {
             ((Settings)settings).setEnv(env);
             ((Settings)settings).setTargetFolder(targetFolder);
-            SecretsVault.init(targetFolder);
+            SecretsVault.init(targetFolder, ((Settings) settings).getSecrets());
         }
 
         if (options != null && settings instanceof  Settings) {

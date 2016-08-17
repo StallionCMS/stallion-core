@@ -35,7 +35,7 @@ import java.util.Set;
 public class JobStatusController extends StandardModelController<JobStatus> {
 
     public static JobStatusController instance() {
-        return (JobStatusController)Context.dal().getNamespaced("st-jobs", "job-status");
+        return (JobStatusController)Context.dal().get("st_job_status");
     }
 
     public static void selfRegister()  {
@@ -43,13 +43,14 @@ public class JobStatusController extends StandardModelController<JobStatus> {
                 .setControllerClass(JobStatusController.class)
                 .setModelClass(JobStatus.class)
                 .setPath("job-status")
-                .setNameSpace("st-jobs")
+                .setBucket("st_job_status")
                 .setPersisterClass(JsonFilePersister.class)
                 .setShouldWatch(false)
                 .setUseDataFolder(true)
                 .setWritable(true);
         if (DB.instance() != null) {
             registration
+                    .setBucket("st_job_status")
                     .setPersisterClass(DbPersister.class)
                     .setPath("")
                     .setTableName("stallion_job_status");

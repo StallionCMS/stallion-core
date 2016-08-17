@@ -21,6 +21,7 @@ package io.stallion.secrets;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.stallion.exceptions.UsageException;
+import io.stallion.settings.childSections.SecretsSettings;
 import io.stallion.utils.Encrypter;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.io.FileUtils;
@@ -38,6 +39,7 @@ import static io.stallion.Context.*;
 public class SecretsVault {
     private String passPhrase;
     private String secretsPath = "";
+    private static SecretsSettings secretsSettings;
 
     private HashMap<String, String> secrets = new HashMap<>();
 
@@ -57,13 +59,15 @@ public class SecretsVault {
         return appSecrets;
     }
 
-    public static void init(String theAppPath) {
+    public static void init(String theAppPath, SecretsSettings theSecretsSettings) {
         // We have to pass in the application path, since we cannot rely on Settings.instance() being available.
         // However, we do not want to actually load the secrets vault, since that adds complexity and overhead
         // in circumstances when it may not even being necessary (such as when running locally when there are no
         // production keys). So we lazy-load the actual vault when it is first requested.
         appPath = theAppPath;
+        secretsSettings = theSecretsSettings;
     }
+
 
     public static Map<String, String> loadIfExists(String appPath) {
         String rawPath = appPath + "/conf/secrets.json";
@@ -81,7 +85,7 @@ public class SecretsVault {
         }
         if (new File(encryptedPath).isFile()) {
             // Get passphrase
-            SecretsVault vault = new SecretsCommandLineManager().loadVault(appPath);
+            SecretsVault vault = new SecretsCommandLineManager().loadVault(appPath, secretsSettings);
             if (vault != null) {
                 return vault.getSecrets();
             }

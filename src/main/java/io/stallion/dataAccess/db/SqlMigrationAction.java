@@ -23,6 +23,7 @@ import io.stallion.boot.SqlMigrateCommandOptions;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
+import io.stallion.reflection.PropertyComparator;
 import io.stallion.services.Log;
 import io.stallion.utils.ResourceHelpers;
 import io.stallion.utils.json.JSON;
@@ -171,6 +172,7 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
                             .setSource(FileUtils.readAllText(file))
             );
         }
+        migrations.sort(new PropertyComparator<>("versionNumber"));
         return migrations;
     }
 

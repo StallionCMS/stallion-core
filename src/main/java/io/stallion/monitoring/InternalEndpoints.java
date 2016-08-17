@@ -28,6 +28,7 @@ import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.MinRole;
+import io.stallion.restfulEndpoints.XSRF;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -62,6 +63,15 @@ public class InternalEndpoints implements EndpointResource {
         }
         info.setHttpStatusCode(response().getStatus());
         return info;
+    }
+
+    @POST
+    @Path("/run-job")
+    @XSRF(false)
+    public Object runJob(@QueryParam("secret") String secret, @QueryParam("job") String job) {
+        checkSecret(secret);
+        JobCoordinator.instance().forceRunJob(job, true);
+        return true;
     }
 
 
@@ -139,6 +149,8 @@ public class InternalEndpoints implements EndpointResource {
         info.setTargetPath(settings().getTargetFolder());
         info.setxRealIp(request().getHeader("X-Real-Ip"));
         info.setxForwardedFor(request().getHeader("x-Fowarded-For"));
+        info.setGuessedHost(request().getHost());
+        info.setGuessedScheme(request().getScheme());
         info.setRemoteAddr(request().getRemoteAddr());
         info.setDeployDate(System.getenv("STALLION_DEPLOY_TIME"));
         info.setGuessedIp(request().getActualIp());

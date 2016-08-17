@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `stallion_job_status` (
   `error` longtext,
   `shouldSucceedBy` bigint default 0,
   `failCount` int default 0,
+  `row_updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `lastDurationSeconds` bigint default 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY name_key (`name`)

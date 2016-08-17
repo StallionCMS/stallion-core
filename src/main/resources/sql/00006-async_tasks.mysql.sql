@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `stallion_async_tasks` (
   `tryCount` int default 0,
   `errorMessage` longtext,
   `dataJson` longtext,
+  `row_updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `localMode` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY custom_key_key (`customKey`)
