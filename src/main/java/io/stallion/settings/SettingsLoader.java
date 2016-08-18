@@ -122,6 +122,9 @@ public class SettingsLoader  {
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             }
+            if (empty(secretsSettings.getPassPhraseFile())) {
+                secretsSettings.setPassPhraseFile("/usr/local/etc/stallion-secrets-passphrase");
+            }
             SecretsVault.init(targetFolder, secretsSettings);
         }
 
