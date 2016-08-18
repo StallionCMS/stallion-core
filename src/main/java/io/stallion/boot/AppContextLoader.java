@@ -38,10 +38,9 @@ import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.RoutesRegistry;
+import io.stallion.services.*;
 import io.stallion.sitemaps.SiteMapController;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
-import io.stallion.services.LocalMemoryCache;
-import io.stallion.services.Log;
 import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.settings.Settings;
 import io.stallion.requests.RequestHandler;
@@ -173,6 +172,8 @@ public class AppContextLoader {
         RoutesRegistry.load();
 
         // Load users, admin and other default functionality
+        TransactionLogController.register();
+        AuditTrailController.register();
         UserController.load();
         UsersApiResource.register();
         JobStatusController.selfRegister();

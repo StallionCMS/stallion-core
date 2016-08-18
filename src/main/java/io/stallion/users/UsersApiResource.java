@@ -29,6 +29,7 @@ import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.Sanitize;
 import io.stallion.utils.json.RestrictedViews;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.*;
 
@@ -105,6 +106,19 @@ public class UsersApiResource implements EndpointResource {
         }
         String html = TemplateRenderer.instance().renderTemplate(url.toString(), ctx);
         return html;
+    }
+
+    @POST
+    @Path("/valet-login")
+    @Produces("application/json")
+    @MinRole(Role.MEMBER)
+    public Object valetLogin(@BodyParam("targetUser") Object userKey) {
+        if (StringUtils.isNumeric(userKey.toString())) {
+            UserController.instance().valetLoginIfAllowed(Long.parseLong(userKey.toString()));
+        } else {
+            UserController.instance().valetLoginIfAllowed(userKey.toString());
+        }
+        return true;
     }
 
     @GET

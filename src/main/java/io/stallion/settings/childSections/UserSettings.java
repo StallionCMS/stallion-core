@@ -62,6 +62,8 @@ public class UserSettings implements SettingsSection {
     private String newAccountsRole;
     @SettingMeta(val="ANON")
     private String defaultEndpointRole;
+    @SettingMeta(valBoolean = false)
+    private Boolean allowValetMode;
 
     @SettingMeta(valBoolean = false)
     private Boolean disableStLoginParam;
@@ -183,6 +185,16 @@ public class UserSettings implements SettingsSection {
 
     public UserSettings setLimitSyncUsersToMemoryToCount(Integer limitSyncUsersToMemoryToCount) {
         this.limitSyncUsersToMemoryToCount = limitSyncUsersToMemoryToCount;
+        return this;
+    }
+
+
+    public Boolean getAllowValetMode() {
+        return allowValetMode;
+    }
+
+    public UserSettings setAllowValetMode(Boolean allowValetMode) {
+        this.allowValetMode = allowValetMode;
         return this;
     }
 

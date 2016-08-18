@@ -187,6 +187,20 @@ public class Context {
         setOrg(new EmptyOrg());
     }
 
+    public static String getValetEmail() {
+        return _request.get().getValetEmail();
+    }
+
+    public static Long getValetUserId() {
+        return _request.get().getValetUserId();
+    }
+
+    public static void setValet(Long valetUserId, String valetEmail) {
+        _request.get().setValetUserId(valetUserId);
+        _request.get().setValetEmail(valetEmail);
+
+    }
+
     public static void setUser(IUser user) {
         _request.get().setUser(user);
     }

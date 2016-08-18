@@ -172,9 +172,12 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             return false;
         }
         try {
-            T user = (T)UserController.instance().cookieStringToUser(userCookie.getValue());
-            if (user != null) {
-                Context.setUser(user);
+            UserValetResult result = UserController.instance().cookieStringToUser(userCookie.getValue());
+            if (result != null && result.getUser() != null) {
+                Context.setUser(result.getUser());
+                if (result.getValet() != null) {
+                    Context.setValet(result.getValet().getId(), result.getValet().getEmail());
+                }
                 return true;
             } else {
                 return false;
@@ -206,6 +209,42 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         T user = checkUserLoginValid(username, password);
         return addSessionCookieForUser(user, rememberMe);
     }
+
+
+
+    public T valetLoginIfAllowed(String email) {
+        T user = forEmail(email);
+        if (user == null) {
+            user = forUsername(email);
+        }
+        if (user == null) {
+            throw new ClientException("Could not find user matching email " + email);
+        }
+        return valetLoginIfAllowed(user);
+    }
+
+    public T valetLoginIfAllowed(Long userId) {
+        T user = forIdOrNotFound(userId);
+        return valetLoginIfAllowed(user);
+    }
+
+    public T valetLoginIfAllowed(T user) {
+        if (!Settings.instance().getUsers().getAllowValetMode()) {
+            throw new ClientException("Valet mode not enabled for this site.");
+        }
+        T valet = (T)Context.getUser();
+        if (valet == null) {
+            throw new ClientException("You are not logged in, cannot use valet mode");
+        }
+        Long valetId = null;
+        if (!empty(Context.getValetUserId())) {
+            valet = forId(Context.getValetUserId());
+        } else if (!valet.isInRole(Role.ADMIN)) {
+            throw new ClientException("You must be an admin to use valet mode");
+        }
+        return addSessionCookieForUser(user, false, valet);
+    }
+
 
     public void logoutCurrentUser() {
 
@@ -277,7 +316,21 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
      * @return
      */
     public T addSessionCookieForUser(T user, Boolean rememberMe) {
-        String cookie = UserController.instance().userToCookieString(user, rememberMe);
+        return addSessionCookieForUser(user, rememberMe, null);
+    }
+    /**
+     * Add a session cookie to the current request response for this user.
+     *
+     * @param user
+     * @param rememberMe
+     * @return
+     */
+    public T addSessionCookieForUser(T user, Boolean rememberMe, T valetUser) {
+        Long valetUserId = null;
+        if (valetUser != null) {
+            valetUserId = valetUser.getId();
+        }
+        String cookie = userToCookieString(user, rememberMe, valetUserId);
         int expires = (int)((mils() + (86400*30*1000))/1000);
         if (rememberMe) {
             Context.getResponse().addCookie(UserController.USER_COOKIE_NAME, cookie, expires);
@@ -497,9 +550,11 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     }
 
 
-
-
     public String userToCookieString(T user, Boolean rememberMe) {
+        return userToCookieString(user, rememberMe, null);
+    }
+
+    public String userToCookieString(T user, Boolean rememberMe, Long valetId) {
         Long now = mils();
         Long expires = now + (86400L * 1000L);
         if (rememberMe) {
@@ -509,6 +564,9 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
                 .setSec(user.getSecret())
                 .setCrt(mils())
                 .setExp(expires);
+        if (!empty(valetId)) {
+            session.setVid(valetId);
+        }
 
         String encryptedPart = Encrypter.encryptString(user.getEncryptionSecret(), JSON.stringify(session));
 
@@ -516,7 +574,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         return cookie;
     }
 
-    public User cookieStringToUser(String cookie) {
+    public UserValetResult cookieStringToUser(String cookie) {
         String[] parts = cookie.split("&", 2);
         if (parts.length < 2) {
             return null;
@@ -529,7 +587,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         String encryptedJson = parts[1];
 
 
-        User user = (User)forId(id);
+        T user = forId(id);
         if (user == null) {
             return null;
         }
@@ -542,13 +600,47 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         if (!info.getSec().equals(user.getSecret())) {
             return null;
         }
-        return user;
+        UserValetResult result = new UserValetResult()
+                .setUser(user);
+        if (!empty(info.getVid())) {
+            T valet = forId(info.getVid());
+            if (valet == null) {
+                return null;
+            }
+            result.setValet(valet);
+        }
+        return result;
+
+    }
+
+    public static class UserValetResult {
+        public IUser user;
+        public IUser valet;
+
+        public IUser getUser() {
+            return user;
+        }
+
+        public UserValetResult setUser(IUser user) {
+            this.user = user;
+            return this;
+        }
+
+        public IUser getValet() {
+            return valet;
+        }
+
+        public UserValetResult setValet(IUser valet) {
+            this.valet = valet;
+            return this;
+        }
     }
 
     public static class SessionInfo {
         private String sec = "";
         private Long exp = 0L;
         private Long crt = 0L;
+        private Long vid = 0L;
 
         public String getSec() {
             return sec;
@@ -575,6 +667,15 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
         public SessionInfo setCrt(Long crt) {
             this.crt = crt;
+            return this;
+        }
+
+        public Long getVid() {
+            return vid;
+        }
+
+        public SessionInfo setVid(Long vid) {
+            this.vid = vid;
             return this;
         }
     }

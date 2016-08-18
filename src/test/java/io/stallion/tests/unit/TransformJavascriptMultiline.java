@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 public class TransformJavascriptMultiline {
     @Test
     public void testTransform() throws IOException {
-        String source = IOUtils.toString(getClass().getResource("/samples/javascript-with-multiline-string.js"));
+        String source = IOUtils.toString(getClass().getResource("/samples/javascript-with-multiline-string.js"), "UTF-8");
         SqlMigrationAction action = new SqlMigrationAction();
         String transformed = action.transformJavascript(source);
         Log.info("Transformed {0}", transformed);

@@ -17,6 +17,7 @@
 
 package io.stallion.requests;
 
+import javax.persistence.Column;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -44,8 +45,6 @@ import org.eclipse.jetty.server.Request;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -61,6 +60,8 @@ public class StRequest implements IRequest {
     private String path;
     private String query = null;
     private IUser user = new EmptyUser();
+    private Long valetUserId = 0L;
+    private String valetEmail = "";
     private boolean scoped = false;
     private Set<String> scopes;
     private IOrg org = new EmptyOrg();
@@ -440,6 +441,26 @@ public class StRequest implements IRequest {
     @Override
     public StRequest setScoped(boolean scoped) {
         this.scoped = scoped;
+        return this;
+    }
+
+    @Column
+    public Long getValetUserId() {
+        return valetUserId;
+    }
+
+    public StRequest setValetUserId(Long valetUserId) {
+        this.valetUserId = valetUserId;
+        return this;
+    }
+
+    @Column
+    public String getValetEmail() {
+        return valetEmail;
+    }
+
+    public StRequest setValetEmail(String valetEmail) {
+        this.valetEmail = valetEmail;
         return this;
     }
 }

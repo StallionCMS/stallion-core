@@ -127,7 +127,7 @@ public class AMinimalSiteTest extends AppIntegrationCaseBase {
 
     @Test
     public void testMarkdown() throws IOException {
-        String page = IOUtils.toString(getClass().getResource("/text_files/busted-page.txt"));
+        String page = IOUtils.toString(getClass().getResource("/text_files/busted-page.txt"), "UTF-8");
         TextFilePersister persister = new TextFilePersister();
         persister.setModelClass(TextItem.class);
         TextItem item = persister.fromString(page, Paths.get("/naming-things.txt"));
