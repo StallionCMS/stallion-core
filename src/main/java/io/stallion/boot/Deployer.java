@@ -217,7 +217,7 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
                     "sudo chown " + user + ".stallion " + wharfFolder + ";" +
                     "sudo chmod 775 " + wharfFolder);
             if (result.getCode() != 0) {
-                Log.warn("Deploy failed to create wharf folder. Exiting.");
+                Log.warn("Failed to create wharf folder. Exiting.");
                 return false;
             }
         } else {
