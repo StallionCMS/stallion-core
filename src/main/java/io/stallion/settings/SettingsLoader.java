@@ -114,7 +114,15 @@ public class SettingsLoader  {
         if (settings instanceof Settings) {
             ((Settings)settings).setEnv(env);
             ((Settings)settings).setTargetFolder(targetFolder);
-            SecretsVault.init(targetFolder, or(((Settings) settings).getSecrets(), new SecretsSettings()));
+            SecretsSettings secretsSettings = or(((Settings) settings).getSecrets(), new SecretsSettings());
+            try {
+                assignDefaultsFromAnnotations(secretsSettings);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            }
+            SecretsVault.init(targetFolder, secretsSettings);
         }
 
         if (options != null && settings instanceof  Settings) {
