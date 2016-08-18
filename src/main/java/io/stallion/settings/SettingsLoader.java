@@ -115,13 +115,6 @@ public class SettingsLoader  {
             ((Settings)settings).setEnv(env);
             ((Settings)settings).setTargetFolder(targetFolder);
             SecretsSettings secretsSettings = or(((Settings) settings).getSecrets(), new SecretsSettings());
-            try {
-                assignDefaultsFromAnnotations(secretsSettings);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            }
             if (empty(secretsSettings.getPassPhraseFile())) {
                 secretsSettings.setPassPhraseFile("/usr/local/etc/stallion-secrets-passphrase");
             }
