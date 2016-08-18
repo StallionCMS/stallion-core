@@ -101,14 +101,18 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
             throw new UsageException("Your publishing config has no hosts!");
         }
         for(String host: config.getHosts()) {
-            doPublish(host);
+            boolean succeeded = doPublish(host);
+            if (!succeeded) {
+                Log.warn("Deploy failed to host {0}. Exiting.", host);
+                System.exit(1);
+            }
         }
 
 
     }
 
 
-    private void doPublish(String host) throws IOException, CommandException {
+    private boolean doPublish(String host) throws IOException, CommandException {
         String localFolder = Context.settings().getTargetFolder();
         String user = options.getUser();
         if (config != null) {
@@ -214,8 +218,19 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
                     "sudo chmod 775 " + wharfFolder);
             if (result.getCode() != 0) {
                 Log.warn("Deploy failed to create wharf folder. Exiting.");
-                return;
+                return false;
             }
+        } else {
+            result = ProcessHelper.run(
+                    "ssh", "-t", user + "@" + host,
+                    "sudo usermod -a -G stallion " + user + ";" +
+                    "sudo chown -R " + user + ".stallion " + wharfFolder + ";"
+                    );
+            if (result.getCode() != 0) {
+                Log.warn("Failed to set wharf ownership. Exiting.");
+                return false;
+            }
+
         }
         result = ProcessHelper.run(
                 "rsync",
@@ -242,7 +257,7 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
                 user + "@" + host + ":" + wharfFolder);
         if (result.getCode() != 0) {
             Log.warn("Deploy failed to rsync local files to wharf folder. Exiting.");
-            return;
+            return false;
         }
 
         // Decrypt and upload the secrets, if any
@@ -261,7 +276,7 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
                 );
             if (result.getCode() != 0) {
                 Log.warn("Deploy failed to upload secrets file. Exiting.");
-                return;
+                return false;
             }
         }
         result = new ProcessHelper(
@@ -269,9 +284,9 @@ class Deployer implements StallionRunAction<DeployCommandOptions> {
                 ).setShowDotsWhileWaiting(false).run();
         if (result.getCode() != 0) {
             Log.warn("Deploy failed to publish site!");
-            return;
+            return false;
         }
-
+        return true;
     }
 
 }
