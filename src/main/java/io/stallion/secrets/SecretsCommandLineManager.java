@@ -131,8 +131,10 @@ public class SecretsCommandLineManager {
         if (secretsSettings == null) {
             return "";
         }
-        File passPhraseFile = new File(secretsSettings.getPassPhraseFile());
-        Log.info("Looking for secrets pass phrase in file " + passPhraseFile);
+        String path = or(secretsSettings.getPassPhraseFile(), "/usr/local/etc/stallion-secrets-passphrase");
+        Log.info("Looking for secrets pass phrase in file {0}", path);
+        File passPhraseFile = new File(path);
+
         if (!passPhraseFile.exists()) {
             return "";
         }

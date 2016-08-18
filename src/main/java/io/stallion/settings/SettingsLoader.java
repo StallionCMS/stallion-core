@@ -126,6 +126,8 @@ public class SettingsLoader  {
         }
 
 
+
+
         settings.assignDefaults();
 
         try {
