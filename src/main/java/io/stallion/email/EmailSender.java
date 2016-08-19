@@ -20,10 +20,13 @@ package io.stallion.email;
 import io.stallion.Context;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.ValidationException;
+import io.stallion.services.TransactionLog;
+import io.stallion.services.TransactionLogController;
 import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.EmailSettings;
 import io.stallion.services.Log;
 import io.stallion.testing.Stubbing;
+import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 
 import javax.mail.Message;
@@ -34,10 +37,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.*;
 
 /**
  * Helper class for sending an email. Can be used as follows:
@@ -64,6 +69,9 @@ public abstract class EmailSender {
     private String text;
     private String replyTo;
     private EmailSettings emailSettings;
+    private String customKey = "";
+    private boolean shouldLog = true;
+    private String type = "";
 
     /**
      * Create a new instance of the default implementation for this application.
@@ -99,6 +107,9 @@ public abstract class EmailSender {
         String tosString = String.join(",", tos);
         try {
             doSend();
+            if (shouldLog) {
+                logEmail();
+            }
         } catch (EmailSendException ex) {
             Log.exception(ex, "Error sending email to: " + tosString);
             return false;
@@ -108,6 +119,28 @@ public abstract class EmailSender {
             throw new ConfigException(invalid);
         }
         return true;
+    }
+
+    protected void logEmail() {
+        Map<String, Object> extra = map();
+        TransactionLog log = new TransactionLog()
+                .setBody(or(getHtml(), getText()))
+                .setSubject(getSubject())
+                .setCustomKey(customKey)
+                .setUserId(Context.getUser().getId())
+                .setOrgId(Context.getUser().getOrgId())
+                .setToAddress(String.join(",", tos))
+                .setCustomKey(customKey)
+                .setType(type)
+                .setCreatedAt(DateUtils.utcNow())
+                ;
+        extra.put("fromAddress", getFrom());
+        extra.put("replyTo", getReplyTo());
+        TransactionLogController.instance().save(log);
+
+
+
+
     }
 
     /**
@@ -328,6 +361,30 @@ public abstract class EmailSender {
     }
 
 
+    public String getCustomKey() {
+        return customKey;
+    }
 
+    public EmailSender setCustomKey(String customKey) {
+        this.customKey = customKey;
+        return this;
+    }
 
+    public boolean isShouldLog() {
+        return shouldLog;
+    }
+
+    public EmailSender setShouldLog(boolean shouldLog) {
+        this.shouldLog = shouldLog;
+        return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public EmailSender setType(String type) {
+        this.type = type;
+        return this;
+    }
 }

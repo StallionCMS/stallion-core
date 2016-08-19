@@ -23,6 +23,7 @@ import io.stallion.dataAccess.filtering.Or;
 import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
+import io.stallion.services.AuditTrailController;
 
 import java.util.List;
 import java.util.Map;
@@ -194,6 +195,19 @@ public interface ModelController<T extends Model> {
      * @param obj
      */
     public void onPostSave(T obj);
+
+    /**
+     * Override this to save to the audit trail log after a save
+     * @param obj
+     */
+    public default void onPostSaveAuditTrailLog(T obj) {
+        AuditTrailEnabled ae = getClass().getAnnotation(AuditTrailEnabled.class);
+        if (ae != null && ae.value()) {
+            AuditTrailController.instance().logUpdate(obj);
+        }
+    }
+
+
 
     /**
      * Override this to perform some action after the object is created.

@@ -17,14 +17,13 @@
 
 package io.stallion.services;
 
-import java.util.List;
-import java.util.Map;
+import io.stallion.Context;
+import io.stallion.dataAccess.*;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.utils.DateUtils;
+import io.stallion.utils.json.JSON;
 
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.dataAccess.DataAccessRegistry;
-import io.stallion.dataAccess.StandardModelController;
-import io.stallion.services.Log;
+import static io.stallion.utils.Literals.truncate;
 
 
 public class AuditTrailController extends StandardModelController<AuditTrail> {
@@ -33,8 +32,32 @@ public class AuditTrailController extends StandardModelController<AuditTrail> {
     }
 
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(AuditTrail.class, AuditTrailController.class, true);
+        DataAccessRegistration reg = new DataAccessRegistration()
+                .setBucket("stallion_audit_trail")
+                .setModelClass(AuditTrail.class)
+                .setControllerClass(AuditTrailController.class);
+        if (DB.available()) {
+            reg.setDatabaseBacked(true);
+            reg.setStashClass(NoStash.class);
+        }
+        DataAccessRegistry.instance().register(reg);
     }
 
 
+    public void logUpdate(Model obj) {
+        AuditTrail at = new AuditTrail()
+                .setCreatedAt(DateUtils.utcNow())
+                .setOrgId(Context.getUser().getOrgId())
+                .setKeepLongTerm(false)
+                .setObjectData(JSON.stringify(obj))
+                .setRemoteIp(Context.getRequest().getActualIp())
+                .setTable(obj.getBucket())
+                .setObjectId(obj.getId())
+                .setUserAgent(truncate(Context.getRequest().getHeader("User-agent"), 200))
+                .setUserEmail(Context.getUser().getEmail())
+                .setValetEmail(Context.getValetEmail())
+                .setValetId(Context.getValetUserId())
+                ;
+        AuditTrailController.instance().save(at);
+    }
 }

@@ -18,6 +18,7 @@
 package io.stallion.utils;
 
 
+import com.google.common.collect.Lists;
 import io.stallion.exceptions.AppException;
 import io.stallion.settings.Settings;
 
@@ -160,6 +161,9 @@ public class Literals {
     }
 
     public static String truncate(String s, int length) {
+        if (s == null) {
+            return "";
+        }
         if (s.length() < length) {
             return s;
         }
@@ -174,6 +178,9 @@ public class Literals {
      * @return
      */
     public static String truncateSmart(String s, int length) {
+        if (s == null) {
+            return "";
+        }
         if (s.length() < length) {
             return s;
         }

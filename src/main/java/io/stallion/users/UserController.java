@@ -18,6 +18,7 @@
 package io.stallion.users;
 
 import io.stallion.Context;
+import io.stallion.dataAccess.AuditTrailEnabled;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.StandardModelController;
@@ -40,6 +41,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.http.Cookie;
 import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.UUID;
@@ -47,6 +50,7 @@ import java.util.UUID;
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
+@AuditTrailEnabled
 public class UserController<T extends IUser> extends StandardModelController<T> {
     private static final String PROBLEM_LOG_CACHE_BUCKET = "problemLog";
     private static final int PROBLEM_LOG_DURATION_SECONDS = 5 * 60;

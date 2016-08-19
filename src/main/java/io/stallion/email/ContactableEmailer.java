@@ -64,6 +64,7 @@ public abstract class ContactableEmailer<T extends Contactable> {
     protected String minuteStamp;
 
 
+
     private Map<String, Object> context = map();
 
     public ContactableEmailer(T user) {
@@ -138,9 +139,15 @@ public abstract class ContactableEmailer<T extends Contactable> {
                 .setHtml(html)
                 .setReplyTo(transformMaybe(getReplyTo()))
                 .setSubject(transformMaybe(getSubject()))
+                .setShouldLog(shouldLog())
+                .setCustomKey(getUniqueKey())
                 .setTo(user.getEmail());
         onPreSend();
         return emailer.send();
+    }
+
+    public boolean shouldLog() {
+        return true;
     }
 
     /**

@@ -18,13 +18,8 @@
 package io.stallion.services;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
 
 import io.stallion.dataAccess.ModelBase;
-import io.stallion.services.Log;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
@@ -34,14 +29,13 @@ public class AuditTrail extends ModelBase {
     private String table;
     private Long objectId;
     private String objectData;
-    private String body;
     private Long userId;
     private String userEmail;
     private String remoteIp;
     private String userAgent;
     private Long valetId;
     private String valetEmail;
-    private Long groupId;
+    private Long orgId;
     private ZonedDateTime createdAt;
     private boolean keepLongTerm = false;
 
@@ -65,23 +59,13 @@ public class AuditTrail extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(columnDefinition = "longtext")
     public String getObjectData() {
         return objectData;
     }
 
     public AuditTrail setObjectData(String objectData) {
         this.objectData = objectData;
-        return this;
-    }
-
-    @Column
-    public String getBody() {
-        return body;
-    }
-
-    public AuditTrail setBody(String body) {
-        this.body = body;
         return this;
     }
 
@@ -105,7 +89,7 @@ public class AuditTrail extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 50)
     public String getRemoteIp() {
         return remoteIp;
     }
@@ -146,12 +130,12 @@ public class AuditTrail extends ModelBase {
     }
 
     @Column
-    public Long getGroupId() {
-        return groupId;
+    public Long getOrgId() {
+        return orgId;
     }
 
-    public AuditTrail setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public AuditTrail setOrgId(Long orgId) {
+        this.orgId = orgId;
         return this;
     }
 

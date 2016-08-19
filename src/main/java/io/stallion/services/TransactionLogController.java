@@ -22,9 +22,11 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
+import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.services.Log;
 
 
@@ -34,6 +36,15 @@ public class TransactionLogController extends StandardModelController<Transactio
     }
 
     public static void register() {
-        DataAccessRegistry.instance().registerDbModel(TransactionLog.class, TransactionLogController.class, NoStash.class);
+        DataAccessRegistration reg = new DataAccessRegistration()
+                .setControllerClass(TransactionLogController.class)
+                .setModelClass(TransactionLog.class)
+                .setBucket("stallion_transaction_logs");
+        if (DB.available()) {
+            reg.setStashClass(NoStash.class);
+            reg.setDatabaseBacked(true);
+        }
+        DataAccessRegistry.instance().register(reg);
+
     }
 }

@@ -149,7 +149,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
 
     @Override
     public void save(T obj) {
-        T existing = this.forId(obj.getId());
+        T existing = this.itemByPrimaryKey.getOrDefault(obj.getId(), null);
         if (existing == null) {
             if (empty(obj.getId())) {
                 obj.setId(DataAccessRegistry.instance().getTickets().nextId());

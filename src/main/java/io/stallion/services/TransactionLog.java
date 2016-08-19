@@ -18,23 +18,21 @@
 package io.stallion.services;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.dataAccess.ModelBase;
-import io.stallion.services.Log;
+import io.stallion.dataAccess.db.Converter;
+import io.stallion.dataAccess.db.converters.JsonMapConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-@Table(name="stallion_transaction_logs")
+@Table(name="stallion_transaction_log")
 public class TransactionLog extends ModelBase {
     private String subject;
     private String body;
     private Long userId;
-    private Long groupId;
+    private Long orgId;
     private String type;
     private String customKey;
     private String toAddress;
@@ -51,7 +49,7 @@ public class TransactionLog extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(columnDefinition = "longtext")
     public String getBody() {
         return body;
     }
@@ -72,16 +70,16 @@ public class TransactionLog extends ModelBase {
     }
 
     @Column
-    public Long getGroupId() {
-        return groupId;
+    public Long getOrgId() {
+        return orgId;
     }
 
-    public TransactionLog setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public TransactionLog setOrgId(Long orgId) {
+        this.orgId = orgId;
         return this;
     }
 
-    @Column
+    @Column(length = 65)
     public String getType() {
         return type;
     }
@@ -91,7 +89,7 @@ public class TransactionLog extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(length = 65)
     public String getCustomKey() {
         return customKey;
     }
@@ -111,7 +109,8 @@ public class TransactionLog extends ModelBase {
         return this;
     }
 
-    @Column
+    @Column(columnDefinition = "longtext")
+    @Converter(cls=JsonMapConverter.class)
     public Map<String, Object> getExtra() {
         return extra;
     }

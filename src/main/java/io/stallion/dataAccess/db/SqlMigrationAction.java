@@ -179,7 +179,14 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
     public List<SqlMigration> getDefaultMigrations() {
         List<SqlMigration> migrations = list();
         Map<String, List<String>> pluginMigrations = map();
-        pluginMigrations.put("stallion", list("00004-users", "00006-async_tasks", "00010-job_status", "00011-temp_tokens"));
+        pluginMigrations.put("stallion", list(
+                "00004-users",
+                "00006-async_tasks",
+                "00010-job_status",
+                "00011-temp_tokens",
+                "00020-create-audit-trail",
+                "00025-create-transaction-log"
+        ));
         if (PluginRegistry.instance() != null) {
             for (StallionJavaPlugin plugin : PluginRegistry.instance().getJavaPluginByName().values()) {
                 pluginMigrations.put(plugin.getPluginName(), plugin.getSqlMigrations());
