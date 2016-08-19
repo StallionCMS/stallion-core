@@ -346,7 +346,11 @@ class RequestProcessor {
             if ("text/html".equals(endpoint.getProduces()) && !Context.getUser().isAuthorized()) {
                 throw new RedirectException(Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.requestUrl(), "utf-8"), 302);
             }
-            throw new ClientException("You do not have the privileges to access this endpoint.", 403);
+            if (!Context.getUser().getApproved()) {
+                throw new ClientException("Your user has not yet been approved. You cannot access this content.", 403);
+            } else {
+                throw new ClientException("You do not have the privileges to access this content.", 403);
+            }
         }
         List<Object> methodArgs = new ArrayList();
         for(RequestArg arg: endpoint.getArgs()) {

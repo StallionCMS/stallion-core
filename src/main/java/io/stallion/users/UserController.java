@@ -240,11 +240,15 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         if (valet == null) {
             throw new ClientException("You are not logged in, cannot use valet mode");
         }
+
         Long valetId = null;
         if (!empty(Context.getValetUserId())) {
             valet = forId(Context.getValetUserId());
         } else if (!valet.isInRole(Role.ADMIN)) {
             throw new ClientException("You must be an admin to use valet mode");
+        }
+        if (valet.getRole().getValue() <= user.getRole().getValue()) {
+            throw new ClientException("You cannot valet to a user who has the same role as you, only into a user of lesser role.");
         }
         return addSessionCookieForUser(user, false, valet);
     }
