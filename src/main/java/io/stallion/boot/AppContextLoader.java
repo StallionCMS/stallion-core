@@ -24,12 +24,15 @@ import io.stallion.asyncTasks.SimpleAsyncRunner;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.Tickets;
+import io.stallion.dataAccess.file.ListingEndpoints;
+import io.stallion.dataAccess.file.ListingExporter;
 import io.stallion.dataAccess.file.TextItemController;
 import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherRunner;
 import io.stallion.fileSystem.FileSystemWatcherService;
+import io.stallion.forms.SimpleFormTag;
 import io.stallion.hooks.HookRegistry;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.jobs.JobStatusController;
@@ -169,6 +172,7 @@ public class AppContextLoader {
         AssetsController.load();
         DefinedBundle.load();
         TemplateRenderer.load();
+        TemplateRenderer.instance().getJinjaTemplating().registerTag(new SimpleFormTag());
         RoutesRegistry.load();
 
         // Load users, admin and other default functionality
@@ -176,6 +180,8 @@ public class AppContextLoader {
         AuditTrailController.register();
         UserController.load();
         UsersApiResource.register();
+        ListingEndpoints.register();
+        ListingExporter.register();
         JobStatusController.selfRegister();
 
         SimpleAsyncRunner.load();

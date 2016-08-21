@@ -23,20 +23,27 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 
 
-public class TargetFolder {
+public class ContentFolder {
     private String type = "";
     private String path = "";
-    private String defaultTemplate = "";
+    private String itemTemplate = "";
     private String className = "";
     private String relativePath = "";
     private String fullPath = "";
     private Boolean writable = false;
+    private boolean listingEnabled = false;
+    private String listingRootUrl = "";
+    private String listingTemplate = "";
+    private String listingTitle = "";
+    private String listingMetaDescription = "";
+    private int itemsPerPage = 10;
+
 
     public String getType() {
         return type;
     }
 
-    public TargetFolder setType(String type) {
+    public ContentFolder setType(String type) {
         this.type = type;
         return this;
     }
@@ -45,17 +52,17 @@ public class TargetFolder {
         return path;
     }
 
-    public TargetFolder setPath(String path) {
+    public ContentFolder setPath(String path) {
         this.path = path;
         return this;
     }
 
-    public String getDefaultTemplate() {
-        return defaultTemplate;
+    public String getItemTemplate() {
+        return itemTemplate;
     }
 
-    public TargetFolder setDefaultTemplate(String defaultTemplate) {
-        this.defaultTemplate = defaultTemplate;
+    public ContentFolder setItemTemplate(String itemTemplate) {
+        this.itemTemplate = itemTemplate;
         return this;
     }
 
@@ -63,12 +70,12 @@ public class TargetFolder {
         return className;
     }
 
-    public TargetFolder setClassName(String className) {
+    public ContentFolder setClassName(String className) {
         this.className = className;
         return this;
     }
 
-    public TargetFolder hydratePaths() {
+    public ContentFolder hydratePaths() {
         if (StringUtils.isEmpty(path)) {
             return this;
         }
@@ -89,7 +96,7 @@ public class TargetFolder {
         return relativePath;
     }
 
-    public TargetFolder setRelativePath(String relativePath) {
+    public ContentFolder setRelativePath(String relativePath) {
         this.relativePath = relativePath;
         return this;
     }
@@ -98,7 +105,7 @@ public class TargetFolder {
         return fullPath;
     }
 
-    public TargetFolder setFullPath(String fullPath) {
+    public ContentFolder setFullPath(String fullPath) {
         this.fullPath = fullPath;
         return this;
     }
@@ -107,8 +114,62 @@ public class TargetFolder {
         return writable;
     }
 
-    public TargetFolder setWritable(Boolean writable) {
+    public ContentFolder setWritable(Boolean writable) {
         this.writable = writable;
+        return this;
+    }
+
+    public boolean isListingEnabled() {
+        return listingEnabled;
+    }
+
+    public ContentFolder setListingEnabled(boolean listingEnabled) {
+        this.listingEnabled = listingEnabled;
+        return this;
+    }
+
+    public String getListingRootUrl() {
+        return listingRootUrl;
+    }
+
+    public ContentFolder setListingRootUrl(String listingRootUrl) {
+        this.listingRootUrl = listingRootUrl;
+        return this;
+    }
+
+    public String getListingTemplate() {
+        return listingTemplate;
+    }
+
+    public ContentFolder setListingTemplate(String listingTemplate) {
+        this.listingTemplate = listingTemplate;
+        return this;
+    }
+
+    public String getListingTitle() {
+        return listingTitle;
+    }
+
+    public ContentFolder setListingTitle(String listingTitle) {
+        this.listingTitle = listingTitle;
+        return this;
+    }
+
+    public String getListingMetaDescription() {
+        return listingMetaDescription;
+    }
+
+    public ContentFolder setListingMetaDescription(String listingMetaDescription) {
+        this.listingMetaDescription = listingMetaDescription;
+        return this;
+    }
+
+    public int getItemsPerPage() {
+        return itemsPerPage;
+    }
+
+    public ContentFolder setItemsPerPage(int itemsPerPage) {
+        this.itemsPerPage = itemsPerPage;
         return this;
     }
 }

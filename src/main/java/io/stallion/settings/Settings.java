@@ -27,7 +27,6 @@ import io.stallion.settings.childSections.*;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.Column;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -141,7 +140,7 @@ public class Settings implements ISettings {
 
     // Default code directories and files
     @SettingMeta(cls=ArrayList.class)
-    private List<TargetFolder> folders;
+    private List<ContentFolder> folders;
     @SettingMeta(val="page.jinja")
     private String pageTemplate = "page.jinja";
 
@@ -367,11 +366,11 @@ public class Settings implements ISettings {
         return StrictnessLevel.STRICT.equals(getStrictnessLevel());
     }
 
-    public List<TargetFolder> getFolders() {
+    public List<ContentFolder> getFolders() {
         return folders;
     }
 
-    public void setFolders(List<TargetFolder> folders) {
+    public void setFolders(List<ContentFolder> folders) {
         this.folders = folders;
     }
 

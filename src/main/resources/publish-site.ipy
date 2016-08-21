@@ -356,6 +356,10 @@ class Publisher(object):
         good("Database schema is up-to-date")
 
     def try_test_start_instance(self):
+        # Kill previous instances running on the same port
+        !stop {self.file_base}
+        !pkill -f 'localMode=true.*-port={self.port}'
+        time.sleep(1)
         # start the server
         source = u"""\
 #sudo su stallionServer

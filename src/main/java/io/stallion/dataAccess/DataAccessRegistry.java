@@ -24,7 +24,7 @@ import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
-import io.stallion.settings.TargetFolder;
+import io.stallion.settings.ContentFolder;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Table;
@@ -105,17 +105,17 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
      */
     private void loadFileBasedDataAccess(String targetFolder, Settings settings) throws Exception {
         List<DataAccessRegistration> registrations = new ArrayList<>();
-        List<TargetFolder> folders = new ArrayList<>();
+        List<ContentFolder> folders = new ArrayList<>();
         if (settings.getFolders() != null) {
             folders.addAll(settings.getFolders());
         }
 
         List<String> names = new ArrayList<>();
         if (new File(targetFolder + "/pages").isDirectory()) {
-            folders.add(new TargetFolder().setPath(targetFolder + "/pages").setType("markdown").setDefaultTemplate(settings.getPageTemplate()));
+            folders.add(new ContentFolder().setPath(targetFolder + "/pages").setType("markdown").setItemTemplate(settings.getPageTemplate()));
         }
 
-        for (TargetFolder folder: folders) {
+        for (ContentFolder folder: folders) {
             DataAccessRegistration registration = new DataAccessRegistration();
             registration.setUseDataFolder(false);
             registration.setPath(folder.getPath());
@@ -135,7 +135,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
                 registration.setPersisterClass(TextFilePersister.class);
 
             }
-            registration.setTemplatePath(folder.getDefaultTemplate());
+            registration.setTemplatePath(folder.getItemTemplate());
             registration.setShouldWatch(true);
             if (!StringUtils.isEmpty(folder.getClassName())) {
                 Class clazz = this.getClass().getClassLoader().loadClass(folder.getClassName());

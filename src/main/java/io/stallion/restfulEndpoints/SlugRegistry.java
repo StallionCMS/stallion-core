@@ -70,6 +70,9 @@ public class SlugRegistry {
     }
 
     public SlugRegistry addDisplayable(Displayable item) {
+        if (item.getSlug() == null) {
+            return this;
+        }
         getSlugMap().put(item.getSlug(), new BucketThing().setBucket(item.getController().getBucket()).setId(item.getId()));
         return this;
     }
