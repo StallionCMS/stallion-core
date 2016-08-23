@@ -17,9 +17,12 @@
 
 package io.stallion.testing;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.stallion.requests.StRequest;
 import io.stallion.services.Log;
+import io.stallion.utils.json.JSON;
+import io.stallion.utils.json.RestrictedViews;
 
 import javax.servlet.http.Cookie;
 import java.io.BufferedReader;
@@ -210,8 +213,7 @@ public class MockRequest extends StRequest {
 
     protected String dataObjectToString() {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(this.dataObject);
+            return JSON.stringify(this.dataObject, RestrictedViews.Internal.class);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }

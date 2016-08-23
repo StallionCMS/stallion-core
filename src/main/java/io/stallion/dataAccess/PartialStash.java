@@ -151,8 +151,19 @@ public class PartialStash<T extends Model> extends Stash<T> {
 
     @Override
     public T detach(T obj) {
-        // Always detached, so can just return object
-        return obj;
+        T existing = this.itemByPrimaryKey.get(obj.getId());
+        if (existing == null) {
+            return obj;
+        }
+        T newItem = null;
+        try {
+            newItem = (T)existing.getClass().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        newItem.setId(obj.getId());
+        cloneInto(existing, newItem, null, true, null);
+        return newItem;
     }
 
 
@@ -310,7 +321,10 @@ public class PartialStash<T extends Model> extends Stash<T> {
             if (item != null) {
                 loadItem(item);
             }
-            return item;
+            if (item == null) {
+                return null;
+            }
+            return detach(item);
         }
     }
 

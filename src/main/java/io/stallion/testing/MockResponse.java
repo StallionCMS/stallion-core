@@ -99,7 +99,7 @@ public class MockResponse<T> extends StResponse {
         this.contentLength = length;
     }
 
-    public T asObject(Class<? extends T> cls) {
+    public <T> T asObject(Class<? extends T> cls) {
         try {
             return JSON.parse(this.getContent(), cls);
         } catch (Exception e) {

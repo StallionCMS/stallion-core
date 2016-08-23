@@ -149,24 +149,36 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
 
     @Override
     public void save(T obj) {
-        T existing = this.itemByPrimaryKey.getOrDefault(obj.getId(), null);
-        if (existing == null) {
-            if (empty(obj.getId())) {
-                obj.setId(DataAccessRegistry.instance().getTickets().nextId());
-                obj.setIsNewInsert(true);
+        T internal = this.itemByPrimaryKey.getOrDefault(obj.getId(), null);
+        if (internal == null) {
+            try {
+                internal = (T)obj.getClass().newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
-            preRegisterItem(obj);
-            getPersister().persist(obj);
-            registerItem(obj);
-            registerKeys(obj);
+            cloneInto(obj, internal, null, true, null);
+            internal.setId(obj.getId());
+            if (empty(obj.getId())) {
+                internal.setId(DataAccessRegistry.instance().getTickets().nextId());
+                internal.setIsNewInsert(true);
+            }
+            preRegisterItem(internal);
+            getPersister().persist(internal);
+            registerItem(internal);
+            registerKeys(internal);
+            obj.setId(internal.getId());
+            obj.setIsNewInsert(false);
+            cloneInto(internal, obj, null, true, null);
         } else {
 
             Map<String, Object> changedValues = map();
             // If these are not the same reference in memory, then we find the changed values,
             // and sync values from the detached object into the permanent object
-            if (existing != null && obj != existing) {
+            if (internal != null && obj != internal) {
                 for (Map.Entry<String, Object> entry: PropertyUtils.getProperties(obj).entrySet()) {
-                    Object org = PropertyUtils.getPropertyOrMappedValue(existing, entry.getKey());
+                    Object org = PropertyUtils.getPropertyOrMappedValue(internal, entry.getKey());
                     if (org == null && entry.getValue() != null) {
                         changedValues.put(entry.getKey(), entry.getValue());
                     } else if (org != null && !org.equals(entry.getValue())) {
@@ -189,8 +201,10 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
     public void hardDelete(T obj)  {
         getPersister().hardDelete(obj);
         obj.setDeleted(true);
-        sync(obj);
-        itemByPrimaryKey.remove(obj.getId());
+        if (itemByPrimaryKey.containsKey(obj.getId())) {
+            sync(obj);
+            itemByPrimaryKey.remove(obj.getId());
+        }
         FilterCache.clearBucket(getBucket());
     }
 
