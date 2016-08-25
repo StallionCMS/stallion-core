@@ -52,7 +52,7 @@ public class ListingExporter implements Exporter {
             urlPaths.add(or(root, "/"));
             urlPaths.add(root + "/rss.xml");
             urlPaths.add(root + "/feed");
-            DisplayableModelController<TextItem> controller = (DisplayableModelController)DataAccessRegistry.instance().get(conf.getRelativePath());
+            DisplayableModelController<TextItem> controller = (DisplayableModelController)DataAccessRegistry.instance().get(conf.getPath());
             int count = controller.filter("published", true).count();
             for (TextItem post: controller.filter("published", true).all()) {
                 urlPaths.add(root + "/archives/" + DateUtils.formatLocalDateFromZonedDate(post.getPublishDate(), "yyyy/MM/"));

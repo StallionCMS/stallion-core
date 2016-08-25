@@ -26,6 +26,6 @@ import io.stallion.requests.StResponse;
 public class HealthTrackingHookHandler extends PostRequestHookHandler {
     @Override
     public void handleRequest(StRequest request, StResponse response) {
-        HealthTracker.instance().logResponse(response);
+        HealthTracker.instance().logResponse(request, response);
     }
 }

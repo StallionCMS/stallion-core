@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>{{meta.title}}</title>
+        <description>{{meta.description}}</description>
+        <link>{{blogUrl}}</link>
+        <language>en-us</language>
+        <lastBuildDate>{{ lastBuildDate }}</lastBuildDate>
+        <generator>{{ generator }}</generator>
+        <atom:link href="{{ meta.url }}" rel="self" type="application/rss+xml" />
+        {% for post in postsPager.items %}
+        <item>
+            <title>{{ post.title }}</title>
+            <description><![CDATA[{{ post.content }}]]></description>
+            <link>{{ post.permalink }}</link>
+            <pubDate>{{ utils.formatLocalDate(post.publishDate, "EEE, dd MMM yyyy HH:mm:ss Z") }}</pubDate>
+            <guid isPermaLink="true">{{ post.permalink }}</guid>
+        </item>
+        {% endfor %}
+
+    </channel>
+
+</rss>

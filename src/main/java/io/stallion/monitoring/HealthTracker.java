@@ -20,6 +20,7 @@ package io.stallion.monitoring;
 import com.sun.management.UnixOperatingSystemMXBean;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
 import io.stallion.exceptions.ClientException;
+import io.stallion.requests.StRequest;
 import io.stallion.requests.StResponse;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -160,10 +161,14 @@ public class HealthTracker {
         return count;
     }
 
-    public void logResponse(StResponse response) {
+    public void logResponse(StRequest request, StResponse response) {
         incrementQueue(responseCounts);
         if (response.getStatus() >= 500) {
-            incrementQueue(response500s);
+            // If the health endpoint is treating us as down, don't log that
+            // as a 500 error or else we will be down for ever
+            if (!request.getPath().startsWith("/st-internal/")) {
+                incrementQueue(response500s);
+            }
         } else if (response.getStatus() == 404) {
             incrementQueue(response404s);
         } else if (response.getStatus() >= 400) {

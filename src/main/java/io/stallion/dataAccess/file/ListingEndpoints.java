@@ -82,7 +82,7 @@ public class ListingEndpoints implements EndpointResource {
     }
 
     private DisplayableModelController<TextItem> postsController() {
-        return (DisplayableModelController<TextItem>)DataAccessRegistry.instance().get(config.getRelativePath());
+        return (DisplayableModelController<TextItem>)DataAccessRegistry.instance().get(config.getPath());
     }
 
     private FilterChain<TextItem> filterChain() throws Exception {
