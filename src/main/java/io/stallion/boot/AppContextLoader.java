@@ -226,6 +226,7 @@ public class AppContextLoader {
         PluginRegistry.loadWithJavaPlugins(options.getTargetPath());
         loadCompletely(options, false, true);
         _app.startServicesForTests();
+        SimpleAsyncRunner.setSyncMode(true);
         return _app;
     }
 

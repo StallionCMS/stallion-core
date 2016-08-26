@@ -117,7 +117,7 @@ public abstract class ContactableEmailer<T extends Contactable> {
             return false;
         }
         if (hasSeenKey()) {
-            Log.warn("You already have sent an email recently with the unique key {0}", getUniqueKey());
+            Log.warn("You already have sent an email recently with the unique key {0}", transformMaybe(getUniqueKey()));
             return false;
         }
         markSeenKey();
@@ -140,7 +140,7 @@ public abstract class ContactableEmailer<T extends Contactable> {
                 .setReplyTo(transformMaybe(getReplyTo()))
                 .setSubject(transformMaybe(getSubject()))
                 .setShouldLog(shouldLog())
-                .setCustomKey(getUniqueKey())
+                .setCustomKey(transformMaybe(getUniqueKey()))
                 .setTo(user.getEmail());
         onPreSend();
         return emailer.send();
@@ -266,7 +266,7 @@ public abstract class ContactableEmailer<T extends Contactable> {
      */
     protected boolean hasSeenKey() {
         if (!empty(getUniqueKey())) {
-            Object seen = LocalMemoryCache.get("contactEmailerKeys", getUniqueKey());
+            Object seen = LocalMemoryCache.get("contactEmailerKeys", transformMaybe(getUniqueKey()));
             if (seen instanceof Boolean && true == (boolean)seen) {
                 return true;
             }
@@ -279,7 +279,7 @@ public abstract class ContactableEmailer<T extends Contactable> {
      */
     protected void markSeenKey() {
         if (!empty(getUniqueKey())) {
-            LocalMemoryCache.set("contactEmailerKeys", getUniqueKey(), true, 100000);
+            LocalMemoryCache.set("contactEmailerKeys", transformMaybe(getUniqueKey()), true, 100000);
         }
     }
 

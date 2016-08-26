@@ -35,6 +35,7 @@ import static io.stallion.Context.*;
  */
 public class SimpleAsyncRunner {
     private static SimpleAsyncRunner _instance;
+    private static boolean syncMode = false;
 
     public static SimpleAsyncRunner instance() {
         return _instance;
@@ -42,6 +43,10 @@ public class SimpleAsyncRunner {
 
     public static void load() {
         _instance = new SimpleAsyncRunner();
+    }
+
+    public static void setSyncMode(boolean isSyncMode) {
+        syncMode = isSyncMode;
     }
 
     public static void shutdown() {
@@ -65,7 +70,11 @@ public class SimpleAsyncRunner {
     }
 
     public SimpleAsyncRunner submit(Runnable runnable) {
-        pool.submit(runnable);
+        if (syncMode) {
+            runnable.run();
+        } else {
+            pool.submit(runnable);
+        }
         return this;
     }
 

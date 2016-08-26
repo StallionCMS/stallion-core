@@ -29,12 +29,16 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.text.Normalizer;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -45,6 +49,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
 
+import static io.stallion.utils.Literals.UTF8;
 import static io.stallion.utils.Literals.map;
 import static io.stallion.utils.Literals.val;
 
@@ -88,6 +93,24 @@ public class GeneralUtils {
         return slug.toLowerCase(Locale.ENGLISH);
     }
 
+    public static String formatCurrency(Double amt) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        return formatter.format(amt);
+    }
+
+    public static String formatCurrency(Float amt) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        return formatter.format(amt);
+    }
+
+
+    public static String urlEncode(String s) {
+        try {
+            return URLEncoder.encode(s, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(s);
+        }
+    }
 
     public static String guessMimeType(String path) {
         return mimeTypes.getOrDefault(FilenameUtils.getExtension(path), null);
