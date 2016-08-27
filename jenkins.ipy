@@ -3,8 +3,10 @@
 
 
 def build():
-    !mvn clean compile package assembly:single install
-
+    !mvn -DskipTests=true clean compile package assembly:single install
+    if _exit_code != 0:
+        sys.exit(_exit_code)
+    
 
 build()    
 
