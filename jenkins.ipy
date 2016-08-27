@@ -5,7 +5,7 @@ import subprocess
 import time
 import traceback
 
-raise Exception("ERRROR")
+raise SystemExit(2)
 
 def build():
     !mvn -DskipTests=true compile package assembly:single install
