@@ -58,6 +58,7 @@ if '--build' in sys.argv:
     except Exception, e:
         raise
     run_selenium_for_build(os.environ['BUILD_NUMBER'])
+    !mvn compile -DskipTests=true install source:jar deploy
     
 elif '--selenium' in sys.argv:
     pass
