@@ -1,0 +1,10 @@
+#!/usr/bin/ipython
+
+
+
+def build():
+    !mvn clean compile package assembly:single install
+
+
+build()    
+
