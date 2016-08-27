@@ -5,7 +5,7 @@ import subprocess
 import time
 import traceback
 
-raise SystemExit(2)
+
 
 def build():
     !mvn -DskipTests=true compile package assembly:single install
@@ -44,6 +44,9 @@ def run_selenium_for_build(build_number):
                 break
             time.sleep(.1)
         !selenium-nashorn selenium/test-users.js
+        if _exit_code != 0:
+            print 'Selenium tests failed!'
+            sys.exit(1)
     finally:
         p.terminate()
         p.wait()
@@ -58,3 +61,5 @@ if '--build' in sys.argv:
     
 elif '--selenium' in sys.argv:
     pass
+
+!touch ipython-success-iYwv42ChyJJ7.txt
