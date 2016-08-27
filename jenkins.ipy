@@ -48,8 +48,7 @@ if '--build' in sys.argv:
     try: 
         build()
     except Exception, e:
-        traceback.print_exc(e)
-        sys.exit(1)
+        raise
     run_selenium_for_build(os.environ['BUILD_NUMBER'])
     
 elif '--selenium' in sys.argv:
