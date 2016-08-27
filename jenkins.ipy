@@ -1,12 +1,51 @@
 #!/usr/bin/ipython
-
-
+import os
+import sys
+import subprocess
 
 def build():
-    !mvn -DskipTests=true clean compile package assembly:single install
+    !mvn -DskipTests=true compile package assembly:single install
     if _exit_code != 0:
         sys.exit(_exit_code)
+        script = '''#!/bin/sh
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
+
+
+'''
+    out_folder = os.environ['HOME'] + '/build-artifacts/' + os.environ['BUILD_NUMBER']
+    if not os.isdir(out_folder):
+        os.makedirs(out_folder)
+    out_file = out_folder + '/stallion'
+    with open(out_file, 'w') as f:
+        f.write(script)
+    !cat target/stallion-core-.1-SNAPSHOT-jar-with-dependencies.jar >> $out_file
+    !chmod 700 $out_file
     
-
-build()    
-
+def run_selenium_for_build(build_number):
+    stallion_exec = os.environ['HOME'] + '/build-artifacts/' + build_number + '/stallion'
+    app_target_path = os.getcwd() + '/src/test/resources/a_minimal_site'
+    p = subprocess.Popen([stallion_exec, 'serve', '-targetPath=' + app_target_path, '-logLevel=FINER', '-env=local'])
+    try: 
+        for x in xrange(0, 50):
+            try: 
+                r = requests.get('http://localhost:8090/')
+            except:
+                time.sleep(.1)
+                continue
+            print r
+            if r.status_code == 200:
+                break
+            time.sleep(.1)
+        !selenium-nashorn selenium/test-users.js
+    finally:
+        p.terminate()
+        p.wait()
+    
+    
+if '--build' in sys.argv:
+    build()
+    run_selenium_for_build(os.environ['BUILD_NUMBER'])
+    
+elif '--selenium' in sys.argv:
+    
