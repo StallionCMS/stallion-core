@@ -1,4 +1,4 @@
-#!/usr/bin/ipython
+#!/usr/local/bin/ipython
 import os
 import sys
 import subprocess
@@ -8,7 +8,7 @@ def build():
     !mvn -DskipTests=true compile package assembly:single install
     if _exit_code != 0:
         sys.exit(_exit_code)
-        script = '''#!/bin/sh
+    script = '''#!/bin/sh
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
 
