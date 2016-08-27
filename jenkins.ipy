@@ -5,6 +5,8 @@ import subprocess
 import time
 import traceback
 
+sys.exit(1)
+
 def build():
     !mvn -DskipTests=true compile package assembly:single install
     if _exit_code != 0:
