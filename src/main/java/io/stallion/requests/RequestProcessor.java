@@ -790,18 +790,18 @@ class RequestProcessor {
 
     private void logHandled(int status, StRequest request, String msg, Object...args) {
         msg = MessageFormat.format(msg, args);
-        Log.logForFrame(2, Level.INFO, "status={0} handler=\"{1}\" {2}={3}", status, msg, request.getMethod(), request.getPath());
+        Log.logForFrame(2, Level.FINE, "status={0} handler=\"{1}\" {2}={3}", status, msg, request.getMethod(), request.getPath());
     }
 
     private void logHandled(StRequest request, String msg, Object...args) {
         msg = MessageFormat.format(msg, args);
-        Log.logForFrame(2, Level.INFO, "handler=\"{0}\" {1}={2}", msg, request.getMethod(), request.getPath());
+        Log.logForFrame(2, Level.FINE, "handler=\"{0}\" {1}={2}", msg, request.getMethod(), request.getPath());
     }
 
     public void markHandled(int status, String message, Object...args) {
         response.setStatus(status);
         message = MessageFormat.format(message, args);
-        Log.logForFrame(2, Level.INFO, "status={0} handler=\"{1}\" {2}={3}", status, message, request.getMethod(), request.getPath());
+        Log.logForFrame(2, Level.FINE, "status={0} handler=\"{1}\" {2}={3}", status, message, request.getMethod(), request.getPath());
     }
 
     public void notFound(String message) {

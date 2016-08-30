@@ -58,6 +58,10 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
 
     }
 
+    public boolean requireDatabase() {
+        return false;
+    }
+
     @Override
     public CommandOptionsBase newCommandOptions() {
         return new CommandOptionsBase();
@@ -149,6 +153,17 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
             builder.setEmailPassword(Prompter.prompt("Email password? "));
             builder.setEmailUsername(Prompter.prompt("Email username? "));
         }
+        boolean configureDatabase = requireDatabase();
+        if (!configureDatabase) {
+            configureDatabase = new Prompter("Configure a local database? ").yesNo();
+        }
+        if (configureDatabase) {
+            builder.setDatabaseUrl(Prompter.prompt("Database URL?" ));
+            builder.setDatabaseUsername(Prompter.prompt("Database username? "));
+            builder.setDatabasePassword(new Prompter("Database password?" ).setAllowEmpty(true).prompt());
+        }
+
+
 
 
         String source = templating.renderTemplate(

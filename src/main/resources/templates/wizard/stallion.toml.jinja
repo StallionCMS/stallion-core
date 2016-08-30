@@ -13,10 +13,17 @@ metaDescription = "{{ builder.siteDescription }}"
 healthCheckSecret = "{{ builder.healthCheckSecret }}"
 
 # If you require a database, configure it here, otherwise all data will be stored in the file system.
+{% if builder.databaseUrl %}
+[database]
+url = "{{ builder.databaseUrl }}"
+username = "{{ builder.databaseUsername }}"
+password = "{{ builder.databasePassword }}"
+{% else %{
 #[database]
 #url = "jdbc:mysql://localhost:3306/database_name?autoReconnect=true"
 #username = "username"
 #password = "mypassword"
+{% endif %]
 
 # Email settings, for sending outbound emails
 # Exceptions, comments, form submissions, etc, will be sent to this address

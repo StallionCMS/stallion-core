@@ -39,7 +39,12 @@ public class Log {
     private static boolean alwaysIncludeLineNumber = true;
 
     static {
-        logger = Logger.getLogger("stallion");
+
+
+
+        logger = Logger.getLogger("io.stallion");
+        logger.config("");
+
         //TODO: configure the logger from settingsp
         logger.setUseParentHandlers(false);
         handler = new ConsoleHandler();
@@ -49,7 +54,8 @@ public class Log {
 
         handler.setFormatter(new LogFormatter());
         logger.addHandler(handler);
-
+        // Hack to fix a bug where ScssStylesheet will reset the global logger
+        System.setProperty("java.util.logging.config.file", "noop");
     }
 
     /**

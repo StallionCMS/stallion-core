@@ -17,6 +17,8 @@
 
 package io.stallion.boot;
 
+import javax.persistence.Column;
+
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
@@ -31,6 +33,10 @@ class ProjectSettingsBuilder {
     private String title;
     private String siteUrl;
     private String healthCheckSecret;
+
+    private String databaseUrl = "";
+    private String databasePassword = "";
+    private String databaseUsername = "";
 
     private String emailUsername;
     private String emailPassword;
@@ -137,6 +143,39 @@ class ProjectSettingsBuilder {
 
     public ProjectSettingsBuilder setHighlightColor(String highlightColor) {
         this.highlightColor = highlightColor;
+        return this;
+    }
+
+
+    public String getDatabaseUrl() {
+        return databaseUrl;
+    }
+
+    public ProjectSettingsBuilder setDatabaseUrl(String databaseUrl) {
+        if (!databaseUrl.contains("?")) {
+            databaseUrl = databaseUrl + "?allowMultiQueries=true&autoReConnect=true";
+        }
+        this.databaseUrl = databaseUrl;
+        return this;
+    }
+
+
+    public String getDatabasePassword() {
+        return databasePassword;
+    }
+
+    public ProjectSettingsBuilder setDatabasePassword(String databasePassword) {
+        this.databasePassword = databasePassword;
+        return this;
+    }
+
+
+    public String getDatabaseUsername() {
+        return databaseUsername;
+    }
+
+    public ProjectSettingsBuilder setDatabaseUsername(String databaseUsername) {
+        this.databaseUsername = databaseUsername;
         return this;
     }
 }
