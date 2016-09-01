@@ -32,15 +32,26 @@ import java.time.ZonedDateTime;
 class JobInstanceDispatcher implements Runnable {
     private Job job;
     private JobDefinition definition;
+    private boolean forced;
+    private JobStatus status;
+    private ZonedDateTime now;
 
-    public JobInstanceDispatcher(JobDefinition definition, Job job) {
+    public JobInstanceDispatcher(JobStatus status, JobDefinition definition, Job job, boolean forced, ZonedDateTime now) {
+        this.status = status;
         this.definition = definition;
         this.job = job;
+        this.forced = forced;
+        this.now = now;
     }
 
     @Override
     public void run() {
-        JobStatus status = JobStatusController.instance().getOrCreateForName(definition.getName());
+        boolean locked = JobStatusController.instance().lockJob(definition.getName());
+        if (!locked) {
+            Log.warn("Job is locked, skipping run command. {0}", definition.getName());
+            return;
+        }
+
         status.setStartedAt(DateUtils.mils());
         JobStatusController.instance().save(status);
 
@@ -55,6 +66,7 @@ class JobInstanceDispatcher implements Runnable {
             Long nextCompleteBy = nextRunAt.plusMinutes(definition.getAlertThresholdMinutes()).toInstant().toEpochMilli();
             Log.info("Threshold minutes: {0} next complete by: {1}", definition.getAlertThresholdMinutes(), nextCompleteBy);
             status.setShouldSucceedBy(nextCompleteBy);
+            JobStatusController.instance().save(status);
         } catch (Exception e) {
             Log.exception(e, "Error running job " + definition.getName());
             status.setFailCount(status.getFailCount() + 1);
@@ -63,7 +75,9 @@ class JobInstanceDispatcher implements Runnable {
             if (HealthTracker.instance() != null) {
                 HealthTracker.instance().logException(e);
             }
+            JobStatusController.instance().save(status);
+        } finally {
+            JobStatusController.instance().resetLockAndNextRunAt(status, now.plusMinutes(1));
         }
-        JobStatusController.instance().save(status);
     }
 }

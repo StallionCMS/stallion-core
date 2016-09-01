@@ -27,7 +27,6 @@ import static io.stallion.utils.Literals.*;
 
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -93,6 +92,7 @@ public class JobCoordinator extends Thread {
     private PriorityBlockingQueue<JobDefinition> queue;
     private Set<String> registeredJobs;
     private Map<String, Long> lastRanAtByJobName = new HashMap<>();
+    private Map<String, JobDefinition> jobByName = map();
     private Boolean synchronousMode = false;
 
     @Override
@@ -140,55 +140,20 @@ public class JobCoordinator extends Thread {
     public void executeJobsForCurrentTime(ZonedDateTime now) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         now = now.withSecond(0).withNano(0);
         Log.finest("Checking for jobs to execute this period");
-        for (Object brake: safeLoop(queue.size()+10)) { // fake while-loop pattern
-            if (queue.size() == 0) {
-                Log.finest("No jobs in queue, returning");
-                return;
-            }
-            JobDefinition definition = queue.poll();
-            if (definition == null) {
-                Log.finer("No job definition found");
-                return;
-            }
-            // If a job is stale by more than five minutes, something is wonky, put it back into the queue and keep processing
-            if (definition.getNextRunAt() == null || definition.getNextRunAt().plusMinutes(5).isBefore(now)) {
-                Log.info("Job definition is null or a previous time: {0} {1}", definition.getName(), definition.getNextRunAt());
-                definition.setNextRunAt(definition.getSchedule().nextAt(now));
-                if (definition.getNextRunAt().isBefore(now)) {
-                    Log.warn("Something is very wrong. Next run at is being calculated to be before the current time! {0} {1}", definition.getName(), definition.getNextRunAt());
-                    putIntoQueue(definition, now);
-                    continue;
-                }
-            }
-            // Not ready to run until the future, keep going
-            if (definition.getNextRunAt().isAfter(now)) {
-                Log.finer("Job definition scheduled for later: {0} {1}", definition.getName(), definition.getNextRunAt());
-                putIntoQueue(definition, now);
-                return;
-            }
-
-            Long lastRanAt = lastRanAtByJobName.getOrDefault(definition.getName(), 0L);
-            // If the job last ran within 90 seconds, then we skip the run, something must have gone wrong
-            // This should never happen, but you can never have too many double-checks
-            // We don't run a job twice in a row accidentally
-            if ((now.toInstant().toEpochMilli() - lastRanAt) < 90000) {
-                Log.warn("Job {0} was ran twice within 90 seconds!", definition.getName());
-                putIntoQueue(definition, now);
-                return;
-            }
+        for (JobStatus jobStatus: JobStatusController.instance().findJobsForPeriod(now)) {
+            JobDefinition definition = JobCoordinator.instance().getJobDefinition(jobStatus.getName());
             lastRanAtByJobName.put(definition.getName(), now.toInstant().toEpochMilli());
             Log.info("Dispatching job {0}", definition.getName());
             // Now start-up a thread to actually run the job
             Class<? extends Job> jobClass = definition.getJobClass();
             Job job = jobClass.newInstance();
-            JobInstanceDispatcher dispatcher = new JobInstanceDispatcher(definition, job);
+            JobInstanceDispatcher dispatcher = new JobInstanceDispatcher(jobStatus, definition, job, false, now);
             if (synchronousMode) {
                 dispatcher.run();
             } else {
                 pool.execute(dispatcher);
             }
-            // Return the job to the queue so it will run again the future
-            putIntoQueue(definition, now);
+
         }
     }
 
@@ -212,7 +177,8 @@ public class JobCoordinator extends Thread {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        JobInstanceDispatcher dispatcher = new JobInstanceDispatcher(jobDefinition, job);
+        JobStatus status = JobStatusController.instance().forUniqueKey("name", jobName);
+        JobInstanceDispatcher dispatcher = new JobInstanceDispatcher(status, jobDefinition, job, forceEvenIfLocked, utcNow());
 
         dispatcher.run();
     }
@@ -234,23 +200,6 @@ public class JobCoordinator extends Thread {
      */
     public void registerJobForTest(JobDefinition job, ZonedDateTime now) {
         doRegisterJob(job, now);
-    }
-
-    /**
-     * Called by unittests when we need to re-sort for a new time
-     */
-    public JobCoordinator resetForDateTime(ZonedDateTime now) {
-        List<JobDefinition> definitions = list();
-        for(Object brake: safeLoop(1000)) {
-            if (queue.size() == 0) {
-                break;
-            }
-            definitions.add(queue.poll());
-        }
-        for(JobDefinition definition: definitions) {
-            putIntoQueue(definition, now);
-        }
-        return this;
     }
 
 
@@ -278,27 +227,19 @@ public class JobCoordinator extends Thread {
         if (registeredJobs.contains(job.getName())) {
             throw new ConfigException("You tried to load the same job twice! If you want to load multiple jobs with the same class, be sure to set the 'name' field of the job definition. Job name: " + job.getName());
         }
+
+
+
+
         registeredJobs.add(job.getName());
-        putIntoQueue(job, now);
+        jobByName.put(job.getName(), job);
+
+        JobStatusController.instance().initializeJobStatus(job, now);
     }
 
-    private void putIntoQueue(JobDefinition definition) {
-        putIntoQueue(definition, utcNow());
-    }
 
-    private void putIntoQueue(JobDefinition definition, ZonedDateTime now) {
-        if (shouldShutDown) {
-            Log.warn("Tried to enqueue a job while the JobCoordinator was shutting down.");
-            return;
-        }
-        ZonedDateTime nextMinute = null;
-        if (now.getSecond() > 30) {
-            nextMinute = now.withSecond(0).plusMinutes(2);
-        } else {
-            nextMinute = now.withSecond(0).plusMinutes(1);
-        }
-        definition.setNextRunAt(definition.getSchedule().nextAt(nextMinute));
-        queue.add(definition);
+    public JobDefinition getJobDefinition(String name) {
+        return jobByName.getOrDefault(name, null);
     }
 
     /**
@@ -307,7 +248,7 @@ public class JobCoordinator extends Thread {
      */
     public List<JobHealthInfo> buildJobHealthInfos() {
         List<JobHealthInfo> infos = list();
-        for(JobDefinition job: queue) {
+        for(JobDefinition job: jobByName.values()) {
             if (job == null || empty(job.getName())) {
                 continue;
             }
@@ -325,6 +266,7 @@ public class JobCoordinator extends Thread {
             health.setLastFinishedAt(status.getCompletedAt());
             health.setLastRunTime(status.getLastDurationSeconds());
             health.setFailCount(status.getFailCount());
+            health.setNextExecuteMinuteStamp(status.getNextExecuteMinuteStamp());
         }
         return infos;
     }

@@ -17,11 +17,13 @@
 
 package io.stallion.jobs;
 
+import io.stallion.dataAccess.AlternativeKey;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.UniqueKey;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import java.time.ZonedDateTime;
 
 @Table(name="stallion_job_status")
 public class JobStatus extends ModelBase {
@@ -33,6 +35,10 @@ public class JobStatus extends ModelBase {
     private long shouldSucceedBy = 0;
     private long lastDurationSeconds = 0;
     private int failCount = 0;
+    private long lockedAt = 0;
+    private String lockGuid = "";
+    private String nextExecuteMinuteStamp = "";
+    private ZonedDateTime nextExecuteAt;
 
 
     @UniqueKey
@@ -115,6 +121,47 @@ public class JobStatus extends ModelBase {
 
     public JobStatus setFailCount(int failCount) {
         this.failCount = failCount;
+        return this;
+    }
+
+    @Column(nullable = false)
+    public long getLockedAt() {
+        return lockedAt;
+    }
+
+    public JobStatus setLockedAt(long lockedAt) {
+        this.lockedAt = lockedAt;
+        return this;
+    }
+
+    @Column(nullable = false, length=50)
+    public String getLockGuid() {
+        return lockGuid;
+    }
+
+    public JobStatus setLockGuid(String lockGuid) {
+        this.lockGuid = lockGuid;
+        return this;
+    }
+
+    @AlternativeKey
+    @Column(nullable = false, length=12)
+    public String getNextExecuteMinuteStamp() {
+        return nextExecuteMinuteStamp;
+    }
+
+    public JobStatus setNextExecuteMinuteStamp(String nextExecuteMinuteStamp) {
+        this.nextExecuteMinuteStamp = nextExecuteMinuteStamp;
+        return this;
+    }
+
+    @Column(nullable = false)
+    public ZonedDateTime getNextExecuteAt() {
+        return nextExecuteAt;
+    }
+
+    public JobStatus setNextExecuteAt(ZonedDateTime nextExecuteAt) {
+        this.nextExecuteAt = nextExecuteAt;
         return this;
     }
 }

@@ -18,9 +18,8 @@
 package io.stallion.tests.integration.jobs;
 
 import io.stallion.Context;
-import io.stallion.jobs.JobDefinition;
-import io.stallion.jobs.Schedule;
-import io.stallion.jobs.JobCoordinator;
+import io.stallion.dataAccess.filtering.Or;
+import io.stallion.jobs.*;
 import io.stallion.testing.AppIntegrationCaseBase;
 import static org.junit.Assert.assertEquals;
 
@@ -28,14 +27,13 @@ import io.stallion.tests.integration.jobs.ExampleJobOne;
 import io.stallion.tests.integration.jobs.ExampleJobThree;
 import io.stallion.tests.integration.jobs.ExampleJobTwo;
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 public class JobsTests extends AppIntegrationCaseBase {
 
@@ -53,6 +51,21 @@ public class JobsTests extends AppIntegrationCaseBase {
     @AfterClass
     public static void tearDownClass() throws Exception {
         cleanUpClass();
+    }
+
+    @After
+    @Before
+    public void deleteJobStatuses() {
+        List<JobStatus> jobStatuses = JobStatusController.instance()
+                .anyOf(
+                        new Or("name", "io.stallion.tests.integration.jobs.ExampleJobOne"),
+                        new Or("name", "io.stallion.tests.integration.jobs.ExampleJobTwo"),
+                        new Or("name", "io.stallion.tests.integration.jobs.ExampleJobThree")
+                )
+                .all();
+        for(JobStatus js: jobStatuses) {
+            JobStatusController.instance().hardDelete(js);
+        }
     }
 
     /**
@@ -74,8 +87,6 @@ public class JobsTests extends AppIntegrationCaseBase {
             }});
         }};
 
-
-
         // Define and load job 2, to run at 12:30 every day
         JobDefinition job2 = new JobDefinition()
                 .setJobClass(ExampleJobTwo.class)
@@ -86,6 +97,7 @@ public class JobsTests extends AppIntegrationCaseBase {
                         .everyDay()
                         .everyMonth()
                         .verify());
+
         // Define and load job 3, to run at 5PM on Tuesday
         JobDefinition job3 = new JobDefinition()
                 .setJobClass(ExampleJobThree.class)
@@ -97,7 +109,7 @@ public class JobsTests extends AppIntegrationCaseBase {
                         .everyMonth()
                         .verify());
 
-        ZonedDateTime now = ZonedDateTime.of(2015, 1, 18, 10, 10, 12, 0, ZoneId.of("UTC"));
+        ZonedDateTime now = ZonedDateTime.of(2015, 1, 18, 10, 40, 12, 0, ZoneId.of("UTC"));
         JobCoordinator.instance().registerJobForTest(job1, now);
         JobCoordinator.instance().registerJobForTest(job2, now);
         JobCoordinator.instance().registerJobForTest(job3, now);
@@ -106,26 +118,23 @@ public class JobsTests extends AppIntegrationCaseBase {
         // Run for time at 11:30 - Job 1 should run
         //now = ZonedDateTime.of(2015, 1, 18, 11, 30, 7, 121, ZoneId.of("UTC"));
         //JobCoordinator.instance().resetForDateTime(now.minusMinutes(1)).executeJobsForCurrentTime(now);
-        JobCoordinator.instance().executeJobsForCurrentTime(
-                ZonedDateTime.of(2015, 1, 18, 11, 30, 7, 121, ZoneId.of("UTC")));
+        JobCoordinator.instance().executeJobsForCurrentTime(ZonedDateTime.of(2015, 1, 18, 11, 30, 7, 121, ZoneId.of("UTC")));
         assertEquals(1, ExampleJobOne.RUN_COUNT);
         assertEquals(0, ExampleJobTwo.RUN_COUNT);
         assertEquals(0, ExampleJobThree.RUN_COUNT);
 
         // Run for time at 11:30 again - no additional runs should happen
-        JobCoordinator.instance().executeJobsForCurrentTime(
-                ZonedDateTime.of(2015, 1, 18, 11, 30, 7, 121, ZoneId.of("UTC")));
+        JobCoordinator.instance().executeJobsForCurrentTime(ZonedDateTime.of(2015, 1, 18, 11, 30, 7, 121, ZoneId.of("UTC")));
         //JobCoordinator.instance().resetForDateTime(now.minusMinutes(1)).executeJobsForCurrentTime(now);
         assertEquals(1, ExampleJobOne.RUN_COUNT);
         assertEquals(0, ExampleJobTwo.RUN_COUNT);
         assertEquals(0, ExampleJobThree.RUN_COUNT);
 
         // Run for time 12:30 - Job 1 and Job 2 should run
-        JobCoordinator.instance().executeJobsForCurrentTime(
-                ZonedDateTime.of(2015, 1, 18, 12, 30, 7, 121, ZoneId.of("UTC")));
+        JobCoordinator.instance().executeJobsForCurrentTime(ZonedDateTime.of(2015, 1, 18, 12, 30, 7, 121, ZoneId.of("UTC")));
         //JobCoordinator.instance().resetForDateTime(now.minusMinutes(1)).executeJobsForCurrentTime(now);
-        assertEquals(2, ExampleJobOne.RUN_COUNT);
         assertEquals(1, ExampleJobTwo.RUN_COUNT);
+        assertEquals(2, ExampleJobOne.RUN_COUNT);
         assertEquals(0, ExampleJobThree.RUN_COUNT);
 
         // Run for time 5PM monday - no jobs should run
@@ -137,6 +146,9 @@ public class JobsTests extends AppIntegrationCaseBase {
         assertEquals(0, ExampleJobThree.RUN_COUNT);
 
         // Run for 12:30 Tuesday - Job 1 and Job 2 should run
+        // (After first running minutes before to get the time reset)
+        JobCoordinator.instance().executeJobsForCurrentTime(
+                ZonedDateTime.of(2015, 1, 20, 12, 25, 7, 121, ZoneId.of("UTC")));
         JobCoordinator.instance().executeJobsForCurrentTime(
                 ZonedDateTime.of(2015, 1, 20, 12, 30, 7, 121, ZoneId.of("UTC")));
         //JobCoordinator.instance().resetForDateTime(now.minusMinutes(1)).executeJobsForCurrentTime(now);

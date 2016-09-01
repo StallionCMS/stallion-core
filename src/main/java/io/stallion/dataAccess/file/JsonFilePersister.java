@@ -67,13 +67,18 @@ public class JsonFilePersister<T extends Model> extends FilePersisterBase<T> {
             directory.mkdirs();
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(file, obj);
+            FileUtils.write(file, JSON.stringify(obj), UTF8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        //ObjectMapper mapper = new ObjectMapper();
+        //mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+        //try {
+            //mapper.writerWithDefaultPrettyPrinter().writeValue(file, obj);
+        //} catch (IOException e) {
+        //    throw new RuntimeException(e);
+        //}
 
     }
 

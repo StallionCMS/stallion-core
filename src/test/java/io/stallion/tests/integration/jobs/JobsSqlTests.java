@@ -35,9 +35,7 @@ import io.stallion.jobs.Schedule;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 
 public class JobsSqlTests extends AppIntegrationCaseBase {
@@ -45,6 +43,7 @@ public class JobsSqlTests extends AppIntegrationCaseBase {
     @BeforeClass
     public static void setUpClass() throws Exception {
         startApp("/mysql_site");
+        JobCoordinator.initForTesting();
         //JobStatusController.selfRegister();
         //JobCoordinator.initForTesting();
     }
@@ -54,12 +53,18 @@ public class JobsSqlTests extends AppIntegrationCaseBase {
         cleanUpClass();
     }
 
+    @Before
+    @After
+    public void cleanup() {
+        new JobsTests().deleteJobStatuses();
+    }
+
     /**
      * Tests processing jobs with no threading involved for easy debugging.
      */
     @Test
     public void testJobProcessing() throws Exception {
-        Log.warn("Implement me");
-
+        Log.info("sql test processing");
+        new JobsTests().testJobProcessing();
     }
 }

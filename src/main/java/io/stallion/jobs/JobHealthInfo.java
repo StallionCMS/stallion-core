@@ -17,9 +17,6 @@
 
 package io.stallion.jobs;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public class JobHealthInfo {
     private String jobName;
@@ -33,6 +30,7 @@ public class JobHealthInfo {
     private boolean lastRunSucceeded;
     private long expectCompleteBy;
     private int failCount = 0;
+    private String nextExecuteMinuteStamp = "";
 
 
     public long getLastStartedAt() {
@@ -114,6 +112,16 @@ public class JobHealthInfo {
 
     public JobHealthInfo setFailCount(int failCount) {
         this.failCount = failCount;
+        return this;
+    }
+
+
+    public String getNextExecuteMinuteStamp() {
+        return nextExecuteMinuteStamp;
+    }
+
+    public JobHealthInfo setNextExecuteMinuteStamp(String nextExecuteMinuteStamp) {
+        this.nextExecuteMinuteStamp = nextExecuteMinuteStamp;
         return this;
     }
 }

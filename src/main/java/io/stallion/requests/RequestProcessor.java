@@ -146,7 +146,7 @@ class RequestProcessor {
                         .setResponse(response));
         XFrameOptionsHandler.handle(request, response);
 
-        Log.info("status={0} {1}={2}", response.getStatus(), request.getMethod(), request.getPath());
+        Log.fine("status={0} {1}={2}", response.getStatus(), request.getMethod(), request.getPath());
 
     }
 

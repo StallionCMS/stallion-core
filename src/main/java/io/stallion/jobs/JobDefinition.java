@@ -21,14 +21,14 @@ import io.stallion.plugins.PluginRegistry;
 
 import java.time.ZonedDateTime;
 
-public class JobDefinition implements Comparable<JobDefinition> {
+public class JobDefinition {
     private String name;
     private Schedule schedule;
     private int alertThresholdMinutes = 75;
     private String className;
     private Class<? extends Job> jobClass;
 
-    private ZonedDateTime nextRunAt = null;
+
 
     public String getName() {
         return name;
@@ -94,26 +94,4 @@ public class JobDefinition implements Comparable<JobDefinition> {
 
 
 
-    @Override
-    public int compareTo(JobDefinition o) {
-        if (getNextRunAt() == null) {
-            return 1;
-        } else if (o.getNextRunAt() == null) {
-            return -1;
-        }
-        return getNextRunAt().compareTo(o.getNextRunAt());
-    }
-
-    /**
-     * It is set when we add a JobDefinition to the JobCoordinator, or when the job definition is
-     * added back to the queue after it has been run.
-     */
-    public ZonedDateTime getNextRunAt() {
-        return nextRunAt;
-    }
-
-    public void setNextRunAt(ZonedDateTime nextRunAt) {
-        nextRunAt = nextRunAt.withSecond(0).withNano(0);
-        this.nextRunAt = nextRunAt;
-    }
 }
