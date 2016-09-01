@@ -185,7 +185,8 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
                 "00010-job_status",
                 "00011-temp_tokens",
                 "00020-create-audit-trail",
-                "00025-create-transaction-log"
+                "00025-create-transaction-log",
+                "00030-job-status-new-columns"
         ));
         if (PluginRegistry.instance() != null) {
             for (StallionJavaPlugin plugin : PluginRegistry.instance().getJavaPluginByName().values()) {
