@@ -50,8 +50,8 @@ public class AsyncTaskDbPersister extends DbPersister<AsyncTask> implements Asyn
         Long minTime = now - 86400 * 2 * 1000;
         AsyncTask task = DB.instance().queryForOne(
                 AsyncTask.class,
-                "SELECT * FROM stallion_async_tasks WHERE lockUuid='' AND executeAt>? AND completedAt=0 AND localMode=? ORDER BY executeAt ASC",
-                minTime, localMode);
+                "SELECT * FROM stallion_async_tasks WHERE lockUuid='' AND executeAt<=? AND executeAt>? AND completedAt=0 AND localMode=? ORDER BY executeAt ASC",
+                now, minTime, localMode, now);
 
         if (task == null) {
             return null;
