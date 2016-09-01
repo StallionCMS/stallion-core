@@ -98,7 +98,7 @@ public class JobCoordinator extends Thread {
     @Override
     public void run() {
 
-        if (Settings.instance().getLocalMode() && "prod".equals(Settings.instance().getEnv()) || "qa".equals(Settings.instance().getEnv())) {
+        if (Settings.instance().getLocalMode() && ("prod".equals(Settings.instance().getEnv()) || "qa".equals(Settings.instance().getEnv()))) {
             Log.info("Running localMode, environment is QA or PROD, thus not running jobs. Do not want to run production jobs locally!");
             return;
         }
