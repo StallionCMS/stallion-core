@@ -83,6 +83,11 @@ public class JobStatusController extends StandardModelController<JobStatus> {
         } else {
             allJobs = DB.instance().query(JobStatus.class, "SELECT * FROM stallion_job_status WHERE nextexecuteminutestamp<=? AND lockedAt=0 AND lockGuid=''", nowStamp);
         }
+        String firstJobName = "";
+        if (allJobs.size() > 0) {
+            firstJobName = ", first job name is " + allJobs.get(0).getName();
+        }
+        Log.info("JobCoordinator: Found {0} jobs for period {1} {2}", allJobs.size(), nowStamp, firstJobName);
         for(JobStatus job: allJobs) {
             Log.fine("Job found for period {0} {1} {2}", job.getName(), nowStamp, job.getNextExecuteMinuteStamp());
             JobDefinition definition = JobCoordinator.instance().getJobDefinition(job.getName());

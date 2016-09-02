@@ -103,7 +103,7 @@ public class JinjaResourceLocator implements ResourceLocator {
         File file = new File(path);
         Log.finer("Load jinja template from path: {0}", file.toString());
         if (!file.exists() || !file.isFile()) {
-            Log.warn("Jinja template does not exist: {0}", file.toString());
+            Log.fine("Jinja template does not exist: {0}", file.toString());
             return null;
         }
 

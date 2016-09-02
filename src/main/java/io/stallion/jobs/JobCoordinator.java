@@ -158,13 +158,7 @@ public class JobCoordinator extends Thread {
     }
 
     public void forceRunJob(String jobName, boolean forceEvenIfLocked) {
-        JobDefinition jobDefinition = null;
-        for(JobDefinition def: queue) {
-            if (jobName.equals(def.getName())) {
-                jobDefinition = def;
-                break;
-            }
-        }
+        JobDefinition jobDefinition = jobByName.getOrDefault(jobName, null);
         if (jobDefinition == null) {
             throw new CommandException("Job not found: " + jobName);
         }

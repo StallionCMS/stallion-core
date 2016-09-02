@@ -19,8 +19,11 @@ package io.stallion.monitoring;
 
 import io.stallion.email.ContactableEmailer;
 import io.stallion.users.User;
+import io.stallion.utils.DateUtils;
+import io.stallion.utils.GeneralUtils;
 
 import java.net.MalformedURLException;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
@@ -50,6 +53,19 @@ public class ExceptionEmailRunnable implements Runnable {
             put("siteUrl", getSettings().getSiteUrl());
             put("siteName", getSettings().getSiteName());
             put("exceptionInfo", ex);
+        }
+
+        @Override
+        public String getUniqueKey() {
+            ExceptionInfo ex = (ExceptionInfo)getContext().get("exceptionInfo");
+            String hash = GeneralUtils.md5Hash(ex.getStackTrace());
+            String minute = utcNow().format(DateUtils.MINUTE_FORMAT);
+            return "exception-" + hash + "-" + GeneralUtils.slugify(minute);
+        }
+
+        @Override
+        public boolean shouldLog() {
+            return false;
         }
 
         @Override

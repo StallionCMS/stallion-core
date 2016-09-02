@@ -241,7 +241,7 @@ public class Settings implements ISettings {
         }
 
         if (getEmailErrors() == null) {
-            if (getEnv().equals("prod") && !getLocalMode()) {
+            if ((getEnv().equals("prod") || getEnv().equals("qa")) && !getLocalMode()) {
                 setEmailErrors(true);
             } else {
                 setEmailErrors(false);

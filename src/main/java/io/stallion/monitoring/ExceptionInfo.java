@@ -21,6 +21,7 @@ import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -40,13 +41,18 @@ public class ExceptionInfo {
     private String requestBody = "";
     private String remoteAddr;
     private String actualIp;
+    private String outerMessage = "";
+    private String outerClassName = "";
 
     public static ExceptionInfo newForException(Throwable e) {
         ExceptionInfo info = new ExceptionInfo();
         info.thrownAt = utcNow();
+        info.stackTrace = ExceptionUtils.getStackTrace(e);
+        if (e instanceof InvocationTargetException) {
+            e = ((InvocationTargetException)e).getTargetException();
+        }
         info.className = e.getClass().getSimpleName();
         info.message = e.getMessage();
-        info.stackTrace = ExceptionUtils.getStackTrace(e);
         info.requestUrl = request().requestUrl();
         info.requestMethod = request().getMethod();
         info.remoteAddr = request().getRemoteAddr();

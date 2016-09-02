@@ -34,7 +34,7 @@ class LogFormatter extends Formatter {
     @Override
     public String format(LogRecord record) {
         StringBuilder sb = new StringBuilder();
-        SimpleDateFormat df = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         String dateString = df.format(new Date(record.getMillis()));
         String classAndMethod = record.getSourceClassName() + "." + record.getSourceMethodName() + " ";
         classAndMethod = StringUtils.rightPad(classAndMethod, 50);
