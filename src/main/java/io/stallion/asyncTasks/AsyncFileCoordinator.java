@@ -62,6 +62,8 @@ public class AsyncFileCoordinator extends AsyncCoordinator {
 
         if (task.getOriginallyScheduledFor() > 0) {
             task.setExecuteAt(task.getOriginallyScheduledFor());
+        } else if (!empty(task.getExecuteAt()) && empty(task.getOriginallyScheduledFor())) {
+            task.setOriginallyScheduledFor(task.getExecuteAt());
         }
         if (!StringUtils.isEmpty(task.getCustomKey())) {
             try {
