@@ -59,6 +59,7 @@ public class QueryToPager<T extends Model> {
 
 
 
+
     public QueryToPager(IRequest request, ModelController<T> controller) {
         this(request, controller, controller.filterChain());
     }
