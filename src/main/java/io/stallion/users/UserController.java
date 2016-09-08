@@ -247,6 +247,10 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         } else if (!valet.isInRole(Role.ADMIN)) {
             throw new ClientException("You must be an admin to use valet mode");
         }
+        if (valet.getId().equals(user.getId())) {
+            // Valet is switching out of valet mode, back to being their normal user
+            return addSessionCookieForUser(user, true);
+        }
         if (valet.getRole().getValue() <= user.getRole().getValue()) {
             throw new ClientException("You cannot valet to a user who has the same role as you, only into a user of lesser role.");
         }
