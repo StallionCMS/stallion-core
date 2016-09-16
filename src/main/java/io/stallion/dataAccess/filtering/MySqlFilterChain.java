@@ -79,6 +79,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
         int x = 0;
         List<Object> params = new ArrayList<>();
+        boolean hasDeletedOp = false;
         for(FilterOperation op: getOperations()) {
             if (getSchema().getColumns().contains(op.getFieldName())) {
                 throw new UsageException(MessageFormat.format("Trying to filter on a field that is not in the schema: {0} schema:{1}", op.getFieldName(), clazz.getName()));
@@ -89,7 +90,9 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (op.getIsExclude() == true) {
                 whereBuilder.append(" NOT ");
             }
-
+            if (op.getFieldName().equals("deleted")) {
+                hasDeletedOp = true;
+            }
 
             if (op.isOrOperation()) {
                 addOrOperation(op, whereBuilder, params);
@@ -103,6 +106,12 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
             }
             x++;
+        }
+        if (!getIncludeDeleted() && !hasDeletedOp) {
+            if (whereBuilder.length() > 0) {
+                whereBuilder.append(" AND ");
+            }
+            whereBuilder.append(" deleted=0 ");
         }
         String whereSql = whereBuilder.toString();
         if (whereSql.trim().length() > 0) {
