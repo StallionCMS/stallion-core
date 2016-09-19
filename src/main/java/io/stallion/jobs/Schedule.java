@@ -65,14 +65,28 @@ public class Schedule {
                 zoneId = ZoneId.of(user.getTimeZoneId());
             }
         }
-        if (zoneId == null) {
-            zoneId = Context.getSettings().getTimeZoneId();
-        }
+
         if (zoneId == null) {
             zoneId = ZoneId.of("UTC");
         }
         ZonedDateTime dt = ZonedDateTime.now(zoneId);
         return nextAt(dt);
+    }
+
+    public ZoneId getZoneId() {
+        ZoneId zoneId = null;
+        if (!StringUtils.isEmpty(timeZoneId)) {
+            zoneId = ZoneId.of(timeZoneId);
+        } else if (timeZoneForUserId != null) {
+            IUser user = UserController.instance().forId(timeZoneForUserId);
+            if (user != null && !StringUtils.isEmpty(user.getTimeZoneId())) {
+                zoneId = ZoneId.of(user.getTimeZoneId());
+            }
+        }
+        if (zoneId == null) {
+            zoneId = ZoneId.of("UTC");
+        }
+        return zoneId;
     }
 
     /**
@@ -109,6 +123,9 @@ public class Schedule {
      * @return
      */
     public ZonedDateTime nextAt(ZonedDateTime startingFrom) {
+        if (!startingFrom.getZone().equals(getZoneId())) {
+            startingFrom = startingFrom.withZoneSameInstant(getZoneId());
+        }
         return new NextDateTimeFinder(startingFrom).find();
     }
 
