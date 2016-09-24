@@ -142,8 +142,11 @@ public class HealthInfo {
                 warnings.add("Swapping rate is over 25 pages.");
             }
 
-            if (system.isSslExpiresWithinMonth()) {
-                warnings.add("SSL certificate expires within 30 days. Make sure to update it!");
+            if (system.isSslExpiresWithin21Days()) {
+                warnings.add("SSL certificate expires within 21 days. Make sure to update it!");
+            }
+            if (system.isSslExpiresWithin7Days()) {
+                errors.add("SSL certificate expires within 7 days. Make sure to update it!");
             }
         }
         return this;

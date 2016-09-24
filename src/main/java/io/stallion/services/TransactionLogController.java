@@ -39,6 +39,7 @@ public class TransactionLogController extends StandardModelController<Transactio
         DataAccessRegistration reg = new DataAccessRegistration()
                 .setControllerClass(TransactionLogController.class)
                 .setModelClass(TransactionLog.class)
+                .setWritable(true)
                 .setBucket("stallion_transaction_logs");
         if (DB.available()) {
             reg.setStashClass(NoStash.class);

@@ -120,8 +120,12 @@ public class HealthTracker {
         return dailyMetrics.getSslExpires();
     }
 
-    public boolean getSslExpiresIn30() {
-        return dailyMetrics.isSslExpiresWithin30();
+    public boolean getSslExpiresIn7() {
+        return dailyMetrics.isSslExpiresWithin7();
+    }
+
+    public boolean getSslExpiresIn21() {
+        return dailyMetrics.isSslExpiresWithin21();
     }
 
     public HttpHealthInfo getHttpHealthInfo() {
@@ -239,7 +243,8 @@ public class HealthTracker {
     public static class DailyMetrics implements Runnable {
         private double ntpOffset = 0;
         private ZonedDateTime sslExpires = null;
-        private boolean sslExpiresWithin30 = false;
+        private boolean sslExpiresWithin21 = false;
+        private boolean sslExpiresWithin7 = false;
 
 
         public void run() {
@@ -277,7 +282,8 @@ public class HealthTracker {
             }
 
             setSslExpires(ZonedDateTime.ofInstant(maxDate.toInstant(), GeneralUtils.UTC));
-            setSslExpiresWithin30(DateUtils.utcNow().plusMonths(1).isAfter(getSslExpires()));
+            setSslExpiresWithin21(DateUtils.utcNow().plusDays(21).isAfter(getSslExpires()));
+            setSslExpiresWithin7(DateUtils.utcNow().plusDays(7).isAfter(getSslExpires()));
             conn.disconnect();
         }
 
@@ -298,12 +304,22 @@ public class HealthTracker {
             this.sslExpires = sslExpires;
         }
 
-        public boolean isSslExpiresWithin30() {
-            return sslExpiresWithin30;
+        public boolean isSslExpiresWithin21() {
+            return sslExpiresWithin21;
         }
 
-        public void setSslExpiresWithin30(boolean sslExpiresWithin30) {
-            this.sslExpiresWithin30 = sslExpiresWithin30;
+        public DailyMetrics setSslExpiresWithin21(boolean sslExpiresWithin21) {
+            this.sslExpiresWithin21 = sslExpiresWithin21;
+            return this;
+        }
+
+        public boolean isSslExpiresWithin7() {
+            return sslExpiresWithin7;
+        }
+
+        public DailyMetrics setSslExpiresWithin7(boolean sslExpiresWithin7) {
+            this.sslExpiresWithin7 = sslExpiresWithin7;
+            return this;
         }
     }
 

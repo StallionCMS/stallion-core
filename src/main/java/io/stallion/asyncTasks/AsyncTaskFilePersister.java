@@ -54,7 +54,7 @@ public class AsyncTaskFilePersister extends JsonFilePersister implements AsyncTa
         File root = new File(getBucketFolderPath() + "/pending");
         File[] files = root.listFiles(fileFilter);
         List items = new ArrayList<>();
-        for(File file: files) {
+        for (File file : files) {
             items.add(fetchOne(file.getAbsolutePath()));
         }
         return items;

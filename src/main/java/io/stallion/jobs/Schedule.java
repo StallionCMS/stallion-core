@@ -126,7 +126,8 @@ public class Schedule {
         if (!startingFrom.getZone().equals(getZoneId())) {
             startingFrom = startingFrom.withZoneSameInstant(getZoneId());
         }
-        return new NextDateTimeFinder(startingFrom).find();
+        ZonedDateTime dt = new NextDateTimeFinder(startingFrom).find();
+        return dt.withZoneSameInstant(ZoneId.of("UTC"));
     }
 
     /**

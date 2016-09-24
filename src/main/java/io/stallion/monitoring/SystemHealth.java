@@ -48,7 +48,8 @@ public class SystemHealth {
     private Double cpuRollingAppUsage = 0.0;
     private Double cpuRollingSystemUsage = 0.0;
     private long cpusAvailable = 0;
-    private boolean sslExpiresWithinMonth = false;
+    private boolean sslExpiresWithin21Days = false;
+    private boolean sslExpiresWithin7Days = false;
     private ZonedDateTime sslExpiresDate = null;
 
 
@@ -92,7 +93,8 @@ public class SystemHealth {
         setCpuRollingSystemUsage(HealthTracker.instance().getAverageSystemCpuLoad());
         setSwapPagingRate(HealthTracker.instance().getSwapPages());
         setSslExpiresDate(HealthTracker.instance().getSslExpires());
-        setSslExpiresWithinMonth(HealthTracker.instance().getSslExpiresIn30());
+        setSslExpiresWithin21Days(HealthTracker.instance().getSslExpiresIn21());
+        setSslExpiresWithin7Days(HealthTracker.instance().getSslExpiresIn7());
         return this;
     }
 
@@ -256,12 +258,22 @@ public class SystemHealth {
         this.memoryPhysicalFree = memoryPhysicalFree;
     }
 
-    public boolean isSslExpiresWithinMonth() {
-        return sslExpiresWithinMonth;
+    public boolean isSslExpiresWithin21Days() {
+        return sslExpiresWithin21Days;
     }
 
-    public void setSslExpiresWithinMonth(boolean sslExpiresWithinMonth) {
-        this.sslExpiresWithinMonth = sslExpiresWithinMonth;
+    public SystemHealth setSslExpiresWithin21Days(boolean sslExpiresWithin21Days) {
+        this.sslExpiresWithin21Days = sslExpiresWithin21Days;
+        return this;
+    }
+
+    public boolean isSslExpiresWithin7Days() {
+        return sslExpiresWithin7Days;
+    }
+
+    public SystemHealth setSslExpiresWithin7Days(boolean sslExpiresWithin7Days) {
+        this.sslExpiresWithin7Days = sslExpiresWithin7Days;
+        return this;
     }
 
     public ZonedDateTime getSslExpiresDate() {

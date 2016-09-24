@@ -253,6 +253,11 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
             } else {
                 DB.instance().addModel(registration.getModelClass());
             }
+        }  else if (registration.isWritable()) {
+            File folder = new File(registration.getAbsolutePath());
+            if (!folder.isDirectory()) {
+                folder.mkdirs();
+            }
         }
 
 

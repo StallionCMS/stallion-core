@@ -88,10 +88,12 @@ public class FileSystemWatcherRunner implements Runnable {
                 //        DirectoryFileFilter.DIRECTORY
                 //);
                 File[] subdirectories = directory.listFiles((FileFilter) DirectoryFileFilter.INSTANCE);
-                for (File dir : subdirectories) {
-                    Log.finer("Register recursive watcher: " + dir.getAbsolutePath());
-                    directories.add(dir);
-                    registerWatcherForFolder(handler, dir.getAbsolutePath());
+                if (subdirectories != null && subdirectories.length > 0) {
+                    for (File dir : subdirectories) {
+                        Log.finer("Register recursive watcher: " + dir.getAbsolutePath());
+                        directories.add(dir);
+                        registerWatcherForFolder(handler, dir.getAbsolutePath());
+                    }
                 }
             }
         }
