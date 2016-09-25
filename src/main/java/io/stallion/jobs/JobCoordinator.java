@@ -22,6 +22,7 @@ import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import static io.stallion.utils.Literals.*;
 
@@ -41,6 +42,7 @@ public class JobCoordinator extends Thread {
     public static JobCoordinator instance() {
         if (_instance == null) {
             _instance = new JobCoordinator();
+            _instance.setName("stallion-job-coordinator");
             //throw new ConfigException("You tried to access the JobCoordinator.instance(), but startUp() method was never called, jobs are not running.");
         }
         return _instance;
@@ -82,8 +84,11 @@ public class JobCoordinator extends Thread {
     /* Instance methods     */
     private JobCoordinator() {
         queue = new PriorityBlockingQueue<>();
-        pool = Executors
-                .newFixedThreadPool(25);
+        BasicThreadFactory factory = new BasicThreadFactory.Builder()
+                .namingPattern("stallion-job-execution-thread-%d")
+                .build();
+        // Create an executor service for single-threaded execution
+        pool = Executors.newFixedThreadPool(25, factory);
         registeredJobs = new HashSet<>();
     };
 

@@ -28,6 +28,7 @@ import io.stallion.utils.DateUtils;
 import io.stallion.utils.ProcessHelper;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -65,7 +66,10 @@ public class HealthTracker {
     }
 
     public static void start() {
-        instance().timedChecker = new ScheduledThreadPoolExecutor(2);
+        BasicThreadFactory factory = new BasicThreadFactory.Builder()
+                .namingPattern("stallion-health-tracker-thread-%d")
+                .build();
+        instance().timedChecker = new ScheduledThreadPoolExecutor(2, factory);
         instance().timedChecker.scheduleAtFixedRate(instance().metrics, 0, 1, TimeUnit.MINUTES);
         instance().timedChecker.scheduleAtFixedRate(instance().dailyMetrics, 0, 24*60, TimeUnit.MINUTES);
     }

@@ -26,6 +26,8 @@ import io.stallion.jobs.JobDefinition;
 import io.stallion.jobs.Schedule;
 import io.stallion.plugins.javascript.JsAsyncTaskHandler;
 import io.stallion.services.Log;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
 import static io.stallion.utils.Literals.*;
 
 import java.util.ArrayList;
@@ -77,6 +79,7 @@ public abstract class AsyncCoordinator extends Thread {
             INSTANCE = new AsyncFileCoordinator();
             AsyncTaskController.registerFileBased();
         }
+        INSTANCE.setName("stallion-async-coordinator-thread");
     }
 
     public static void initEphemeralSynchronousForTests() {
@@ -141,8 +144,12 @@ public abstract class AsyncCoordinator extends Thread {
     protected AsyncCoordinator() {
         threads = new ArrayList<>();
         int poolSize = 4;
-        pool = Executors
-                .newFixedThreadPool(poolSize);
+        BasicThreadFactory factory = new BasicThreadFactory.Builder()
+                .namingPattern("stallion-async-task-runnable-%d")
+                .build();
+        // Create an executor service for single-threaded execution
+        pool = Executors.newFixedThreadPool(poolSize, factory);
+
     }
 
 
@@ -200,6 +207,7 @@ public abstract class AsyncCoordinator extends Thread {
             return false;
         }
         AsyncTaskExecuteRunnable runnable = new AsyncTaskExecuteRunnable(task);
+
         if (isSynchronousMode()) {
             runnable.run(true);
         } else {

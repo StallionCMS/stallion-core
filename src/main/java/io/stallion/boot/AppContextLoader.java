@@ -189,7 +189,11 @@ public class AppContextLoader {
         if (testMode) {
             AsyncCoordinator.initEphemeralSynchronousForTests();
         } else {
-            AsyncCoordinator.init();
+            if (options instanceof ServeCommandOptions && ((ServeCommandOptions) options).isNoTasks()) {
+
+            } else {
+                AsyncCoordinator.init();
+            }
         }
 
         // Load plugins
@@ -263,6 +267,7 @@ public class AppContextLoader {
         PropertyUtils.resetCache();
 
 
+
         _app = null;
     }
 
@@ -277,13 +282,17 @@ public class AppContextLoader {
      * @return
      */
     public AppContextLoader startAllServices() {
-        AsyncCoordinator.startup();
+        if (AsyncCoordinator.instance() != null) {
+            AsyncCoordinator.startup();
+        }
         JobCoordinator.startUp();
         FileSystemWatcherService.start();
         HealthTracker.start();
         for (StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
             plugin.startServices();
         }
+        FilterCache.start();
+        LocalMemoryCache.start();
         return _app;
     }
 
@@ -297,6 +306,9 @@ public class AppContextLoader {
         for (StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
             plugin.startServicesForTests();
         }
+        FilterCache.start();
+        LocalMemoryCache.start();
+
         return _app;
     }
 

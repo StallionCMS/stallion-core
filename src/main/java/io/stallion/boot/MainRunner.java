@@ -177,6 +177,7 @@ public class MainRunner
         }
 
         watcherThread = new Thread(watcher);
+        watcherThread.setName("stallion-dev-mode-source-code-watcher");
         watcherThread.start();
 
     }

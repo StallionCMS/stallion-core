@@ -52,6 +52,7 @@ public class FileSystemWatcherService {
             return _runner;
         }
         watchingThread = new Thread(instance());
+        watchingThread.setName("stallion-file-system-watcher");
         watchingThread.start();
         return _runner;
     }

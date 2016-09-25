@@ -37,6 +37,8 @@ public class SystemInformation {
     private String xForwardedHost = "";
     private String guessedHost = "";
     private String guessedScheme = "";
+    private String xForwardedProto = "";
+    private String xUpstreamForwardedProto = "";
 
     public String getRemoteAddr() {
         return remoteAddr;
@@ -149,6 +151,24 @@ public class SystemInformation {
 
     public SystemInformation setGuessedScheme(String guessedScheme) {
         this.guessedScheme = guessedScheme;
+        return this;
+    }
+
+    public String getxForwardedProto() {
+        return xForwardedProto;
+    }
+
+    public SystemInformation setxForwardedProto(String xForwardedProto) {
+        this.xForwardedProto = xForwardedProto;
+        return this;
+    }
+
+    public String getxUpstreamForwardedProto() {
+        return xUpstreamForwardedProto;
+    }
+
+    public SystemInformation setxUpstreamForwardedProto(String xUpstreamForwardedProto) {
+        this.xUpstreamForwardedProto = xUpstreamForwardedProto;
         return this;
     }
 }

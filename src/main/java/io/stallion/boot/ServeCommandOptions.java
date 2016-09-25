@@ -32,6 +32,9 @@ public class ServeCommandOptions extends CommandOptionsBase {
     @Option(name="-localMode", usage="Set to 'false' if you want to simulate a server environment, with bundled assets, logging to file instead of console, etc.")
     private String localMode = null;
 
+    @Option(name="-noTasks", usage = "Do not execute asynchronous tasks.")
+    private boolean noTasks = false;
+
 
     @Override
     public Settings hydrateSettings(Settings settings) {
@@ -68,5 +71,12 @@ public class ServeCommandOptions extends CommandOptionsBase {
         this.localMode = localMode;
     }
 
+    public boolean isNoTasks() {
+        return noTasks;
+    }
 
+    public ServeCommandOptions setNoTasks(boolean noTasks) {
+        this.noTasks = noTasks;
+        return this;
+    }
 }

@@ -153,7 +153,7 @@ public class Booter {
         }
 
         // Shutdown hooks
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        Thread shutDownHookThread = new Thread() {
             public void run() {
                 try {
                     Unirest.shutdown();
@@ -161,7 +161,9 @@ public class Booter {
                     e.printStackTrace();
                 }
             }
-        });
+        };
+        shutDownHookThread.setName("stallion-shutdown-hook");
+        Runtime.getRuntime().addShutdownHook(shutDownHookThread);
 
 
         // Execute the action

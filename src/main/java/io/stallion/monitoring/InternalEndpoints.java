@@ -151,12 +151,14 @@ public class InternalEndpoints implements EndpointResource {
         info.setxForwardedFor(request().getHeader("x-Fowarded-For"));
         info.setGuessedHost(request().getHost());
         info.setGuessedScheme(request().getScheme());
+        info.setxForwardedProto(request().getHeader("X-Forwarded-Proto"));
         info.setRemoteAddr(request().getRemoteAddr());
         info.setDeployDate(System.getenv("STALLION_DEPLOY_TIME"));
         info.setGuessedIp(request().getActualIp());
         info.setInstanceHostName(System.getenv("STALLION_HOST"));
         info.setInstanceDomain(System.getenv("STALLION_DOMAIN"));
         info.setxForwardedHost(request().getHeader("x-forwarded-host"));
+        info.setxUpstreamForwardedProto(request().getHeader("x-upstream-forwarded-proto"));
         info.setEnv(Settings.instance().getEnv());
         info.setPort(settings().getPort());
         List<ClassLoader> loaders = new ArrayList<>();

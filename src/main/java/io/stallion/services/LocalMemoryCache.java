@@ -19,9 +19,13 @@ package io.stallion.services;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.PersistenceConfiguration;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
@@ -29,7 +33,48 @@ import static io.stallion.Context.*;
 
 public class LocalMemoryCache {
     private static CacheManager manager;
+    private static TimerTask evictThread;
+    private static Timer evictThreadTimer;
 
+
+
+    public static void start() {
+        if (manager == null) {
+            load();
+        }
+
+        // Every 5 minutes, evict all expired elements from the cache so they do not build up over time
+        evictThread = new TimerTask() {
+            public void run() {
+                Thread.currentThread().setName("stallion-ehcache-evict-task");
+                if (manager == null) {
+                    return;
+                }
+                for(String name: manager.getCacheNames()) {
+                    manager.getCache(name).evictExpiredElements();
+                }
+            }
+        };
+
+        evictThreadTimer = new Timer("stallion-ehcache-evict-timer");
+        evictThreadTimer.scheduleAtFixedRate(evictThread, 0, 5 * 60 * 1000);
+    }
+
+    public static void shutdown() {
+
+        if (evictThreadTimer != null) {
+            evictThreadTimer.cancel();
+            evictThreadTimer = null;
+        }
+        if (evictThread != null) {
+            evictThread.cancel();
+            evictThread = null;
+        }
+        if (manager != null) {
+            manager.shutdown();
+            manager = null;
+        }
+    }
 
     public static void load() {
 
@@ -47,7 +92,10 @@ public class LocalMemoryCache {
             if (manager.getCache(bucket) != null) {
                 return;
             }
-            CacheConfiguration config = new CacheConfiguration(bucket, 10000);
+            CacheConfiguration config = new CacheConfiguration();
+            config.setName(bucket);
+            // Max cache size is 100MB
+            config.setMaxBytesLocalHeap(100 * 1000 * 1000L);
             //config.setDiskPersistent(false);
             //config.setMaxElementsOnDisk(0);
             //config.setMaxBytesLocalDisk(0L);
@@ -59,12 +107,6 @@ public class LocalMemoryCache {
         }
     }
 
-    public static void shutdown() {
-        if (manager != null) {
-            manager.shutdown();
-        }
-        manager = null;
-    }
     public static Object get(String key) {
         return get("default", key);
     }

@@ -130,7 +130,6 @@ public class StRequest implements IRequest {
     @Override
     public String getScheme() {
         if (empty(scheme) && this.request != null) {
-            scheme = this.request.getScheme();
             if (!empty(getHeader("x-upstream-forwarded-proto"))) {
                 scheme = getHeader("x-upstream-forwarded-proto");
             }
@@ -149,6 +148,9 @@ public class StRequest implements IRequest {
                     scheme = baseUrl.substring(0, i);
                 }
             }
+        }
+        if (empty(scheme) && this.request != null) {
+            scheme = this.request.getScheme();
         }
         if (empty(scheme)){
             scheme = "http";
