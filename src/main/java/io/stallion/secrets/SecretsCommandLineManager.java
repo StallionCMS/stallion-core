@@ -55,8 +55,12 @@ public class SecretsCommandLineManager {
             "        ||; ::\\__/:: ;\n" +
             "         \\\\\\ '::::' /\n" +
             "          `=':-..-'`";
-
     public SecretsVault loadVault(String appPath, SecretsSettings secretsSettings) {
+        return loadVault(appPath, secretsSettings, "");
+    }
+
+    public SecretsVault loadVault(String appPath, SecretsSettings secretsSettings, String password) {
+
         targetFolder = appPath;
         keyringServiceName = "Stallion Secrets Key: " + targetFolder;
 
@@ -65,7 +69,14 @@ public class SecretsCommandLineManager {
         } else {
             Log.info("Secrets passphrase file is {0}", secretsSettings.getPassPhraseFile());
         }
-        password = findPasswordFromFile(secretsSettings);
+
+        if (empty(password)) {
+            password = findPasswordFromEnv();
+        }
+        if (empty(password)) {
+            password = findPasswordFromFile(secretsSettings);
+        }
+
 
         if (empty(password)) {
             password = findPasswordInKeyring();
@@ -125,6 +136,10 @@ public class SecretsCommandLineManager {
             }
         }
 
+    }
+
+    public String findPasswordFromEnv() {
+        return System.getenv("STALLION_SECRETS_PASSPHRASE");
     }
 
     public String findPasswordFromFile(SecretsSettings secretsSettings) {

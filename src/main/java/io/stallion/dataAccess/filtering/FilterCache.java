@@ -17,6 +17,7 @@
 
 package io.stallion.dataAccess.filtering;
 
+import io.stallion.settings.Settings;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -91,7 +92,7 @@ public class FilterCache {
         CacheConfiguration config = new CacheConfiguration();
         config.setName(bucket);
         // Max cache size is 50MB
-        config.setMaxBytesLocalHeap(50 * 1000 * 1000L);
+        config.setMaxBytesLocalHeap(Settings.instance().getFilterCacheSize());
         //config.setDiskPersistent(false);
         //config.setMaxElementsOnDisk(0);
         //config.setMaxBytesLocalDisk(0L);

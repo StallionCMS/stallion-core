@@ -66,6 +66,9 @@ public class Settings implements ISettings {
     @SettingMeta(valLong = 1430510589000L)
     private Long appCreatedMillis;
 
+    // Tuning
+    @SettingMeta(valLong = 5000000)
+    private Long filterCacheSize;
 
 
     // File system info
@@ -755,6 +758,15 @@ public class Settings implements ISettings {
 
     public Settings setoAuth(OAuthSettings oAuth) {
         this.oAuth = oAuth;
+        return this;
+    }
+
+    public Long getFilterCacheSize() {
+        return filterCacheSize;
+    }
+
+    public Settings setFilterCacheSize(Long filterCacheSize) {
+        this.filterCacheSize = filterCacheSize;
         return this;
     }
 

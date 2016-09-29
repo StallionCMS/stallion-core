@@ -27,6 +27,7 @@ import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginTestsRunAction;
 import io.stallion.secrets.SecretsAction;
+import io.stallion.secrets.SecretsDecryptAction;
 import io.stallion.services.Log;
 import io.stallion.tools.ExportToHtml;
 import io.stallion.tools.ScriptExecBase;
@@ -64,7 +65,8 @@ public class Booter {
             new SqlCheckNeedsMigrationAction(),
             new SqlGenerationAction(),
             new InteractiveJavascriptRunAction(),
-            new ForceTaskAction()
+            new ForceTaskAction(),
+            new SecretsDecryptAction()
     );
 
     public void boot(String[] args) throws Exception {

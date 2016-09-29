@@ -116,6 +116,10 @@ public class SecretsVault {
 
     }
 
+    public String secretsToJson() {
+        return JSON.stringify(getSecrets());
+    }
+
     public HashMap<String, String> getSecrets() {
         return secrets;
     }
