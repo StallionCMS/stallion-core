@@ -534,6 +534,11 @@ class RequestProcessor {
             serveComboBundleFile();
         } else if (request.getPath().startsWith("/st-bundle-file/")) {
             serveBundleFile();
+        } else if (request.getPath().startsWith("/st-file-bundle-assets/")) {
+            serveFileBundleAsset();
+        } else if (request.getPath().startsWith("/st-file-bundle/")) {
+            serveFileBundle();
+
         } else if (request.getPath().startsWith("/st-bundle-v2/")) {
             serveBundleV2(request.getPath());
         } else if (request.getPath().startsWith("/st-concatenated-bundle")) {
@@ -547,6 +552,19 @@ class RequestProcessor {
                 serveFolderAsset(request.getPath().substring(11));
             }
         }
+    }
+
+    public void serveFileBundleAsset() throws Exception {
+        FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(request.getQueryParams().get("bundlePath"));
+        String filePath = request.getPath().substring(23);
+        String content = br.renderFile(filePath);
+        sendContentResponse(content, request.getPath());
+    }
+
+    public void serveFileBundle() throws Exception {
+        String path = request.getPath().substring(16);
+        FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
+        sendContentResponse(br.renderProductionContent(), path);
     }
 
     public void serveBundleFile() throws Exception {

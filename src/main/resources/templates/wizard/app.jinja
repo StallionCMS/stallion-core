@@ -1,13 +1,40 @@
-{% extends "base.jinja" %}
-{% block main_body %}
-<div class="posts">
-    <section class="post">
-        <header class="post-header">
-            <h2 class="post-title">Hello{% if name %} {{ name }}{% endif %}, I am an app.</h2>
-        </header>
-        <div class="post-description">
-            Implementation to come soon.
-        </div>
-    </section>
-</div><!--end posts-->
+{% extends "stallion:common-base.jinja" %}
+
+{% block builtin_head_bundles %}
+{{ assets.assetBundle(pluginName, "app.bundle.css") }}
+{% endblock %}
+
+{% block bundle_css %}
+{% endblock %}
+
+{% block extra_meta %}
+{% endblock %}
+
+{% block body_content %}
+<div class="container-fluid">
+    <div id="app-wrap">
+        <div id="{{ pluginName }}-app">
+            <div class="row">
+                <h2>I am a new Java Stallion web application.</h2>
+                <h4>I need to be implemented.</h4>
+            </div><!--/row-->
+        </div><!--end /presto-app-->
+    </div>
+</div><!--/container-->
+
+{% endblock %}
+
+{%-- block builtin_footer_bundles --%}
+
+{%-- endblock --%}
+{%-- block bundle_js --%}
+{{ assets.assetBundle(pluginName, "app.bundle.js") }}
+{%-- endblock --%}
+
+{% block pre_end_body %}
+<script type="text/javascript">
+
+    var theApplicationContext = {{ theApplicationContextJson }};
+
+</script>
 {% endblock %}

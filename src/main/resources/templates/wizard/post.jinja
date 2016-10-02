@@ -1,0 +1,14 @@
+{% extends "base.jinja" %}
+{% block main_body %}
+<div class="posts">
+    <section class="post">
+        <header class="post-header">
+            <h2 class="post-title">{{ page.title }}</h2>
+            <h4 class="post-byline">{% if post.author %}{{ post.author }}{% endif %} at {{ dateUtils.formatLocalDate(post.publishDate, "MMM d, YYYY") }}</h4>
+        </header>
+        <div class="post-description">
+            {{ page.content }}
+        </div>
+    </section>
+</div><!--end posts-->
+{% endblock %}

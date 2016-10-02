@@ -24,7 +24,11 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -71,9 +75,13 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
 
     @Override
     public void execute(CommandOptionsBase options) throws Exception {
-        String folder = or(options.getTargetPath(), Paths.get(".").toAbsolutePath().normalize().toString());
-        targetFolder = folder;
         this.options = options;
+        String folder = or(options.getTargetPath(), Paths.get(".").toAbsolutePath().normalize().toString());
+        makeNewApp(folder);
+    }
+    public void makeNewApp(String javaFolder) throws Exception {
+        targetFolder = javaFolder;
+
         templating = new JinjaTemplating(targetFolder, false);
 
 
@@ -86,7 +94,7 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
         setJavaPackageName(getGroupId() + "." + getPluginName());
 
 
-        File dir = new File(folder);
+        File dir = new File(javaFolder);
         if (!dir.isDirectory()) {
             FileUtils.forceMkdir(dir);
         }
@@ -111,7 +119,21 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
         copyTemplate("/templates/wizard/PluginSettings.java.jinja", sourceFolder + "/" + pluginNameTitleCase + "Settings.java", ctx);
         copyTemplate("/templates/wizard/MainRunner.java.jinja", sourceFolder + "/MainRunner.java", ctx);
         copyTemplate("/templates/wizard/Endpoints.java.jinja", sourceFolder + "/Endpoints.java", ctx);
+        copyTemplate("/templates/wizard/build.py.jinja", "build.py", ctx);
+        copyTemplate("/templates/wizard/run-dev.jinja", "run-dev.sh", ctx);
 
+        Files.setPosixFilePermissions(FileSystems.getDefault().getPath(targetFolder + "/build.py"),
+                set(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)
+        );
+        Files.setPosixFilePermissions(FileSystems.getDefault().getPath(targetFolder + "/run-dev.sh"),
+                set(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)
+        );
+        copyFile("/templates/wizard/app.bundle", "src/main/resources/assets/app.bundle");
+        copyFile("/templates/wizard/app.js", "src/main/resources/assets/app.js");
+        copyFile("/templates/wizard/app.scss", "src/main/resources/assets/app.scss");
+        copyFile("/templates/wizard/file1.js", "src/main/resources/assets/common/file1.js");
+        copyFile("/templates/wizard/file2.js", "src/main/resources/assets/common/file2.js");
+        copyFile("/templates/wizard/app.jinja", "src/main/resources/templates/app.jinja");
 
     }
 
@@ -122,11 +144,19 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
                 IOUtils.toString(getClass().getResource(resourcePath), UTF8),
                 ctx);
         File file = new File(targetFolder + "/" + relativePath);
+        File parent = file.getParentFile();
+        if (!parent.isDirectory()) {
+            parent.mkdirs();
+        }
         FileUtils.writeStringToFile(file, source, "utf-8");
     }
 
     public void copyFile(String resourcePath, String relativePath) throws IOException {
         File file = new File(targetFolder + "/" + relativePath);
+        File parent = file.getParentFile();
+        if (!parent.isDirectory()) {
+            parent.mkdirs();
+        }
         String source = IOUtils.toString(getClass().getResource(resourcePath), UTF8);
         FileUtils.writeStringToFile(file, source, "utf-8");
     }

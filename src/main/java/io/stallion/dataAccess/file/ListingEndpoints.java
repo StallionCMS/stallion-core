@@ -49,7 +49,7 @@ public class ListingEndpoints implements EndpointResource {
     public static void register() {
         for(ContentFolder config: Settings.instance().getFolders()) {
             if (config.isListingEnabled()) {
-                EndpointsRegistry.instance().addResource("", new ListingEndpoints(config));
+                EndpointsRegistry.instance().addResource(config.getListingRootUrl(), new ListingEndpoints(config));
             }
         }
     }

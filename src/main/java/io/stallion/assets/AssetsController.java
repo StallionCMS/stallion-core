@@ -203,6 +203,21 @@ public class AssetsController {
         return new BundleHandler(fileName, "").toHtml();
     }
 
+
+    /**
+     * Output the HTML required to render a bundle of assets.
+     * *
+     * @param fileName
+     * @return
+     */
+    public String bundle2(String fileName) {
+        if (Settings.instance().getBundleDebug()) {
+            return new FileSystemAssetBundleRenderer(fileName).renderDebugHtml();
+        } else {
+            return new FileSystemAssetBundleRenderer(fileName).renderProductionHtml();
+        }
+    }
+
     /**
      * Get the URL for an asset file, with a timestamp added for cache busting.
      * @param path

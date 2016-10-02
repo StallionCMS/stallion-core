@@ -1,0 +1,8 @@
+
+
+# Uncomment to add hosts to provision with Stablehand
+
+#[[hosts]]
+#host="node-x.mydomain.com" # The domain name or IP address of the host
+#class="StallionBasicScheme" # The scheme to apply when provisioning the server
+

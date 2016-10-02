@@ -1,0 +1,29 @@
+#!python
+import os
+import sys
+from plumbum import FG, BG, local, TEE, TF
+
+args = []
+if '--skip-tests' in sys.argv:
+    args.append('-DskipTests=true')
+if '--jenkins' in sys.argv:
+    args.append('-DstallionEnv=jenkins')
+args = tuple(args) + ('compile', 'package', 'assembly:single', 'install')
+local['mvn'][args] & FG
+
+script = '''#!/bin/sh
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
+
+
+'''
+with open('./target/{{ config.artifactId|lower }}-stallion-app', 'w') as f:
+    f.write(script)
+
+
+
+(local['cat']['./target/{{ config.artifactId|lower }}-1.0-SNAPSHOT-jar-with-dependencies.jar'] >> './target/{{ config.artifactId|lower }}-stallion-app') & FG
+os.chmod('./target/{{ config.artifactId|lower }}-stallion-app', 0o700)
+if not os.path.isdir('../site/bin'):
+    os.makedirs('../site/bin')
+local['cp']['./target/{{ config.artifactId|lower }}-stallion-app', '../site/bin/{{ config.artifactId|lower }}-stallion-app'] & FG

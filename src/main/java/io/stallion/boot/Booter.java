@@ -54,11 +54,11 @@ public class Booter {
     private static final List<StallionRunAction> builtinActions = Literals.list(
             new StallionServer(),
             new UserAdder(),
-            new Deployer(),
+            //new Deployer(),
             new PluginTestsRunAction(),
             new ScriptExecBase(),
             new NewProjectBuilder(),
-            new NewJavaPluginRunAction(),
+            //new NewJavaPluginRunAction(),
             new ExportToHtml(),
             new SecretsAction(),
             new SqlMigrationAction(),

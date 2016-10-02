@@ -1,0 +1,2 @@
+#!/bin/bash
+mvn compile exec:java -Dexec.mainClass={{ config.javaPackageName }}.MainRunner -Dexec.args="serve -env=local -targetPath=../site -devMode=true -logLevel=FINER"

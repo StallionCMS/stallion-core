@@ -12,6 +12,22 @@ metaDescription = "{{ builder.siteDescription }}"
 #authorName = "Your name"
 healthCheckSecret = "{{ builder.healthCheckSecret }}"
 
+{% if builder.makeBlog %}
+[[folders]]
+listingRootUrl = "/blog"
+folder = "posts"
+path = "posts"
+listingTitle = "Our Blog"
+postsPerPage = 10
+itemTemplate = "post.jinja"
+listingTemplate = "listing.jinja"
+listingEnabled = true
+{% endif %}
+
+[custom]
+hasBlog = {{ builder.makeBlog }}
+
+
 # If you require a database, configure it here, otherwise all data will be stored in the file system.
 {% if builder.databaseUrl %}
 [database]

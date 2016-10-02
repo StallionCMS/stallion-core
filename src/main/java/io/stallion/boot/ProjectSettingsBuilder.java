@@ -47,6 +47,8 @@ class ProjectSettingsBuilder {
     private String highlightColor;
 
 
+    private boolean makeBlog = false;
+
     public String getSiteName() {
         return siteName;
     }
@@ -176,6 +178,15 @@ class ProjectSettingsBuilder {
 
     public ProjectSettingsBuilder setDatabaseUsername(String databaseUsername) {
         this.databaseUsername = databaseUsername;
+        return this;
+    }
+
+    public boolean isMakeBlog() {
+        return makeBlog;
+    }
+
+    public ProjectSettingsBuilder setMakeBlog(boolean makeBlog) {
+        this.makeBlog = makeBlog;
         return this;
     }
 }

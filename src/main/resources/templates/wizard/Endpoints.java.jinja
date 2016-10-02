@@ -1,15 +1,38 @@
 package {{ config.javaPackageName }};
 
+
+import java.util.List;
+import java.util.Map;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.templating.TemplateRenderer;
+import io.stallion.Context;
+import io.stallion.utils.Sanitize;
+import static io.stallion.utils.Literals.*;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 
+
 public class Endpoints implements EndpointResource {
+
+
+    @GET
+    @Path("/app")
+    @Produces("text/html")
+    public Object app() {
+        Map ctx = map(
+            val("pluginName", "{{ config.pluginName }}"),
+            val("theApplicationContextJson", Sanitize.htmlSafeJson(
+                 map(
+                     val("user", Context.getUser())
+                 )
+            ))
+        );
+        return TemplateRenderer.instance().renderTemplate("{{ config.pluginName }}:app.jinja", ctx);
+    }
 
     @GET
     @Path("/hello-world")
@@ -17,5 +40,6 @@ public class Endpoints implements EndpointResource {
     public Object hello() {
         return "Hello, world.";
     }
+
 }
 

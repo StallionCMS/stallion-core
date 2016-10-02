@@ -1,0 +1,14 @@
+
+# Uncomment and fill in with proper values for your own site
+
+#[env.prod]
+#hosts = ["0.0.0.0"]  # A list of domain names or IP addresses for the web hosts to deploy to
+#rootFolder = "/srv/stallion-www" # Where the app will live on the server
+#checkUrls = ["/"] # URL's to check for a 200 response when deploying
+#basePort = 12500 # The port the app will be served on
+#domain = "mysite.com" # The primary domain at which the application will live
+#aliasDomains = ['alt.mysite.com'] # Alternative domains at which the application will also be accessible
+#redirectDomains = ['www.mysite.com'] # Domains that will redirect to the primary domain
+#sslCertChain = "/etc/letsencrypt/live/mysite.com/fullchain.pem" # Path to the SSL chain
+#sslPrivateKey = "/etc/letsencrypt/live/mysite.com/privkey.pem" # Path to the SSL private key
+#redirectToSsl = false # Always redirect visitors to the SSL version of the site

@@ -43,6 +43,11 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
     private JinjaTemplating templating;
     private ProjectSettingsBuilder builder;
 
+    private boolean shouldMakePages = false;
+    private boolean shouldMakeTemplates = false;
+    private boolean shouldMakeAssets = false;
+    private boolean shouldMakeBlog = false;
+
     @Override
     public String getActionName() {
         return "new";
@@ -88,15 +93,19 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         init(options);
         String msg = "Choose the starting scaffolding: \n" +
                 "1) Barebones\n" +
-                "2) Simple Text Site\n" +
-                "3) Javascript Site\n\nChoose a number: ";
-        String choice = new Prompter(msg).setChoices("1", "2", "3").prompt();
+                "2) Text File Web Site\n" +
+                "3) Javascript Application\n" +
+                "4) Java Application" +
+                "\n\nChoose a number: ";
+        String choice = new Prompter(msg).setChoices("1", "2", "3", "4").prompt();
         if ("1".equals(choice)) {
             makeBareBonesSite(getTargetFolder());
         } else if ("2".equals(choice)) {
             makeSimpleTextSite(getTargetFolder());
         } else if ("3".equals(choice)) {
             makeJavascriptSite(getTargetFolder());
+        } else if ("4".equals(choice)) {
+            makeJavaApplication(getTargetFolder());
         } else {
             throw new UsageException("Invalid choice " + choice);
         }
@@ -104,28 +113,91 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
 
     }
 
-    protected void makeBareBonesSite(String folder) throws Exception {
+    protected void makeBasicScaffold(String folder) throws Exception {
         makeStandardConf();
-        makeTemplates();
-        makeAssets();
-        makePages();
-        boolean shouldMakeUser = new Prompter("Do you want to create an admin user right now? This is needed to use some of the internal tools from the web. You can do this later by running >stallion user-add. (y/n)? ").yesNo();
+        copyFile("/templates/wizard/deployment.toml", "conf/deployment.toml");
+        copyFile("/templates/wizard/hosts.toml", "conf/hosts.toml");
+
+        if (shouldMakeTemplates) {
+            makeTemplates();
+        }
+        if (shouldMakeAssets) {
+            makeAssets();
+        }
+        if (shouldMakePages) {
+            makePages();
+        }
+
+        if (shouldMakeBlog) {
+            copyFile("/templates/wizard/post.jinja", "templates/post.jinja");
+            copyFile("/templates/wizard/listing.jinja", "templates/listing.jinja");
+            makePosts();
+        }
+
+
+        boolean shouldMakeUser = new Prompter("Do you want to create an admin user right now? This is needed to use some of the internal tools from the web. You can do this later by running >stallion user-add. (Y/n)? ").yesNo();
         if (shouldMakeUser) {
             makeUser();
         }
+
+
+    }
+
+    protected void makeBareBonesSite(String folder) throws Exception {
+        shouldMakeTemplates = true;
+        shouldMakePages = true;
+        shouldMakeAssets = true;
+        makeBasicScaffold(folder);
         System.out.printf("\n\nYour site is now complete! You can test it out by running >bin/stallion serve\n\n");
     }
 
     protected void makeSimpleTextSite(String folder) throws Exception {
-        makeBareBonesSite(folder);
+        shouldMakeBlog = true;
+        shouldMakeTemplates = true;
+        shouldMakePages = true;
+        shouldMakeAssets = true;
+        makeBasicScaffold(folder);
+        System.out.printf("\n\nYour site is now complete! You can test it out by running >bin/stallion serve\n\n");
 
     }
 
     protected void makeJavascriptSite(String folder) throws Exception {
-        makeSimpleTextSite(folder);
+        shouldMakeTemplates = true;
+        shouldMakePages = true;
+        shouldMakeAssets = true;
+        makeBasicScaffold(folder);
         removeFile("pages/home.txt");
         makeJs();
         copyFile("/templates/wizard/app.jinja", "templates/app.jinja");
+        System.out.printf("\n\nYour site is now complete! You can test it out by running >bin/stallion serve\n\n");
+    }
+
+    protected void makeJavaApplication(String folder) throws Exception {
+        targetFolder = targetFolder + "/site";
+        templating = new JinjaTemplating(targetFolder, false);
+
+        File file = new File(targetFolder);
+        if (!file.isDirectory()) {
+            new File(targetFolder).mkdirs();
+        }
+        if (new File(targetFolder + "/site/conf").exists()) {
+            throw new UsageException("You have already initialized an application at this location.");
+        }
+
+        // Make the simple site
+        shouldMakeTemplates = false;
+        shouldMakePages = false;
+        shouldMakeAssets = false;
+        makeBasicScaffold(folder);
+        removeFile("pages/home.txt");
+
+        NewJavaPluginRunAction javaAction = new NewJavaPluginRunAction();
+        file = new File(folder + "/java-app");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        javaAction.makeNewApp(folder + "/java-app");
+        System.out.printf("\n\nYour site is now complete! Run it by going to " + folder + "/java-app and running ./run-dev.sh");
     }
 
     protected void makeStandardConf() throws IOException {
@@ -134,6 +206,7 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
             new File(targetFolder).mkdirs();
         }
         builder = new ProjectSettingsBuilder()
+                .setMakeBlog(shouldMakeBlog)
                 .setHealthCheckSecret(GeneralUtils.randomToken(20))
                 .setSiteName(new Prompter("What is the name of your new site? ").prompt())
                 .setSiteDescription(new Prompter("What is a one or two sentence description of your site? ").prompt())
@@ -155,7 +228,7 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         }
         boolean configureDatabase = requireDatabase();
         if (!configureDatabase) {
-            configureDatabase = new Prompter("Configure a local database? ").yesNo();
+            configureDatabase = new Prompter("Configure a local database? (Y/n) ").yesNo();
         }
         if (configureDatabase) {
             builder.setDatabaseUrl(Prompter.prompt("Database URL?" ));
@@ -183,6 +256,16 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         }
         copyFile("/templates/wizard/home.txt", "pages/home.txt");
         copyFile("/templates/wizard/about.txt", "pages/about.txt");
+        copyFile("/templates/wizard/contact-us.txt", "pages/contact-us.txt");
+    }
+
+    protected void makePosts() throws IOException {
+        File f = new File(targetFolder + "/posts");
+        if (!f.isDirectory()) {
+            f.mkdirs();
+        }
+        copyFile("/templates/wizard/first-post.txt", "posts/first-post.txt");
+        copyFile("/templates/wizard/second-post.txt", "posts/second-post.txt");
     }
 
     protected void makeTemplates() throws IOException {
@@ -191,8 +274,10 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
             f.mkdirs();
         }
         copyFile("/templates/wizard/page.jinja", "templates/page.jinja");
+        copyFile("/templates/wizard/contact-us.jinja", "templates/contact-us.jinja");
         //copyFile("/templates/wizard/home.jinja", "templates/home.jinja");
         copyFile("/templates/wizard/base.jinja", "templates/base.jinja");
+
     }
 
     protected void removeFile(String relativePath) throws IOException {

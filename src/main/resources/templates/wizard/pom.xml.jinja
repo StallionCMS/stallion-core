@@ -23,6 +23,38 @@
 
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <!-- If you want snapshots versions -->
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>stallion-repo</id>
+            <url>http://mvn.stallion.io/repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>stallion-repo</id>
+            <url>http://mvn.stallion.io/repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
     <build>
         <plugins>
             <plugin>
@@ -61,7 +93,20 @@
                     <staleMillis>1</staleMillis>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>io.stallion</groupId>
+                <artifactId>stallion-assets-pipeline-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>bundle-assets</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>bundle-assets</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
