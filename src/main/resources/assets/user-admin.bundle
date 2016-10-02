@@ -1,7 +1,7 @@
 /admin/admin.css
 /admin/users-manage.css
-/always/jquery-1.11.3.min.js
-/always/stallion.js
+/vendor/jquery-3.1.1.js
+/basic/stallion.js
 /vendor/vue.js
 /vendor/vue-router.js
 /admin/users-edit.vue
