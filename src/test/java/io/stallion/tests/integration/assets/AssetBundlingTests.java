@@ -62,24 +62,24 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
         assertEquals(200, response.getStatus());
         Log.finer("Page content: {0}", response.getContent());
 
-        assertContains(response.getContent(), "/st-resource/stallion/always/stallion.js");
-        assertContains(response.getContent(), "/st-assets/pure-min.css");
+        //assertContains(response.getContent(), "/st-resource/stallion/always/stallion.js");
+        assertContains(response.getContent(), "/st-file-bundle-assets/pure-min.css.css");
 
 
-        response = client.get("/st-assets/pure.css");
+        response = client.get("/st-file-bundle-assets/pure-min.css.css?bundlePath=assets%2Fsite.bundle.js&ts=1475435330734\"");
         Log.finer("Local asset content: {0}", response.getContent());
         assertEquals(200, response.getStatus());
         // TODO fix this:
         //assertTrue(response.getContent().contains("Pure v0.5.0"));
 
-        response = client.get("/st-resource/stallion/always/stallion.js");
+        response = client.get("/st-resource/stallion/basic/stallion.js");
         Log.finer("Resource asset content: {0}", response.getContent());
         assertResponseContains(response, "Stallion common JS library");
 
 
-        response = client.get("/st-assets/site.head.bundle.js?stBundle=standard");
-        Log.finer("Bundle content: {0}", response.getContent());
-        assertEquals(200, response.getStatus());
+        //response = client.get("/st-assets/site.head.bundle.js?stBundle=standard");
+        //Log.finer("Bundle content: {0}", response.getContent());
+        //assertEquals(200, response.getStatus());
 
 
 

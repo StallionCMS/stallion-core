@@ -22,7 +22,7 @@
   <link rel="alternate" type="application/rss+xml" title="{{ rss_link.title }}" href="{{ rss_link.link }}" />
   {% endfor %}
   {% block builtin_head_bundles %}
-    {{ assets.assetBundle("stallion", "stallion-default-assets.bundle.css") }}
+    {{ assets.bundle("stallion", "stallion-default-assets.bundle.css") }}
   {% endblock %}
   {% block bundle_css %}
   {{ assets.bundle("site.bundle.css") }}
@@ -39,7 +39,7 @@
   {% block body_content %}
   {% endblock %}
   {%-- block builtin_footer_bundles --%}
-    {{ assets.assetBundle("stallion", "stallion-default-assets.bundle.js") }}
+    {{ assets.bundle("stallion", "stallion-default-assets.bundle.js") }}
   {%-- endblock --%}
   {%-- block bundle_js --%}
     {{ assets.bundle("site.bundle.js") }}

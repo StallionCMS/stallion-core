@@ -1,7 +1,7 @@
 {% extends "stallion:common-base.jinja" %}
 
 {% block builtin_head_bundles %}
-{{ assets.assetBundle(pluginName, "app.bundle.css") }}
+{{ assets.bundle(pluginName, "app.bundle.css") }}
 {% endblock %}
 
 {% block bundle_css %}
@@ -28,7 +28,7 @@
 
 {%-- endblock --%}
 {%-- block bundle_js --%}
-{{ assets.assetBundle(pluginName, "app.bundle.js") }}
+{{ assets.bundle(pluginName, "app.bundle.js") }}
 {%-- endblock --%}
 
 {% block pre_end_body %}

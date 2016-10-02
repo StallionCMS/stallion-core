@@ -9,7 +9,7 @@
     {% block extra_meta %}
     {% endblock %}
     {% block builtin_head_bundles %}
-    {{ assets.definedBundle("alwaysHeadStylesheets") }}
+    {{ assets.bundle("stallion", "stallion-default-assets.bundle.css") }}
     <style>
         body {
             background-color: {{ styleSettings.backgroundColor }};
@@ -72,7 +72,7 @@
     <div class="footer-info">Powered by <a href="https://stallion.io">Stallion</a></div>
   </footer>
 {% block builtin_footer_bundles %}
-{{ assets.definedBundle("alwaysFooterJavascripts") }}
+  {{ assets.bundle("stallion", "stallion-default-assets.bundle.js") }}
 {% endblock %}
 {% block pre_end_body %}
 {% endblock %}
