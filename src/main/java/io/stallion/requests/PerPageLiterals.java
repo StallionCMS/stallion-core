@@ -40,11 +40,6 @@ public class PerPageLiterals {
         return this;
     }
 
-    public PerPageLiterals addDefinedBundle(String name) {
-        addString(AssetsController.instance().definedBundle(name));
-        return this;
-    }
-
     public PerPageLiterals addBundle(String path) {
         addString(AssetsController.instance().bundle(path));
         return this;

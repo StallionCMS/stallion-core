@@ -52,11 +52,6 @@ public class AssetsControllerSafeWrapper {
         return assets.pageHeadLiterals();
     }
 
-
-    public String definedBundle(String bundleName) {
-        return assets.definedBundle(bundleName);
-    }
-
     public String bundle(String fileName) {
         return assets.bundle(fileName);
     }

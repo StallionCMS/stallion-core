@@ -20,9 +20,7 @@ package io.stallion.assets;
 
 
 import io.stallion.Context;
-import io.stallion.assets.processors.AngularCompiler;
-import io.stallion.assets.processors.ReactJsxCompiler;
-import io.stallion.assets.processors.RiotCompiler;
+import io.stallion.assetBundling.BundleRegistry;
 import io.stallion.exceptions.ClientException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherService;
@@ -82,14 +80,15 @@ public class AssetsController {
     public static AssetsController load() {
         _instance = new AssetsController();
         if (new File(Settings.instance().getTargetFolder() + "/assets").isDirectory()) {
+            /*
             FileSystemWatcherService.instance().registerWatcher(
                     new AssetFileChangeEventHandler()
                             .setWatchedFolder(Settings.instance().getTargetFolder() + "/assets")
                             .setWatchTree(true)
-            );
+            );*/
         }
         // Load the pre-processors;
-        ExternalCommandPreProcessorRegistry.instance();
+        //ExternalCommandPreProcessorRegistry.instance();
         return _instance;
     }
 
@@ -165,7 +164,7 @@ public class AssetsController {
     }
 
 
-    public String assetBundle(String plugin, String path) {
+    public String bundle(String plugin, String path) {
         if (Settings.instance().getBundleDebug()) {
             return new ResourceAssetBundleRenderer(plugin, path).renderDebugHtml();
         } else {
@@ -173,25 +172,6 @@ public class AssetsController {
         }
     }
 
-    /**
-     * Get the HTML for a named bundle that is built manually via code, (rather than from
-     * a bundle file).
-     *
-     * @param bundleName
-     * @return
-     */
-    public String definedBundle(String bundleName) {
-        return new BundleHandler(DefinedBundle.getByName(bundleName)).toHtml();
-    }
-
-    public String compiledBundle(String bundlePath) {
-        int i = bundlePath.indexOf(".");
-        if (i == -1) {
-            throw new ClientException("Invalid bundle name, no extension: " + bundlePath);
-        }
-        String name = bundlePath.substring(0, i);
-        return BundleRegistry.instance().getOrNotFound(name).renderHtmlIncludes(bundlePath);
-    }
 
     /**
      * Output the HTML required to render a bundle of assets.
@@ -200,23 +180,13 @@ public class AssetsController {
      * @return
      */
     public String bundle(String fileName) {
-        return new BundleHandler(fileName, "").toHtml();
-    }
-
-
-    /**
-     * Output the HTML required to render a bundle of assets.
-     * *
-     * @param fileName
-     * @return
-     */
-    public String bundle2(String fileName) {
         if (Settings.instance().getBundleDebug()) {
             return new FileSystemAssetBundleRenderer(fileName).renderDebugHtml();
         } else {
             return new FileSystemAssetBundleRenderer(fileName).renderProductionHtml();
         }
     }
+
 
     /**
      * Get the URL for an asset file, with a timestamp added for cache busting.
@@ -237,18 +207,6 @@ public class AssetsController {
         return url;
     }
 
-    /**
-     * Runs
-     * @param preProcessorName
-     * @param path
-     */
-    public void externalPreprocessIfNecessary(String preProcessorName, String path) {
-        // Only pre-process if we are in bundle debug mode and local mode
-        if (!settings().getBundleDebug() || !settings().getLocalMode()) {
-            return;
-        }
-        ExternalCommandPreProcessorRegistry.instance().preProcessIfNeeded(preProcessorName, path);
-    }
 
 
     public Long getTimeStampForAssetFile(String path) {
@@ -275,27 +233,6 @@ public class AssetsController {
         return ts;
     }
 
-    /**
-     * Converts the source content using the named processor. Useful for converting
-     * react.jsx files into javascript, etc.
-     *
-     * @param processor
-     * @param path
-     * @param source
-     * @return
-     */
-    public String convertUsingProcessor(String processor, String path, String source) {
-        String cacheKey = "convertsource--" + processor + "--" + GeneralUtils.slugify(path) + "-ts--" + getKeyStringForPathSource(path, source);
-        String result = PermaCache.get(cacheKey);
-        if (result != null) {
-            Log.info("Cache hit for {0}", cacheKey);
-            return result;
-        }
-        Log.info("Cache miss for {0}", cacheKey);
-        result = convertUsingProcessorNoCache(processor, path, source);
-        PermaCache.set(cacheKey, result);
-        return result;
-    }
 
     private String getKeyStringForPathSource(String path, String source) {
         Long ts = getCurrentTimeStampForAssetFile(path);
@@ -306,21 +243,6 @@ public class AssetsController {
         }
     }
 
-    public String convertUsingProcessorNoCache(String processor, String path, String source) {
-        if (empty(processor)) {
-            return source;
-        }
-        if ("angularHtml".equals(processor)) {
-            Log.fine("Convert asset using angular");
-            return AngularCompiler.htmlToJs(source, path);
-        } else if ("jsx".equals(processor)) {
-            Log.info("process JSX {0} {1}", processor, path);
-            return ReactJsxCompiler.transform(source);
-        } else if ("riot".equals(processor)) {
-            return RiotCompiler.transform(source);
-        }
-        return source;
-    }
 
     public AssetsControllerSafeWrapper getWrapper() {
         if (wrapper == null) {

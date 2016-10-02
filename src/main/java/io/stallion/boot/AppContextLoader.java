@@ -17,7 +17,6 @@
 package io.stallion.boot;
 
 import io.stallion.assets.AssetsController;
-import io.stallion.assets.DefinedBundle;
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
 
@@ -170,7 +169,7 @@ public class AppContextLoader {
         FilterCache.load();
         DataAccessRegistry.load();
         AssetsController.load();
-        DefinedBundle.load();
+        //DefinedBundle.load();
         TemplateRenderer.load();
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new SimpleFormTag());
         RoutesRegistry.load();
@@ -246,7 +245,7 @@ public class AppContextLoader {
 
         PluginRegistry.shutdown();
 
-        DefinedBundle.shutdown();
+        //DefinedBundle.shutdown();
         AssetsController.shutdown();
         TemplateRenderer.shutdown();
 

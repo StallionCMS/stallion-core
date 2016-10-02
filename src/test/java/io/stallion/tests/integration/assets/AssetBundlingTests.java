@@ -18,7 +18,7 @@
 package io.stallion.tests.integration.assets;
 
 import io.stallion.Context;
-import io.stallion.assets.BundleHandler;
+
 
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
@@ -43,73 +43,13 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
     }
 
     @Test
-    public void testLocalAssetsBundle() {
-        BundleHandler bundle = new BundleHandler("site-local.bundle.css");
-        bundle.setFileContents(LOCAL_ASSET_BUNDLE);
-
-        String debugHtml = bundle.toDebugHtml();
-
-        Log.finer("Debug HTML: {0}", debugHtml);
-        assertContains(debugHtml, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-assets/pure-min.css?vstring=");
-        assertContains(debugHtml, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-assets/nested/nested.js?vstring=");
-
-        String liveHtml = bundle.toLiveHtml();
-        Log.finer("Live HTML: {0}", liveHtml);
-        assertContains(liveHtml, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-assets/site-local.bundle.css?stBundle=standard&ts=");
-
-
-        String liveContent = bundle.toConcatenatedContent();
-        Log.finer("Live Content: {0}", liveContent);
-        assertContains(liveContent, "Pure v0.5.0");
-        assertTrue(StringUtils.split(liveContent, "\n").length< 12);
-    }
-
-    @Test
-    public void testExternalBundle() {
-        BundleHandler bundle = new BundleHandler("site-external.bundle.js");
-        bundle.setFileContents(EXTERNAL_BUNDLE);
-
-        String debugHtml = bundle.toDebugHtml();
-
-        Log.finer("Debug HTML: {0}", debugHtml);
-
-        assertContains(debugHtml, "<script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js?vstring=");
-        assertTrue(!debugHtml.contains("will-be-skipped.js"));
-
-        String liveHtml = bundle.toLiveHtml();
-        Log.finer("Live HTML: {0}", liveHtml);
-        assertContains(liveHtml, "<script src=\"http://localhost:8090/testing/st-assets/site-external.bundle.js?stBundle=standard&ts=");
-
-
-        String liveContent = bundle.toConcatenatedContent();
-        Log.finer("Live Content: {0}", liveContent);
-        assertContains(liveContent, "/*! jQuery v1.11.2");
-        assertTrue(StringUtils.split(liveContent, "\n").length< 7);
+    public void testFileAssetBundle() {
 
     }
 
     @Test
     public void testResourceBundle() {
-        BundleHandler bundle = new BundleHandler("site-resource.bundle.js");
-        bundle.setFileContents(RESOURCE_BUNDLE);
 
-
-        Context.getSettings().setDevMode(true);
-        String devHtml = bundle.toDebugHtml();
-        assertContains(devHtml, "src=\"http://local.stallion.io/core-resources/stallion.js?vstring=");
-
-
-        Context.getSettings().setDevMode(false);
-        String debugHtml = bundle.toDebugHtml();
-        assertContains(debugHtml, "src=\"http://localhost:8090/testing/st-resource/stallion/always/stallion.js?vstring=");
-
-
-        String liveHtml = bundle.toLiveHtml();
-        assertContains(liveHtml, "<script src=\"http://localhost:8090/testing/st-assets/site-resource.bundle.js?stBundle=standard&ts=");
-
-
-        String liveContent = bundle.toConcatenatedContent();
-        assertContains(liveContent, "Stallion common JS library");
 
     }
 

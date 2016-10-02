@@ -19,6 +19,7 @@ package io.stallion.requests;
 
 import io.stallion.Context;
 import io.stallion.assetBundling.AssetHelpers;
+import io.stallion.assetBundling.BundleRegistry;
 import io.stallion.assets.*;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.Displayable;
@@ -530,27 +531,17 @@ class RequestProcessor {
     public void tryRouteAssetRequest() throws Exception{
         if (request.getPath().startsWith("/st-resource/")) {
             serveResourceAsset(request.getPath().substring(13));
-        } else if (request.getPath().startsWith("/st-combo-file/")) {
-            serveComboBundleFile();
-        } else if (request.getPath().startsWith("/st-bundle-file/")) {
-            serveBundleFile();
+        } else if (request.getPath().startsWith("/st-resource-bundle/")) {
+            serveBundleV2();
         } else if (request.getPath().startsWith("/st-file-bundle-assets/")) {
             serveFileBundleAsset();
         } else if (request.getPath().startsWith("/st-file-bundle/")) {
             serveFileBundle();
 
         } else if (request.getPath().startsWith("/st-bundle-v2/")) {
-            serveBundleV2(request.getPath());
-        } else if (request.getPath().startsWith("/st-concatenated-bundle")) {
-            serveConcatenatedBundle();
+            serveBundleV2();
         } else if (request.getPath().startsWith("/st-assets/")) {
-            if ("standard".equals(request.getQueryParams().get("stBundle"))) {
-                serveBundle(request.getPath().substring(11));
-            } else if ("defined".equals(request.getQueryParams().get("stBundle"))) {
-                serveDefinedBundle(request.getPath().substring(11));
-            } else {
-                serveFolderAsset(request.getPath().substring(11));
-            }
+            serveFolderAsset(request.getPath().substring(11));
         }
     }
 
@@ -565,43 +556,6 @@ class RequestProcessor {
         String path = request.getPath().substring(16);
         FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
         sendContentResponse(br.renderProductionContent(), path);
-    }
-
-    public void serveBundleFile() throws Exception {
-        String path = request.getPath().replace("/st-bundle-file/", "");
-        String[] parts = StringUtils.splitByWholeSeparator(path, "/st-file-path/",2);
-        String bundleName = parts[0];
-        String filePath = parts[1];
-        String content = BundleRegistry.instance().getOrNotFound(bundleName).renderBundleFile(filePath);
-        sendContentResponse(content, request.getPath());
-    }
-
-
-    public void serveConcatenatedBundle() throws Exception {
-        String path = request.getPath().replace("/st-concatenated-bundle/", "");
-        int i = path.indexOf(".");
-        if (i == -1) {
-              throw new ClientException("Invalid bundle name, must contain extension: " + path);
-        }
-        String name = path.substring(0, i);
-        String content = BundleRegistry.instance().get(name).renderConcatenated(path);
-        sendContentResponse(content, request.getPath());
-    }
-
-    public void serveComboBundleFile() throws Exception {
-        String path = request.getPath().replace("/st-combo-file/", "/");
-        String extension = FilenameUtils.getExtension(path);
-        path = FilenameUtils.removeExtension(path);
-        String[] parts = StringUtils.split(path, "/", 2);
-        String bundleName = parts[0];
-        path = parts[1];
-        String content = "";
-        if (extension.equals("css")) {
-            content = DefinedBundle.renderComboFile(bundleName, path, true);
-        } else {
-            content = DefinedBundle.renderComboFile(bundleName, path, false);
-        }
-        sendContentResponse(content, request.getPath());
     }
 
     public void serveResourceAsset(String assetPath) throws Exception  {
@@ -641,7 +595,7 @@ class RequestProcessor {
             //if (!empty(request.getParameter("nocache"))) {
                 //content = AssetsController.instance().convertUsingProcessorNoCache(request.getParameter("processor"), path, content);
             //} else {
-            content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), assetPath, content);
+            //content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), assetPath, content);
             //}
             markHandled(200, "resource-asset");
             sendContentResponse(content);
@@ -653,29 +607,16 @@ class RequestProcessor {
         }
     }
 
-    public void serveBundle(String path)  throws Exception {
-
-        BundleHandler bundleHandler = new BundleHandler(path, request.getQueryString());
-        markHandled(200, "serve-bundle");
-        String content = bundleHandler.toConcatenatedContent();
-        sendContentResponse(content, path);
-    }
-
-    public void serveBundleV2(String path) throws Exception {
-        path = path.replace("/st-bundle-v2/", "");
+    public void serveBundleV2() throws Exception {
+        String path = request.getPath();
+        int i = path.indexOf("/st-");
+        i = path.indexOf("/", i + 3);
+        path = path.substring(i + 1);
         String[] parts = path.split("/", 2);
         String plugin = parts[0];
         path = parts[1];
         path = AssetsController.ensureSafeAssetsPath(path);
         String content = new ResourceAssetBundleRenderer(plugin, path).renderProductionContent();
-        sendContentResponse(content, path);
-    }
-
-    public void serveDefinedBundle(String path) throws Exception  {
-        String definedBundleName = FilenameUtils.getBaseName(path);
-        BundleHandler bundleHandler = new BundleHandler(DefinedBundle.getByName(definedBundleName));
-        markHandled(200, "defined-bundle");
-        String content = bundleHandler.toConcatenatedContent();
         sendContentResponse(content, path);
     }
 
@@ -689,13 +630,13 @@ class RequestProcessor {
         }
         if (!empty(request.getParameter("processor"))) {
             String contents = IOUtils.toString(new FileReader(fullPath));
-            contents = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), path, contents);
+            //contents = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), path, contents);
             markHandled(200, "folder-asset-with-processor");
             sendContentResponse(contents, file.lastModified(), fullPath);
         } else {
-            if (!empty(preProcessor)) {
-                AssetsController.instance().externalPreprocessIfNecessary(preProcessor, path);
-            }
+            //if (!empty(preProcessor)) {
+            //    AssetsController.instance().externalPreprocessIfNecessary(preProcessor, path);
+            //}
             markHandled(200, "folder-asset");
             sendAssetResponse(file);
         }
