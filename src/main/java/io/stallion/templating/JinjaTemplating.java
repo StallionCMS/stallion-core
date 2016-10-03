@@ -19,18 +19,26 @@ package io.stallion.templating;
 
 import com.hubspot.jinjava.Jinjava;
 import com.hubspot.jinjava.JinjavaConfig;
+import com.hubspot.jinjava.interpret.InterpretException;
+import com.hubspot.jinjava.interpret.RenderResult;
+import com.hubspot.jinjava.interpret.TemplateError;
 import com.hubspot.jinjava.lib.filter.Filter;
 import com.hubspot.jinjava.lib.tag.Tag;
 import com.hubspot.jinjava.loader.ResourceNotFoundException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.exceptions.WebException;
+import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import static io.stallion.utils.Literals.*;
 
 public class JinjaTemplating implements Templating {
@@ -118,12 +126,56 @@ public class JinjaTemplating implements Templating {
             } else if (templateString == null) {
                 templateString = "";
             }
-            content = jinjava.render(templateString, context);
+            RenderResult result = jinjava.renderForResult(templateString, context);
+            List fatalErrors = (List)result.getErrors().stream().filter((error) -> {
+                return error.getSeverity() == TemplateError.ErrorType.FATAL;
+            }).collect(Collectors.toList());
+            if(!fatalErrors.isEmpty()) {
+                Log.warn("Exception when rendering template: {0}", template);
+                throw new FatalTemplateErrorsException(template, fatalErrors);
+            } else {
+                return result.getOutput();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return content;
     }
+
+    public static class FatalTemplateErrorsException extends InterpretException {
+        private final String templatePath;
+        private final Iterable<TemplateError> errors;
+
+        public FatalTemplateErrorsException(String templatePath, Iterable<TemplateError> errors) {
+            super("Fatal error rendering template \"" + templatePath + "\".\n" + generateMessage(errors));
+            this.templatePath = templatePath;
+            this.errors = errors;
+        }
+
+        private static String generateMessage(Iterable<TemplateError> errors) {
+            StringBuilder msg = new StringBuilder();
+            Iterator var2 = errors.iterator();
+
+            while(var2.hasNext()) {
+                TemplateError error = (TemplateError)var2.next();
+                msg.append(error.toString()).append('\n');
+                if(error.getException() != null) {
+                    msg.append(ExceptionUtils.getStackTrace(error.getException())).append('\n');
+                }
+            }
+
+            return msg.toString();
+        }
+
+        public String getTemplatePath() {
+            return this.templatePath;
+        }
+
+        public Iterable<TemplateError> getErrors() {
+            return this.errors;
+        }
+    }
+
+
 
     public void registerTag(Tag tag) {
         tags.add(tag);

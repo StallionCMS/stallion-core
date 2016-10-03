@@ -19,7 +19,6 @@ package io.stallion.requests;
 
 import io.stallion.Context;
 import io.stallion.assetBundling.AssetHelpers;
-import io.stallion.assetBundling.BundleRegistry;
 import io.stallion.assets.*;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.Displayable;
@@ -27,7 +26,6 @@ import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.Model;
 import io.stallion.exceptions.*;
 import io.stallion.hooks.HookRegistry;
-import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.javascript.JsEndpoint;
 
 import io.stallion.reflection.PropertyUtils;
@@ -42,21 +40,14 @@ import io.stallion.utils.ResourceHelpers;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.JSON;
 import io.stallion.utils.json.RestrictedViews;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import javax.servlet.ServletOutputStream;
-import javax.xml.ws.Response;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -529,36 +520,55 @@ class RequestProcessor {
      * Else, do nothing.
      */
     public void tryRouteAssetRequest() throws Exception{
-        if (request.getPath().startsWith("/st-resource/")) {
-            serveResourceAsset(request.getPath().substring(13));
-        } else if (request.getPath().startsWith("/st-resource-bundle/")) {
-            serveBundleV2();
-        } else if (request.getPath().startsWith("/st-file-bundle-assets/")) {
-            serveFileBundleAsset();
-        } else if (request.getPath().startsWith("/st-file-bundle/")) {
+        if (request.getPath().startsWith("/st-assets") && "true".equals(request.getParameter("isConcatenatedFileBundle"))) {
             serveFileBundle();
+        } else if (request.getPath().startsWith("/st-assets") && "true".equals(request.getParameter("isBundleFile"))) {
+            serveFileBundleAsset();
+        } else if (request.getPath().startsWith("/st-resource") && "true".equals(request.getParameter("isFullResourceBundle"))) {
+            serveResourceBundle();
+        } else if (request.getPath().startsWith("/st-resource/")) {
+            serveResourceAsset();
 
-        } else if (request.getPath().startsWith("/st-bundle-v2/")) {
-            serveBundleV2();
         } else if (request.getPath().startsWith("/st-assets/")) {
             serveFolderAsset(request.getPath().substring(11));
+        // Deprecated
+        } else if (request.getPath().startsWith("/st-resource-bundle/")) {
+            serveResourceBundle();
+        // Deprecated
+        } else if (request.getPath().startsWith("/st-bundle-v2/")) {
+            serveResourceBundle();
         }
+
     }
 
     public void serveFileBundleAsset() throws Exception {
-        FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(request.getQueryParams().get("bundlePath"));
-        String filePath = request.getPath().substring(23);
+        String path = request.getPath();
+        int i = path.indexOf("/st-");
+        i = path.indexOf("/", i + 3);
+        path = path.substring(i + 1);
+
+        FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
+        String filePath = request.getParameter("bundleFilePath");
         String content = br.renderFile(filePath);
         sendContentResponse(content, request.getPath());
     }
 
     public void serveFileBundle() throws Exception {
-        String path = request.getPath().substring(16);
+        String path = request.getPath();
+        int i = path.indexOf("/st-");
+        i = path.indexOf("/", i + 3);
+        path = path.substring(i + 1);
+
         FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
         sendContentResponse(br.renderProductionContent(), path);
     }
 
-    public void serveResourceAsset(String assetPath) throws Exception  {
+    public void serveResourceAsset() throws Exception  {
+        String path = request.getPath();
+        int i = path.indexOf("/st-");
+        i = path.indexOf("/", i + 3);
+        String assetPath = path.substring(i + 1);
+
         String[] parts = assetPath.split("/", 2);
         String plugin = parts[0];
         assetPath = parts[1];
@@ -581,33 +591,27 @@ class RequestProcessor {
                 content = AssetHelpers.renderDebugModeBundleFileByPath(url.getPath(), assetPath);
             }
             sendContentResponse(content, assetPath);
-        }
-
-        //if (!BundleHandler.resourceIsAllowed(plugin, path)) {
-        //    Log.fine("Resource {0} not on the white list!", path);
-        //    throw new NotFoundException("Resource path does not exist or is not public: " + path);
-        //}
-        assetPath = AssetsController.ensureSafeAssetsPath(assetPath);
-
-
-        if (!empty(request.getParameter("processor"))) {
-            String content = ResourceHelpers.loadAssetResource(plugin, assetPath);
-            //if (!empty(request.getParameter("nocache"))) {
-                //content = AssetsController.instance().convertUsingProcessorNoCache(request.getParameter("processor"), path, content);
-            //} else {
-            //content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), assetPath, content);
-            //}
-            markHandled(200, "resource-asset");
-            sendContentResponse(content);
         } else {
-            markHandled(200, "resource-asset");
-            URL url = ResourceHelpers.pluginPathToUrl(plugin, assetPath);
-            new ServletFileSender(request, response).sendResource(url, assetPath);
-            complete();
+            assetPath = AssetsController.ensureSafeAssetsPath(assetPath);
+            if (!empty(request.getParameter("processor"))) {
+                String content = ResourceHelpers.loadAssetResource(plugin, assetPath);
+                //if (!empty(request.getParameter("nocache"))) {
+                //content = AssetsController.instance().convertUsingProcessorNoCache(request.getParameter("processor"), path, content);
+                //} else {
+                //content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), assetPath, content);
+                //}
+                markHandled(200, "resource-asset");
+                sendContentResponse(content);
+            } else {
+                markHandled(200, "resource-asset");
+                URL url = ResourceHelpers.pluginPathToUrl(plugin, assetPath);
+                new ServletFileSender(request, response).sendResource(url, assetPath);
+                complete();
+            }
         }
     }
 
-    public void serveBundleV2() throws Exception {
+    public void serveResourceBundle() throws Exception {
         String path = request.getPath();
         int i = path.indexOf("/st-");
         i = path.indexOf("/", i + 3);

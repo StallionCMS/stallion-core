@@ -33,6 +33,29 @@ public class ScheduleTests  {
         ZonedDateTime expected;
         ZonedDateTime actual;
 
+        {
+            /* With time zone */
+            Schedule schedule = new Schedule()
+                    .minutes(1, 31)
+                    .hours(9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+                    .timezone("America/New_York")
+                    .everyDay()
+                    .everyMonth()
+                    .verify();
+            // 11:12 UTC/7:12AM New York, should schedule for 9:01AM New York, 13:01 UTC
+            now = ZonedDateTime.of(2014, 5, 1, 11, 12, 0, 0, ZoneId.of("UTC"));
+            actual = schedule.nextAt(now);
+            expected = ZonedDateTime.of(2014, 5, 1, 13, 1, 0, 0, ZoneId.of("UTC"));
+            Assert.assertEquals(expected, actual);
+
+            // 17:12 UTC/1:12PM New York, should schedule for 1:31PM New York, 17:31 UTC
+            now = ZonedDateTime.of(2014, 5, 1, 17, 12, 0, 0, ZoneId.of("UTC"));
+            actual = schedule.nextAt(now);
+            expected = ZonedDateTime.of(2014, 5, 1, 17, 31, 0, 0, ZoneId.of("UTC"));
+            Assert.assertEquals(expected, actual);
+
+        }
+
         /* Every hour on the 17th minute */
         {
             Schedule schedule = new Schedule()

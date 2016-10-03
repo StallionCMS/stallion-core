@@ -73,6 +73,9 @@ public class JobsTests extends AppIntegrationCaseBase {
      */
     @Test
     public void testJobProcessing() throws Exception {
+        ExampleJobOne.RUN_COUNT = 0;
+        ExampleJobTwo.RUN_COUNT = 0;
+        ExampleJobThree.RUN_COUNT = 0;
 
         // Define and load job 1, to run at 30 minutes after the hour
         JobDefinition job1 = new JobDefinition() {{

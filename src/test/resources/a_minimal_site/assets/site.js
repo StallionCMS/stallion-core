@@ -1,2 +1,2 @@
 /* site javscript*/
-console.log('site.js');
+console.log('a_minimal_site:site.js');

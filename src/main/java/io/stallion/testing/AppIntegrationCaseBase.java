@@ -87,6 +87,13 @@ public abstract class AppIntegrationCaseBase {
         assert content.contains(expected);
     }
 
+    public void assertNotContains(String content, String unexpected) {
+        if (content.contains(unexpected)) {
+            Log.warn("Content ''{0}'' erroneously contains string ''{1}''!!", content, unexpected);
+        }
+        assert !content.contains(unexpected);
+    }
+
     public void assertResponseDoesNotContain(MockResponse response, String content) {
         assertResponseDoesNotContain(response, content, 200);
     }

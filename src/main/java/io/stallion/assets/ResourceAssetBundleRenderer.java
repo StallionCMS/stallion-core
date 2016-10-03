@@ -51,6 +51,9 @@ public class ResourceAssetBundleRenderer {
 
     public ResourceAssetBundleRenderer(String plugin, String path) {
         this.plugin = or(plugin, "stallion");
+        if (path.endsWith(".bundle")) {
+            throw new UsageException("Invalid bundle path: " + path + ". The path must end with the extension for the type of content from the bundle that you want to render - .css, .js, or .head.js");
+        }
         path = AssetsController.ensureSafeAssetsPath(path);
         int i = path.indexOf(".bundle.") + 7;
         if (i == -1) {
@@ -124,7 +127,7 @@ public class ResourceAssetBundleRenderer {
         String content = renderProductionContent();
         String hash = DigestUtils.md5Hex(content);
         String tag = "<script src=\"{0}\" type=\"text/javascript\"></script>";
-        String url = Settings.instance().getCdnUrl() + "/st-bundle-v2/" + plugin + path + extension + "?hash=" + hash;
+        String url = Settings.instance().getCdnUrl() + "/st-resource/" + plugin + path + extension + "?isFullResourceBundle=true&hash=" + hash;
         if (".css".equals(extension)) {
             tag = "<link rel=\"stylesheet\" href=\"{0}\">";
         }

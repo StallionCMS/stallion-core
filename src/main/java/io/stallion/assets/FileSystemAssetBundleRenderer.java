@@ -46,6 +46,7 @@ public class FileSystemAssetBundleRenderer {
     private String path;
     private String extension;
     private File bundleFile;
+    private String bundleRelativePath;
 
     public FileSystemAssetBundleRenderer(String path) {
         path = AssetsController.ensureSafeAssetsPath(path);
@@ -62,7 +63,10 @@ public class FileSystemAssetBundleRenderer {
             throw new UsageException("Illegal assets path " + path);
         }
         if (!path.startsWith("assets/")) {
+            this.bundleRelativePath = path;
             path = "assets/" + path;
+        } else {
+            this.bundleRelativePath = path.substring(7);
         }
         this.path = path;
         fileSystemPath = Settings.instance().getTargetFolder() + "/" + path;
@@ -106,7 +110,10 @@ public class FileSystemAssetBundleRenderer {
                 relativePath = "/" + relativePath;
             }
             try {
-                url = Settings.instance().getCdnUrl() + "/st-file-bundle-assets" + relativePath + extension + "?bundlePath=" + URLEncoder.encode(this.path, "utf-8") + extension + "&ts=" + af.getHydratedAt();
+                url = Settings.instance().getCdnUrl() + "/st-assets/" + bundleRelativePath + this.extension
+                        + "?isBundleFile=true&bundleFilePath=" + URLEncoder.encode(relativePath + extension, "utf-8")
+                        + "&ts=" + af.getHydratedAt();
+                //url = Settings.instance().getCdnUrl() + "/st-file-bundle-assets" + relativePath + extension + "?bundlePath=" + URLEncoder.encode(this.path, "utf-8") + extension + "&ts=" + af.getHydratedAt();
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -120,7 +127,7 @@ public class FileSystemAssetBundleRenderer {
         String content = renderProductionContent();
         String hash = DigestUtils.md5Hex(content);
         String tag = "<script src=\"{0}\" type=\"text/javascript\"></script>";
-        String url = Settings.instance().getCdnUrl() + "/st-file-bundle/" + path + extension + "?hash=" + hash;
+        String url = Settings.instance().getCdnUrl() + "/st-assets/" + bundleRelativePath + extension + "?isConcatenatedFileBundle=true&hash=" + hash;
         if (".css".equals(extension)) {
             tag = "<link rel=\"stylesheet\" href=\"{0}\">";
         }
