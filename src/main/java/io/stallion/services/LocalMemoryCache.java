@@ -22,6 +22,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.PersistenceConfiguration;
 
 import java.util.Timer;
@@ -78,6 +79,8 @@ public class LocalMemoryCache {
 
     public static void load() {
 
+        Configuration config = new Configuration();
+        config.setName("stallionLocalMemoryCache");
         manager = CacheManager.create();
     }
 
@@ -94,6 +97,10 @@ public class LocalMemoryCache {
             }
             CacheConfiguration config = new CacheConfiguration();
             config.setName(bucket);
+            // We have to do this way because there is no way to programmatically configure the
+            // sizeOfEngine
+            System.setProperty("net.sf.ehcache.sizeofengine.stallionLocalMemoryCache." + bucket, "io.stallion.dataAccess.filtering.EstimatedSizeOfEngine");
+
             // Max cache size is 100MB
             config.setMaxBytesLocalHeap(100 * 1000 * 1000L);
             //config.setDiskPersistent(false);

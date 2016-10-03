@@ -22,7 +22,9 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.PersistenceConfiguration;
+import net.sf.ehcache.config.SizeOfPolicyConfiguration;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,6 +40,7 @@ public class FilterCache {
     private static CacheManager manager;
     private static TimerTask evictThread;
     private static Timer evictThreadTimer;
+
 
     public static void start() {
         if (manager == null) {
@@ -79,6 +82,9 @@ public class FilterCache {
 
     public static void load() {
 
+        Configuration config = new Configuration();
+        config.setName("stallionFilterCache");
+        CacheManager.create(config);
         manager = CacheManager.create();
     }
 
@@ -89,9 +95,14 @@ public class FilterCache {
         if (manager.getCache(bucket) != null) {
             return;
         }
+        // We have to do this way because there is no way to programmmatically configured the
+        // sizeOfEngine
+        System.setProperty("net.sf.ehcache.sizeofengine.stallionFilterCache." + bucket, "io.stallion.dataAccess.filtering.EstimatedSizeOfEngine");
+
         CacheConfiguration config = new CacheConfiguration();
         config.setName(bucket);
-        // Max cache size is 50MB
+        // Max cache size is very approximately, 50MB
+
         config.setMaxBytesLocalHeap(Settings.instance().getFilterCacheSize());
         //config.setDiskPersistent(false);
         //config.setMaxElementsOnDisk(0);
@@ -99,8 +110,15 @@ public class FilterCache {
         config.setOverflowToOffHeap(false);
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
         persistenceConfiguration.strategy(PersistenceConfiguration.Strategy.NONE);
+
         config.persistence(persistenceConfiguration);
-        manager.addCache(new Cache(config));
+        //SizeOfPolicyConfiguration sizeOfPolicyConfiguration = new SizeOfPolicyConfiguration();
+        //sizeOfPolicyConfiguration.
+        //config.addSizeOfPolicy();
+        //config.set
+        Cache cache = new Cache(config);
+
+        manager.addCache(cache);
 
         //Cache cache = manager.getCache(bucket);
         //CacheConfiguration config = cache.getCacheConfiguration();
