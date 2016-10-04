@@ -50,13 +50,9 @@ def run_selenium_for_build(build_number):
     
     
 if '--build' in sys.argv:
-    try: 
-        build()
-    except Exception, e:
-        raise
+    build()
     run_selenium_for_build(os.environ['BUILD_NUMBER'])
     mvn['compile', '-DskipTests=true', 'install', 'source:jar', 'deploy'] & FG
-    
 elif '--selenium' in sys.argv:
     run_selenium_for_build(os.environ['BUILD_NUMBER'])
     pass
