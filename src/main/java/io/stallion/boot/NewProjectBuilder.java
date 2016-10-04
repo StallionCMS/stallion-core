@@ -302,8 +302,8 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
                 "}";
         replaceString("/assets/site.css", "/**--highlight-color-section--*/", colorsCss);
         copyFile("/templates/wizard/site.js", "assets/site.js");
-        copyFile("/templates/wizard/site.bundle.css", "assets/site.bundle.css");
-        copyFile("/templates/wizard/site.bundle.js", "assets/site.bundle.js");
+        copyFile("/templates/wizard/site.bundle", "assets/site.bundle");
+
 
     }
 

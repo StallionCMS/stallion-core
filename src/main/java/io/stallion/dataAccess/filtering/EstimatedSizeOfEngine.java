@@ -30,7 +30,7 @@ import net.sf.ehcache.pool.SizeOfEngine;
 
 public class EstimatedSizeOfEngine implements SizeOfEngine {
     public EstimatedSizeOfEngine() {
-        Log.info("EstimatedSizeOfEngine being loaded.");
+        Log.finer("EstimatedSizeOfEngine being loaded.");
     }
     @Override
     public Size sizeOf(Object key, Object value, Object container) {
