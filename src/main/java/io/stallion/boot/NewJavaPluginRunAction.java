@@ -133,6 +133,8 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
         copyFile("/templates/wizard/app.scss", "src/main/resources/assets/app.scss");
         copyFile("/templates/wizard/file1.js", "src/main/resources/assets/common/file1.js");
         copyFile("/templates/wizard/file2.js", "src/main/resources/assets/common/file2.js");
+        copyFile("/assets/vendor/jquery-1.11.3.js", "src/main/resources/assets/vendor/jquery-1.11.3.js");
+        copyFile("/assets/basic/stallion.js", "src/main/resources/assets/vendor/stallion.js");
         copyFile("/templates/wizard/app.jinja", "src/main/resources/templates/app.jinja");
 
     }

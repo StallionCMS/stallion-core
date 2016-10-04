@@ -87,7 +87,7 @@ public class AppContextLoader {
         }
         File confFile = new File(options.getTargetPath() + "/conf/stallion.toml");
         if (!confFile.exists()) {
-             throw new CommandException("Cannot load site because conf file is missing. You either targetted the wrong directory, or need to create a site first. Looked for the conf file at " + confFile.getAbsolutePath());
+             throw new CommandException("Cannot load site because the 'conf/stallion.toml' file is missing. You either targeted the wrong directory, or need to create a site first. Stallion expected to find the conf file at " + confFile.getAbsolutePath());
         }
 
         Settings.init(options.getEnv(), options);

@@ -17,6 +17,7 @@
 
 package io.stallion.boot;
 
+import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 import io.stallion.templating.JinjaTemplating;
@@ -78,12 +79,16 @@ public class NewProjectBuilder implements StallionRunAction<CommandOptionsBase> 
         this.options = options;
         templating = new JinjaTemplating(targetFolder, false);
         File dir = new File(folder);
-        if (!dir.isDirectory()) {
-            throw new UsageException("The target folder does not exist: " + folder);
+        if (!dir.getParentFile().isDirectory()) {
+            throw new CommandException("The parent folder does not exist: " + dir.getParentFile().getAbsolutePath());
         }
         File confDir = new File(folder + "/conf");
         if (confDir.exists()) {
-            throw new UsageException("You have already initialized the folder " + folder);
+            throw new CommandException("You have already initialized the folder " + folder);
+        }
+        confDir = new File(folder + "/site/conf");
+        if (confDir.exists()) {
+            throw new CommandException("You have already initialized the folder " + folder);
         }
 
     }

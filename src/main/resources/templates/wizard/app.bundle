@@ -1,3 +1,5 @@
 /app.scss
+/vendor/jquery-1.11.3.js
+/vendor/stallion.js
 /common/*.js
 /app.js
