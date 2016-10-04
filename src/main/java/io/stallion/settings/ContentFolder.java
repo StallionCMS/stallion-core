@@ -37,6 +37,7 @@ public class ContentFolder {
     private String listingTitle = "";
     private String listingMetaDescription = "";
     private int itemsPerPage = 10;
+    private String bucket;
 
 
     public String getType() {
@@ -170,6 +171,18 @@ public class ContentFolder {
 
     public ContentFolder setItemsPerPage(int itemsPerPage) {
         this.itemsPerPage = itemsPerPage;
+        return this;
+    }
+
+    public String getBucket() {
+        if (bucket == null) {
+            return new File(path).getName();
+        }
+        return bucket;
+    }
+
+    public ContentFolder setBucket(String bucket) {
+        this.bucket = bucket;
         return this;
     }
 }

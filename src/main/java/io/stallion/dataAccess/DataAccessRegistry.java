@@ -110,10 +110,10 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
             folders.addAll(settings.getFolders());
         }
 
-        List<String> names = new ArrayList<>();
-        if (new File(targetFolder + "/pages").isDirectory()) {
-            folders.add(new ContentFolder().setPath(targetFolder + "/pages").setType("markdown").setItemTemplate(settings.getPageTemplate()));
-        }
+        //List<String> names = new ArrayList<>();
+        //if (new File(targetFolder + "/pages").isDirectory()) {
+        //    folders.add(new ContentFolder().setPath(targetFolder + "/pages").setType("markdown").setItemTemplate(settings.getPageTemplate()));
+        //}
 
         for (ContentFolder folder: folders) {
             DataAccessRegistration registration = new DataAccessRegistration();

@@ -58,6 +58,7 @@ public class Booter {
             new PluginTestsRunAction(),
             new ScriptExecBase(),
             new NewProjectBuilder(),
+            new NewDraftPageAction(),
             //new NewJavaPluginRunAction(),
             new ExportToHtml(),
             new SecretsAction(),

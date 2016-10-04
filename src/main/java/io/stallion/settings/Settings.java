@@ -27,6 +27,7 @@ import io.stallion.settings.childSections.*;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -337,6 +338,14 @@ public class Settings implements ISettings {
         if (getSecrets() == null) {
             setSecrets(new SecretsSettings());
         }
+
+        if (new File(targetFolder + "/pages").isDirectory()) {
+            if (folders == null) {
+                folders = new ArrayList<>();
+            }
+            folders.add(new ContentFolder().setPath(targetFolder + "/pages").setType("markdown").setItemTemplate(getPageTemplate()));
+        }
+
 
     }
 
