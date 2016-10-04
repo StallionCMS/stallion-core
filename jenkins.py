@@ -23,7 +23,7 @@ exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
     out_file = out_folder + '/stallion'
     with open(out_file, 'w') as f:
         f.write(script)
-    cat['target/stallion-core-1.0-SNAPSHOT-jar-with-dependencies.jar'] >> out_file
+    (cat['target/stallion-core-1.0-SNAPSHOT-jar-with-dependencies.jar'] >> out_file) & FG
     os.chmod(out_file, 0o700)
     
 def run_selenium_for_build(build_number):
