@@ -29,8 +29,8 @@ exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
 def run_selenium_for_build(build_number):
     stallion_exec = os.environ['HOME'] + '/build-artifacts/' + build_number + '/stallion'
     app_target_path = os.getcwd() + '/src/test/resources/a_minimal_site'
-    print 'Serve command: %s serve -targetPath=%s -logLevel=FINER -env=local' % (stallion_exec, app_target_path)
-    print 'Selenium command: selenium-nashorn selenium/test-users.js'
+    print('Serve command: %s serve -targetPath=%s -logLevel=FINER -env=local' % (stallion_exec, app_target_path))
+    print('Selenium command: selenium-nashorn selenium/test-users.js')
     p = subprocess.Popen([stallion_exec, 'serve', '-targetPath=' + app_target_path, '-logLevel=FINER', '-env=local'])
     try: 
         for x in xrange(0, 50):
@@ -39,7 +39,7 @@ def run_selenium_for_build(build_number):
             except:
                 time.sleep(.1)
                 continue
-            print r
+            print(r)
             if r.status_code == 200:
                 break
             time.sleep(.1)
