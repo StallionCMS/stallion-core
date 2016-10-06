@@ -80,6 +80,11 @@ public class UserSettings implements SettingsSection {
         }
     }
 
+    /**
+     * Get the page where not-logged in users will be redirected to to login. Defaults to /st-users/login
+     *
+     * @return
+     */
     public String getLoginPage() {
         if (empty(loginPage)) {
             return "/st-users/login";
@@ -91,6 +96,12 @@ public class UserSettings implements SettingsSection {
         this.loginPage = loginPage;
     }
 
+    /**
+     * If true, people can create accounts and it will be automatically approved without
+     * admin intervention.
+     *
+     * @return
+     */
     public Boolean getNewAccountsAutoApprove() {
         return newAccountsAutoApprove;
     }
@@ -99,6 +110,13 @@ public class UserSettings implements SettingsSection {
         this.newAccountsAutoApprove = newAccountsAutoApprove;
     }
 
+    /**
+     * True by default. Users can use the default password reset screens and endpoints in order
+     * to reset their password over email. Set this to false if you want to implement your own
+     * custom reset path, which may be needed for more secure sites.
+     *
+     * @return
+     */
     public Boolean getPasswordResetEnabled() {
         return passwordResetEnabled;
     }
@@ -107,6 +125,13 @@ public class UserSettings implements SettingsSection {
         this.passwordResetEnabled = passwordResetEnabled;
     }
 
+    /**
+     * True by default. If false, none of the built-in user login, account creation, password reset,
+     * and user management endpoints will be available. It will be up to the application developer
+     * to implement them.
+     *
+     * @return
+     */
     public Boolean getEnableDefaultEndpoints() {
         return enableDefaultEndpoints;
     }
@@ -116,6 +141,12 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * If true, enables the endpoint to allow public visitors to create
+     * their own account.
+     *
+     * @return
+     */
     public Boolean getNewAccountsAllowCreation() {
         return newAccountsAllowCreation;
     }
@@ -125,6 +156,11 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * If true, new accounts will need to verify their email address first.
+     *
+     * @return
+     */
     public Boolean getNewAccountsRequireValidEmail() {
         return newAccountsRequireValidEmail;
     }
@@ -134,6 +170,10 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The Role that new accounts will be assigned to. Defaults to "MEMBER".
+     * @return
+     */
     public String getNewAccountsRole() {
         return newAccountsRole;
     }
@@ -143,6 +183,12 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * This should be a domain name. If it is non-empty, users will only be able to create new accounts
+     * if they have an email address from this domain.
+     *
+     * @return
+     */
     public String getNewAccountsDomainRestricted() {
         return newAccountsDomainRestricted;
     }
@@ -152,6 +198,11 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The path to the password reset page.
+     *
+     * @return
+     */
     public String getPasswordResetPage() {
         return passwordResetPage;
     }
@@ -161,6 +212,11 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The path to the email verify page
+     *
+     * @return
+     */
     public String getVerifyEmailPage() {
         return verifyEmailPage;
     }
@@ -170,6 +226,11 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * If true, all users in the data store will be synced into memory.
+     *
+     * @return
+     */
     public Boolean getSyncAllUsersToMemory() {
         return syncAllUsersToMemory;
     }
@@ -179,6 +240,11 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * If set to X, only the most recently updated X users will be synced to memory on boot.
+     *
+     * @return
+     */
     public Integer getLimitSyncUsersToMemoryToCount() {
         return limitSyncUsersToMemoryToCount;
     }
@@ -188,7 +254,11 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
-
+    /**
+     * If true, admin's can switch to non-admin accounts in valet mode, which allows them to act as that user.
+     *
+     * @return
+     */
     public Boolean getAllowValetMode() {
         return allowValetMode;
     }
@@ -198,6 +268,11 @@ public class UserSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * If set, all endpoints by default will only be accessible to users of the given role or higher
+     *
+     * @return
+     */
     public String getDefaultEndpointRole() {
         return defaultEndpointRole;
     }
@@ -205,12 +280,16 @@ public class UserSettings implements SettingsSection {
         return Role.valueOf(defaultEndpointRole);
     }
 
-
     public UserSettings setDefaultEndpointRole(String defaultEndpointRole) {
         this.defaultEndpointRole = defaultEndpointRole;
         return this;
     }
 
+    /**
+     * If true, putting stLogin=true in the URL will not redirect unlogged in users to the login page.
+     *
+     * @return
+     */
     public Boolean getDisableStLoginParam() {
         return disableStLoginParam;
     }

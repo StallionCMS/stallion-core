@@ -32,7 +32,11 @@ public class CloudStorageSettings implements SettingsSection {
     @SettingMeta(val="")
     private String javaClass;
 
-
+    /**
+     * The secret token or password used to connect to the cloud service.
+     *
+     * @return
+     */
     public String getSecret() {
         return secret;
     }
@@ -41,6 +45,10 @@ public class CloudStorageSettings implements SettingsSection {
         this.secret = secret;
     }
 
+    /**
+     * The access token or user name used to connect to the cloud service
+     * @return
+     */
     public String getAccessToken() {
         return accessToken;
     }
@@ -49,6 +57,11 @@ public class CloudStorageSettings implements SettingsSection {
         this.accessToken = accessToken;
     }
 
+    /**
+     * The Java subclass of io.stallion.services.CloudStorageService used to connect to the cloud service.
+     *
+     * @return
+     */
     public String getJavaClass() {
         return javaClass;
     }

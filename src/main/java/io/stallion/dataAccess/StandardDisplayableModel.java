@@ -244,6 +244,10 @@ public class StandardDisplayableModel extends ModelBase implements Displayable {
         }
     }
 
+    /**
+     * Alias for getPublishDate()
+     * @return
+     */
     public ZonedDateTime getDate() {
         return this.getPublishDate();
     }
@@ -421,6 +425,12 @@ public class StandardDisplayableModel extends ModelBase implements Displayable {
         return (D) this;
     }
 
+    /**
+     * The content as entered by the user, before any processing. For markdown based content, this will be the
+     * original markdown. For HTML, it will be the HTML before any sanitization.
+     *
+     * @return
+     */
     @Override
     @Column(columnDefinition = "longtext")
     public String getOriginalContent() {
@@ -432,6 +442,12 @@ public class StandardDisplayableModel extends ModelBase implements Displayable {
         return (D) this;
     }
 
+    /**
+     * Gets first part of the main content, based on heuristics. Looks for the &lt;!--more--&gt; tag first,
+     * and then looks for the first block tag.
+     *
+     * @return
+     */
     public String getSummary() {
         if (empty(getContent())) {
             return "";
@@ -451,6 +467,12 @@ public class StandardDisplayableModel extends ModelBase implements Displayable {
         return getContent();
     }
 
+    /**
+     * Gets the summary truncated by word to the max number of characters.
+     *
+     * @param max
+     * @return
+     */
     public String getTruncatedSummary(int max) {
         String summary = getSummary();
         if (summary.length() < max) {
@@ -462,10 +484,19 @@ public class StandardDisplayableModel extends ModelBase implements Displayable {
     }
 
 
+    /**
+     * Format the publish date as a string in MMM d, YYYY form
+     * @return
+     */
     public String formatPublishDate() {
         return formatPublishDate("MMM d, YYYY");
     }
 
+    /**
+     * Format the publish date based on the passed in pattern
+     * @param pattern
+     * @return
+     */
     public String formatPublishDate(String pattern) {
         ZonedDateTime dt = getPublishDate();
         if (dt == null) {

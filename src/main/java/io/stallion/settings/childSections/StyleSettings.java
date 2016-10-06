@@ -22,7 +22,10 @@ import io.stallion.settings.Settings;
 
 import static io.stallion.utils.Literals.*;
 
-
+/**
+ * Inserted into the global template context with the "styles" variable. This is used to customize the colors and
+ * look and feel of default templates, such as the 404 page, the password reset template, etc.
+ */
 public class StyleSettings implements SettingsSection {
     @SettingMeta
     private String logoImage;
@@ -60,8 +63,10 @@ public class StyleSettings implements SettingsSection {
     private String footer;
 
 
-
-
+    /**
+     * The full URL of the logo, with {cdnUrl} or {port} token converted to the actual CDN URL
+     * @return
+     */
     public String getLogoImageUrl() {
         String url = getLogoImage();
         if (empty(url)) {
@@ -86,6 +91,11 @@ public class StyleSettings implements SettingsSection {
         return url;
     }
 
+    /**
+     * The path or URL for the logo image. Use {cdnUrl} to put in a the CDN Url, or {port} to put in the port number
+     *
+     * @return
+     */
     public String getLogoImage() {
         return logoImage;
     }
@@ -95,7 +105,11 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
-
+    /**
+     * The background color of the default pages, in hex form
+     *
+     * @return
+     */
     public String getBackgroundColor() {
         return backgroundColor;
     }
@@ -105,6 +119,11 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The logo text color in hex form, used if the logo image is missing
+     *
+     * @return
+     */
     public String getLogoTextColor() {
         return logoTextColor;
     }
@@ -123,6 +142,12 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+
+    /**
+     * A secondary color used for separation lines, buttons, etc.
+     *
+     * @return
+     */
     public String getHighlightColor() {
         return highlightColor;
     }
@@ -132,6 +157,11 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The color used for links
+     *
+     * @return
+     */
     public String getLinkColor() {
         return linkColor;
     }
@@ -141,6 +171,11 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The color for primary buttons.
+     *
+     * @return
+     */
     public String getPrimaryButtonColor() {
         return primaryButtonColor;
     }
@@ -150,6 +185,10 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The font family to use for h1, h2, etc tags.
+     * @return
+     */
     public String getHeaderFont() {
         return headerFont;
     }
@@ -159,6 +198,10 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The font family to use for regular body text.
+     * @return
+     */
     public String getBodyFont() {
         return bodyFont;
     }
@@ -168,6 +211,11 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * Custom CSS of arbitrary length.
+     *
+     * @return
+     */
     public String getCustomCss() {
         return customCss;
     }
@@ -177,6 +225,11 @@ public class StyleSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * Text to include in the footer of the templates.
+     *
+     * @return
+     */
     public String getFooter() {
         return footer;
     }

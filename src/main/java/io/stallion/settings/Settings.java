@@ -101,9 +101,6 @@ public class Settings implements ISettings {
     private Integer nodeNumber = 1;
     @SettingMeta(val="x-Real-Ip", help="The HTTP header that contains the original client IP address, by default, with nginx proxying, this is x-Real-Ip")
     private String ipHeaderName;
-    @SettingMeta(help="The name of the executable jar file, default is stallion.", val = "stallion")
-    private String executableName;
-
 
 
 
@@ -153,10 +150,6 @@ public class Settings implements ISettings {
     // Publishing
     //@SettingMeta(cls=ArrayList.class)
     //private List<PublishingConfig> publishing;
-
-
-    @SettingMeta(cls=ArrayList.class)
-    private List<DeploymentsConfig> deployments;
 
 
     // Time
@@ -370,14 +363,25 @@ public class Settings implements ISettings {
         }
     }
 
+
     public SecondaryDomain getSecondaryDomainByDomain(String domain) {
         return secondaryDomainByDomain.get(domain);
     }
 
+    /**
+     * In strict mode, more errors will be exceptions that stop all processing. For instance, missing template variables
+     * will cause exceptions rather than being ignored.
+     * @return
+     */
     public boolean isStrict() {
         return StrictnessLevel.STRICT.equals(getStrictnessLevel());
     }
 
+    /**
+     * ContentFolders are folders in your local site directory that are to be registered with the data access controller.
+     * The .txt will be converted into accessible web pages in your site.
+     * @return
+     */
     public List<ContentFolder> getFolders() {
         return folders;
     }
@@ -386,6 +390,10 @@ public class Settings implements ISettings {
         this.folders = folders;
     }
 
+    /**
+     * The database configuration
+     * @return
+     */
     public DbConfig getDatabase() {
         return database;
     }
@@ -394,6 +402,10 @@ public class Settings implements ISettings {
         this.database = database;
     }
 
+    /**
+     * The user configuration
+     * @return
+     */
     public UserSettings getUsers() {
         return users;
     }
@@ -402,6 +414,10 @@ public class Settings implements ISettings {
         this.users = users;
     }
 
+    /**
+     * Email configuration for Stallion sending emails via SMTP
+     * @return
+     */
     public EmailSettings getEmail() {
         return email;
     }
@@ -411,6 +427,10 @@ public class Settings implements ISettings {
     }
 
 
+    /**
+     * Cross-Origin Request configuration -- allow endpoints to respond to cross-origin requests.
+     * @return
+     */
     public CorsSettings getCors() {
         return cors;
     }
@@ -420,6 +440,11 @@ public class Settings implements ISettings {
         return this;
     }
 
+    /**
+     * Where all data stored to flat-file by the Controllers and Persisters will actually live in the
+     * file system. This will be "app-data" under the site directory by default.
+     * @return
+     */
     public String getDataDirectory() {
         return dataDirectory;
     }
@@ -428,6 +453,10 @@ public class Settings implements ISettings {
         this.dataDirectory = dataDirectory;
     }
 
+    /**
+     * A hashtable of arbitrary user defined settings.
+     * @return
+     */
     public CustomSettings getCustom() {
         return custom;
     }
@@ -436,6 +465,11 @@ public class Settings implements ISettings {
         this.custom = custom;
     }
 
+    /**
+     * The default template to use to render pages
+     *
+     * @return
+     */
     public String getPageTemplate() {
         return pageTemplate;
     }
@@ -444,6 +478,14 @@ public class Settings implements ISettings {
         this.pageTemplate = pageTemplate;
     }
 
+    /**
+     * The base URL for CDN (Content Delivery Network) that will pass through to your site. This is used
+     * by AssetsController.url() or AssetsController.bundle() to build URL's to your assets. If empty, will use
+     * the site URL instead. Using a CDN can improve performance as it will cache requested assets in data centers
+     * nearer to the end user.
+     *
+     * @return
+     */
     public String getCdnUrl() {
         return cdnUrl;
     }
@@ -452,6 +494,12 @@ public class Settings implements ISettings {
         this.cdnUrl = cdnUrl;
     }
 
+    /**
+     * The base URL at which the site lives. Used to build links internally, also used for checking cross-origin
+     * requests.
+     *
+     * @return
+     */
     public String getSiteUrl() {
         return siteUrl;
     }
@@ -459,6 +507,7 @@ public class Settings implements ISettings {
     public void setSiteUrl(String siteUrl) {
         this.siteUrl = siteUrl;
     }
+
 
     public List<RouteDefinition> getRoutes() {
         return routes;
@@ -468,6 +517,12 @@ public class Settings implements ISettings {
         this.routes = routes;
     }
 
+    /**
+     * Run in debug mode. True by default when env=local. In debug mode, the full stack trace of exceptions
+     * will be rendered to the HTML output.
+     *
+     * @return
+     */
     public Boolean getDebug() {
         return debug;
     }
@@ -476,6 +531,12 @@ public class Settings implements ISettings {
         this.debug = debug;
     }
 
+    /**
+     * Should be a time zone parseable by ZoneId.of() Used by the DateUtils.renderLocalDate() method when there
+     * is no time zone for the particular user.
+     *
+     * @return
+     */
     public String getTimeZone() {
         return timeZone;
     }
@@ -492,6 +553,14 @@ public class Settings implements ISettings {
         this.timeZoneId = timeZoneId;
     }
 
+    /**
+     * Usually set by the command line options, rather than the stallion.toml file.
+     *
+     * If true, templates and assets will automatically be checked for changes from the original source
+     * and re-compiled if they have changed.
+     *
+     * @return
+     */
     public Boolean getDevMode() {
         return devMode;
     }
@@ -500,6 +569,11 @@ public class Settings implements ISettings {
         this.devMode = devMode;
     }
 
+    /**
+     * Set the log level - INFO, FINE, FINER, FINEST
+     *
+     * @return
+     */
     public String getLogLevel() {
         return logLevel;
     }
@@ -517,7 +591,11 @@ public class Settings implements ISettings {
     }
 
 
-
+    /**
+     * The current environment name, set by command line options.
+     *
+     * @return
+     */
     public String getEnv() {
         return env;
     }
@@ -526,6 +604,13 @@ public class Settings implements ISettings {
         this.env = env;
     }
 
+    /**
+     * True by default if in debug mode, false on production. If true,
+     * bundle files will be included on the page as individual source files, rather than as a concatenated,
+     * minified file.
+     *
+     * @return
+     */
     public Boolean getBundleDebug() {
         return bundleDebug;
     }
@@ -534,6 +619,11 @@ public class Settings implements ISettings {
         this.bundleDebug = bundleDebug;
     }
 
+    /**
+     * The name of your site, accessible in templates via {{ site.name }}
+     *
+     * @return
+     */
     public String getSiteName() {
         return siteName;
     }
@@ -542,6 +632,13 @@ public class Settings implements ISettings {
         this.siteName = siteName;
     }
 
+    /**
+     * The default title of your site, will be used in the HTML title tag in the default base template
+     * if no other title for a page is defined.
+     *
+     *
+     * @return
+     */
     public String getDefaultTitle() {
         return defaultTitle;
     }
@@ -550,6 +647,10 @@ public class Settings implements ISettings {
         this.defaultTitle = defaultTitle;
     }
 
+    /**
+     * The default meta tag description value. Used if there is no override for the particular page or endpoint.
+     * @return
+     */
     public String getMetaDescription() {
         return metaDescription;
     }
@@ -558,6 +659,11 @@ public class Settings implements ISettings {
         this.metaDescription = metaDescription;
     }
 
+    /**
+     * Get the name of the author of the site
+     *
+     * @return
+     */
     public String getAuthorName() {
         return authorName;
     }
@@ -566,6 +672,11 @@ public class Settings implements ISettings {
         this.authorName = authorName;
     }
 
+    /**
+     * The port the server should run on. Usually set by the command line options.
+     *
+     * @return
+     */
     public Integer getPort() {
         return port;
     }
@@ -574,6 +685,12 @@ public class Settings implements ISettings {
         this.port = port;
     }
 
+    /**
+     * The root site folder that contains the conf directory and the conf/stallion.toml files.
+     * This is always set via the command line options, or defaults to the current working directory.
+     *
+     * @return
+     */
     public String getTargetFolder() {
         return targetFolder;
     }
@@ -590,6 +707,12 @@ public class Settings implements ISettings {
         this.strictnessLevel = strictnessLevel;
     }
 
+    /**
+     * A list of paths that will be checked for a 200 response when the health check
+     * is run.
+     *
+     * @return
+     */
     public List<String[]> getHealthCheckEndpoints() {
         return healthCheckEndpoints;
     }
@@ -598,6 +721,11 @@ public class Settings implements ISettings {
         this.healthCheckEndpoints = healthCheckEndpoints;
     }
 
+    /**
+     * A secret token that must be passed in when accessing the health endpoints.
+     *
+     * @return
+     */
     public String getHealthCheckSecret() {
         return healthCheckSecret;
     }
@@ -607,6 +735,11 @@ public class Settings implements ISettings {
     }
 
 
+    /**
+     * If true, exceptions will emailed to the admin defined in the email configuration.
+     *
+     * @return
+     */
     public Boolean getEmailErrors() {
         return emailErrors;
     }
@@ -615,6 +748,11 @@ public class Settings implements ISettings {
         this.emailErrors = emailErrors;
     }
 
+    /**
+     * A map of 301 redirects in the form of original URL or path to destination URL or path.
+     *
+     * @return
+     */
     public Map<String, String> getRedirects() {
         return redirects;
     }
@@ -623,6 +761,10 @@ public class Settings implements ISettings {
         this.redirects = redirects;
     }
 
+    /**
+     * The meta tag value for generator. "Stallion" by default.
+     * @return
+     */
     public String getMetaGenerator() {
         return metaGenerator;
     }
@@ -631,6 +773,11 @@ public class Settings implements ISettings {
         this.metaGenerator = metaGenerator;
     }
 
+    /**
+     * The path to the log file when file-based logging is on.
+     *
+     * @return
+     */
     public String getLogFile() {
         return logFile;
     }
@@ -639,6 +786,11 @@ public class Settings implements ISettings {
         this.logFile = logFile;
     }
 
+    /**
+     * If true, log to the console instead of file. This defaults to true in local mode.
+     *
+     * @return
+     */
     public Boolean getLogToConsole() {
         return logToConsole;
     }
@@ -655,6 +807,14 @@ public class Settings implements ISettings {
         this.logToFile = logToFile;
     }
 
+    /**
+     * True if this is a developer running locally, false if this is running deployed on a server.
+     *
+     * If localMode is true, production jobs and tasks will not be run and logging will go to the console.
+     *
+     *
+     * @return
+     */
     public Boolean getLocalMode() {
         return localMode;
     }
@@ -664,7 +824,10 @@ public class Settings implements ISettings {
     }
 
 
-
+    /**
+     * A mapping of internal rewrites, from source path to destintion path.
+     * @return
+     */
     public Map<String, String> getRewrites() {
         return rewrites;
     }
@@ -673,7 +836,12 @@ public class Settings implements ISettings {
         this.rewrites = rewrites;
     }
 
-
+    /**
+     * A list of domains that content is also accesible at, and their mapping
+     * to URL paths.
+     *
+     * @return
+     */
     public List<SecondaryDomain> getSecondaryDomains() {
         return secondaryDomains;
     }
@@ -691,6 +859,10 @@ public class Settings implements ISettings {
         this.rewriteCompiledPatterns = rewriteCompiledPatterns;
     }
 
+    /**
+     * A list of arrays, each array has two values, a source regular expression and a destination path.
+     * @return
+     */
     public List<String[]> getRewritePatterns() {
         return rewritePatterns;
     }
@@ -699,6 +871,11 @@ public class Settings implements ISettings {
         this.rewritePatterns = rewritePatterns;
     }
 
+    /**
+     * Configuration for integration with a cloud file storage, such as S3.
+     *
+     * @return
+     */
     public CloudStorageSettings getCloudStorage() {
         return cloudStorage;
     }
@@ -707,6 +884,12 @@ public class Settings implements ISettings {
         this.cloudStorage = cloudStorage;
     }
 
+    /**
+     * Default CSS styles and colors that will be used in the default templates
+     * for log in, password reset emails, etc.
+     *
+     * @return
+     */
     public StyleSettings getStyles() {
         return styles;
     }
@@ -715,6 +898,11 @@ public class Settings implements ISettings {
         this.styles = style;
     }
 
+    /**
+     * For deployed sites using stablehand, which node this is.
+     *
+     * @return
+     */
     public Integer getNodeNumber() {
         return nodeNumber;
     }
@@ -724,6 +912,11 @@ public class Settings implements ISettings {
         return this;
     }
 
+    /**
+     * A random token used for preventing spam in form submissions and comments.
+     *
+     * @return
+     */
     public String getAntiSpamSecret() {
         return antiSpamSecret;
     }
@@ -733,6 +926,10 @@ public class Settings implements ISettings {
         return this;
     }
 
+    /**
+     * If true, the default form submission endpoint will be disabled.
+     * @return
+     */
     public Boolean getDisableFormSubmissions() {
         return disableFormSubmissions;
     }
@@ -743,6 +940,13 @@ public class Settings implements ISettings {
     }
 
 
+    /**
+     * If there is a proxy server in front of Stallion, that proxy server will set
+     * the IP address of the original requester and put it in a header. Add that header
+     * name here so that Stallion can know the IP of the original requester.
+     *
+     * @return
+     */
     public String getIpHeaderName() {
         return ipHeaderName;
     }
@@ -752,15 +956,11 @@ public class Settings implements ISettings {
         return this;
     }
 
-    public String getExecutableName() {
-        return executableName;
-    }
-
-    public Settings setExecutableName(String executableName) {
-        this.executableName = executableName;
-        return this;
-    }
-
+    /**
+     * Configuration for enabling users to give out OAuth access
+     *
+     * @return
+     */
     public OAuthSettings getoAuth() {
         return oAuth;
     }
@@ -788,6 +988,11 @@ public class Settings implements ISettings {
         return this;
     }
 
+    /**
+     * Included in the templates for error pages.
+     *
+     * @return
+     */
     public String getSupportEmail() {
         return supportEmail;
     }
@@ -896,20 +1101,6 @@ public class Settings implements ISettings {
         return this;
     }
 
-    public List<DeploymentsConfig> getDeploymentConfigs() {
-        //return convertMapListToObjects(deployments, DeploymentsConfig.class);
-        return deployments;
-    }
-
-
-    public List<DeploymentsConfig> getDeployments() {
-        return deployments;
-    }
-
-    public Settings setDeployments(List<DeploymentsConfig> deployments) {
-        this.deployments = deployments;
-        return this;
-    }
 
 
     public String getNginxClientMaxBodySize() {

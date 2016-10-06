@@ -29,8 +29,8 @@ import static io.stallion.utils.Literals.*;
  *
  * Example usage:
  *
- * @POST
- * public String newThing(@BodyParam("email") String email, @BodyParam("name") String name, @BodyParam String nickName) {
+ * {@literal @}POST
+ * public String newThing({@literal @}BodyParam("email") String email, {@literal @}BodyParam("name") String name, {@literal @}BodyParam String nickName) {
  *     new ParamsValidator()
  *         .add("name", name, 1)
  *         .addEmail("email", email)

@@ -54,7 +54,6 @@ public class Booter {
     private static final List<StallionRunAction> builtinActions = Literals.list(
             new StallionServer(),
             new UserAdder(),
-            //new Deployer(),
             new PluginTestsRunAction(),
             new ScriptExecBase(),
             new NewProjectBuilder(),

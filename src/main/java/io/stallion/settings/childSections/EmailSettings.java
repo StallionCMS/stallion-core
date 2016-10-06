@@ -54,7 +54,10 @@ public class EmailSettings implements SettingsSection {
     @SettingMeta()
     private String outboundEmailTestAddress;
 
-
+    /**
+     * The SMTP host
+     * @return
+     */
     public String getHost() {
         return host;
     }
@@ -63,6 +66,10 @@ public class EmailSettings implements SettingsSection {
         this.host = host;
     }
 
+    /**
+     * The username with which to connect to the SMTP server
+     * @return
+     */
     public String getUsername() {
         return username;
     }
@@ -71,6 +78,10 @@ public class EmailSettings implements SettingsSection {
         this.username = username;
     }
 
+    /**
+     * The password with which to connect to the SMTP server
+     * @return
+     */
     public String getPassword() {
         return password;
     }
@@ -79,6 +90,10 @@ public class EmailSettings implements SettingsSection {
         this.password = password;
     }
 
+    /**
+     * Whether to use TLS to connect, defaults to true
+     * @return
+     */
     public Boolean getTls() {
         return tls;
     }
@@ -87,6 +102,10 @@ public class EmailSettings implements SettingsSection {
         this.tls = tls;
     }
 
+    /**
+     * The SMTP port to try to connect to, defaults to 587
+     * @return
+     */
     public Long getPort() {
         return port;
     }
@@ -95,6 +114,11 @@ public class EmailSettings implements SettingsSection {
         this.port = port;
     }
 
+    /**
+     * The default email address for the "From" field.
+     *
+     * @return
+     */
     public String getDefaultFromAddress() {
         return defaultFromAddress;
     }
@@ -103,6 +127,10 @@ public class EmailSettings implements SettingsSection {
         this.defaultFromAddress = defaultFromAddress;
     }
 
+    /**
+     * The name and postal address of the sender, for compliance with the CAN-SPAM law
+     * @return
+     */
     public String getCanSpamText() {
         return or(canSpamText, "");
     }
@@ -111,6 +139,12 @@ public class EmailSettings implements SettingsSection {
         this.canSpamText = canSpamText;
     }
 
+    /**
+     * A list of email addresses for admins, these addresses will get exception emails
+     * and other other system emails.
+     *
+     * @return
+     */
     public List<String> getAdminEmails() {
         return adminEmails;
     }
@@ -120,6 +154,17 @@ public class EmailSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * If true, will restrict outbound email address sending to a whitelist of addresses,
+     * all other emails will be converted into a white-listed form using the "+" section.
+     * So if this is true, and the outboundEmailTestAddress email is admin@stallion.io, and you are trying to email
+     * barack@whitehouse.gov, then the to address will be converted to admin+barack-whitehouse-gov@stallion.io
+     *
+     * This is setting is true in local and QA mode. The purpose of this setting is to prevent accidentally
+     * sending real emails to people from the development mode.
+     *
+     * @return
+     */
     public Boolean getRestrictOutboundEmails() {
         return restrictOutboundEmails;
     }
@@ -129,6 +174,12 @@ public class EmailSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * A list of regualar expressions, email addresses matching the patterns will be permitted outbound email
+     * addresses even if restrictOutboundEmails is true.
+     *
+     * @return
+     */
     public List<String> getAllowedTestingOutboundEmailPatterns() {
         return allowedTestingOutboundEmailPatterns;
     }
@@ -138,6 +189,9 @@ public class EmailSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * A list of whitelisted outbound email addresses
+     */
     public List<String> getAllowedOutboundEmails() {
         return allowedOutboundEmails;
     }
@@ -147,6 +201,10 @@ public class EmailSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * Compiled regular expressions for getAllowedTestingOutboundEmailPatterns()
+     * @return
+     */
     public List<Pattern> getAllowedTestingOutboundEmailCompiledPatterns() {
         return allowedTestingOutboundEmailCompiledPatterns;
     }
@@ -156,6 +214,11 @@ public class EmailSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * The email address that all outbound emails are routed to in local and QA mode.
+     *
+     * @return
+     */
     public String getOutboundEmailTestAddress() {
         return outboundEmailTestAddress;
     }

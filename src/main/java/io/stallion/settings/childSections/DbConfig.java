@@ -63,6 +63,10 @@ public class DbConfig implements SettingsSection {
         }
     }
 
+    /**
+     * Get the database username
+     * @return
+     */
     public String getUsername() {
         return username;
     }
@@ -71,6 +75,11 @@ public class DbConfig implements SettingsSection {
         this.username = username;
     }
 
+    /**
+     * Get the JDBC URL connection for the database
+     *
+     * @return
+     */
     public String getUrl() {
         return url;
     }
@@ -79,6 +88,11 @@ public class DbConfig implements SettingsSection {
         this.url = url;
     }
 
+    /**
+     * Get the password for connecting to the database
+     *
+     * @return
+     */
     public String getPassword() {
         return password;
     }
@@ -87,6 +101,11 @@ public class DbConfig implements SettingsSection {
         this.password = password;
     }
 
+    /**
+     * Use a custom subclass of io.stallion.dataAccess.db.DB for accessing the database.
+     *
+     * @return
+     */
     public String getDbAccessorClass() {
         return dbAccessorClass;
     }
@@ -103,11 +122,24 @@ public class DbConfig implements SettingsSection {
         return driverClass;
     }
 
+    /**
+     * Override the default JDBC driver class for the database URL. This should be a full
+     * path including the package and class name.
+     *
+     * @return
+     */
     public DbConfig setDriverClass(String driverClass) {
         this.driverClass = driverClass;
         return this;
     }
 
+    /**
+     * The subclass of DbImplementation that DB will use for help with customizing database access for the given
+     * type of DB. If you are using something other than MySQL or Postgres, you will need to create a subclass
+     * for the engine you are connecting to.
+     *
+     * @return
+     */
     public String getImplementationClass() {
         return implementationClass;
     }

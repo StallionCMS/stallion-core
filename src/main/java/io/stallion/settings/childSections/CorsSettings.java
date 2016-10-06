@@ -96,6 +96,10 @@ public class CorsSettings implements SettingsSection {
         }
     }
 
+    /**
+     * If true, allow all cross-origin requests.
+     * @return
+     */
     public boolean isAllowAll() {
         return allowAll;
     }
@@ -105,6 +109,10 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * A list of domains from which to allow cross-origin requests
+     * @return
+     */
     public List<String> getOriginWhitelist() {
         return originWhitelist;
     }
@@ -114,6 +122,11 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * A list of regular expressions that match domains that are allowed to
+     * make cross-origin requests
+     * @return
+     */
     public List<String> getOriginRegexWhitelist() {
         return originRegexWhitelist;
     }
@@ -123,6 +136,11 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * Compiled form of getOriginRegexWhitelist
+     *
+     * @return
+     */
     public List<Pattern> getOriginPatternWhitelist() {
         return originPatternWhitelist;
     }
@@ -132,6 +150,11 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * If
+     *
+     * @return
+     */
     public boolean isAllowCredentials() {
         return allowCredentials;
     }
@@ -141,6 +164,11 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * A regular expression for URL's that are allowed cross-origin requests
+     *
+     * @return
+     */
     public String getUrlsRegex() {
         return urlsRegex;
     }
@@ -159,6 +187,10 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * Which headers are sent for cross-origin requests.
+     * @return
+     */
     public List<String> getExposeHeaders() {
         return exposeHeaders;
     }
@@ -168,11 +200,18 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * String form of getExposeHeaders();
+     * @return
+     */
     public String getExposeHeadersString() {
         return exposeHeadersString;
     }
 
-
+    /**
+     * Which headers are allowed for cross-origin requests
+     * @return
+     */
     public List<String> getAllowHeaders() {
         return allowHeaders;
     }
@@ -182,6 +221,10 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * Which  HTTP methods are allowed for cross-origin requests. Defaults to all methods.
+     * @return
+     */
     public List<String> getAllowedMethods() {
         return allowedMethods;
     }
@@ -191,6 +234,11 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * Time in seconds from which a pre-flight OPTIONS request is valid for.
+     *
+     * @return
+     */
     public Integer getPreflightMaxAge() {
         return preflightMaxAge;
     }
@@ -200,10 +248,20 @@ public class CorsSettings implements SettingsSection {
         return this;
     }
 
+    /**
+     * String form of the allowedMethods list
+     * @return
+     */
     public String getAllowedMethodsString() {
         return allowedMethodsString;
     }
 
+    /**
+     * True by default, Cross-origin requests are always allowed for fonts. Makes it easy to host font assets
+     * via a CDN and have them show up in Firefox.
+     *
+     * @return
+     */
     public boolean isAllowAllForFonts() {
         return allowAllForFonts;
     }
