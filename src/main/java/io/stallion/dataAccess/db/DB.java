@@ -39,10 +39,7 @@ import io.stallion.utils.StallionClassLoader;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.handlers.BeanListHandler;
-import org.apache.commons.dbutils.handlers.MapHandler;
-import org.apache.commons.dbutils.handlers.MapListHandler;
-import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.apache.commons.dbutils.handlers.*;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -326,6 +323,27 @@ public class DB {
         }
 
     }
+
+
+    /**
+     * Query the database with arbitrary SQL and return a scalar object (a string, number, boolean, etc).
+     *
+     * @param sql
+     * @param params
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> queryColumn(String sql, Object...params) {
+
+        QueryRunner runner = new QueryRunner(dataSource);
+        try {
+            return runner.query(sql, new ColumnListHandler<T>(), params);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 
     /**
      * Fetch all objects of the given model.
