@@ -33,7 +33,11 @@ public class MyResource implements EndpointResource {
     @Path("/hello/creatify")
     @JsonView(RestrictedViews.Member.class)
     public Object creatify(@ObjectParam(targetClass = ExamplePojo.class) ExamplePojo rawThing) {
-        ExamplePojo pojo = SafeMerger.with().nonEmpty("userName", "displayName", "content", "age").optionalEmail("email").merge(rawThing);
+        ExamplePojo pojo = SafeMerger.with()
+                .nonEmpty("userName", "displayName", "content", "age")
+                .optionalEmail("email")
+                .ignoreOptionalEmpty()
+                .merge(rawThing);
         //ExamplePojo pojo = ExamplePojoController.instance().mergeWithDefaults(thing);
         pojo.setUpdateMessage("This was updated by the method creatify");
         pojo.setUpdated(123456789L);

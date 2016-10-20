@@ -33,6 +33,11 @@ import static io.stallion.utils.Literals.list;
 
 public class SafeMerger {
     private List<OneParam> params = list();
+    private boolean _ignoreOptionEmpty = false;
+
+
+
+
 
     public static SafeMerger with() {
         return new SafeMerger();
@@ -64,6 +69,12 @@ public class SafeMerger {
         }
         return this;
     }
+
+    public SafeMerger ignoreOptionalEmpty() {
+        _ignoreOptionEmpty = true;
+        return this;
+    }
+
 
     public SafeMerger nonEmpty(String...fieldNames) {
         for (String field: fieldNames) {
@@ -159,10 +170,17 @@ public class SafeMerger {
                 return;
             }
         }
-        if (param.isNonEmpty() && emptyObject(val)) {
-            errors.add("Field " + param.getFieldName() + " must not be empty.");
-            return;
+        if (emptyObject(val)) {
+            if (param.isNonEmpty()) {
+                errors.add("Field " + param.getFieldName() + " must not be empty.");
+                return;
+            } else if (!param.isRequired() && _ignoreOptionEmpty) {
+                return;
+            }
         }
+
+
+
         if (param.getMinLength() > 0) {
             if (val instanceof String) {
                 if (((String) val).length() < param.getMinLength()) {
