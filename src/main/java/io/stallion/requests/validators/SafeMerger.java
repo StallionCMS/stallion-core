@@ -152,13 +152,16 @@ public class SafeMerger {
             }
             return;
         }
-        if (emptyObject(val))  {
-            if (param.isNonEmpty()) {
-                errors.add("Field " + param.getFieldName() + " must not be empty.");
-                return;
-            } else if (!param.isRequired()) {
+        if (val == null)  {
+            if (param.isRequired()) {
+                errors.add("Field " + param.getFieldName() + " is required.");
+            } else {
                 return;
             }
+        }
+        if (param.isNonEmpty() && emptyObject(val)) {
+            errors.add("Field " + param.getFieldName() + " must not be empty.");
+            return;
         }
         if (param.getMinLength() > 0) {
             if (val instanceof String) {
