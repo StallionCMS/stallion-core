@@ -177,6 +177,9 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         } else {
             inParams = (Object[])op.getOriginalValue();
         }
+        if (inParams.length == 0) {
+            return;
+        }
 
         for(int x = 0; x < inParams.length; x++) {
             if (x >= (inParams.length - 1)) {
