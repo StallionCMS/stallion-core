@@ -23,7 +23,6 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
-import com.sun.prism.Texture;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.file.TextFilePersister;
 import io.stallion.exceptions.CommandException;
