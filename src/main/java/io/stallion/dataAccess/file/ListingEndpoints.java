@@ -37,6 +37,7 @@ import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -49,7 +50,11 @@ public class ListingEndpoints implements EndpointResource {
     public static void register() {
         for(ContentFolder config: Settings.instance().getFolders()) {
             if (config.isListingEnabled()) {
-                EndpointsRegistry.instance().addResource(config.getListingRootUrl(), new ListingEndpoints(config));
+                String rootUrl = config.getListingRootUrl();
+                if (StringUtils.endsWith(rootUrl, "/")) {
+                    rootUrl = rootUrl.substring(0, rootUrl.length()-1);
+                }
+                EndpointsRegistry.instance().addResource(rootUrl, new ListingEndpoints(config));
             }
         }
     }
