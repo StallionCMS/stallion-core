@@ -475,7 +475,11 @@ public final class PropertyUtils {
                 value.getClass() == Integer.class
                 )
             ) {
-            return ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) value), GeneralUtils.UTC);
+            if (value.getClass() == Integer.class || value.getClass() == int.class) {
+                return ZonedDateTime.ofInstant(Instant.ofEpochMilli(((int) value) * 1000), GeneralUtils.UTC);
+            } else {
+                return ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) value), GeneralUtils.UTC);
+            }
         }
         if (destinationClass == ZonedDateTime.class && (value.getClass() == double.class || value.getClass() == Double.class)) {
             return ZonedDateTime.ofInstant(Instant.ofEpochMilli(Math.round((Double)value)), GeneralUtils.UTC);
@@ -507,6 +511,9 @@ public final class PropertyUtils {
         }
         if ((destinationClass == long.class || destinationClass == Long.class)  &&  value.getClass() == String.class) {
             return new Long((String) value);
+        }
+        if ((destinationClass == long.class || destinationClass == Long.class)  &&  value instanceof Integer) {
+            return new Long((Integer) value);
         }
         if ((destinationClass == float.class || destinationClass == Float.class)  &&  value.getClass() == String.class) {
             return new Float((String) value);
