@@ -199,7 +199,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param value
      * @return
      */
-    public FilterChain exclude(String name, Object value)  {
+    public FilterChain<T> exclude(String name, Object value)  {
         return exclude(name, value, "eq");
     }
 
@@ -212,7 +212,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param op
      * @return
      */
-    public FilterChain exclude(String name, Object value, String op) {
+    public FilterChain<T> exclude(String name, Object value, String op) {
         return excludeBy(name, value, FilterOperator.fromString(op));
     }
 
@@ -224,7 +224,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param op
      * @return
      */
-    public FilterChain excludeBy(String name, Object value, FilterOperator op)  {
+    public FilterChain<T> excludeBy(String name, Object value, FilterOperator op)  {
         FilterOperation fop = new FilterOperation();
         fop.setFieldName(name);
         fop.setOperator(op);
