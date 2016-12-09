@@ -41,4 +41,5 @@ public @interface Converter {
      * @return
      */
     public Class<? extends AttributeConverter> cls() default AttributeConverter.class;
+    public Class elementClass() default Object.class;
 }

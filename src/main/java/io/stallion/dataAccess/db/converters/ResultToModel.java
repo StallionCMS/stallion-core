@@ -52,11 +52,11 @@ public interface ResultToModel<T extends Model> {
             }
             for (Col col : getSchema().getColumns()) {
                 Object value = resultSet.getObject(col.getName());
-
-                if (col.getConverter() != null) {
-                    value = col.getConverter().fromDb(obj, value, col.getName());
-                }
-                if (!empty(col.getConverterClassName())) {
+                if (col.getJsDbColumnConverter() != null) {
+                    value = col.getJsDbColumnConverter().fromDb(obj, value, col.getName());
+                } else if (col.getAttributeConverter() != null) {
+                    value = col.getAttributeConverter().convertToEntityAttribute(value);
+                } else if (!empty(col.getConverterClassName())) {
                     AttributeConverter converter = DB.instance().getConverter(col.getConverterClassName());
                     value = converter.convertToEntityAttribute(value);
                 }

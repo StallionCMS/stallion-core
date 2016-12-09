@@ -65,6 +65,11 @@ public class JSON {
 
     }
 
+    public static ObjectMapper getMapper() {
+        return mapper;
+    }
+
+
     public static Map<String, Object> parseMap(String json) {
         return parse(json, new TypeReference<Map<String, Object>>(){});
     }

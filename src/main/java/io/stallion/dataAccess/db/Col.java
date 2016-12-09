@@ -18,6 +18,9 @@
 package io.stallion.dataAccess.db;
 
 
+import io.stallion.dataAccess.db.converters.AttributeConverter;
+import io.stallion.dataAccess.db.converters.JavascriptDbColumnConverter;
+
 /**
  * This class is used internally when reflecting over a Java model and converting it into
  * a table schema.
@@ -32,11 +35,12 @@ public class Col {
     private Boolean updateable = true;
     private Boolean insertable = true;
     private String converterClassName = "";
+    private JavascriptDbColumnConverter jsDbColumnConverter = null;
     private Boolean nullable = true;
     private int length = 0;
 
     private Object defaultValue = null;
-    private DbColumnConverter converter = null;
+    private AttributeConverter attributeConverter;
 
     /**
      * The name of the column in the database table.
@@ -129,6 +133,26 @@ public class Col {
         return this;
     }
 
+    public JavascriptDbColumnConverter getJsDbColumnConverter() {
+        return jsDbColumnConverter;
+    }
+
+    public Col setJsDbColumnConverter(JavascriptDbColumnConverter jsDbColumnConverter) {
+        this.jsDbColumnConverter = jsDbColumnConverter;
+        return this;
+    }
+
+    public AttributeConverter getAttributeConverter() {
+        return attributeConverter;
+    }
+
+    public Col setAttributeConverter(AttributeConverter attributeConverter) {
+        this.attributeConverter = attributeConverter;
+        return this;
+    }
+
+
+
     /**
      * Is this column indexed or a key?
      * @return
@@ -168,19 +192,6 @@ public class Col {
         return this;
     }
 
-    /**
-     * The converter instance that converts to and fro the object type that
-     * the JDBC needs and what the model instance needs.
-     * @return
-     */
-    public DbColumnConverter getConverter() {
-        return converter;
-    }
-
-    public Col setConverter(DbColumnConverter converter) {
-        this.converter = converter;
-        return this;
-    }
 
     public Boolean getNullable() {
         return nullable;

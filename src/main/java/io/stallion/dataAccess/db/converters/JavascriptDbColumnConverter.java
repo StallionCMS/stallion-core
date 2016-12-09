@@ -15,12 +15,18 @@
  *
  */
 
-package io.stallion.dataAccess.db;
+package io.stallion.dataAccess.db.converters;
+
+import java.util.List;
+import java.util.Map;
+
+import static io.stallion.utils.Literals.*;
 
 import io.stallion.dataAccess.Model;
+import io.stallion.services.Log;
 
 
-public class DbColumnConverter {
+public class JavascriptDbColumnConverter {
     public Object toDb(Model model, Object val, String fieldName) {
         return val;
     }

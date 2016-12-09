@@ -231,7 +231,8 @@ load = loadjs;
     var DataAccessRegistration = Java.type('io.stallion.dataAccess.DataAccessRegistration');
     var DataAccessRegistry = Java.type('io.stallion.dataAccess.DataAccessRegistry');
     var DynamicModelDefinition = Java.type('io.stallion.dataAccess.DynamicModelDefinition');
-    var Col = Java.type("io.stallion.dataAccess.db.Col");                                                                         var DbColumnConverter = Java.type("io.stallion.dataAccess.db.DbColumnConverter");
+    var Col = Java.type("io.stallion.dataAccess.db.Col");
+    var DbColumnConverter = Java.type("io.stallion.dataAccess.db.converters.JavascriptDbColumnConverter");
 
     var StallionJSON = Java.type('io.stallion.utils.json.JSON');
     var StallionUtils = Java.type('io.stallion.utils.GeneralUtils');
@@ -632,7 +633,7 @@ load = loadjs;
                 .setUniqueKey(prop.uniqueKey === true)
                 .setUpdateable(prop.updateable)
                 .setInsertable(prop.insertable)
-                .setConverter(converter)
+                .setJsDbColumnConverter(converter)
                 .setDefaultValue(prop.defaultValue);
             if (prop.length) {
                 col.setLength(prop.length);

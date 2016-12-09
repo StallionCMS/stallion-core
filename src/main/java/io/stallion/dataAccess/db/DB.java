@@ -25,8 +25,6 @@ import io.stallion.dataAccess.Tickets;
 import io.stallion.dataAccess.UniqueKey;
 import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.db.converters.*;
-import io.stallion.dataAccess.db.mysql.MySqlDbImplementation;
-import io.stallion.dataAccess.db.postgres.PostgresDbImplementation;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.plugins.javascript.BaseJavascriptModel;
@@ -838,8 +836,8 @@ public class DB {
         if (arg == null && col.getDefaultValue() != null) {
             arg = col.getDefaultValue();
         }
-        if (col.getConverter() != null) {
-            arg = col.getConverter().toDb(o, arg, col.getPropertyName());
+        if (col.getAttributeConverter() != null) {
+            arg = col.getAttributeConverter().convertToDatabaseColumn(arg);
         } else if (arg != null && !StringUtils.isBlank(col.getConverterClassName())) {
             AttributeConverter converter = this.getConverter(col.getConverterClassName());
             arg = converter.convertToDatabaseColumn(arg);
@@ -988,7 +986,22 @@ public class DB {
             if (converterAnno != null) {
                 Log.finest("ConverterAnno {0} {1} {2} ", columnName, converterAnno, converterAnno.name());
                 if (empty(converterAnno.name())) {
-                    col.setConverterClassName(converterAnno.cls().getCanonicalName());
+                    try {
+                        AttributeConverter converter = (AttributeConverter)converterAnno.cls().newInstance();
+                        if (converter instanceof TypedCollectionAttributeConverter) {
+                            if (converterAnno.elementClass() == null || converterAnno.elementClass().equals(Object.class)) {
+                                throw new UsageException("You used a TypedCollectionAttributeConverter but did not set the value for elementClass which controls the type of object that you want to convert to. ");
+                            }
+                            ((TypedCollectionAttributeConverter) converter).setElementClass(converterAnno.elementClass());
+                        }
+                        col.setAttributeConverter(converter);
+                        //col.setConverterClassName(converterAnno.cls().getCanonicalName());
+                    } catch (InstantiationException e) {
+                        throw new RuntimeException(e);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+
                 } else {
                     col.setConverterClassName(converterAnno.name());
                 }
