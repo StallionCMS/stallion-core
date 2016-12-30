@@ -45,11 +45,13 @@ import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 @Path("/st-internal")
+@Produces("application/json")
 public class InternalEndpoints implements EndpointResource {
 
 
     @GET
     @Path("/health")
+
     public HealthInfo checkHealth(@QueryParam("secret") String secret, @QueryParam("failOnWarnings") Boolean failOnWarnings, @QueryParam("sections") String sections) {
         failOnWarnings = or(failOnWarnings, false);
         sections = or(sections, "all");
