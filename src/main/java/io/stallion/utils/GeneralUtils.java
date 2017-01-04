@@ -93,6 +93,10 @@ public class GeneralUtils {
         return slug.toLowerCase(Locale.ENGLISH);
     }
 
+    public static String truncateSmart(String s, int length){
+        return Literals.truncateSmart(s, length);
+    }
+
     public static String formatCurrency(Double amt) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         return formatter.format(amt);
