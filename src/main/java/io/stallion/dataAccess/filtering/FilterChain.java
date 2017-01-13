@@ -604,7 +604,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param page
      * @return
      */
-    public Pager pager(Integer page)  {
+    public Pager<T> pager(Integer page)  {
         return this.pager(page, 10);
     }
 
@@ -616,7 +616,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param size - how many items are on a page
      * @return
      */
-    public Pager pager(Integer page, Integer size)  {
+    public Pager<T> pager(Integer page, Integer size)  {
         String methodKey = "pager"  + Literals.GSEP + page + Literals.GSEP + size;
         Object cached = getCached(methodKey);
         if (cached != null) {
