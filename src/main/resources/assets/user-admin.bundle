@@ -2,8 +2,8 @@
 /admin/users-manage.css
 /vendor/jquery-1.11.3.js
 /basic/stallion.js
-/vendor/vue.js
-/vendor/vue-router.js
+/vendor/vue2.js
+/vendor/vue-router2.js
 /admin/users-edit.vue
 /admin/users-table.vue
 /admin/users-manage-v2.js
