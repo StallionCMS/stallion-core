@@ -4,11 +4,11 @@
 
 <template>
     <div>
-        <div v-if="$loadingRouteData">Loading user …</div>
+        <div v-if="loading">Loading user …</div>
         <div>
             <a href="#/">&#171; return to all users</a>
         </div>
-        <div class="pure-g"  v-if="!$loadingRouteData">
+        <div class="pure-g"  v-if="!loading">
             <div class="pure-u-2-3">
                 <h3>Edit user: {{user.email}} - {{user.displayName}}</h3>
                 <form id="st-update-user-form" name="updateUserForm" class="pure-form pure-form-stacked" v-on:submit.prevent="submit">
@@ -86,28 +86,37 @@
 <script>
 module.exports = {
     data: function() {
+        console.log('dafadsf');
         return {
             loading: false,
             user: {},
             resetSent: false
         }
     },
-    route: {
-        data: function(transition) {
+    created: function() {
+        console.log('users edit created');
+        this.updateFromRoute();
+    },
+    watch: {
+        '$route': function(to, from) {
+            this.updateFromRoute();
+        }
+    },
+    methods: {
+        updateFromRoute: function() {
             var self = this;
-            console.log('route.data transition!');
+            this.loading = true;
+            this.page = this.$route.params.page || 1;
+            this.user = [];
+            console.log('route changed!!!');
             stallion.request({
                 url: '/st-users/view-user/' + self.$route.params.userId,
                 success: function(user) {
-                    transition.next({user: user});
+                    self.user = user;
+                    self.loading = false;
                 }
             });
         },
-    },
-    ready: function() {
-
-    },
-    methods: {
         submit: function(evt, callback) {
             var self = this;
             var fields = ['displayName', 'givenName', 'familyName', 'email', 'username', 'role'];
@@ -223,12 +232,8 @@ module.exports = {
             });
             
         }
-    },
-    created: function() {
-        console.log('created');
     }
 }
-console.log('register template');
 </script>
 
 

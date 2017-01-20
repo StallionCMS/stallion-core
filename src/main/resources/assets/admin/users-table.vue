@@ -28,18 +28,18 @@
                     </th>
                 </tr>
             </thead>
-            <tbody v-if="$loadingRouteData">
+            <tbody v-if="loading">
                 <tr>
                     <td colspan="6">Loading users…</td>
                 </tr>
             </tbody>
-            <tbody v-if="!$loadingRouteData && users.length === 0"">
+            <tbody v-if="!loading && users.length === 0"">
                 <tr>
                     <td colspan="6">No users found</td>
                 </tr>
             </tbody>
-            <tbody v-if="!$loadingRouteData && users.length > 0">
-                <tr v-for="user in users""  class="clickable-row user-row user-row-{{user.id}}" v-on:click="rowClick(user.id)" data-user-id="{{user.id}}">
+            <tbody v-if="!loading && users.length > 0">
+                <tr v-for="user in users""  :class="['clickable-row', 'user-row', 'user-row-' + user.id]" v-on:click="rowClick(user.id)" :data-user-id="user.id">
                     <td>{{user.username}}</td>
                     <td>{{user.displayName}}</td>
                     <td>{{user.email}}</td>
@@ -58,10 +58,10 @@
                 <tr>
                     <td colspan="6" v-if="pager.pageCount > 0">
                         <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==1}" href="#/1">First</a>
-                        <a v-for="num in pager.surroundingPages" href="#/{{num}}" v-bind:class="{'pager-link': true, 'current-page': num==page}">
+                        <a v-for="num in pager.surroundingPages" :href="'#/' + num" v-bind:class="{'pager-link': true, 'current-page': num==page}">
                             {{num}}
                         </a>
-                        <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==pager.pageCount}" href="#/{{pager.pageCount}}">Last</a>
+                        <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==pager.pageCount}" :href="'#/' +pager.pageCount">Last</a>
                     </td>
                 </tr>
                 <tr>
@@ -77,26 +77,33 @@
 <script>
 module.exports = {
     data: function() {
+
         return {
             users: [],
             pager: null,
             page: 1,
-            withDeleted: false
+            withDeleted: false,
+            loading: true
         };
     },
-    route: {
-        data: function(transition) {
-            this.withDeleted = false;
-            this.page = this.$route.params.page || 1;
-            this.users = [];
-            this.fetchData(transition);
+    watch: {
+        '$route': function(to, from) {
+            this.updateFromRoute();
         }
     },
     created: function() {
-        console.log('created');
+        console.log('created', this.$route);
+        this.updateFromRoute();
     },
     methods: {
-        fetchData: function(transition) {
+        updateFromRoute: function() {
+            this.loading = true;
+            this.page = this.$route.params.page || 1;
+            this.user = [];
+            console.log('route changed!!!');
+            this.fetchData();
+        },
+        fetchData: function() {
             var self = this;
             console.log('fetchData');
             stallion.request({
@@ -104,9 +111,7 @@ module.exports = {
                 success: function (o) {
                     self.users = o.items;
                     self.pager = o;
-                    if (transition) {
-                        transition.next();
-                    }
+                    self.loading = false;
                 }
             });
         },
@@ -128,7 +133,6 @@ module.exports = {
         }
     }
 }
-console.log('register template');
 </script>
 
 
