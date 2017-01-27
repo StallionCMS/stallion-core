@@ -212,6 +212,9 @@ public class DB {
         cpds.setUser(config.getUsername());
         cpds.setPassword(config.getPassword());
 
+        if (url.contains("utf8mb4_unicode_ci")) {
+            cpds.setConnectionCustomizerClassName("io.stallion.dataAccess.db.mysql.Utf8InitCustomizer");
+        }
 
         cpds.setAcquireRetryAttempts(10);
         cpds.setAcquireRetryDelay(200);
@@ -222,6 +225,8 @@ public class DB {
         cpds.setMaxPoolSize(20);
         cpds.setIdleConnectionTestPeriod(5000);
         cpds.setTestConnectionOnCheckin(true);
+
+
 
         this.dataSource = cpds;
 
