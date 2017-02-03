@@ -734,6 +734,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             return "Verify your email address.";
         }
 
+        @Override
         public String getUniqueKey() {
             return truncate(GeneralUtils.slugify(getSubject()), 150) + "-" + user.getEmail() + "-" + minuteStamp + getEmailType();
         }
@@ -774,7 +775,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             return "Reset your password for " + Settings.instance().getSiteName();
         }
 
-
+        @Override
         public String getUniqueKey() {
             return truncate(GeneralUtils.slugify(getSubject()), 150) + "-" + user.getEmail() + "-" + minuteStamp + getEmailType();
         }

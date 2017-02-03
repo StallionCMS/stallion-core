@@ -23,12 +23,15 @@ import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyComparator;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
+import io.stallion.utils.DateUtils;
 import io.stallion.utils.Literals;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -66,6 +69,11 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     private boolean _includeDeleted = false;
     private Integer matchingCount = 0;
     private LocalMemoryStash<T> stash;
+
+    public FilterChain(String bucket, List<T> originalObjects) {
+        this.bucket = bucket;
+        this.originalObjects = originalObjects;
+    }
 
     public FilterChain(String bucket, LocalMemoryStash<T> stash) {
         this.setBucket(bucket);
@@ -699,7 +707,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
             if (op.isOrOperation()) {
                 continue;
             }
-            if (!op.getIsExclude() && op.getOperator().equals(FilterOperator.EQUAL) && stash.getUniqueFields().contains(op.getFieldName())) {
+            if (!op.getIsExclude() && op.getOperator().equals(FilterOperator.EQUAL) && stash != null && stash.getUniqueFields().contains(op.getFieldName())) {
                 T availableItem = stash.forUniqueKey(op.getFieldName(), op.getOriginalValue());
                 if (availableItem != null) {
                     availableItems = list(availableItem);
@@ -708,7 +716,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
                 }
                 break;
             }
-            if (!op.getIsExclude() && op.getOperator().equals(FilterOperator.EQUAL) && stash.getKeyFields().contains(op.getFieldName())) {
+            if (!op.getIsExclude() && op.getOperator().equals(FilterOperator.EQUAL) && stash != null && stash.getKeyFields().contains(op.getFieldName())) {
                 availableItems = stash.listForKey(op.getFieldName(), op.getOriginalValue());
                 if (availableItems == null) {
                     availableItems = list();
@@ -913,7 +921,12 @@ public class FilterChain<T extends Model> implements Iterable<T> {
             return StringUtils.containsIgnoreCase(propValue.toString(), op.getTypedValue().toString());
         }
 
-        int i = op.getComparableValue().compareTo(propValue);
+        int i;
+        if (propValue instanceof ZonedDateTime) {
+            i = ((ZonedDateTime) op.getTypedValue()).compareTo((ZonedDateTime)propValue);
+        } else {
+            i = op.getComparableValue().compareTo(propValue);
+        }
         if (op.getOperator().equals(FilterOperator.GREATER_THAN)) {
             return i < 0;
         }
@@ -953,7 +966,17 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         if (op.getOriginalValue().getClass().equals(String.class)) {
             String val = (String) op.getOriginalValue();
             if (propValue != null) {
-                if (propValue.getClass().equals(Integer.class)) {
+                if (propValue instanceof Enum) {
+                    op.setTypedValue(Enum.valueOf((Class<? extends Enum>) propValue.getClass(), val));
+                } else if (propValue instanceof ZonedDateTime) {
+                    if (((String) op.getOriginalValue()).length() == 16) {
+                        op.setTypedValue(ZonedDateTime.parse((String)op.getOriginalValue() + ":00 UTC", DateUtils.SQL_FORMAT_ZONED));
+                    } else if (((String) op.getOriginalValue()).length() == 19) {
+                        op.setTypedValue(ZonedDateTime.parse((String)op.getOriginalValue() + " UTC", DateUtils.SQL_FORMAT_ZONED));
+                    } else {
+                        op.setTypedValue(ZonedDateTime.parse((String)op.getOriginalValue(), DateUtils.ISO_FORMAT));
+                    }
+                } else if (propValue.getClass().equals(Integer.class)) {
                     op.setTypedValue(Integer.parseInt(val));
                 } else if (propValue.getClass().equals(Long.class)) {
                     op.setTypedValue(Long.parseLong(val));

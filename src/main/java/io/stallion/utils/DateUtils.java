@@ -37,11 +37,13 @@ import static io.stallion.utils.Literals.emptyInstance;
 public class DateUtils {
     static ZoneId UTC = ZoneId.of("UTC");
 
-    public static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ofPattern("MMM d, YYYY h:mm a");
-    public static final DateTimeFormatter SLUG_FORMAT = DateTimeFormatter.ofPattern("YYYY-MM-dd-HHmm-ssSS");
-    public static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    public static final DateTimeFormatter SQL_FORMAT =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    public static final DateTimeFormatter MINUTE_FORMAT =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static final DateTimeFormatter DEFAULT_FORMAT =   DateTimeFormatter.ofPattern("MMM d, YYYY h:mm a");
+    public static final DateTimeFormatter SLUG_FORMAT =      DateTimeFormatter.ofPattern("YYYY-MM-dd-HHmm-ssSS");
+    public static final DateTimeFormatter ISO_FORMAT =       DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    public static final DateTimeFormatter SQL_FORMAT =       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter SQL_FORMAT_ZONED =       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss V");
+    public static final DateTimeFormatter MINUTE_FORMAT =    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
 
     /**
      * Gets the current time in UTC
