@@ -51,7 +51,14 @@ public interface ResultToModel<T extends Model> {
 
             }
             for (Col col : getSchema().getColumns()) {
-                Object value = resultSet.getObject(col.getName());
+                Object value = null;
+                // TODO: really wish there was a way to test for the existence of a column,
+                // rather than throwing the exception
+                try {
+                    value = resultSet.getObject(col.getName());
+                } catch (SQLException e) {
+                    continue;
+                }
                 if (col.getJsDbColumnConverter() != null) {
                     value = col.getJsDbColumnConverter().fromDb(obj, value, col.getName());
                 } else if (col.getAttributeConverter() != null) {
