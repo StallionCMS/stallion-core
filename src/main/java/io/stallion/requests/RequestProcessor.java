@@ -338,7 +338,7 @@ class RequestProcessor {
             if ("text/html".equals(endpoint.getProduces()) && !Context.getUser().isAuthorized()) {
                 throw new RedirectException(Settings.instance().getUsers().getLoginPage() + "?stReturnUrl=" + URLEncoder.encode(request.requestUrl(), "utf-8"), 302);
             }
-            if (!Context.getUser().isAuthorized()) {
+            if (empty(Context.getUser().getId())) {
                 throw new ClientException("You must be logged in as an authorized user to view this content.", 403);
             } else if (!Context.getUser().getApproved()) {
                 throw new ClientException("Your user has not yet been approved. You cannot access this content.", 403);
