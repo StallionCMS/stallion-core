@@ -55,7 +55,6 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     private static final String PROBLEM_LOG_CACHE_BUCKET = "problemLog";
     private static final int PROBLEM_LOG_DURATION_SECONDS = 5 * 60;
     private static final int MAX_PROBLEMS = 7;
-
     public static String USER_COOKIE_NAME = "stUserSession";
 
 
