@@ -208,6 +208,7 @@ public class InternalEndpoints implements EndpointResource {
     @POST
     @Produces("text/html")
     @Path("/force-exception")
+    @XSRF(false)
     public String forceException(@QueryParam("secret") String secret) {
         checkSecret(secret);
         throw new WebException("A forced exception!", 500);
@@ -216,6 +217,7 @@ public class InternalEndpoints implements EndpointResource {
     @GET
     @Produces("text/html")
     @Path("/force-exception-get")
+    @XSRF(false)
     public String forceExceptionGet(@QueryParam("secret") String secret) {
         checkSecret(secret);
         throw new WebException("A forced exception!", 500);

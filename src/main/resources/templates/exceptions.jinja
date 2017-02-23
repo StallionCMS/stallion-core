@@ -13,6 +13,12 @@
 <div class="soft">On {{ utils.formatLocalDate(exception.thrownAt) }}</div>
 <div>{{ exception.requestMethod }} {{ exception.requestUrl }}</div>
 <div>IP Address: {{ exception.actualIp }}</div>
+{% if exception.id or exception.username %}
+<div>Email: {{ exception.email }}</div>
+<div>Username: {{ exception.username }}</div>
+<div>User ID: {{ exception.userId }}</div>
+<div>Valet ID: {{ exception.valetId }}</div>
+{% endif %}
 <code><pre>{{ exception.stackTrace }}</pre></code>
 {% if exception.requestBody %}
 <h5>Request body:</h5>

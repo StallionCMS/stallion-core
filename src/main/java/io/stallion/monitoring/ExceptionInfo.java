@@ -17,6 +17,7 @@
 
 package io.stallion.monitoring;
 
+import io.stallion.Context;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -43,6 +44,10 @@ public class ExceptionInfo {
     private String actualIp;
     private String outerMessage = "";
     private String outerClassName = "";
+    private String username;
+    private String email;
+    private Long userId;
+    private Long valetId;
 
     public static ExceptionInfo newForException(Throwable e) {
         ExceptionInfo info = new ExceptionInfo();
@@ -65,6 +70,12 @@ public class ExceptionInfo {
             info.setRequestBody(request().getContent());
         } catch (RuntimeException e2) {
             Log.info("Error logging the exception - could not get the request body: {0}", e2);
+        }
+        if (!Context.getUser().isAnon()) {
+            info.setEmail(Context.getUser().getEmail());
+            info.setUsername(Context.getUser().getUsername());
+            info.setUserId(Context.getUser().getId());
+            info.setValetId(Context.getValetUserId());
         }
         return info;
     }
@@ -152,6 +163,42 @@ public class ExceptionInfo {
 
     public ExceptionInfo setActualIp(String actualIp) {
         this.actualIp = actualIp;
+        return this;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public ExceptionInfo setUsername(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public ExceptionInfo setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public ExceptionInfo setUserId(Long userId) {
+        this.userId = userId;
+        return this;
+    }
+
+    public Long getValetId() {
+        return valetId;
+    }
+
+    public ExceptionInfo setValetId(Long valetId) {
+        this.valetId = valetId;
         return this;
     }
 }
