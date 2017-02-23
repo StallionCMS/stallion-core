@@ -11,7 +11,7 @@
 <hr>
 <div class="title">{{ exception.className }} <span class="message">{{ exception.message }}</span></div>
 <div class="soft">On {{ utils.formatLocalDate(exception.thrownAt) }}</div>
-<div>{{ exception.requestMethod }} {{ exception.requestUrl }}</div>
+<div>{{ exception.requestMethod }} {{ exception.requestUrlWithQuery }}</div>
 <div>IP Address: {{ exception.actualIp }}</div>
 {% if exception.id or exception.username %}
 <div>Email: {{ exception.email }}</div>

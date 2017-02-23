@@ -37,6 +37,7 @@ public class ExceptionInfo {
     private ZonedDateTime thrownAt;
     private String stackTrace;
     private String requestUrl;
+    private String requestUrlWithQuery;
     private String requestMethod;
     private Map<String, String> requestHeaders;
     private String requestBody = "";
@@ -58,7 +59,8 @@ public class ExceptionInfo {
         }
         info.className = e.getClass().getSimpleName();
         info.message = e.getMessage();
-        info.requestUrl = request().requestUrl();
+        info.requestUrl = request().getRequestUrl();
+        info.requestUrlWithQuery = request().getRequestUrlWithQuery();
         info.requestMethod = request().getMethod();
         info.remoteAddr = request().getRemoteAddr();
         info.actualIp = request().getActualIp();
@@ -122,6 +124,15 @@ public class ExceptionInfo {
 
     public void setRequestUrl(String requestUrl) {
         this.requestUrl = requestUrl;
+    }
+
+    public String getRequestUrlWithQuery() {
+        return requestUrlWithQuery;
+    }
+
+    public ExceptionInfo setRequestUrlWithQuery(String requestUrlWithQuery) {
+        this.requestUrlWithQuery = requestUrlWithQuery;
+        return this;
     }
 
     public String getRequestMethod() {
