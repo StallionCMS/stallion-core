@@ -19,7 +19,10 @@
 <div>User ID: {{ exception.userId }}</div>
 <div>Valet ID: {{ exception.valetId }}</div>
 {% endif %}
-<code><pre>{{ exception.stackTrace }}</pre></code>
+<code><pre>
+{% for line in exception.stackTraces %}{{ line }}
+{% endfor %}
+</pre></code>
 {% if exception.requestBody %}
 <h5>Request body:</h5>
 <code><pre>{{ exception.requestBody }}</pre></code>

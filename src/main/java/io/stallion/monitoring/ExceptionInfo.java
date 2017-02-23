@@ -35,7 +35,7 @@ public class ExceptionInfo {
     private String className;
     private String message;
     private ZonedDateTime thrownAt;
-    private String stackTrace;
+    private String[] stackTraces;
     private String requestUrl;
     private String requestUrlWithQuery;
     private String requestMethod;
@@ -53,7 +53,7 @@ public class ExceptionInfo {
     public static ExceptionInfo newForException(Throwable e) {
         ExceptionInfo info = new ExceptionInfo();
         info.thrownAt = utcNow();
-        info.stackTrace = ExceptionUtils.getStackTrace(e);
+        info.stackTraces = ExceptionUtils.getRootCauseStackTrace(e);
         if (e instanceof InvocationTargetException) {
             e = ((InvocationTargetException)e).getTargetException();
         }
@@ -110,12 +110,13 @@ public class ExceptionInfo {
         this.thrownAt = thrownAt;
     }
 
-    public String getStackTrace() {
-        return stackTrace;
+    public String[] getStackTraces() {
+        return stackTraces;
     }
 
-    public void setStackTrace(String stackTrace) {
-        this.stackTrace = stackTrace;
+    public ExceptionInfo setStackTraces(String[] stackTraces) {
+        this.stackTraces = stackTraces;
+        return this;
     }
 
     public String getRequestUrl() {

@@ -21,6 +21,8 @@ import io.stallion.email.ContactableEmailer;
 import io.stallion.users.User;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
+import io.stallion.utils.json.JSON;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;
 import java.time.format.DateTimeFormatter;
@@ -58,7 +60,7 @@ public class ExceptionEmailRunnable implements Runnable {
         @Override
         public String getUniqueKey() {
             ExceptionInfo ex = (ExceptionInfo)getContext().get("exceptionInfo");
-            String hash = GeneralUtils.md5Hash(ex.getStackTrace());
+            String hash = GeneralUtils.md5Hash(StringUtils.join(ex.getStackTraces(), "\n"));
             String minute = utcNow().format(DateUtils.MINUTE_FORMAT);
             return "exception-" + hash + "-" + GeneralUtils.slugify(minute);
         }
