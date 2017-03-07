@@ -170,9 +170,10 @@ public class Booter {
 
         // Execute the action
         action.loadApp(options);
+        for (StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
+            plugin.preExecuteAction(action.getActionName(), options);
+        }
         action.execute(options);
-
-
 
         if (!AppContextLoader.isNull()) {
             AppContextLoader.shutdown();

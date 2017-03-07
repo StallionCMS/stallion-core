@@ -19,11 +19,7 @@ package io.stallion.dataAccess.db;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-import io.stallion.dataAccess.AlternativeKey;
-import io.stallion.dataAccess.DynamicModelDefinition;
-import io.stallion.dataAccess.Tickets;
-import io.stallion.dataAccess.UniqueKey;
-import io.stallion.dataAccess.Model;
+import io.stallion.dataAccess.*;
 import io.stallion.dataAccess.db.converters.*;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
@@ -37,7 +33,10 @@ import io.stallion.utils.StallionClassLoader;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.handlers.*;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -535,6 +534,7 @@ public class DB {
             try {
                 return runner.query(sql, handler, args);
             } catch (SQLException e) {
+                Log.exception(e.getNextException(), "Root exception in query");
                 throw new RuntimeException(e);
             }
         }
@@ -552,10 +552,12 @@ public class DB {
      */
     public <T> List<T> queryBean(Class<T> model, String sql, Object ...args) {
         QueryRunner runner = new QueryRunner(dataSource);
+        //BeanListHandler<T> handler = new BeanListHandler(model);
         BeanListHandler<T> handler = new BeanListHandler(model);
         try {
             return runner.query(sql, handler, args);
         } catch (SQLException e) {
+            Log.exception(e.getNextException(), "Root exception in queryBean");
             throw new RuntimeException(e);
         }
     }
@@ -1114,6 +1116,53 @@ public class DB {
         List<Map<String, Object>> columns = DB.instance().findRecords("SHOW COLUMNS FROM `" + tableName + "` WHERE field=?", column);
         return columns.size() > 0;
     }
+
+    public SqlAndParams toInQueryParams(List things) {
+        SqlAndParams o = new SqlAndParams();
+        StringBuffer buf = new StringBuffer();
+        buf.append("(");
+        for (Object thing: things) {
+            buf.append("?,");
+        }
+        String sql = StringUtils.strip(buf.toString(), ",");
+        sql = sql + ")";
+        o.setSql(sql);
+        o.setParamsList(things);
+        return o;
+    }
+
+    public static class SqlAndParams {
+        private List<Object> paramsList;
+        private Object[] params;
+        private String sql;
+
+
+        public List<Object> getParamsList() {
+            return paramsList;
+        }
+
+        public SqlAndParams setParamsList(List<Object> paramsList) {
+            this.paramsList = paramsList;
+            return this;
+        }
+
+
+        public Object[] getParams() {
+            return asArray(getParamsList(), Object.class);
+        }
+
+
+        public String getSql() {
+            return sql;
+        }
+
+        public SqlAndParams setSql(String sql) {
+            this.sql = sql;
+            return this;
+        }
+    }
+
+
 
     /**
      * Get the table schema for a given model class

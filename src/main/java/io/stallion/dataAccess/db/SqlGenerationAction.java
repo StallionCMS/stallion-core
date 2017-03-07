@@ -228,7 +228,14 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
                 sql.append(" NOT NULL");
             }
             if (col.getDefaultValue() != null) {
-                sql.append(" DEFAULT '" + col.getDefaultValue().toString().replace("'", "\'") + "'");
+                Object defaultValue = col.getDefaultValue();
+                if (col.getDefaultValue().equals(true)) {
+                    sql.append(" DEFAULT 1 ");
+                } else if (defaultValue.equals(false)) {
+                    sql.append(" DEFAULT 0 ");
+                } else {
+                    sql.append(" DEFAULT '" + defaultValue.toString().replace("'", "\'") + "'");
+                }
             }
             i++;
             if (i != columns.size()) {

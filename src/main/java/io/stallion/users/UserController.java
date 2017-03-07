@@ -174,8 +174,11 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         if (userCookie == null) {
             return false;
         }
+        return checkCookieAndAuthorizeForCookieValue(userCookie.getValue());
+    }
+    public boolean checkCookieAndAuthorizeForCookieValue(String cookieValue) {
         try {
-            UserValetResult result = UserController.instance().cookieStringToUser(userCookie.getValue());
+            UserValetResult result = UserController.instance().cookieStringToUser(cookieValue);
             if (result != null && result.getUser() != null) {
                 Context.setUser(result.getUser());
                 if (result.getValet() != null) {

@@ -53,7 +53,9 @@ public class RequestHandler extends AbstractHandler {
     }
 
     public void handle(String path, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-
+        if (path.startsWith("/st-wsroot")) {
+            return;
+        }
         StRequest stRequest = new StRequest(path, baseRequest, request);
         StResponse stResponse = new StResponse(response);
         handleStallionRequest(stRequest, stResponse);

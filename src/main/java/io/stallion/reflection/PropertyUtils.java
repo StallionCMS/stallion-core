@@ -36,7 +36,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -481,6 +484,14 @@ public final class PropertyUtils {
                 return ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) value), GeneralUtils.UTC);
             }
         }
+
+        if (destinationClass == ZonedDateTime.class && value instanceof Timestamp) {
+            return ZonedDateTime.ofInstant(((Timestamp) value).toInstant(), UTC);
+        }
+        if (destinationClass == Long.class && value instanceof BigInteger) {
+            return ((BigInteger) value).longValue();
+        }
+
         if (destinationClass == ZonedDateTime.class && (value.getClass() == double.class || value.getClass() == Double.class)) {
             return ZonedDateTime.ofInstant(Instant.ofEpochMilli(Math.round((Double)value)), GeneralUtils.UTC);
         }

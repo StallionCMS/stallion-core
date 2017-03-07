@@ -17,6 +17,8 @@
 
 package io.stallion.plugins;
 
+import io.stallion.boot.CommandOptionsBase;
+import io.stallion.boot.ServeCommandOptions;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.ModelBase;
@@ -30,6 +32,8 @@ import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.JavaRestEndpoint;
 import io.stallion.restfulEndpoints.ResourceToEndpoints;
 import io.stallion.services.Log;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +47,10 @@ public abstract class StallionJavaPlugin {
 
     public List<String> getSqlMigrations() {
         return list();
+    }
+
+    public void preExecuteAction(String action, CommandOptionsBase options) {
+
     }
 
     /**
@@ -82,6 +90,14 @@ public abstract class StallionJavaPlugin {
 
     }
 
+    public void preStartJetty(Server server, HandlerCollection handlerCollection, ServeCommandOptions options) {
+
+    }
+
+    public void postStartJetty(Server server, ServeCommandOptions options) {
+
+    }
+
     /**
      * Called by AppContextLoader.startServicesForTests(), which is called when loading
      * an app context via the BaseIntegrationTestCase JUnit test case base class.
@@ -91,6 +107,13 @@ public abstract class StallionJavaPlugin {
 
     }
 
+
+    /**
+     * Override this to shutdown services when the Stallion AppContext shutsdown
+     */
+    public void shutdownJetty(Server server) {
+
+    }
 
     /**
      * Override this to shutdown services when the Stallion AppContext shutsdown

@@ -20,6 +20,7 @@ package io.stallion.boot;
 import io.stallion.Context;
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.plugins.PluginRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.requests.RequestHandler;
 import io.stallion.restfulEndpoints.RestEndpointBase;
@@ -27,7 +28,9 @@ import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -67,9 +70,20 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
 
         // Start the server
         Server server = new Server(Settings.instance().getPort());
-        server.setHandler(RequestHandler.instance());
+
+        HandlerCollection handlerCollection = new HandlerCollection();
+        handlerCollection.setServer(server);
+        handlerCollection.setHandlers(new Handler[] {});
+
+        for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
+            plugin.preStartJetty(server, handlerCollection, options);
+        }
+
+        handlerCollection.addHandler(RequestHandler.instance());
 
 
+
+        server.setHandler(handlerCollection);
         server.start();
 
         System.out.print("-------------------------------------------------------\n");
@@ -91,6 +105,10 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
             MainRunner.setupWatchers(Settings.instance().getTargetFolder());
         }
 
+        for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
+            plugin.postStartJetty(server, options);
+        }
+
 
         System.out.print("-------------------------------------------------------\n");
         String art = "" +
@@ -107,8 +125,15 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
 
         server.join();
 
+        System.out.println("Shutting down plugins");
+        for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
+            plugin.shutdownJetty(server);
+        }
+
         System.out.println("Shutting down async coordinator");
         AsyncCoordinator.gracefulShutdown();
+
+
 
     }
 
