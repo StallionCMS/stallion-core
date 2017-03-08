@@ -33,12 +33,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static io.stallion.utils.Literals.*;
 
 
 public class DbPersister<T extends Model> extends BasePersister<T> {
-    private long lastSyncAt = 0;
+    private long lastSyncAt = ZonedDateTime.now(UTC).toInstant().toEpochMilli();
     private String tableName = "";
     private String sortField = "id";
     private String sortDirection = "ASC";
@@ -110,6 +112,9 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
         return true;
     }
 
+
+    final ReentrantLock syncLock = new ReentrantLock();
+
     @Override
     public void onPreRead() {
         // Check to see if we have read this bucket yet, for this request
@@ -124,10 +129,22 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
         if (!checkNeedsSync()) {
             return;
         }
-        boolean hasChanges = syncFromDatabase();
-        if (hasChanges) {
-            FilterCache.clearBucket(getBucket());
+        try {
+            if (syncLock.tryLock(10, TimeUnit.SECONDS)) {
+                if (lastSyncAt < (mils() - 15000)) {
+                    return;
+                }
+                boolean hasChanges = syncFromDatabase();
+                if (hasChanges) {
+                    FilterCache.clearBucket(getBucket());
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (syncLock.isHeldByCurrentThread()) syncLock.unlock();
         }
+
     }
 
 
