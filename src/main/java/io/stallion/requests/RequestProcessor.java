@@ -272,7 +272,7 @@ class RequestProcessor {
         if (!empty(item.getContentType())) {
             response.setContentType(item.getContentType());
         }
-        markHandled(200, "slug->displayableItemController for id={0} slug={1} controller={2}", baseItem.getId(), item.getSlug(), baseItem.getController().getClass().getName());
+        markHandled(200, MessageFormat.format("slug->displayableItemController for id={0} slug={1} controller={2}", baseItem.getId(), item.getSlug(), baseItem.getController().getClass().getName()));
         String output = ((DisplayableModelController)baseItem.getController()).render(item, ctx);
         sendContentResponse(output);
     }
@@ -312,7 +312,7 @@ class RequestProcessor {
         } else if (result != null) {
             response.getMeta().setTitle(result.getPageTitle());
             response.getMeta().setDescription(result.getMetaDescription());
-            markHandled(200, "templateRenderer for template {0}", result.getTemplate());
+            markHandled(200, MessageFormat.format("templateRenderer for template {0}", result.getTemplate()));
             output = TemplateRenderer.instance().renderTemplate(result.getTemplate(), routeResultToContext(result));
             sendContentResponse(output);
         }
@@ -763,9 +763,8 @@ class RequestProcessor {
         Log.logForFrame(2, Level.FINE, "handler=\"{0}\" {1}={2}", msg, request.getMethod(), request.getPath());
     }
 
-    public void markHandled(int status, String message, Object...args) {
+    public void markHandled(int status, String message) {
         response.setStatus(status);
-        message = MessageFormat.format(message, args);
         Log.logForFrame(2, Level.FINE, "status={0} handler=\"{1}\" {2}={3}", status, message, request.getMethod(), request.getPath());
     }
 
