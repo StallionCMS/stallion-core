@@ -19,6 +19,7 @@ package io.stallion.dataAccess.filtering;
 
 import org.apache.commons.beanutils.BeanComparator;
 
+import javax.persistence.Column;
 import java.util.List;
 
 /**
@@ -36,6 +37,7 @@ class FilterOperation {
     private Boolean hasDot = null;
     private boolean orOperation;
     private List<FilterOperation> orSubOperations;
+    private boolean caseInsensitive = false;
 
     public boolean hasDot() {
         if (hasDot == null) {
@@ -139,6 +141,15 @@ class FilterOperation {
 
     public FilterOperation setOrSubOperations(List<FilterOperation> orSubOperations) {
         this.orSubOperations = orSubOperations;
+        return this;
+    }
+
+    public boolean isCaseInsensitive() {
+        return caseInsensitive;
+    }
+
+    public FilterOperation setCaseInsensitive(boolean caseInsensitive) {
+        this.caseInsensitive = caseInsensitive;
         return this;
     }
 }

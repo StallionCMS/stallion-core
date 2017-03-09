@@ -27,4 +27,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueKey {
+    public boolean caseInsensitive() default false;
 }

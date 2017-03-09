@@ -21,6 +21,8 @@ package io.stallion.dataAccess.db;
 import io.stallion.dataAccess.db.converters.AttributeConverter;
 import io.stallion.dataAccess.db.converters.JavascriptDbColumnConverter;
 
+import javax.persistence.Column;
+
 /**
  * This class is used internally when reflecting over a Java model and converting it into
  * a table schema.
@@ -32,6 +34,7 @@ public class Col {
     private Class jType = String.class;
     private Boolean alternativeKey = false;
     private Boolean uniqueKey = false;
+    private Boolean caseInsensitive = false;
     private Boolean updateable = true;
     private Boolean insertable = true;
     private String converterClassName = "";
@@ -176,6 +179,19 @@ public class Col {
 
     public Col setUniqueKey(Boolean uniqueKey) {
         this.uniqueKey = uniqueKey;
+        return this;
+    }
+
+    /**
+     * Whether filtering should be case insensitive
+     * @return
+     */
+    public Boolean getCaseInsensitive() {
+        return caseInsensitive;
+    }
+
+    public Col setCaseInsensitive(Boolean caseInsensitive) {
+        this.caseInsensitive = caseInsensitive;
         return this;
     }
 

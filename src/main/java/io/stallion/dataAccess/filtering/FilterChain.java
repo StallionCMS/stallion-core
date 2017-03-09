@@ -166,6 +166,30 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      * @param op
      * @return
      */
+    public FilterChain<T> filterBy(String name, Object value, FilterOperator op, boolean caseInsensitive) {
+
+        FilterOperation fop = new FilterOperation();
+        fop.setCaseInsensitive(caseInsensitive);
+        fop.setFieldName(name);
+        fop.setOperator(op);
+        fop.setOriginalValue(value);
+        if (caseInsensitive && value instanceof String) {
+            fop.setOriginalValue(((String) value).toLowerCase());
+        }
+        if (value instanceof Iterable) {
+            fop.setIterable(value);
+        }
+        return cloneChainAndAddOperation(fop);
+    }
+
+
+    /**
+     * Add a filter to the chain with a custom operator
+     * @param name
+     * @param value
+     * @param op
+     * @return
+     */
     public FilterChain<T> filterBy(String name, Comparable value, FilterOperator op) {
         FilterOperation fop = new FilterOperation();
         fop.setFieldName(name);
@@ -867,6 +891,10 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         }
         if (propValue == null && op.getOriginalValue() == null && op.getOperator().equals(FilterOperator.EQUAL)) {
             return true;
+        }
+
+        if (op.isCaseInsensitive() && propValue instanceof String) {
+            propValue = ((String) propValue).toLowerCase();
         }
 
         // Handle the IN operator

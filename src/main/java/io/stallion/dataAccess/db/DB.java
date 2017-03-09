@@ -1019,6 +1019,8 @@ public class DB {
             }
             if (method.getAnnotation(UniqueKey.class) != null) {
                 col.setUniqueKey(true);
+                UniqueKey uk = (UniqueKey)method.getAnnotation(UniqueKey.class);
+                col.setCaseInsensitive(uk.caseInsensitive());
                 schema.getKeyNames().add(col.getName());
             }
             if (columnAnno.unique()) {

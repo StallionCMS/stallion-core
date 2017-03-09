@@ -53,6 +53,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
     protected Map<String, Map<Object, Set<T>>> keyNameToKeyToValue;
     protected Map<String, Map<Object, T>> keyNameToUniqueKeyToValue;
     protected List<Col> columns;
+    protected Set<String> uniqueFieldsCaseInsensitive = set();
 
     @Override
     public void init(DataAccessRegistration registration, ModelController<T> controller, Persister<T> persister) {
@@ -102,6 +103,9 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         if (!empty(columns)) {
             for (Col col: columns) {
                 if (col.getUniqueKey()) {
+                    if (true == col.getCaseInsensitive()) {
+                        this.uniqueFieldsCaseInsensitive.add(col.getPropertyName());
+                    }
                     this.keyNameToUniqueKeyToValue.put(col.getPropertyName(), new HashMap<Object, T>());
                 } else if (col.getAlternativeKey()) {
                     this.keyNameToKeyToValue.put(col.getPropertyName(), new HashMap<Object, Set<T>>());
@@ -333,7 +337,11 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         }
         for (String uniqueKey : keyNameToUniqueKeyToValue.keySet()) {
             Object val = PropertyUtils.getPropertyOrMappedValue(item, uniqueKey);
+
             if (val != null) {
+                if (this.uniqueFieldsCaseInsensitive.contains(uniqueKey) && val instanceof String) {
+                    val = ((String) val).toLowerCase();
+                }
                 this.keyNameToUniqueKeyToValue.get(uniqueKey).put(val, item);
             }
         }

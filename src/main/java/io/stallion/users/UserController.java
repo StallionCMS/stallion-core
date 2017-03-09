@@ -25,6 +25,7 @@ import io.stallion.dataAccess.StandardModelController;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.dataAccess.file.JsonFilePersister;
+import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.email.ContactableEmailer;
 import io.stallion.exceptions.ClientException;
 import io.stallion.requests.StRequest;
@@ -99,7 +100,9 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
     public T forEmail(String email)  {
         // TODO make lookup by key work
-        T user = filter("email", email).first();
+        T user = filterChain()
+                .filterBy("email", email, FilterOperator.EQUAL, true)
+                .first();
         if (user == null) {
             return null;
         }
@@ -111,7 +114,9 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
     public T forUsername(String username) {
         // TODO make lookup by key work
-        T user = filter("username", username).first();
+        T user = filterChain()
+                .filterBy("username", username, FilterOperator.EQUAL, true)
+                .first();
         if (user != null && !empty(user.getAliasForId())) {
             user = forId(user.getAliasForId());
         }
