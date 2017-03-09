@@ -117,6 +117,7 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
 
     @Override
     public void onPreRead() {
+        Long now = mils();
         // Check to see if we have read this bucket yet, for this request
         if (Context.getRequest() == null || Context.getRequest().getItems() == null) {
             return;
@@ -131,7 +132,8 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
         }
         try {
             if (syncLock.tryLock(10, TimeUnit.SECONDS)) {
-                if (lastSyncAt < (mils() - 15000)) {
+                // Was synced by other thread, skipping
+                if (lastSyncAt >= now) {
                     return;
                 }
                 boolean hasChanges = syncFromDatabase();

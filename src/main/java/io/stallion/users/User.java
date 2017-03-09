@@ -65,7 +65,7 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
 
     @Override
     @Column
-    @UniqueKey
+    @UniqueKey(caseInsensitive = true)
     @JsonView(RestrictedViews.Member.class)
     public String getUsername() {
         return username;
@@ -121,7 +121,7 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
 
     @Override
     @Column
-    @UniqueKey
+    @UniqueKey(caseInsensitive = true)
     @JsonView(RestrictedViews.Member.class)
     public String getEmail() {
         return email;
