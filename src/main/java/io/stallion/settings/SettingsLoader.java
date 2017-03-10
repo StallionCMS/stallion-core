@@ -23,6 +23,7 @@ import io.stallion.boot.CommandOptionsBase;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.secrets.SecretsVault;
 import io.stallion.services.Log;
+import io.stallion.settings.childSections.CustomSettings;
 import io.stallion.settings.childSections.SecretsSettings;
 import io.stallion.settings.childSections.SettingsSection;
 
@@ -143,6 +144,21 @@ public class SettingsLoader  {
 
     public void assignDefaultsFromAnnotations(Object settings) throws IllegalAccessException, InstantiationException {
         Class cls = settings.getClass();
+
+        if (settings instanceof CustomSettings) {
+            CustomSettings cs = (CustomSettings) settings;
+            for(String key: cs.keySet()) {
+                Object value = cs.get(key);
+                if (value instanceof  String && ((String) value).startsWith("secret:::")) {
+                    String secretName = ((String) value).substring(9);
+                    Log.info("Load secret {0} ", secretName);
+                    value = SecretsVault.getAppSecrets().getOrDefault(secretName, null);
+                    cs.put(key, value);
+                }
+
+            }
+        }
+
         for(Field field: cls.getDeclaredFields()) {
             boolean isAccessible = field.isAccessible();
             field.setAccessible(true);
