@@ -44,6 +44,8 @@ public class AssetsControllerSafeWrapper {
         return assets.resource(path, plugin, developerUrl);
     }
 
+
+
     public String pageFooterLiterals() {
         return assets.pageHeadLiterals();
     }
@@ -54,6 +56,10 @@ public class AssetsControllerSafeWrapper {
 
     public String bundle(String fileName) {
         return assets.bundle(fileName);
+    }
+
+    public String bundle(String plugin, String fileName) {
+        return assets.bundle(plugin, fileName);
     }
 
     public String url(String path) {

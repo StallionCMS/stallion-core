@@ -60,6 +60,11 @@ public class S3StorageService extends CloudStorageService {
         client =  new AmazonS3Client(credentials);
     }
 
+    @Override
+    public String getBucketBaseUrl(String bucket) {
+        return "https://s3.amazonaws.com/" + bucket;
+    }
+
     public void uploadFile(File file, String bucket, String fileKey, boolean isPublic) {
         String contentType = GeneralUtils.guessMimeType(fileKey);
         uploadFile(file, bucket, fileKey, isPublic, contentType, null);
@@ -84,6 +89,13 @@ public class S3StorageService extends CloudStorageService {
         req.setMetadata(meta);
         client.putObject(req);
 
+    }
+
+    public String getSignedDownloadUrl(String bucket, String fileKey) {
+        GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(bucket, fileKey);
+        req.setExpiration(Date.from(utcNow().plusMinutes(60).toInstant()));
+        req.setMethod(HttpMethod.GET);
+        return client.generatePresignedUrl(req).toString();
     }
 
     public String getSignedUploadUrl(String bucket, String fileKey, String contentType, Map headers) {

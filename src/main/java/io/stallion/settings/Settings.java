@@ -49,6 +49,7 @@ public class Settings implements ISettings {
     private CorsSettings cors = null;
     private OAuthSettings oAuth;
     private SecretsSettings secrets;
+    private UserUploadSettings userUploads;
 
 
     // Site information
@@ -340,6 +341,12 @@ public class Settings implements ISettings {
         }
 
 
+        if (empty(userUploads.getUploadsDirectory())) {
+            userUploads.setUploadsDirectory(getDataDirectory() + "/st-user-file-uploads");
+        }
+
+
+
     }
 
     /**
@@ -412,6 +419,16 @@ public class Settings implements ISettings {
 
     public void setUsers(UserSettings users) {
         this.users = users;
+    }
+
+
+    public UserUploadSettings getUserUploads() {
+        return userUploads;
+    }
+
+    public Settings setUserUploads(UserUploadSettings userUploads) {
+        this.userUploads = userUploads;
+        return this;
     }
 
     /**

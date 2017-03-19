@@ -20,6 +20,7 @@ import io.stallion.assets.AssetsController;
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
 
+import io.stallion.contentPublishing.UploadedFileEndpoints;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.Tickets;
@@ -182,6 +183,9 @@ public class AppContextLoader {
         ListingEndpoints.register();
         ListingExporter.register();
         JobStatusController.selfRegister();
+
+
+        UploadedFileEndpoints.registerIfEnabled();
 
         SimpleAsyncRunner.load();
 

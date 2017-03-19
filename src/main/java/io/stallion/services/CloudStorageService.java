@@ -53,6 +53,9 @@ public abstract class CloudStorageService {
         _instance = controller;
     }
 
+    public abstract String getBucketBaseUrl(String bucket);
+
+    public abstract String getSignedDownloadUrl(String bucket, String fileKey);
 
     public abstract String getSignedUploadUrl(String bucket, String fileKey, String contentType, Map headers);
 

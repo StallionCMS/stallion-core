@@ -182,6 +182,15 @@ public class JobCoordinator extends Thread {
         dispatcher.run();
     }
 
+    public void registerJob(JobComplete jobComplete) {
+        JobDefinition def = new JobDefinition()
+                .setAlertThresholdMinutes(jobComplete.getAlertThresholdMinutes())
+                .setJobClass(jobComplete.getClass())
+                .setName(jobComplete.getName())
+                .setSchedule(jobComplete.getSchedule());
+        doRegisterJob(def, utcNow());
+    }
+
     /**
      * Register the given job definition to be run as a recurring class
      *

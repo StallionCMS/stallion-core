@@ -1,0 +1,33 @@
+{% extends "base.jinja" %}
+{% block main_body %}
+<div class="posts">
+    <section class="post">
+        <header class="post-header">
+            <h2 class="post-title">{{ page.title }}</h2>
+        </header>
+        <div class="post-description">
+            <div>
+                {{ page.content }}
+            </div>
+            {% simple_form %}
+            <fieldset>
+                <legend>Contact us</legend>
+                <div class="st-form-success" style="display:none;">
+                    Thank you for reaching out, we will get back to you promptly!
+                </div>
+                <label for="name">Your name</label>
+                <input class="pure-input-1" name="name" type="text" placeholder="Your name" required="required">
+
+                <label for="email">Email</label>
+                <input class="pure-input-1" name="email" type="email" placeholder="Email" required="required">
+                <label>Your message</label>
+                <textarea class="pure-input-1" name="message" required="required"></textarea>
+                <p>
+                    <button type="submit" class="pure-button pure-button-primary">Get in touch</button>
+                </p>
+            </fieldset>
+            {% endform %}
+        </div>
+    </section>
+</div><!--end posts-->
+{% endblock %}

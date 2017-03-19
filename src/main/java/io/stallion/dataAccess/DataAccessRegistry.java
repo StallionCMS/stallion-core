@@ -149,6 +149,8 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
         }
     }
 
+
+
     public ModelController registerDbModel(Class<? extends Model> model, Class<? extends ModelController> controller) {
         return registerDbModel(model, controller, LocalMemoryStash.class);
     }
@@ -189,6 +191,36 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
                 .setModelClass(model);
         return register(registration);
     }
+
+    public ModelController registerDbOrFileModel(Class<? extends Model> model, Class<? extends ModelController> controller, String bucket) {
+        Table anno = model.getAnnotation(Table.class);
+        if (anno == null) {
+            throw new UsageException("A @Table annotation is required on the model " + model.getCanonicalName() + " in order to register it.");
+        }
+        bucket = or(bucket, anno.name());
+        String table = anno.name();
+        DataAccessRegistration registration = new DataAccessRegistration()
+                .setDatabaseBacked(true)
+                .setPersisterClass(DbPersister.class)
+                .setBucket(bucket)
+                .setTableName(table)
+                .setControllerClass(controller)
+                .setStashClass(PartialStash.class)
+                .setModelClass(model);
+        if (!DB.available()) {
+            registration
+                    .setDatabaseBacked(false)
+                    .setPersisterClass(JsonFilePersister.class)
+                    .setStashClass(LocalMemoryStash.class)
+                    .setPath(bucket)
+                    .setUseDataFolder(true)
+                    .setShouldWatch(true)
+                    .setWritable(true)
+                    ;
+        }
+        return register(registration);
+    }
+
 
     /**
      * Registers the data store defined by the passed in DalRegistration.  Does everything

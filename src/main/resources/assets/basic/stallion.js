@@ -81,6 +81,7 @@ if (window.$ && !window.jQuery) {
         if (!req.error) {
             req.error = st.defaultRequestErrorHandler;
         }
+        
 
         var method = req.method || 'get';
         var dataString = req.data;
@@ -101,40 +102,62 @@ if (window.$ && !window.jQuery) {
             contentType: 'application/json',
             dataType: 'json'
         }).success(function(obj) {
-            if (spinner) {
-                spinner.clear();
-            }
-            if (req.success) {
-                req.success(obj);
+            try {
+                if (spinner) {
+                    spinner.clear();
+                }
+                if (req.success) {
+                    req.success(obj);
+                }
+            } finally {
+                if (req.always) {
+                    req.always(obj);
+                }
             }
         }).error(function(xhr) {
-            if (spinner) {
-                spinner.clear();
-            }
-            // Don't give an error message for cases where the error happens from navigating away from the page
-            // before we have finished a request.
-            if (xhr.readyState != 4) {
-                return;
-            }
-            var o;
             try {
-                o = JSON.parse(xhr.responseText);
-            } catch(e) {
-                o = {message: xhr.responseText};
+                if (spinner) {
+                    spinner.clear();
+                }
+                // Don't give an error message for cases where the error happens from navigating away from the page
+                // before we have finished a request.
+                if (xhr.readyState != 4) {
+                    return;
+                }
+                var o;
+                try {
+                    o = JSON.parse(xhr.responseText);
+                } catch(e) {
+                    o = {message: xhr.responseText};
+                }
+                if (!o.message) {
+                    o.message = 'Error processing request';
+                }
+                
+                req.error(o, req.form, xhr);
+                
+            } finally {
+                if (req.always) {
+                    req.always(xhr);
+                }
             }
-            if (!o.message) {
-                o.message = 'Error processing request';
-            }
-
-            req.error(o, req.form, xhr);
-
         });
     };
 
     st.tryMakeSpinner = function(form) {
-        
         var $form = $(form);
-        var $btn = $form.find(' .st-button-submit');
+        var $btn = [];
+        if ($form.get(0) && $form.get(0).tagName === 'BUTTON') {
+            $btn = $form;
+        }
+        if (!$btn.length) {
+            if ($form.hasClass('.btn') || $form.hasClass('.pure-button')) {
+                $btn = $form;
+            }
+        }
+        if (!$btn.length) {
+            $btn = $form.find(' .st-button-submit');
+        }
         if (!$btn.length) {
             $btn = $form.find('.pure-button-primary[type="submit"]');
         }
@@ -281,6 +304,48 @@ if (window.$ && !window.jQuery) {
             setTimeout(function() { $div.remove(); }, 6000);
         }
     };
+
+    st.debounce = function(func, wait, immediate) {
+	var timeout;
+	return function() {
+	    var context = this, args = arguments;
+	    var later = function() {
+		timeout = null;
+		if (!immediate) func.apply(context, args);
+	    };
+	    var callNow = immediate && !timeout;
+	    clearTimeout(timeout);
+	    timeout = setTimeout(later, wait);
+	    if (callNow) func.apply(context, args);
+	};
+    };
+    
+    st.slugify = function(text) {
+        return text.toString().toLowerCase()
+            .replace(/\s+/g, '-')           // Replace spaces with -
+            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+            .replace(/^-+/, '')             // Trim - from start of text
+            .replace(/-+$/, '');            // Trim - from end of text
+    };
+    
+    st.generateUUID = function() {
+       var d = new Date().getTime();
+       if(window.performance && typeof window.performance.now === "function"){
+           d += performance.now(); //use high-precision timer if available
+       }
+       var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+           var r = (d + Math.random()*16)%16 | 0;
+           d = Math.floor(d/16);
+           return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+       });
+       return uuid;
+    };
+
+    st.toTitleCase = function(str) {
+        return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    }
+    
     
     
 }());

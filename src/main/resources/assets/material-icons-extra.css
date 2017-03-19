@@ -1,0 +1,75 @@
+
+
+.material-icons.material-bold:after {
+    content: "format_bold";
+}
+
+.material-icons.material-italic:after {
+    content: "format_italic";
+}
+
+.material-icons.material-format-size:after {
+    content: "format_size";
+}
+
+.material-icons.material-link:after {
+    content: "link";
+}
+
+.material-icons.material-image:after {
+    content: "image";
+}
+
+.material-icons.material-format-list-bulleted:before {
+    content: "format_list_bulleted";
+}
+
+.material-icons.material-format-list-numbered:before {
+    content: "\E242";
+    /* "material_format_list_numbered";
+    // <i class="material-icons">;</i>
+   */
+}
+
+.material-icons.material-format-quote:after {
+    content: "format_quote";
+}
+
+.material-icons.material-code:after {
+    content: "code";
+}
+
+.material-icons.material-search:after {
+    content: "search";
+}
+
+.material-icons.material-fullscreen:after {
+    content: "fullscreen";
+}
+
+
+.material-icons.material-strikethrough-s:after {
+    content: "strikethrough_s";
+}
+
+.material-icons.material-add-to-photos:after {
+    content: "add_to_photos";
+}
+
+.material-icons.material-content-paste:after {
+    content: "content_paste";
+}
+
+.material-icons.material-undo:after {
+    content: "undo";
+}
+
+.material-icons.material-redo:after {
+    content: "redo";
+}
+
+
+
+.material-icons.material-local-drink:after {
+    content: "local_drink";
+}

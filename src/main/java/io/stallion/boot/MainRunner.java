@@ -44,6 +44,7 @@ public class MainRunner
      * @throws Exception
      */
     public static void main( String[] args ) throws Exception {
+        System.setProperty("java.awt.headless", "true");
         mainWithPlugins(args);
     }
 

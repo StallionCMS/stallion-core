@@ -26,3 +26,4 @@ build.ipy
 makedocs.ipy
 .sass-cache
 src/test/resources/a_minimal_site/app-data/
+src/test/resources/ui_demo/app-data/
