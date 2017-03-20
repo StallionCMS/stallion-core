@@ -11,18 +11,23 @@
              line-height: 1em;
          }
      }
+     .btn-toolbar .btn-default.btn-insert {
+         width: 80px;
+         height: 30px;
+     }
      .btn-toolbar .btn .material-icons {
          font-size: 18px;
          line-height: 1em;
          vertical-align: -30%;
      }
+     
 
  }
 </style>
 
 <template>
     <div class="markdown-textarea-vue">
-        <textarea name="content" @input="onInput" @change="onChange" :value="markdown" data-provide="markdown" rows="10"></textarea>
+        <textarea name="content" @input="onInput" @change="onChange" v-model="markdown" data-provide="markdown" rows="10"></textarea>
         <text-editor-widget-modal v-if="widgetModalShown" :widget-type="newWidgetType" :widget="editingWidget" @confirmed="onConfirmedWidget" @close="widgetModalShown=false"></text-editor-widget-modal>
     </div>
 </template>
@@ -135,7 +140,8 @@
          },
          toHtml: function(originalContent) {
              var self = this;
-             var html = markdown.toHTML(originalContent);
+             var html = markdown.toHTML(originalContent, 'Maruku');
+             //html = sanitizeHtml(html);
              self.currentWidgets.forEach(function(widget) {
                  var reText = "\\[(" + widget.type.toUpperCase() + ") (" + widget.guid + ")\\]";
                  var re = new RegExp(reText, 'g');
@@ -245,39 +251,21 @@
                  return self.toHtml(editor.getContent());
              };
          }
-
+         config.hiddenButtons = 'cmdImage';
          if (!config.additionalButtons) {
              config.additionalButtons = [
                  [{
-                     name: "groupCustom",
+                     name: "groupLink",
                      data: [{
                          name: "cmdBeer",
                          toggle: false, // this param only take effect if you load bootstrap.js
                          title: "Beer",
-                         icon: {material: "material-icons material-local-drink"},
+                         icon: '',
+                         btnText: 'Insert +',
+                         btnClass: 'btn btn-insert',
+                         //icon: {material: "material-icons material-local-drink"},
                          callback: function(e){
-
                              self.showWidgetModal();
-                             /*
-                             // Replace selection with some drinks
-                             var chunk, cursor,
-                                 selected = e.getSelection(), content = e.getContent(),
-                                 drinks = ["Heinekken", "Budweiser",
-                                           "Iron City", "Amstel Light",
-                                           "Red Stripe", "Smithwicks",
-                                           "Westvleteren", "Sierra Nevada",
-                                           "Guinness", "Corona", "Calsberg"],
-                                 index = Math.floor((Math.random()*10)+1)
-                                 // Give random drink
-                                 chunk = drinks[index]
-                             
-                             // transform selection and set the cursor into chunked text
-                             e.replaceSelection(chunk)
-                                 cursor = selected.start
-                             
-                             // Set the cursor
-                             e.setSelection(cursor,cursor+chunk.length)
-                             // */
                          }
                      }]
                  }]

@@ -7,11 +7,10 @@
 
 
 <template>
-    <div>
+    <div class="file-upload-target-vue">
         <form v-bind:action="formAction"
               class="my-dropzone st-file-dropzone dropzone"
               id="my-awesome-dropzone">
-            
         </form>        
     </div>
 </template>

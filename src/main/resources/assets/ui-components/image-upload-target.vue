@@ -1,6 +1,5 @@
 <template>
-    <div class="image-uploader">
-        <h3 class="title">Upload Image</h3>
+    <div class="image-upload-target-vue">
         <form :action="formAction"
               class="image-dropzone dropzone"
               id="my-image-dropzone">

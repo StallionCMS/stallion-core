@@ -33,7 +33,7 @@
                 </div>
                 <div class="p">
                     <image-library-chooser  v-if="tab==='chooser'" @chosen="onChosen"></image-library-chooser>
-                    <image-uploader v-if="tab==='uploader'" @uploaded="onChosen"></image-uploader>
+                    <image-upload-target v-if="tab==='uploader'" @uploaded="onChosen"></image-upload-target>
                 </div>
             </div>
             <div slot="footer">

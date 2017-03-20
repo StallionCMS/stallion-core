@@ -50,24 +50,12 @@
              okToInsert: true,
              insertLabel: 'Insert Widget',
              widgetConfigureTag: '',
-             widgetTypes: [
-                 {
-                     type: 'image',
-                     description: 'Image',
-                     buttonLabel: 'Insert Image',
-                     modalTitle: 'Choose Image to Insert',
-                     materialIcon: 'image'
-                 },
-                 {
-                     type: 'embed',
-                     materialIcon: 'code',
-                     description: 'HTML Embed (Youtube Video, Slideshare, etc.)'
-                 }
-             ]
+             widgetTypes: this.loadWidgetTypes()
          }
          
      },
      computed: {
+         
          modalTitle: function() {
              var self = this;
              if (self.$refs && self.$refs.active && self.$refs.active.getModalTitle) {
@@ -119,6 +107,25 @@
              self.activeWidget = activeWidget;
              self.widgetConfigureTag = this.widgetTypeToTag(activeWidget.type);
          },
+         loadWidgetTypes: function() {
+             if (this.$store && this.$store.state.widgetTypes) {
+                 return this.$store.state.widgetTypes;
+             }
+             return [
+                 {
+                     type: 'image',
+                     description: 'Image',
+                     buttonLabel: 'Insert Image',
+                     modalTitle: 'Choose Image to Insert',
+                     materialIcon: 'image'
+                 },
+                 {
+                     type: 'embed',
+                     materialIcon: 'code',
+                     description: 'HTML Embed (Youtube Video, Slideshare, etc.)'
+                 }
+             ];   
+         },         
          widgetTypeToTag: function(widgetType) {
              return widgetType + '-widget-configure';
          },

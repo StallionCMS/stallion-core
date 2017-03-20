@@ -18,6 +18,7 @@ basic/stallion.js
 /vendor/pikaday.css
 /vendor/sortable.js
 /vendor/select2.js
+/vendor/sanitize-html.js
 /vendor/to-markdown.js
 /vendor/markdown.js
 /vendor/bootstrap-markdown.js
