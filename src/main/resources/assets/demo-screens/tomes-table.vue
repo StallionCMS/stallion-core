@@ -29,7 +29,7 @@
     <div class="tomes-table-vue">
         <h3 v-if="isLoading">Loading &hellip;</h3>
         <div v-if="!isLoading">
-            <st-data-table ref="tometable" :infinite-scroll="true" :columns="columns" label="tome" :browser-url-template="'/tomes'" :data-url="'/st-publisher/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" :extra-data-fields="['checkedoutBooks', 'maxCheckouts']"  >
+            <st-data-table ref="tometable" :infinite-scroll="true" :columns="columns" label="tome" :browser-url-template="'/tomes'" :data-url="'/st-ui-demo/testing-tomes/tomes'" :route="$route" table-class="table table-striped" :single-click-editing="true" :extra-data-fields="['checkedoutBooks', 'maxCheckouts']"  >
                 <div class="filters-slot form-inline" slot="filters">
                     <select v-model="filterPrice" class="form-control price-filter" v-bind:class="{'empty-value': !filterPrice}" placeholder="Filter by price">
                         <option value=""> - Filter by price - </option>

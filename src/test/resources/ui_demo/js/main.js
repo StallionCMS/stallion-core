@@ -22,4 +22,5 @@ print("Running main.js");
 
     stallion.registerEndpoints(screens);
 
+    Packages.io.stallion.contentPublishing.liveTesting.TomeController.registerAll();
 }());
