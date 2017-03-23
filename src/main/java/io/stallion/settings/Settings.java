@@ -340,8 +340,7 @@ public class Settings implements ISettings {
             folders.add(new ContentFolder().setPath(targetFolder + "/pages").setType("markdown").setItemTemplate(getPageTemplate()));
         }
 
-
-        if (empty(userUploads.getUploadsDirectory())) {
+        if (userUploads != null && empty(userUploads.getUploadsDirectory())) {
             userUploads.setUploadsDirectory(getDataDirectory() + "/st-user-file-uploads");
         }
 

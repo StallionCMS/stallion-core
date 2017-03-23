@@ -37,6 +37,7 @@ public class Col {
     private Boolean caseInsensitive = false;
     private Boolean updateable = true;
     private Boolean insertable = true;
+    private Boolean virtual = false;
     private String converterClassName = "";
     private JavascriptDbColumnConverter jsDbColumnConverter = null;
     private Boolean nullable = true;
@@ -94,6 +95,17 @@ public class Col {
 
     public Col setUpdateable(Boolean updateable) {
         this.updateable = updateable; return this;
+    }
+
+
+    @Column
+    public Boolean getVirtual() {
+        return virtual;
+    }
+
+    public Col setVirtual(Boolean virtual) {
+        this.virtual = virtual;
+        return this;
     }
 
     /**

@@ -32,12 +32,19 @@ import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.JavaRestEndpoint;
 import io.stallion.restfulEndpoints.ResourceToEndpoints;
 import io.stallion.services.Log;
+import io.stallion.utils.ResourceHelpers;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import static io.stallion.utils.Literals.UTF8;
+import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.list;
 
 public abstract class StallionJavaPlugin {
@@ -46,6 +53,25 @@ public abstract class StallionJavaPlugin {
     public abstract String getPluginName();
 
     public List<String> getSqlMigrations() {
+        URL resource = getClass().getResource("/sql/migrations.txt");
+        if (resource != null) {
+            try {
+                List<String> migrations = list();
+                Log.fine("Found /sql/migrations file for plugin {0}", getClass().getCanonicalName());
+                for(String migration: IOUtils.toString(resource, UTF8).split("\\n")) {
+                    migration = StringUtils.strip(migration);
+                    if (migration.startsWith("#") || migration.startsWith("//")) {
+                        continue;
+                    }
+                    if (!empty(migration)) {
+                          migrations.add(migration);
+                    }
+                }
+                return migrations;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return list();
     }
 

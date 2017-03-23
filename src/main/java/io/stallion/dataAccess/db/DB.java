@@ -987,6 +987,12 @@ public class DB {
             if (!columnAnno.nullable()) {
                 col.setDefaultValue(PropertyUtils.getProperty(inst, propertyName));
             }
+            VirtualColumn virtualAnno = method.getAnnotation(VirtualColumn.class);
+            if (virtualAnno != null) {
+                col.setVirtual(true);
+                col.setInsertable(false);
+                col.setUpdateable(false);
+            }
 
             Converter converterAnno = method.getDeclaredAnnotation(Converter.class);
             Log.finest("Adding schema Column {0}", columnName);

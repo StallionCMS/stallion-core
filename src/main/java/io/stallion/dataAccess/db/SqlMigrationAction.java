@@ -73,15 +73,8 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
         createMigrationTrackingTableIfNotExists();
         // Get a ticket to make sure the tickets table is operational
         Long nonce = DB.instance().getTickets().nextId();
-        List<SqlMigration> migrations = getDefaultMigrations();
-        migrations.addAll(getUserMigrations());
         DB db = DB.instance();
-        for (SqlMigration migration: migrations) {
-            Long currentVersion = or(db.queryScalar("SELECT MAX(versionNumber) FROM stallion_sql_migrations WHERE appName=?", migration.getAppName()), 0L);
-            if (currentVersion >= migration.getVersionNumber()) {
-                Log.finer("File {0} is below current version of {1} for app {2}", migration.getFilename(), currentVersion, migration.getAppName());
-                continue;
-            }
+        for (SqlMigration migration: findNotRunMigrations()) {
             Log.info("Run migration app:" + migration.getAppName() + " file:" + migration.getFilename());
             if (migration.isJavascript()) {
                 ScriptEngine engine = getOrCreateScriptEngine();;
@@ -98,8 +91,22 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
                     migration.getVersionNumber(), migration.getAppName(), migration.getFilename()
             );
         }
+    }
 
-
+    public List<SqlMigration> findNotRunMigrations() {
+        List<SqlMigration> migrations = getDefaultMigrations();
+        migrations.addAll(getUserMigrations());
+        DB db = DB.instance();
+        List<SqlMigration> unRunMigrations = list();
+        for (SqlMigration migration: migrations) {
+            Long currentVersion = or(db.queryScalar("SELECT MAX(versionNumber) FROM stallion_sql_migrations WHERE appName=?", migration.getAppName()), 0L);
+            if (currentVersion >= migration.getVersionNumber()) {
+                Log.finer("File {0} is below current version of {1} for app {2}", migration.getFilename(), currentVersion, migration.getAppName());
+                continue;
+            }
+            unRunMigrations.add(migration);
+        }
+        return unRunMigrations;
     }
 
     public String transformJavascript(String source) {

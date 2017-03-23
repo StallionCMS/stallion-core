@@ -54,7 +54,7 @@ public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointRe
         this.fileController = fileController;
     }
     public static void registerIfEnabled() {
-        if (Settings.instance().getUserUploads().getEnabled()) {
+        if (Settings.instance().getUserUploads() != null && Settings.instance().getUserUploads().getEnabled()) {
             UploadedFileController.register();
             EndpointsRegistry.instance().addResource("", new UploadedFileEndpoints(UploadedFileController.instance()));
         }

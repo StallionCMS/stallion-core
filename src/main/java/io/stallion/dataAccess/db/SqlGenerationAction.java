@@ -94,6 +94,13 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
         //Set<Class<? extends ModelBase>> classes = reflections.getSubTypesOf(ModelBase.class);
         //Log.info("Model Count {0} {1}", classes.size(), classes);
         //classes = set(User.class);
+        List<SqlMigration> unRunMigrations = new SqlMigrationAction().findNotRunMigrations();
+        if (unRunMigrations.size() > 0) {
+            String unRunStr = StringUtils.join(apply(unRunMigrations, mig->mig.getFilename()), "\n");
+            throw new UsageException("\n\nYou have migrations that have not yet been executed: \n\n" + unRunStr + "\n\n Before generating new migrations based " +
+                    "on your models, you should run existing migrations to bring the database up to date. Run the 'sql-migrate' action in " +
+                    "order to execute all outstanding migrations.\n\n");
+        }
         boolean hasNewMigrations = false;
        // for (Class cls: classes) {
         List<Schema> schemas = DB.instance().getSchemas();
@@ -111,10 +118,7 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
             boolean shouldWrite = new Prompter("Write this script to file? ").yesNo();
             if (shouldWrite) {
                 lastMigrationNumber += 10;
-                String prefix = StringUtils.leftPad(lastMigrationNumber.toString(), 5, '0');
-                String file = Settings.instance().getTargetFolder() + "/sql/" + prefix + "-" + result.getChangePrefix()
-                        + ".mysql.js";
-                FileUtils.writeAllText(result.getSqlJs(), new File(file), Charset.forName("UTF-8"));
+                writeMigrationToFile(lastMigrationNumber, result);
                 hasNewMigrations = true;
             }
         }
@@ -127,11 +131,62 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
         }
     }
 
+    public void writeMigrationToFile(Integer migrationNumber, GenerateResult result) {
+        String prefix = StringUtils.leftPad(migrationNumber.toString(), 5, '0');
+
+        File dir = new File(System.getProperty("user.dir") + "/src/main/resources/sql");
+        File migrationsFile = new File(System.getProperty("user.dir") + "/src/main/resources/sql/migrations.txt");;
+        if (dir.exists() && migrationsFile.exists()) {
+            String name = prefix + "-" + result.getChangePrefix()
+                    + ".mysql.js";
+            File newMigrationFile = new File(dir.getAbsolutePath() + "/" + name);
+
+            FileUtils.writeAllText(result.getSqlJs(), newMigrationFile, Charset.forName("UTF-8"));
+
+            // Append the new migration to the text file with a list of migrations
+            String s = FileUtils.readAllText(migrationsFile);
+            if (!s.endsWith("\n")) {
+                s += "\n";
+            }
+            s += prefix + "-" + result.getChangePrefix();
+            FileUtils.writeAllText(s, migrationsFile, Charset.forName("UTF-8"));
+
+        } else {
+            String file = Settings.instance().getTargetFolder() + "/sql/" + prefix + "-" + result.getChangePrefix()
+                    + ".mysql.js";
+            FileUtils.writeAllText(result.getSqlJs(), new File(file), Charset.forName("UTF-8"));
+        }
+
+    }
+
+
     public int getLastMigrationNumber() {
         Integer max = 0;
-        for (SqlMigration migration: new SqlMigrationAction().getUserMigrations()) {
-            if (migration.getVersionNumber() > max) {
-                max = migration.getVersionNumber();
+        File migrationsFile = new File(System.getProperty("user.dir") + "/src/main/resources/sql/migrations.txt");
+        if (migrationsFile.exists()) {
+            for(String line: FileUtils.readAllText(migrationsFile, UTF8).split("\\n")) {
+                line = StringUtils.strip(line);
+                if (empty(line)) {
+                    continue;
+                }
+                if (line.startsWith("//") || line.startsWith("#")) {
+                    continue;
+                }
+                int dash = line.indexOf("-");
+                if (dash == -1) {
+                    continue;
+                }
+                Integer version = Integer.valueOf(StringUtils.stripStart(line.substring(0, dash), "0"));
+                if (version >= max) {
+                    max = version;
+                }
+            }
+
+        } else {
+            for (SqlMigration migration : new SqlMigrationAction().getUserMigrations()) {
+                if (migration.getVersionNumber() > max) {
+                    max = migration.getVersionNumber();
+                }
             }
         }
         return max;
@@ -148,6 +203,9 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
         } else {
             List<Col> missingColumns = list();
             for(Col col: schema.getColumns()) {
+                if (col.getVirtual()) {
+                    continue;
+                }
                 if (!DB.instance().columnExists(schema.getName(), col.getName())) {
                     missingColumns.add(col);
                 }

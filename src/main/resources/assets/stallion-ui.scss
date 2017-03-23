@@ -1,1 +1,90 @@
 
+
+.p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.space-top {
+    margin-bottom: 0em;
+    margin-top: 1em;
+}
+.space-bottom {
+    margin-bottom: 1em;
+    margin-top: 0em;
+}
+
+
+.autogrow-textarea.form-control {
+    min-height: 50px;
+}
+.autogrow-textarea.form-control {
+    height: 50px;
+}
+
+
+.st-data-table-vue {
+    table {
+        margin-top: 2em;
+    }
+    td:first-child {
+        padding-left: 20px;
+    }
+}
+
+
+.autogrow-textarea.form-control.autogrow-single-line {
+    min-height: 36px;
+    height: 36px;
+}
+
+ .fade {
+   opacity: 0;
+   -webkit-transition: opacity 0.1s linear;
+      -moz-transition: opacity 0.1s linear;
+       -ms-transition: opacity 0.1s linear;
+        -o-transition: opacity 0.1s linear;
+           transition: opacity 0.1s linear;
+ }
+
+.st-file-dropzone {
+    max-width: 600px;
+    background-color: #FCFCFC;
+    width: 100%;
+    border: 1px solid #999;
+    min-height: 200px;
+}
+.st-file-dropzone .dz-message {
+    font-size: 18px;
+}
+
+/* Image Library, Image collection widget */
+
+.small-image-upload-target-column image-uploader .title {
+    display: none;
+}
+.small-image-upload-target-column image-uploader .dz-default.dz-message {
+    margin: 0px;
+}
+.small-image-upload-target-column image-uploader .image-dropzone.st-file-dropzone {
+    min-height: 50px;
+}
+.add-image-button-column > div {
+    height: 94px;
+    line-height: 94px;
+}
+
+
+.vertical-tab {
+    display: block;
+    border: 1px solid #DDD;
+    padding: 1em;
+    background-color: #F3F3F3;
+}
+
+.vertical-tab.active-tab {
+    border-right: 1px solid transparent;
+    background-color: #FFFFFF;
+}
+
+
+

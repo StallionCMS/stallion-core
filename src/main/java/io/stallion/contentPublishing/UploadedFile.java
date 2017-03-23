@@ -32,7 +32,7 @@ import java.util.Map;
 import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.map;
 
-@Table(name="stallion_publisher_uploaded_files")
+@Table(name="stallion_uploaded_files")
 public class UploadedFile extends ModelBase {
     private String name = "";
     private String rawUrl = "";

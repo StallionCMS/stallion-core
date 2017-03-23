@@ -103,6 +103,7 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
         String sourceFolder = "/src/main/java/" + getJavaPackageName().replaceAll("\\.", "/");
         List<String> paths = list(
                 targetFolder + "/src/main/resources",
+                targetFolder + "/src/main/resources/sql",
                 targetFolder + "/src/test/resources",
                 targetFolder + "/src/main/java/" + getJavaPackageName().replaceAll("\\.", "/"),
                 targetFolder + "/src/test/java/" + getJavaPackageName().replaceAll("\\.", "/")
@@ -113,6 +114,8 @@ public class NewJavaPluginRunAction implements StallionRunAction<CommandOptionsB
                 FileUtils.forceMkdir(file);
             }
         }
+        new File(targetFolder + "/src/main/resources/sql/migrations.txt").createNewFile();
+
         Map ctx = map(val("config", this));
         copyTemplate("/templates/wizard/pom.xml.jinja", "pom.xml", ctx);
         copyTemplate("/templates/wizard/PluginBooter.java.jinja", sourceFolder + "/" + pluginNameTitleCase + "Plugin.java", ctx);
