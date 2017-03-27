@@ -61,4 +61,6 @@ public abstract class CloudStorageService {
 
     public abstract void uploadFile(File file, String bucket, String fileKey, boolean isPublic);
     public abstract void uploadFile(File file, String bucket, String fileKey, boolean isPublic, String contentType, Map<String, String> headers);
+
+    public abstract void deleteFile(String bucket, String fileKey);
 }

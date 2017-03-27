@@ -42,6 +42,7 @@ import org.imgscalr.Scalr;
 import org.parboiled.common.FileUtils;
 
 import javax.imageio.ImageIO;
+import javax.persistence.Column;
 import javax.servlet.http.Part;
 
 
@@ -50,6 +51,21 @@ public class UploadRequestProcessor<U extends UploadedFile> {
 
     private String uploadsFolder;
     private UploadedFileController<U> fileController;
+
+
+    protected IRequest getStRequest() {
+        return stRequest;
+    }
+
+
+    protected String getUploadsFolder() {
+        return uploadsFolder;
+    }
+
+    protected UploadedFileController<U> getFileController() {
+        return fileController;
+    }
+
     public UploadRequestProcessor(String uploadsFolder, IRequest stRequest) {
         this(uploadsFolder, stRequest, UploadedFileController.instance());
     }
@@ -289,13 +305,13 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         byte[] scaledImageInByte = baos.toByteArray();
         baos.close();
 
-        String base = FilenameUtils.removeExtension(orgPath);
 
-        String relativePath = FilenameUtils.getBaseName(uploaded.getCloudKey()).replace(this.uploadsFolder, "");
+
+        String relativePath = FilenameUtils.removeExtension(uploaded.getCloudKey());
         if (!"org".equals(postfix)) {
-            relativePath = "." + postfix;
+            relativePath = relativePath + "." + postfix;
         }
-        relativePath = "." + uploaded.getExtension();
+        relativePath = relativePath + "." + uploaded.getExtension();
         String thumbnailPath = this.uploadsFolder + relativePath;
         Log.info("Write all byptes to {0}", thumbnailPath);
         FileUtils.writeAllBytes(scaledImageInByte, new File(thumbnailPath));
@@ -318,7 +334,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
             uploaded.setMediumHeight(height);
             uploaded.setMediumWidth(width);
         } else if (postfix.equals("org")) {
-            uploaded.setCloudKey(url);
+            uploaded.setCloudKey(relativePath);
             uploaded.setRawUrl(url);
             uploaded.setSizeBytes(sizeBytes);
             uploaded.setHeight(height);

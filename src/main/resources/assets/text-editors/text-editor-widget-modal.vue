@@ -25,11 +25,11 @@
                     </div>
                 </div>
                 <div v-if="activeWidget.type">
-                    <component :is="widgetConfigureTag" ref="active" :widget-original="activeWidget" @confirmed="onWidgetConfirmed" ></component>
+                    <component :is="widgetConfigureTag" ref="active" :widget-original="activeWidget" @confirmed="onWidgetConfirmed" @insertable="onInsertableStateChange"></component>
                 </div>
             </div>
             <div slot="footer">
-                <button class="btn btn-primary btn-md" :disabled="!okToInsert" @click="insertWidget">{{ insertLabel }}</button>
+                <button id="widget-modal-insert-button" v-show="!hideInsert && activeWidget" class="btn btn-primary btn-md" :disabled="disableInsert" @click="insertWidgetClicked">{{ insertLabel }}</button>
                 <a @click="cancel" href="javascript:;">Cancel</a>
             </div>
         </modal-base>
@@ -46,16 +46,28 @@
      data: function() {
          return {
              activeWidget: null,
+             activeWidgetDefinition: null,
+             insertLabelOverride: null,
              isNew: false,
-             okToInsert: true,
-             insertLabel: 'Insert Widget',
              widgetConfigureTag: '',
-             widgetTypes: this.loadWidgetTypes()
+             widgetTypes: this.loadWidgetTypes(),
+             disableInsert: true,
+             hideInsert: true,
+             insertCallback: null
          }
          
      },
      computed: {
-         
+         insertLabel: function() {
+             var self = this;
+             if (self.insertLabelOverride) {
+                 return self.insertLabelOverride;
+             } else if (self.activeWidgetDefinition && self.activeWidgetDefinition.insertLabel) {
+                 return self.activeWidgetDefinition.insertLabel;
+             } else {
+                 return "Insert Widget";
+             }
+         },
          modalTitle: function() {
              var self = this;
              if (self.$refs && self.$refs.active && self.$refs.active.getModalTitle) {
@@ -76,6 +88,26 @@
          this.onActivate();
      },
      methods: {
+         onInsertableStateChange: function(state) {
+             console.log('onInsertableStateChange ', state);
+             if (state.hidden !== undefined) {
+                 this.hideInsert = state.hidden;
+             }
+             if (state.enabled !== undefined) {
+                 this.disableInsert = !state.enabled;
+                 if (state.enabled) {
+                     this.hideInsert = false;
+                 }
+             }
+             if (state.label) {
+                 this.insertLabelOverride = state.label;
+             }
+             if (state.callback) {
+                 this.insertCallback = state.callback;
+             } else {
+                 this.insertCallback = null;
+             }
+         },
          onActivate: function() {
              var self = this;
              var activeWidget = null;
@@ -105,7 +137,20 @@
              }
              self.isNew = isNew;
              self.activeWidget = activeWidget;
+             if (self.activeWidget) {
+                 self.widgetTypes.forEach(function(wt) {
+                     if (wt.type === self.activeWidget.type) {
+                         self.activeWidgetDefinition = wt;
+                     }
+                 });
+             }
+             if (self.activeWidgetDefinition && self.activeWidgetDefinition.defaultInsertButtonShown) {
+                 self.showInsert = true;
+             } else {
+                 self.showInsert = false;
+             }
              self.widgetConfigureTag = this.widgetTypeToTag(activeWidget.type);
+             
          },
          loadWidgetTypes: function() {
              if (this.$store && this.$store.state.widgetTypes) {
@@ -117,12 +162,14 @@
                      description: 'Image',
                      buttonLabel: 'Insert Image',
                      modalTitle: 'Choose Image to Insert',
-                     materialIcon: 'image'
+                     materialIcon: 'image',
+                     defaultInsertButtonShown: true
                  },
                  {
                      type: 'embed',
                      materialIcon: 'code',
-                     description: 'HTML Embed (Youtube Video, Slideshare, etc.)'
+                     description: 'HTML Embed (Youtube Video, Slideshare, etc.)',
+                     defaultInsertButtonShown: true
                  }
              ];   
          },         
@@ -136,7 +183,15 @@
              this.$emit('confirmed', JSON.parse(JSON.stringify(widget)));
              this.$refs.themodal.close();
          },
-         insertWidget: function() {
+         insertWidgetClicked: function() {
+             if (this.insertCallback) {
+                 this.insertCallback();
+                 return;
+             }
+             if (this.$refs.active.insertClicked) {
+                 this.$refs.active.insertClicked();
+                 return;
+             }
              var widget = this.activeWidget;
              widget = JSON.parse(JSON.stringify(this.$refs.active.getWidget()));
              this.$emit('confirmed', widget);
@@ -146,8 +201,12 @@
              var self = this;
              self.activeWidget.type = widgetTypeDefinition.type;
              self.widgetConfigureTag = self.widgetTypeToTag(self.activeWidget.type);
-             //this.insertLabel = insertLabel || this.insertLabel;
-             //this.title = title || this.title;
+             self.activeWidgetDefinition = widgetTypeDefinition;
+             if (self.activeWidgetDefinition.defaultInsertButtonShown) {
+                 self.showInsert = true;
+             } else {
+                 self.showInsert = false;
+             }
          }
      }
      

@@ -476,8 +476,8 @@
                          value = value * 1000;
                      }
                      var timeZone = moment.tz.guess();
-                     if (this.$store && this.$store.state.user && this.$store.state.uesr.timeZoneId) {
-                         timeZone = this.$store.state.uesr.timeZoneId;
+                     if (this.$store && this.$store.state.user && this.$store.state.user.timeZoneId) {
+                         timeZone = this.$store.state.user.timeZoneId;
                      }
                      return moment.tz(value, timeZone).format(format.substr(format.indexOf(':') + 1));
                  } else if(format) {

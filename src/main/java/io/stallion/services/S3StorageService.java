@@ -21,10 +21,7 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.CloudStorageSettings;
@@ -89,6 +86,12 @@ public class S3StorageService extends CloudStorageService {
         req.setMetadata(meta);
         client.putObject(req);
 
+    }
+
+    @Override
+    public void deleteFile(String bucket, String fileKey) {
+        DeleteObjectRequest req = new DeleteObjectRequest(bucket, fileKey);
+        client.deleteObject(req);
     }
 
     public String getSignedDownloadUrl(String bucket, String fileKey) {

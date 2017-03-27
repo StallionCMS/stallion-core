@@ -156,7 +156,7 @@ if (window.$ && !window.jQuery) {
             }
         }
         if (!$btn.length) {
-            $btn = $form.find(' .st-button-submit');
+            $btn = $form.find('.st-button-submit');
         }
         if (!$btn.length) {
             $btn = $form.find('.pure-button-primary[type="submit"]');
@@ -164,6 +164,10 @@ if (window.$ && !window.jQuery) {
         if (!$btn.length) {
             $btn = $form.find('[type="submit"]');
         }
+        if (!$btn.length) {
+            $btn = $form.find('.btn-primary');
+        }
+        
         if (!$btn.length) {
             return null;
         }
