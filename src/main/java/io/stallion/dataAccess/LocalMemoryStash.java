@@ -23,6 +23,7 @@ import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -265,6 +266,11 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
 
     @Override
     public void loadAll()  {
+        // In lightweight mode, we don't sync all models so as to boot quicker
+        if (Settings.instance().getLightweightMode()) {
+            return;
+        }
+
         Log.fine("Load all from {0}. ", getBucket());
         List<T> items = this.getPersister().fetchAll();
         for(T item: items) {

@@ -27,6 +27,7 @@ import io.stallion.settings.childSections.*;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.Column;
 import java.io.File;
 import java.time.ZoneId;
 import java.util.*;
@@ -84,6 +85,10 @@ public class Settings implements ISettings {
     private Boolean localMode;
     @SettingMeta()
     private Boolean devMode;
+
+    @SettingMeta()
+    private Boolean lightweightMode;
+
     @SettingMeta()
     private String logFile;
     @SettingMeta()
@@ -839,6 +844,15 @@ public class Settings implements ISettings {
         this.localMode = localMode;
     }
 
+
+    public Boolean getLightweightMode() {
+        return lightweightMode;
+    }
+
+    public Settings setLightweightMode(Boolean lightweightMode) {
+        this.lightweightMode = lightweightMode;
+        return this;
+    }
 
     /**
      * A mapping of internal rewrites, from source path to destintion path.

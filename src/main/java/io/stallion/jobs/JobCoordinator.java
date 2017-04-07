@@ -212,6 +212,11 @@ public class JobCoordinator extends Thread {
 
 
     private void doRegisterJob(JobDefinition job, ZonedDateTime now) {
+        if (Settings.instance().getLightweightMode()) {
+            Log.fine("No job registration in lightweight mode.");
+            return;
+        }
+
         if (shouldShutDown) {
             Log.warn("Tried to add a job while the JobCoordinator was shutting down.");
             return;

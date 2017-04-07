@@ -71,9 +71,13 @@
          modalTitle: function() {
              var self = this;
              if (self.$refs && self.$refs.active && self.$refs.active.getModalTitle) {
-                 return self.$refs.active.getModalTitle();
+                 return self.$refs.active.getModalTitle(self.isNew);
+             } else if (self.isNew && self.activeWidgetDefinition && self.activeWidgetDefinition.insertModalTitle) {
+                 return self.activeWidgetDefinition.insertModalTitle;
+             } else if (!self.isNew && self.activeWidgetDefinition) {
+                 return self.activeWidgetDefinition.editModalTitle;
              } else if (self.activeWidget.type && self.isNew) {
-                 return "Insert " + stallion.toTitleCase(self.activeWidget.type || 'Widget');                 
+                 return "Insert " + stallion.toTitleCase(self.activeWidget.type || 'Widget');
              } else if (self.activeWidgetType && !self.isNew) {
                  return "Edit " + stallion.toTitleCase(self.activeWidget.type || 'Widget');
              } else {

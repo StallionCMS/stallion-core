@@ -24,6 +24,7 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +53,15 @@ public class CommandOptionsBase {
     @Option(name="-devMode", usage="Set to 'true' if you want to use the development URL for resource assets")
     private Boolean devMode = false;
 
+    @Option(name="-lightweightMode", usage="Set to 'true' if you don't want all data to be synced from the database.")
+    private Boolean lightweightMode = false;
+
+
+
     @Argument(index = 0)
     private List<String> arguments = new ArrayList<String>();
+
+
 
     private List<StallionJavaPlugin> extraPlugins = list();
 
@@ -62,6 +70,7 @@ public class CommandOptionsBase {
         if (strictnessLevel != null) {
             settings.setStrictnessLevel(strictnessLevel);
         }
+        settings.setLightweightMode(lightweightMode);
         return settings;
     }
 
@@ -156,6 +165,16 @@ public class CommandOptionsBase {
 
     public CommandOptionsBase setLoggingAlwaysIncludesLineNumber(boolean loggingAlwaysIncludesLineNumber) {
         this.loggingAlwaysIncludesLineNumber = loggingAlwaysIncludesLineNumber;
+        return this;
+    }
+
+
+    public Boolean getLightweightMode() {
+        return lightweightMode;
+    }
+
+    public CommandOptionsBase setLightweightMode(Boolean lightweightMode) {
+        this.lightweightMode = lightweightMode;
         return this;
     }
 }

@@ -182,7 +182,9 @@ public class AppContextLoader {
         UsersApiResource.register();
         ListingEndpoints.register();
         ListingExporter.register();
+
         JobStatusController.selfRegister();
+
 
 
         UploadedFileEndpoints.registerIfEnabled();

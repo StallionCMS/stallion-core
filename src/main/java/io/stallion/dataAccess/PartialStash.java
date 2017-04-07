@@ -26,6 +26,7 @@ import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -208,7 +209,12 @@ public class PartialStash<T extends Model> extends Stash<T> {
 
     @Override
     public void loadAll() {
+        // In lightweight mode, we don't sync all models so as to boot quicker
+        if (Settings.instance().getLightweightMode()) {
+            return;
+        }
         if (!DB.isUseDummyPersisterForSqlGenerationMode()) {
+
             for (T obj : DB.instance().query(getPersister().getModelClass(), getInitialLoadSql())) {
                 loadItem(obj);
             }
