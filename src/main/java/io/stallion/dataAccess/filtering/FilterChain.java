@@ -29,6 +29,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
+import javax.persistence.Column;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -69,33 +70,40 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     private boolean _includeDeleted = false;
     private Integer matchingCount = 0;
     private LocalMemoryStash<T> stash;
+    private boolean useCache = true;
 
     public FilterChain(String bucket, List<T> originalObjects) {
         this.bucket = bucket;
         this.originalObjects = originalObjects;
+        // Don't use cache when we pass in a pre-filtered list of objects.
+        this.useCache = false;
     }
 
     public FilterChain(String bucket, LocalMemoryStash<T> stash) {
         this.setBucket(bucket);
         this.stash = stash;
-        this.originalObjects = new ArrayList();
+        this.originalObjects = stash.getItems();
     }
+
+    public FilterChain(String bucket, FilterOperation op, LocalMemoryStash<T> stash) {
+        this.setBucket(bucket);
+        this.stash = stash;
+        operations.add(op);
+    }
+
 
     public FilterChain(String bucket, List<T> originalObjects, LocalMemoryStash<T> stash) {
         this.setBucket(bucket);
         this.stash = stash;
         this.originalObjects = (List<T>)originalObjects;
-    }
-    public FilterChain(String bucket, List<T> originalObjects, FilterOperation op, LocalMemoryStash<T> stash) {
-        this.setBucket(bucket);
-        this.stash = stash;
-        this.originalObjects = originalObjects;
-        operations.add(op);
+        this.useCache = false;
     }
 
-    public FilterChain(FilterChain chain, LocalMemoryStash<T> stash) {
+
+    protected FilterChain(FilterChain chain, LocalMemoryStash<T> stash) {
         this.setBucket(chain.getBucket());
         this.stash = stash;
+        this.useCache = chain.useCache;
         this.operations = (ArrayList<FilterOperation>)chain.operations.clone();
         this.sortField = chain.sortField;
         this.sortDirection = chain.sortDirection;
@@ -338,6 +346,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      */
     protected FilterChain<T> newCopy() {
         FilterChain<T> chain = new FilterChain<T>(this.getBucket(), originalObjects, stash);
+        chain.setUseCache(this.isUseCache());
         chain.operations = (ArrayList<FilterOperation>)operations.clone();
         chain.setIncludeDeleted(getIncludeDeleted());
         return chain;
@@ -1045,6 +1054,9 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     }
 
     protected Object getCached(String methodName) {
+        if (!useCache) {
+            return null;
+        }
         String key = buildKey(methodName);
         if (checkSkipCache(key)) {
             return null;
@@ -1058,6 +1070,9 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     }
 
     protected void setCached(String methodName, Object val) {
+        if (!useCache) {
+            return;
+        }
         String key = buildKey(methodName);
         FilterCache.set(this.getBucket(), key, val);
     }
@@ -1065,9 +1080,12 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     private String buildKey(String methodName) {
         StringBuilder builder = new StringBuilder();
         builder.append(methodName + Literals.GSEP);
-        if (this.originalObjects.size() > 0) {
+        if (this.stash != null) {
+            builder.append(this.stash.getBucket() + Literals.GSEP);
+        } else if (this.originalObjects.size() > 0) {
             builder.append(this.originalObjects.get(0).getClass().getCanonicalName());
         }
+
         for (FilterOperation op: operations) {
             //Log.finest("fn: {0} op: {1} isExclude: {2} orgVal: {3}", op.getFieldName(), op.getOperator(), op.getIsExclude(), op.getOriginalValue());
             String ov = "<null>";
@@ -1170,6 +1188,16 @@ public class FilterChain<T extends Model> implements Iterable<T> {
 
     public FilterChain<T> includeDeleted() {
         _includeDeleted = true;
+        return this;
+    }
+
+
+    public boolean isUseCache() {
+        return useCache;
+    }
+
+    public FilterChain setUseCache(boolean useCache) {
+        this.useCache = useCache;
         return this;
     }
 
