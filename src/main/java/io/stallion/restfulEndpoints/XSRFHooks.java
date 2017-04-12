@@ -19,6 +19,7 @@ package io.stallion.restfulEndpoints;
 
 import io.stallion.hooks.HookRegistry;
 import io.stallion.requests.PostRequestHookHandler;
+import io.stallion.requests.PreRequestHookHandler;
 import io.stallion.requests.StRequest;
 import io.stallion.requests.StResponse;
 import io.stallion.settings.Settings;
@@ -30,7 +31,7 @@ import java.util.UUID;
 import static io.stallion.utils.Literals.*;
 
 
-public class XSRFHooks extends PostRequestHookHandler {
+public class XSRFHooks extends PreRequestHookHandler {
     public static final String COOKIE_NAME = "XSRF-TOKEN";
     public static final String HEADER_NAME = "X-XSRF-TOKEN";
 
