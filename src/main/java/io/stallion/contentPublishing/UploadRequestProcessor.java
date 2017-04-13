@@ -258,6 +258,9 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         try {
             File originalImageFile = new File(path);
             BufferedImage image = ImageIO.read(originalImageFile);
+            if (image == null) {
+                throw new ClientException("Could not interpret uploaded file as a valid image file.");
+            }
             hydrateHeightAndWidth(uploaded, image);
             if (uploaded.getWidth() > 60) {
                 createResized(uploaded, image, path, 120, 60, "thumb");
