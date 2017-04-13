@@ -273,6 +273,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
                 createResized(uploaded, image, path, 1600, 900, "medium");
             }
             if (Settings.instance().getUserUploads().getResizeImagesToMax() > 0) {
+                Scalr.Mode scaleMode = Scalr.Mode.FIT_TO_WIDTH;
                 if (uploaded.getWidth() > Settings.instance().getUserUploads().getResizeImagesToMax()) {
                     createResized(
                             uploaded,
@@ -280,7 +281,8 @@ public class UploadRequestProcessor<U extends UploadedFile> {
                             path,
                             Settings.instance().getUserUploads().getResizeImagesToMax(),
                             Settings.instance().getUserUploads().getResizeImagesToMax(),
-                            "org"
+                            "org",
+                            scaleMode
                     );
                 }
             }
@@ -294,11 +296,14 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         uploaded.setHeight(image.getHeight());
         uploaded.setWidth(image.getWidth());
     }
-
     public void createResized(U uploaded, BufferedImage image, String orgPath, int targetHeight, int targetWidth, String postfix) throws IOException {
+        createResized(uploaded, image, orgPath, targetHeight, targetWidth, postfix, Scalr.Mode.FIT_TO_WIDTH);
+
+    }
+    public void createResized(U uploaded, BufferedImage image, String orgPath, int targetHeight, int targetWidth, String postfix, Scalr.Mode scalrMode) throws IOException {
         String imageFormat = uploaded.getExtension();
 
-        BufferedImage scaledImg = Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH,
+        BufferedImage scaledImg = Scalr.resize(image, Scalr.Method.QUALITY, scalrMode,
                 targetWidth, targetHeight, Scalr.OP_ANTIALIAS);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int height = scaledImg.getHeight();
