@@ -227,6 +227,8 @@ if (window.$ && !window.jQuery) {
     };
 
     st.showError = function(msg, target) {
+        msg = msg.replace(/</g, '&lt;');
+        msg = msg.replace(/>/g, '&gt;');
         if (target) {
             var $target = $(target);
             var $errorWrap = $target.find('.st-error-wrap');

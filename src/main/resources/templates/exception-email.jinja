@@ -1,6 +1,6 @@
 
-<h2>Exception! {{ exceptionInfo.className }}:{{exceptionInfo.message}}</h2>
-<p>HTTP command: {{ exceptionInfo.requestMethod }} {{ exceptionInfo.requestUrl }}</p>
+<h2>Exception! {{ exceptionInfo.className|e }}:{{exceptionInfo.message|e}}</h2>
+<p>HTTP command: {{ exceptionInfo.requestMethod|e }} {{ exceptionInfo.requestUrl|e }}</p>
 <div>
     <big><a href="{{ siteUrl }}/st-internal/exceptions">View exceptions &#187;</a></big>
 </div>

@@ -9,24 +9,24 @@
 <h1>Recent exceptions</h1>
 {% for exception in exceptions %}
 <hr>
-<div class="title">{{ exception.className }} <span class="message">{{ exception.message }}</span></div>
+<div class="title">{{ exception.className|e }} <span class="message">{{ exception.message|e }}</span></div>
 <div class="soft">On {{ utils.formatLocalDate(exception.thrownAt) }}</div>
-<div>{{ exception.requestMethod }} {{ exception.requestUrlWithQuery }}</div>
-<div>IP Address: {{ exception.actualIp }}</div>
+<div>{{ exception.requestMethod|e }} {{ exception.requestUrlWithQuery|e }}</div>
+<div>IP Address: {{ exception.actualIp|e }}</div>
 {% if exception.id or exception.username %}
-<div>Email: {{ exception.email }}</div>
-<div>Username: {{ exception.username }}</div>
-<div>User ID: {{ exception.userId }}</div>
-<div>Valet ID: {{ exception.valetId }}</div>
+<div>Email: {{ exception.email|e }}</div>
+<div>Username: {{ exception.username|e }}</div>
+<div>User ID: {{ exception.userId|e }}</div>
+<div>Valet ID: {{ exception.valetId|e }}</div>
 {% endif %}
 <code><pre>
-{% for line in exception.stackTraces %}{{ line }}
+{% for line in exception.stackTraces %}{{ line|e }}
 {% endfor %}
 </pre></code>
 {% if exception.requestBody %}
 <h5>Request body:</h5>
-<code><pre>{{ exception.requestBody }}</pre></code>
+<code><pre>{{ exception.requestBody|e }}</pre></code>
 {% endif %}
 <h5>Headers:</h5>
-<code><pre>{{ exception.requestHeadersString }}</pre></code>
+<code><pre>{{ exception.requestHeadersString|e }}</pre></code>
 {% endfor %}
