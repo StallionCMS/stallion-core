@@ -60,6 +60,10 @@
                 </div>
             </div>
             <div class="form-group">
+                <label>Special Features</label>
+                <checkboxes v-model="book.features" :choices="['Big Print', 'Reference', 'No Checkout', 'Audiobook']"></checkboxes>
+            </div>
+            <div class="form-group">
                 <label>Expires At (datetime-picker)</label>
                 <div>
                     <datetime-picker v-model="book.expiresAt"></datetime-picker>
@@ -91,9 +95,11 @@
              author: 'Edward Gibbon',
              title: 'A Tale of Two Cities',
              description: 'One of the finest novels of all time',
+             features: ['Big Print', 'Audiobook'],
              publishedAt: (new Date().getTime() / 1000) - (2 * 86400),
              expiresAt: (new Date().getTime() / 1000) + (2 * 86400),
-             categories: ['science']
+             categories: ['science'],
+             
          };
 
          if (localStorage.demoBook) {

@@ -122,13 +122,7 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
                 hasNewMigrations = true;
             }
         }
-        if (hasNewMigrations) {
-            boolean runMigrations = new Prompter("Execute all new SQL migrations? ").yesNo();
-            if (runMigrations) {
-                SqlMigrationAction action = new SqlMigrationAction();
-                action.execute(options);
-            }
-        }
+
     }
 
     public void writeMigrationToFile(Integer migrationNumber, GenerateResult result) {
