@@ -687,11 +687,13 @@ class RequestProcessor {
         String message = "Server error handling request";
         Throwable anEx = ex;
         int status = 500;
+        Map extra = null;
         for (int x =0; x < 10; x++) {  // because while loops are evil
             if (anEx instanceof WebException) {
                 WebException webEx = (WebException) anEx;
                 message = webEx.getMessage();
                 status = webEx.getStatusCode();
+                extra = webEx.getExtra();
             } else {
                 anEx = anEx.getCause();
             }
@@ -706,6 +708,9 @@ class RequestProcessor {
             result.put("message", message);
             if (Context.getSettings().getDebug()) {
                 result.put("debug", ex.toString());
+            }
+            if (extra != null) {
+                result.putAll(extra);
             }
             try {
                 out = JSON.stringify(result);

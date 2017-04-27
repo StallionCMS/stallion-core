@@ -39,6 +39,8 @@ public class ClientException extends WebException {
         super(message, statusCode);
     }
 
+
+
     /**
      * Message will get displayed to the end user, so make it polite and friendly.
      * @param message

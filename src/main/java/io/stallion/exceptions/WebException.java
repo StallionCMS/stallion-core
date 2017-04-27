@@ -17,11 +17,17 @@
 
 package io.stallion.exceptions;
 
+import javax.persistence.Column;
+import java.util.Map;
+
+import static io.stallion.utils.Literals.map;
+
 /**
  * Generic web exception that will generate a 4xx or 5xx response to the client with a user friendly message.
  */
 public class WebException extends RuntimeException {
     private int statusCode = 500;
+    private Map extra = map();
 
     public WebException(String message) {
         this(message, 500);
@@ -29,6 +35,12 @@ public class WebException extends RuntimeException {
     public WebException(String message, int statusCode) {
         super(message);
         this.setStatusCode(statusCode);
+    }
+
+    public WebException(String message, int statusCode, Map extra) {
+        super(message);
+        this.setStatusCode(statusCode);
+        this.extra = extra;
     }
 
     public WebException(String message, int statusCode, Throwable cause) {
@@ -42,5 +54,15 @@ public class WebException extends RuntimeException {
 
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
+    }
+
+
+    public Map<String, Object> getExtra() {
+        return extra;
+    }
+
+    public WebException setExtra(Map<String, Object> extra) {
+        this.extra = extra;
+        return this;
     }
 }
