@@ -1,5 +1,11 @@
+<style lang="scss">
+ .autogrow-text-vue {
+     resize: none;
+ }
+</style>
+
 <template>
-    <textarea @keydown.enter.prevent.stop="onEnter" class="autogrow-textarea form-control autogrow-single-line autogrow-short" @input="onInput"></textarea>
+    <textarea @keydown.enter.prevent.stop="onEnter" class="autogrow-textarea form-control autogrow-single-line autogrow-short autogrow-text-vue" @input="onInput"></textarea>
 </template>
 
 <script>
@@ -20,7 +26,6 @@
              return false;
          },
          onInput: function(a, b) {
-             console.log('onInput', a, b);
              this.$emit('input', this.$el.value);
          }
      },

@@ -54,6 +54,12 @@
                 </div>
             </div>
             <div class="form-group">
+                <label>Published City</label>
+                <div>
+                    <autocomplete-input v-model="book.city" :choices="cities" :config="{minChars: 1}"></autocomplete-input>
+                </div>
+            </div>
+            <div class="form-group">
                 <label>Published At (date-picker)</label>
                 <div>
                     <date-picker v-model="book.publishedAt"></date-picker>
@@ -94,6 +100,7 @@
          var book = {
              author: 'Edward Gibbon',
              title: 'A Tale of Two Cities',
+             city: 'Boston',
              description: 'One of the finest novels of all time',
              features: ['Big Print', 'Audiobook'],
              publishedAt: (new Date().getTime() / 1000) - (2 * 86400),
@@ -111,6 +118,9 @@
          if (!book.expiresAt) {
              book.expiresAt = (new Date().getTime() / 1000) - (2 * 86400);
          }
+         if (book.city === undefined) {
+             book.city = 'Boston';
+         }
          console.log('initial book categories ', book.categories);
          
          return {
@@ -119,6 +129,20 @@
                  'Charles Dickens',
                  'Edward Gibbon',
                  'Tom Clancy'
+             ],
+             cities: [
+                 'Chicago',
+                 'Boston',
+                 'Detroit',
+                 'New York',
+                 'Los Angeles',
+                 'York',
+                 'Newark',
+                 'Portland (Oregon)',
+                 'Portland (Maine)',
+                 'San Francisco',
+                 'San Diego',
+                 'Miami',
              ],
              categories: [
                  'history',

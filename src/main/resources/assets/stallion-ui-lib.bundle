@@ -3,6 +3,8 @@ vendor/grids-responsive-min.css
 basic/stallion.css
 vendor/jquery-1.11.3.js
 basic/stallion.js
+/vendor/auto-complete.js
+/vendor/auto-complete.css
 /vendor/bootstrap.min.css
 /vendor/material-icons.css
 /vendor/vue2.js
