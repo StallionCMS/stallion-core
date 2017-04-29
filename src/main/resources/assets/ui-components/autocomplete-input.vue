@@ -6,7 +6,7 @@
 </style>
 
 <template>
-    <input @input="onInput" :value="value" @change="onChange" class="form-control autocomplete-input-vue">
+    <input @input="onInput" :value="value" @change="onChange" :class="'form-control autocomplete-input-vue ' + cssClass" :placeholder="placeholder"" :required="required">
 </template>
 
 <script>
@@ -17,6 +17,11 @@
                  return {};
              }
          },
+         placeholder: {
+             default: ''
+         },
+         required: undefined,
+         cssClass: '',
          choices: null,
          value: null
      },
