@@ -199,7 +199,7 @@
              
              var self = this;
              var data = {
-                 originalContent: rawContent,
+                 originalContent: originalContent,
                  widgets: widgets
              }
              if (withHtml) {

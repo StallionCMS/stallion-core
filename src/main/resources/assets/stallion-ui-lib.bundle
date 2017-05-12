@@ -26,7 +26,6 @@ basic/stallion.js
 /vendor/bootstrap-markdown.js
 /vendor/bootstrap-markdown.min.css
 /vendor/bootstrap.js
-/vendor/require.js
 /material-icons-extra.css
 /stallion-ui.scss
 /ui-components/common.js
