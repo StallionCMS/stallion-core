@@ -26,7 +26,6 @@ import static io.stallion.utils.Literals.map;
  * Will short-circuit the request and return a 400 error by default.
  */
 public class ClientException extends WebException {
-    private Map extra = map();
 
     /**
      * Message will get displayed to the end user, so make it polite and friendly.
@@ -48,7 +47,7 @@ public class ClientException extends WebException {
     public ClientException(String message, int statusCode, Map extra) {
         super(message);
         this.setStatusCode(statusCode);
-        this.extra = extra;
+        setExtra(extra);
     }
 
 

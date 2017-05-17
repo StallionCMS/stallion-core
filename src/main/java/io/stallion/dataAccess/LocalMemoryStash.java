@@ -94,7 +94,12 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         for(String propertyName: PropertyUtils.getPropertyNames(this.getPersister().getModelClass())) {
             if (PropertyUtils.propertyHasAnnotation(this.getPersister().getModelClass(), propertyName, UniqueKey.class)) {
                 Log.fine("Model:{0} has uniquekey on {1}", this.getPersister().getModelClass(), propertyName);
+                UniqueKey uk = PropertyUtils.getAnnotationForProperty(getPersister().getModelClass(), propertyName, UniqueKey.class);
+                if (uk.caseInsensitive()) {
+                    this.uniqueFieldsCaseInsensitive.add(propertyName);
+                }
                 this.keyNameToUniqueKeyToValue.put(propertyName, new HashMap<Object, T>());
+
             }
             if (PropertyUtils.propertyHasAnnotation(this.getPersister().getModelClass(), propertyName, AlternativeKey.class)) {
                 Log.fine("Model:{0} has alternativeKey on {1}", this.getPersister().getModelClass(), propertyName);
@@ -402,6 +407,9 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         Map<Object, T> map = this.keyNameToUniqueKeyToValue.getOrDefault(keyName, null);
         if (map == null) {
             throw new ConfigException("There is no unique key '" + keyName + "' defined for bucket '" + getBucket() + "'");
+        }
+        if (this.uniqueFieldsCaseInsensitive.contains(keyName) && lookupValue instanceof String) {
+            lookupValue = ((String)lookupValue).toLowerCase();
         }
         T value = map.get(lookupValue);
         if (value == null) {
