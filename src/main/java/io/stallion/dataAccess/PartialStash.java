@@ -370,7 +370,13 @@ public class PartialStash<T extends Model> extends Stash<T> {
             onPreRead();
             return detach(value);
         } else {
-            return filterChain().filter(keyName, value).first();
+            T item = filterChain().setUseCache(false).filter(keyName, value).first();
+            if (item == null) {
+                return null;
+            } else {
+                loadItem(item);
+                return detach(item);
+            }
         }
     }
 

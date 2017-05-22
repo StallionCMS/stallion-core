@@ -1196,7 +1196,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         return useCache;
     }
 
-    public FilterChain setUseCache(boolean useCache) {
+    public FilterChain<T> setUseCache(boolean useCache) {
         this.useCache = useCache;
         return this;
     }
