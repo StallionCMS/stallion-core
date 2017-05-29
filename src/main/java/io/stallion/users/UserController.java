@@ -40,6 +40,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.persistence.Column;
 import javax.servlet.http.Cookie;
 import java.io.File;
 import java.lang.annotation.Retention;
@@ -574,6 +575,10 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     }
 
     public String userToCookieString(T user, Boolean rememberMe, Long valetId) {
+        return userToCookieString(user, rememberMe, valetId, "");
+    }
+
+    public String userToCookieString(T user, Boolean rememberMe, Long valetId, String sessionSecret) {
         Long now = mils();
         Long expires = now + (86400L * 1000L);
         if (rememberMe) {
@@ -581,6 +586,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         }
         SessionInfo session = new SessionInfo()
                 .setSec(user.getSecret())
+                .setSsec(sessionSecret)
                 .setCrt(mils())
                 .setExp(expires);
         if (!empty(valetId)) {
@@ -628,6 +634,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             }
             result.setValet(valet);
         }
+        result.setSessionKey(info.getSsec());
         return result;
 
     }
@@ -635,6 +642,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     public static class UserValetResult {
         public IUser user;
         public IUser valet;
+        private String sessionKey;
 
         public IUser getUser() {
             return user;
@@ -653,10 +661,20 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             this.valet = valet;
             return this;
         }
+
+        public String getSessionKey() {
+            return sessionKey;
+        }
+
+        public UserValetResult setSessionKey(String sessionKey) {
+            this.sessionKey = sessionKey;
+            return this;
+        }
     }
 
     public static class SessionInfo {
         private String sec = "";
+        private String ssec = "";
         private Long exp = 0L;
         private Long crt = 0L;
         private Long vid = 0L;
@@ -670,6 +688,14 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             return this;
         }
 
+        public String getSsec() {
+            return ssec;
+        }
+
+        public SessionInfo setSsec(String ssec) {
+            this.ssec = ssec;
+            return this;
+        }
 
         public Long getExp() {
             return exp;
