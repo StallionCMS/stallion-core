@@ -272,6 +272,7 @@
              labelPluralComputed: '',
              titleComputed: '',
              customFilter: '',
+             rowKey: '',
              filters: [],
              filterBys: [],
              page: 1,
@@ -498,6 +499,10 @@
          clearAllFilters: function() {
              this.filters = [];
              this.filterBys = '';
+             this.rowKey = '';
+         },
+         hasFilters: function() {
+             return (this.filters && this.filters.length) || (this.filterBys && this.filterBys.length) || this.rowKey;
          },
          clearFiltersAndRefresh: function() {
              this.clearAllFilters();
@@ -598,6 +603,9 @@
                  if (this.customFilter) {
                      url += '&customFilter=' + encodeURIComponent(this.customFilter);
                  }
+                 if (this.rowKey) {
+                     url += '&rowKey=' + encodeURIComponent(this.rowKey);
+                 }
                  if (this.filterBys) {
                      this.filterBys.forEach(function(f) {
                          url += '&filter_by=' + f;
@@ -660,7 +668,8 @@
                  search: searchTerm,
                  filters: encodeURIComponent(JSON.stringify(filters)),
                  sort: sort,
-                 customFilter: self.customFilter
+                 customFilter: self.customFilter,
+                 rowKey: self.rowKey
              };
              //Object.keys(params).forEach(function(key) {
              //    url = url.replace(new RegExp('{{\\s*' + key + '\\s*}}', 'g'), params[key] || '');
@@ -740,6 +749,7 @@
                  this.sortDirectionComputed = 'asc';
              }
              this.customFilter = this.route.query.customFilter || '';
+             this.rowKey = this.route.query.rowKey || '';
              this.filters = [];
              if (this.route.query.filters) { 
                  try {
