@@ -231,7 +231,8 @@ public class PartialStash<T extends Model> extends Stash<T> {
 
     public String getInitialLoadSql() {
         Schema schema = DB.instance().getSchema(getPersister().getModelClass());
-        String sql = "SELECT * FROM " + schema.getName() + " ORDER BY row_updated_at DESC LIMIT 50000";
+        String sql = "SELECT * FROM " + schema.getName() + " ORDER BY row_updated_at DESC LIMIT " +
+                getController().getPartialStashInitialQueryLimit();
         return sql;
     }
 

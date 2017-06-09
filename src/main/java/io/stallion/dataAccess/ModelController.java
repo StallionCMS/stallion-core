@@ -63,6 +63,11 @@ public interface ModelController<T extends Model> {
      */
     public Persister<T> getPersister();
 
+
+    public default Long getPartialStashInitialQueryLimit() {
+        return 5000L;
+    }
+
     /**
      * The instance of the Stash class.
      * @return
