@@ -607,6 +607,13 @@ class RequestProcessor {
             } else {
                 markHandled(200, "resource-asset");
                 URL url = ResourceHelpers.pluginPathToUrl(plugin, assetPath);
+                // If not found, and no referer, throw generic 404
+                if (url == null && empty(request.getHeader("Referer"))) {
+                    throw new NotFoundException("Asset resource not found: " + plugin + ":" + assetPath);
+                } else if (url == null) {
+                    // If not found, and referer, may mean there is a bug
+                    throw new WebException("Requested linked resource that is not found: " + plugin + ":" + assetPath);
+                }
                 new ServletFileSender(request, response).sendResource(url, assetPath);
                 complete();
             }

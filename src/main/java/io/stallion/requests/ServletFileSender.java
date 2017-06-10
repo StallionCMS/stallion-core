@@ -59,7 +59,7 @@ public class ServletFileSender {
         try {
             int length = url.openConnection().getContentLength();
             sendAssetResponse(url.openStream(), 0, length, url.toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
