@@ -24,11 +24,14 @@ import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.RouteDefinition;
 import io.stallion.services.Log;
 import io.stallion.settings.childSections.*;
+import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Column;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -234,7 +237,16 @@ public class Settings implements ISettings {
 
 
         if (logFile == null) {
-            logFile = "/tmp/log/stallion/" + StringUtils.strip(GeneralUtils.slugify(targetFolder), "-") + ".log";
+            String nowString = DateUtils.formatNow("yyyy-MM-dd-HHmmss");
+            String base = "";
+            try {
+                if (!empty(siteUrl)) {
+                    base = new URL(siteUrl.replace(":{port}", "")).getHost();
+                }
+            } catch(IOException e) {
+                Log.exception(e, "Error parsing siteUrl " + siteUrl);
+            }
+            logFile = "/tmp/log/stallion/" + base + "-" + nowString + "-" + StringUtils.strip(GeneralUtils.slugify(targetFolder), "-") + ".log";
         }
         if (logToConsole == null) {
             logToConsole = getLocalMode();

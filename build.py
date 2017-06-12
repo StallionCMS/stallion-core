@@ -78,7 +78,7 @@ exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
         path = os.environ['HOME'] + "/st/publisher"
         swap_pom_scope_and_build(path, quiet, test)
         if '--dist' in sys.argv:
-            build_exec(path, '-complete', 'publisher-complete-1.0-SNAPSHOT-jar-with-dependencies.jar', 'stallion-publisher', quiet, '-DskipTests', True)
+            build_exec(path, '-complete', 'publisher-complete-1.1.0-SNAPSHOT-jar-with-dependencies.jar', 'stallion-publisher', quiet, '-DskipTests', True)
         if '--deploy' in sys.argv:
             os.chdir(path)
             mvn['-DskipTests=true', 'install', 'source:jar', 'deploy'] & FG
