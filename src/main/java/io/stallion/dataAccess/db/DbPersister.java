@@ -160,9 +160,9 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
 
         ZonedDateTime dt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(lastSyncAt), ZoneId.of("UTC"));
         //dt.format(StallionUtils.ISO_FORMAT);
-        String formatedNow = dt.format(DateUtils.SQL_FORMAT);
+        String formattedLastSyncAt = dt.format(DateUtils.SQL_FORMAT);
         Class < T > cls = getModelClass();
-        List<T> items = DB.instance().query(cls, "SELECT * FROM " + getTableName() + " WHERE row_updated_at >= ?", formatedNow);
+        List<T> items = DB.instance().query(cls, "SELECT * FROM " + getTableName() + " WHERE row_updated_at >= ?", formattedLastSyncAt);
         boolean hasChanges = false;
         for (T item: items) {
             boolean changed = getStash().loadItem(item);
