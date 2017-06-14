@@ -333,6 +333,7 @@ public class PartialStash<T extends Model> extends Stash<T> {
         T item = this.itemByPrimaryKey.get(id);
         if (item != null) {
             onPreRead();
+            item = this.itemByPrimaryKey.get(id);
             return detach(item);
         } else {
             item = filterChain().filter("id", id).first();
