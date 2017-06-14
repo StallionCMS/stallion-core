@@ -120,6 +120,20 @@ public class JobStatusController extends StandardModelController<JobStatus> {
         return returnJobs;
     }
 
+    public boolean isJobReadyToRun(JobDefinition job, ZonedDateTime now) {
+        List<JobStatus> js = DB.instance().query(
+                JobStatus.class,
+                "SELECT * FROM stallion_job_status WHERE nextexecuteminutestamp<=? AND name=? AND lockedAt=0 AND lockGuid='' LIMIT 1",
+                TIME_STAMP_FORMAT.format(now),
+                job.getName()
+        );
+        if (js.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void resetLockAndNextRunAt(JobStatus jobStatus) {
         resetLockAndNextRunAt(jobStatus, DateUtils.utcNow());
     }
@@ -175,6 +189,7 @@ public class JobStatusController extends StandardModelController<JobStatus> {
         String lockId = UUID.randomUUID().toString();
         Long lockedAt = DateUtils.mils();
         if (!getPersister().isDbBacked()) {
+            Log.info("Locking job based on file lock: {0}", name);
             JobStatus job = forUniqueKey("name", name);
             if (empty(job.getLockGuid()) && empty(job.getLockedAt())) {
                 job.setLockedAt(lockedAt);
@@ -184,6 +199,7 @@ public class JobStatusController extends StandardModelController<JobStatus> {
                 return false;
             }
         } else {
+            Log.info("Locking job based on database: {0} lockGuid: {1}", name, lockId);
             DB.instance().execute(
                     "UPDATE stallion_job_status SET lockedAt=?, lockGuid=? WHERE lockedAt = 0 AND lockGuid='' AND name=?",
                     lockedAt, lockId, name

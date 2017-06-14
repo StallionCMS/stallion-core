@@ -46,12 +46,17 @@ class JobInstanceDispatcher implements Runnable {
 
     @Override
     public void run() {
+        Log.info("Try to lock job for run {0}", definition.getName());
         boolean locked = JobStatusController.instance().lockJob(definition.getName());
         if (!locked) {
             Log.warn("Job is locked, skipping run command. {0}", definition.getName());
             return;
         }
-
+        if (JobStatusController.instance().isJobReadyToRun(definition, this.now)) {
+            Log.warn("Job nextexecuteminutestamp time has not arrived. Not executing.");
+            return;
+        }
+        Log.info("Job locked, execute now {0}", definition.getName());
         status.setStartedAt(DateUtils.mils());
         JobStatusController.instance().save(status);
 
@@ -64,7 +69,7 @@ class JobInstanceDispatcher implements Runnable {
             status.setError("");
             ZonedDateTime nextRunAt = definition.getSchedule().nextAt(DateUtils.utcNow().plusMinutes(3));
             Long nextCompleteBy = nextRunAt.plusMinutes(definition.getAlertThresholdMinutes()).toInstant().toEpochMilli();
-            Log.info("Threshold minutes: {0} next complete by: {1}", definition.getAlertThresholdMinutes(), nextCompleteBy);
+            Log.info("Job Completed: {0} Threshold minutes: {1} next complete by: {d}", definition.getName(), definition.getAlertThresholdMinutes(), nextCompleteBy);
             status.setShouldSucceedBy(nextCompleteBy);
             JobStatusController.instance().save(status);
         } catch (Exception e) {
