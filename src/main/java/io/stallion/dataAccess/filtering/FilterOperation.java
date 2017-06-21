@@ -66,6 +66,10 @@ class FilterOperation {
         return this;
     }
 
+    public String getOperatorForSql() {
+        return getOperator().forSql();
+    }
+
     public FilterOperator getOperator() {
         return operator;
     }

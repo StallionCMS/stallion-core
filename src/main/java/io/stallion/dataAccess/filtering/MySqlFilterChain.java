@@ -100,8 +100,14 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 if (op.getOperator().equals(FilterOperator.ANY)) {
                     addInClause(whereBuilder, op, params);
                 } else {
-                    whereBuilder.append(MessageFormat.format(" ({0} {1} ?) ", op.getFieldName(), op.getOperator().forSql()));
-                    params.add(formatParam(op));
+                    String operatorSql = op.getOperatorForSql();
+                    if (operatorSql.equals("=") && op.getOriginalValue() == null) {
+                        whereBuilder.append(MessageFormat.format(" ({0} IS NULL) ", op.getFieldName()));
+                    } else {
+                        whereBuilder.append(MessageFormat.format(" ({0} {1} ?) ", op.getFieldName(), operatorSql));
+                        params.add(formatParam(op));
+                    }
+
                 }
 
             }
@@ -158,8 +164,13 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (subOp.getOperator().equals(FilterOperator.ANY)) {
                 addInClause(whereBuilder, subOp, params);
             } else {
-                whereBuilder.append("(`" + subOp.getFieldName() + "`" + subOp.getOperator().forSql() + " ? )");
-                params.add(formatParam(subOp));
+                if (subOp.getOperatorForSql().equals("=") && subOp.getOriginalValue() == null) {
+                    whereBuilder.append("(`" + subOp.getFieldName() + "` IS null )");
+                } else {
+                    whereBuilder.append("(`" + subOp.getFieldName() + "` " + subOp.getOperatorForSql() + " ? )");
+                    params.add(formatParam(subOp));
+                }
+
             }
 
 
