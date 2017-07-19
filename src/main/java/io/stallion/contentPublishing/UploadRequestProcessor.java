@@ -76,6 +76,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         }
         this.uploadsFolder = uploadsFolder;
         this.fileController = fileController;
+
     }
 
     public U upload() {
@@ -112,6 +113,9 @@ public class UploadRequestProcessor<U extends UploadedFile> {
                 .setPubliclyViewable(Settings.instance().getUserUploads().getUploadsArePublic())
                 .setId(id)
                 ;
+        if ("true".equals(stRequest.getQueryParams().getOrDefault("stUploadIsPublic", ""))) {
+            uploaded.setPubliclyViewable(true);
+        }
         fileController.save(uploaded);
         return uploaded;
     }

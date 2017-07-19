@@ -1,6 +1,6 @@
 <template>
     <div class="image-upload-target-vue">
-        <form :action="formAction"
+        <form :action="completeFormAction"
               class="image-dropzone dropzone"
               id="my-image-dropzone">
         </form>        
@@ -10,17 +10,38 @@
 <script>
  module.exports = {
      props: {
+         message: {
+             type: String,
+             default: "Drag one more more files here. Or click to open a file picker.",
+         },
+         isPublic: {
+             default: false
+         },
          callback: Function,
          formAction: {
              type: String,
              default: "/st-user-uploads/upload-file"
          },         
      },
+     computed: {
+         completeFormAction: function() {
+             var action = this.formAction;
+             if (action.indexOf('?') === -1) {
+                 action += '?';
+             } else {
+                 action += '&';
+             }
+             if (this.isPublic) {
+                 action += 'stUploadIsPublic=true';
+             }
+             return action;
+         }
+     },
      mounted: function() {
          var self = this;
          console.log('form-components/image-uploader.mounted');
          self.dropzone = new Dropzone($(self.$el).find('.image-dropzone').get(0), {
-             dictDefaultMessage: "Drag one more more files here. Or click to open a file picker.",
+             dictDefaultMessage: self.message,
              uploadMultiple: false,
              //             parallelUploads: true,
              maxFiles: 1,
@@ -37,7 +58,7 @@
                      if (self.callback) {
                          self.callback(response);
                      }
-                     self.$emit('uploaded', file);
+                     self.$emit('uploaded', {domFile: file, fileInfo: response});
 
                  });
              },
