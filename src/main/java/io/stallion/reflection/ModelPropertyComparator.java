@@ -17,24 +17,30 @@
 
 package io.stallion.reflection;
 
-import java.io.Serializable;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
-/**
- * A comparator that compares objects based on the passed in property name, using
- * PropertyUtils to look up the parameter.
- *
- * @param <T>
- */
-public class PropertyComparator<T> implements Comparator<T> {
+import io.stallion.dataAccess.Model;
+import io.stallion.services.Log;
+
+
+public class ModelPropertyComparator <T extends Model> implements Comparator<T> {
     private String propertyName = "";
+    private boolean idIsSecondarySort = false;
 
-    public PropertyComparator(String propertyName) {
+    public ModelPropertyComparator(String propertyName) {
         this.propertyName = propertyName;
     }
+
+
+    public ModelPropertyComparator(String propertyName, boolean idIsSecondarySort) {
+        this.propertyName = propertyName;
+        this.idIsSecondarySort = idIsSecondarySort;
+    }
+
 
     @Override
     public int compare(T o1, T o2) {
@@ -44,13 +50,21 @@ public class PropertyComparator<T> implements Comparator<T> {
         Comparable val1 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o1, propertyName);
         Comparable val2 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o2, propertyName);
         if (val1 == null && val2 == null) {
-            return 0;
+            if (idIsSecondarySort && o1.getId() != null && o2.getId() != null) {
+                return o1.getId().compareTo(o2.getId());
+            } else {
+                return 0;
+            }
         } else if (val1 == null) {
             return 1;
         } else if (val2 == null) {
             return -1;
         }
 
-        return val1.compareTo(val2);
+        int result = val1.compareTo(val2);
+        if (result == 0 && idIsSecondarySort && o1.getId() != null && o2.getId() != null) {
+            o1.getId().compareTo(o2.getId());
+        }
+        return result;
     }
 }

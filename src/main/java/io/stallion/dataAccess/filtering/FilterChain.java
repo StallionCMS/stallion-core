@@ -20,6 +20,7 @@ package io.stallion.dataAccess.filtering;
 import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.LocalMemoryStash;
 import io.stallion.exceptions.UsageException;
+import io.stallion.reflection.ModelPropertyComparator;
 import io.stallion.reflection.PropertyComparator;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
@@ -71,6 +72,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     private Integer matchingCount = 0;
     private LocalMemoryStash<T> stash;
     private boolean useCache = true;
+    private boolean idAsSecondarySort = true;
 
     public FilterChain(String bucket, List<T> originalObjects) {
         this.bucket = bucket;
@@ -780,7 +782,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         // Apply the sort
         if (!Literals.empty(getSortField())) {
             //BeanComparator beanComparator = new BeanComparator(getSortField());
-            PropertyComparator comparator = new PropertyComparator(getSortField());
+            ModelPropertyComparator comparator = new ModelPropertyComparator(getSortField(), isIdAsSecondarySort());
             Collections.sort(items, comparator);
             if (getSortDirection().equals(SortDirection.DESC)) {
                 Collections.reverse(items);
@@ -1151,6 +1153,15 @@ public class FilterChain<T extends Model> implements Iterable<T> {
 
     protected void setSortField(String sortField) {
         this.sortField = sortField;
+    }
+
+    public boolean isIdAsSecondarySort() {
+        return idAsSecondarySort;
+    }
+
+    public FilterChain setIdAsSecondarySort(boolean idAsSecondarySort) {
+        this.idAsSecondarySort = idAsSecondarySort;
+        return this;
     }
 
     public SortDirection getSortDirection() {

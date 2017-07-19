@@ -55,6 +55,7 @@ public class QueryToPager<T extends Model> {
     private Integer _pageSize = 50;
     private boolean _requestProcessed = false;
     private String defaultSort = "";
+    private boolean idAsSecondarySort = true;
 
 
 
@@ -213,6 +214,16 @@ public class QueryToPager<T extends Model> {
 
     public QueryToPager setDefaultSort(String defaultSort) {
         this.defaultSort = defaultSort;
+        return this;
+    }
+
+
+    public FilterChain<T> getChain() {
+        return chain;
+    }
+
+    public QueryToPager setChain(FilterChain<T> chain) {
+        this.chain = chain;
         return this;
     }
 }
