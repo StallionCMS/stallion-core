@@ -28,6 +28,7 @@ import io.stallion.reflection.PropertyComparator;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -156,6 +157,7 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
         if (!file.exists() || !file.isFile()) {
             return null;
         }
+        Log.finest("Fetch one from file path: {0}", filePath);
         T o = doFetchOne(file);
         if (o == null) {
             return null;

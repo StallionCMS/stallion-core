@@ -159,7 +159,7 @@ public class QueryToPager<T extends Model> {
             List<LinkedHashMap> filterObjects = JSON.parseList(filters);
             for (LinkedHashMap<String, Object> o: filterObjects) {
                 String field = o.get("name").toString();
-                if (_allFilters && !_allowedFilters.contains(field)) {
+                if (!_allFilters && !_allowedFilters.contains(field)) {
                     Log.warn("Filter not allowed: " + field);
                     continue;
                 }
@@ -179,7 +179,7 @@ public class QueryToPager<T extends Model> {
                 sort = sort.substring(1);
                 dir = SortDirection.DESC;
             }
-            if (_allSorts && !_allowedSortable.contains(sort)) {
+            if (!_allSorts && !_allowedSortable.contains(sort)) {
                 Log.warn("Sort not allowed: " + sort);
             } else {
                 this.chain = chain.sortBy(sort, dir);
