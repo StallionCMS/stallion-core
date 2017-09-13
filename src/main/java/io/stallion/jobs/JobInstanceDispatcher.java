@@ -57,6 +57,8 @@ class JobInstanceDispatcher implements Runnable {
             return;
         }
         Log.info("Job locked, execute now {0}", definition.getName());
+        // Retrieve the status from the store to make sure we have the up-to-date version
+        status = JobStatusController.instance().getOrCreateForName(definition.getName());
         status.setStartedAt(DateUtils.mils());
         JobStatusController.instance().save(status);
 
