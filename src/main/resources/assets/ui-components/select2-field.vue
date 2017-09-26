@@ -47,6 +47,9 @@
              if (typeof(opt) !== 'string') {
                  value = opt.value;
                  label = opt.label;
+                 if (opt.selected !== undefined && opt.selected !== null) {
+                     selected = opt.selected;
+                 }
              }
              if (self.multiple && self.value && self.value.length != undefined) {
                  if ($.inArray(value, self.value) > -1) {
@@ -130,6 +133,7 @@
                  this.selectOptions.push(option);
              }
          },
+         
          onEnter: function(evt) {
              evt.stopPropagation();
              evt.preventDefault();
