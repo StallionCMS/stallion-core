@@ -6,7 +6,7 @@
 </style>
 
 <template>
-    <input @input="onInput" :value="value" @change="onChange" :class="'form-control autocomplete-input-vue ' + cssClass" :placeholder="placeholder"" :required="required">
+    <input @input="onInput" @keyup.enter="onEnter" :value="value" @change="onChange" :class="'form-control autocomplete-input-vue ' + cssClass" :placeholder="placeholder"" :required="required">
 </template>
 
 <script>
@@ -46,12 +46,21 @@
          new autoComplete(config);
      },
      methods: {
+         getValue: function() {
+             return this.$el.value;
+         },
+         clear: function() {
+             return this.$el.value = '';
+         },
+         onEnter: function(evt) {
+             this.$emit('enter', evt, this);
+         },
          onInput: function(evt) {
-             this.$emit('input', evt.target.value);
+             this.$emit('input', evt.target.value, evt, this);
          },
          onChange: function(evt) {
-             this.$emit('input', evt.target.value);
-             this.$emit('change', evt);
+             this.$emit('input', evt.target.value, evt, this);
+             this.$emit('change', evt, this);
          }
      }
  };
