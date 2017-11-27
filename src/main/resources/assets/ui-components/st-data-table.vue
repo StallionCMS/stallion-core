@@ -132,7 +132,7 @@
                 <slot name="search">
                     <form @submit.prevent="doSearch" class="table-search form-inline">
                         <div class="input-group search-input-group">
-                            <input type="text" class="form-control search-field" :placeholder="'Search for ' + label" v-model="searchTerm">
+                            <input type="text" class="form-control search-field" :placeholder="searchPlaceholderComputed" v-model="searchTerm">
                             <span v-show="searchTerm && searchTerm.length >= 3" @click="navigate({page: 1, searchTerm: ''})" class="cancel-search">✕</span>
                             <button type="submit" class="btn btn-primary input-group-addon search-button"><i class="material-icons">search</i></button>
                         </div>
@@ -257,7 +257,7 @@
                  return [];
              }
          },
-         
+         searchPlaceholder: '',
          labelPlural: '',
          sortDirection: String,
          sortField: String,
@@ -301,6 +301,7 @@
                  data.filtersByField[filter.name] = filter.value;
              });
          }
+         
          return data;
      },
      created: function() {
@@ -367,6 +368,12 @@
              if (this.route) {
                  this.updateFromRoute();
              }
+             if (!this.searchPlaceholder) {
+                 this.searchPlaceholderComputed = 'Search for ' + this.label;
+             } else {
+                 this.searchPlaceholderComputed = this.searchPlaceholder;
+             }
+             
 
 
          },
