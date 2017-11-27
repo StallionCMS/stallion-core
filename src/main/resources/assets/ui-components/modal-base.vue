@@ -32,7 +32,7 @@
                 <div class="modal-footer">
                     <slot name="footer">
                         <button class="btn btn-primary btn-large st-button-submit" v-on:click="saveChanges">{{ confirmLabel }}</button>
-                        <a href="javascript:;" v-on:click="close" style="float:right;">{{ cancelLabel }}</a>
+                        <a href="javascript:;" class="modal-cancel-link" v-on:click="close" style="float:right;">{{ cancelLabel }}</a>
                     </slot>
                 </div>
             </div><!-- end .modal-content -->
