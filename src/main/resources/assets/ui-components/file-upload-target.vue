@@ -29,7 +29,7 @@
          var self = this;
          var opts = this.options || {};
          if (!opts.dictDefaultMessage) {
-             opts.dictDefaultMessage = "Drag one more more files here. Or click to open a file picker.";
+             opts.dictDefaultMessage = "Drag one or more files here. Or click to open a file picker.";
          }
          opts.init = function() {
              this.on("uploadprogress", function(file, percent, c, d) {

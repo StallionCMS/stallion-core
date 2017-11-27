@@ -12,7 +12,7 @@
      props: {
          message: {
              type: String,
-             default: "Drag one more more files here. Or click to open a file picker.",
+             default: "Drag one or more files here. Or click to open a file picker.",
          },
          isPublic: {
              default: false
