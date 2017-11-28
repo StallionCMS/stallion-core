@@ -238,7 +238,7 @@ if (window.$ && !window.jQuery) {
                 $target.prepend($node);
                 $errorWrap = $node;
             }
-            $errorWrap.html("<div style='' class='alert alert-danger st-error pre-fade'>" + msg + "</div>");
+            $errorWrap.html("<div style='' class='alert alert-danger st-error pre-fade'><div class='alert-icon-wrapper'><span class='alert-icon-inner material-icons'></span></div><div class='alert-message'>" + msg + "</div></div>");
             setTimeout(function() {
                 $('.st-error.pre-fade').removeClass('pre-fade');
             }, 30);       
@@ -247,8 +247,11 @@ if (window.$ && !window.jQuery) {
             var top = calcTopForMessageFixed();
             var $div = $('<div class="alert alert-danger st-error st-message-fixed pre-fade"></div>')
                 .css({right: '20px', top: top + 'px', position: 'fixed'})
-                .html(msg);
+                .html("<div class='alert-icon-wrapper'><span class='alert-icon-inner material-icons'></span></div><div class='alert-message'>" + msg + "</div><span class='close-alert-wrap'><span class='material-icons'>close</span></span>");
             $(document.body).append($div);
+            $div.find('.close-alert-wrap').click(function() {
+                $div.remove();
+            });
             setTimeout(function() {
                 $('.st-error.pre-fade').removeClass('pre-fade');
             }, 30);       
@@ -296,7 +299,7 @@ if (window.$ && !window.jQuery) {
                 $target.prepend($node);
                 $successWrap = $node;
             }
-            $successWrap.html("<div style='' class='alert alert-success st-success pre-fade'>" + msg + "</div>");
+            $successWrap.html("<div style='' class='alert alert-success st-success pre-fade'><div class='alert-message'>" + msg + "</div></div>");
             setTimeout(function() {
                 $('.st-success.pre-fade').removeClass('pre-fade');
             }, 30);       
@@ -304,8 +307,11 @@ if (window.$ && !window.jQuery) {
             var top = calcTopForMessageFixed();            
             var $div = $('<div class="alert alert-success st-success st-message-fixed"></div>')
                 .css({right: '20px', top: top + 'px', position: 'fixed'})
-                .html(msg);
+                .html("<div class='alert-icon-wrapper'><span class='alert-icon-inner material-icons'></span></div><div class='alert-message'>" + msg + "</div><span class='close-alert-wrap'><span class='material-icons'>close</span></span>");
             $(document.body).append($div);
+            $div.find('.close-alert-wrap').click(function() {
+                $div.remove();
+            });
             setTimeout(function() { $div.fadeOut(2000); }, 4000);
             setTimeout(function() { $div.remove(); }, 6000);
         }

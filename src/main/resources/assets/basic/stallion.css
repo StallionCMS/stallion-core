@@ -22,12 +22,6 @@
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1;
-    padding: 1em;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    transition: all .7s ease 0s;
 }
 .st-error h2 {
     margin: 0px;
@@ -37,17 +31,24 @@
     color: #3D7149;
     background-color: #D5ECCD;
     border-color: #3D7149;
+    transition: all .7s ease 0s;
+}
+
+.st-message-fixed {
+    opacity: 1;
     padding: 1em;
     margin-bottom: 20px;
     margin-top: 1em;
     margin-bottom: 1em;
     border: 1px solid transparent;
     border-radius: 4px;
-    transition: all .7s ease 0s;
+    
 }
-
-.st-message-fixed {
-    opacity: 1;
+.st-message-fixed .alert-icon-wrapper {
+    display: inline-block;
+}
+.st-message-fixed .alert-message {
+    display: inline-block;
 }
 
 .pre-fade {
