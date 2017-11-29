@@ -226,9 +226,10 @@ if (window.$ && !window.jQuery) {
         st.showError(o.message, form);
     };
 
-    st.showError = function(msg, target) {
+    st.showError = function(msg, target, noFade) {
         msg = msg.replace(/</g, '&lt;');
         msg = msg.replace(/>/g, '&gt;');
+        msg = msg.replace(/\n/g, '<br>');
         if (target) {
             var $target = $(target);
             var $errorWrap = $target.find('.st-error-wrap');
@@ -254,9 +255,11 @@ if (window.$ && !window.jQuery) {
             });
             setTimeout(function() {
                 $('.st-error.pre-fade').removeClass('pre-fade');
-            }, 30);       
-            setTimeout(function() { $div.fadeOut(2000); }, 4000);
-            setTimeout(function() { $div.remove(); }, 6000);
+            }, 30);
+            if (!noFade) {
+                setTimeout(function() { $div.fadeOut(2000); }, 4000);
+                setTimeout(function() { $div.remove(); }, 6000);
+            }
         }
 
     };
@@ -289,6 +292,10 @@ if (window.$ && !window.jQuery) {
     }
 
     st.showSuccess = function(msg, target) {
+        msg = msg.replace(/</g, '&lt;');
+        msg = msg.replace(/>/g, '&gt;');
+        msg = msg.replace(/\n/g, '<br>');
+        
         var $target = null;
         if (target) {
             $target = $(target);
@@ -312,8 +319,10 @@ if (window.$ && !window.jQuery) {
             $div.find('.close-alert-wrap').click(function() {
                 $div.remove();
             });
-            setTimeout(function() { $div.fadeOut(2000); }, 4000);
-            setTimeout(function() { $div.remove(); }, 6000);
+            if (!noFade) {
+                setTimeout(function() { $div.fadeOut(2000); }, 4000);
+                setTimeout(function() { $div.remove(); }, 6000);
+            }
         }
     };
 
