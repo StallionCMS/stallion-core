@@ -291,7 +291,7 @@ if (window.$ && !window.jQuery) {
         return top;
     }
 
-    st.showSuccess = function(msg, target) {
+    st.showSuccess = function(msg, target, noFade) {
         msg = msg.replace(/</g, '&lt;');
         msg = msg.replace(/>/g, '&gt;');
         msg = msg.replace(/\n/g, '<br>');
