@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.List;
 
 
 public class SecureTempTokens {
@@ -36,7 +37,14 @@ public class SecureTempTokens {
         return getOrCreate(key, expires);
     }
     public static TempToken getOrCreate(String key, ZonedDateTime expiresAt) throws Exception {
-        TempToken token = (TempToken) DB.instance().fetchOne(TempToken.class, "customkey", key);
+        List<TempToken> tokens = DB.instance().queryBean(TempToken.class,
+                "SELECT * FROM stallion_temp_tokens WHERE customKey=? LIMIT 1",
+                key);
+
+        TempToken token = null;
+        if (tokens.size() > 0) {
+            token = tokens.get(0);
+        }
         ZonedDateTime now = DateUtils.utcNow();
         // If the token has already been used or is expired, we generate a new token
         if (token != null && token.getUsedAt() == null && now.isBefore(token.getExpiresAt())) {
@@ -65,7 +73,9 @@ public class SecureTempTokens {
         if (StringUtils.isBlank(tokenString)) {
             throw new ClientException("The passed in token is empty");
         }
-        TempToken token = (TempToken)DB.instance().fetchOne(TempToken.class, "token", tokenString);
+        TempToken token = DB.instance().fetchBean(TempToken.class,
+                "SELECT * FROM stallion_temp_tokens WHERE token=? LIMIT 1",
+                tokenString);
         if (token == null) {
             throw new ClientException("Token not found");
         }

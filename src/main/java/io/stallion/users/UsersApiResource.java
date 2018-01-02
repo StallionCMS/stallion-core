@@ -208,8 +208,6 @@ public class UsersApiResource implements EndpointResource {
         return user;
     }
 
-
-
     @POST
     @Path("/send-verify-email")
     @Produces("text/html")

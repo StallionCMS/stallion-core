@@ -563,6 +563,33 @@ public class DB {
     }
 
     /**
+     * Find a list of objects of the given model via arbitrary SQL.
+     * Accepts any java bean, does not require a Stallion Model
+     *
+     * @param model
+     * @param sql
+     * @param args
+     * @param <T>
+     * @return
+     */
+    public <T> T fetchBean(Class<T> model, String sql, Object ...args) {
+        QueryRunner runner = new QueryRunner(dataSource);
+        //BeanListHandler<T> handler = new BeanListHandler(model);
+        BeanListHandler<T> handler = new BeanListHandler(model);
+        try {
+            List<T> results = runner.query(sql, handler, args);
+            if (results.size() == 0) {
+                return null;
+            } else {
+                return results.get(0);
+            }
+        } catch (SQLException e) {
+            Log.exception(e.getNextException(), "Root exception in queryBean");
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Find a list of objects via arbitrary SQL, checking the cache first, and storing to the
      * cache if retrieved fromt he database.
      *
