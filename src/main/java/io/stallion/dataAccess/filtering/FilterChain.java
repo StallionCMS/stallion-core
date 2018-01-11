@@ -73,6 +73,12 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     private LocalMemoryStash<T> stash;
     private boolean useCache = true;
     private boolean idAsSecondarySort = true;
+    private List<String> sumColumns = list();
+    private List<String> averageColumns = list();
+
+    private Map<String, Double> averages = null;
+    private Map<String, Double> sums = null;
+
 
     public FilterChain(String bucket, List<T> originalObjects) {
         this.bucket = bucket;
@@ -111,6 +117,9 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         this.sortDirection = chain.sortDirection;
         this.originalObjects = chain.originalObjects;
     }
+
+
+
 
     /**
      * Do a basic equality filter
@@ -351,6 +360,8 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         chain.setUseCache(this.isUseCache());
         chain.operations = (ArrayList<FilterOperation>)operations.clone();
         chain.setIncludeDeleted(getIncludeDeleted());
+        chain.averageColumns = averageColumns;
+        chain.sumColumns = sumColumns;
         return chain;
     }
 
@@ -425,6 +436,8 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         setCached("groupBy", groups);
         return groups;
     }
+
+
 
     /**
      * Do a groupBy of the passed in objects.
@@ -507,6 +520,21 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         }
             */
         return groups;
+    }
+
+    /**
+     * Return an average of the following columns with the pager.
+     *
+     * @return
+     */
+    public FilterChain<T> avg(String... cols) {
+        this.averageColumns.addAll(list(cols));
+        return this;
+    }
+
+    public FilterChain<T> sum(String... cols) {
+        this.sumColumns.addAll(list(cols));
+        return this;
     }
 
 
@@ -679,9 +707,13 @@ public class FilterChain<T extends Model> implements Iterable<T> {
 
         Pager pager = new Pager();
         pager.setCurrentItems(objects);
+        pager.setSums(sums);
+        pager.setAverages(averages);
+
         if (objects.size() == 0) {
             return pager;
         }
+
         pager.setCurrentPage(page);
         pager.setItemsPerPage(size);
         pager.setHasPreviousPage(true);
@@ -1238,6 +1270,45 @@ public class FilterChain<T extends Model> implements Iterable<T> {
 
     FilterChain setStash(LocalMemoryStash<T> stash) {
         this.stash = stash;
+        return this;
+    }
+
+
+    protected List<String> getSumColumns() {
+        return sumColumns;
+    }
+
+    public FilterChain setSumColumns(List<String> sumColumns) {
+        this.sumColumns = sumColumns;
+        return this;
+    }
+
+    protected List<String> getAverageColumns() {
+        return averageColumns;
+    }
+
+    public FilterChain setAverageColumns(List<String> averageColumns) {
+        this.averageColumns = averageColumns;
+        return this;
+    }
+
+
+    public Map<String, Double> getAverages() {
+        return averages;
+    }
+
+    public FilterChain setAverages(Map<String, Double> averages) {
+        this.averages = averages;
+        return this;
+    }
+
+
+    public Map<String, Double> getSums() {
+        return sums;
+    }
+
+    public FilterChain setSums(Map<String, Double> sums) {
+        this.sums = sums;
         return this;
     }
 }

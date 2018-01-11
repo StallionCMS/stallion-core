@@ -17,6 +17,8 @@
 
 package io.stallion.restfulEndpoints;
 
+import javax.persistence.Column;
+import java.lang.annotation.Annotation;
 import java.util.regex.Pattern;
 
 
@@ -24,6 +26,7 @@ public class RequestArg {
     private String type = "";
     private String name = "";
     private Object defaultValue = null;
+    private Annotation annotationInstance = null;
     private Class annotationClass;
     private Class targetClass = null;
     private boolean required;
@@ -72,6 +75,14 @@ public class RequestArg {
     }
 
 
+    public Annotation getAnnotationInstance() {
+        return annotationInstance;
+    }
+
+    public RequestArg setAnnotationInstance(Annotation annotationInstance) {
+        this.annotationInstance = annotationInstance;
+        return this;
+    }
 
     public Class getAnnotationClass() {
         return annotationClass;

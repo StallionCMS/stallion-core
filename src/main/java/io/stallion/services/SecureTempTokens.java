@@ -18,6 +18,9 @@
 package io.stallion.services;
 
 import io.stallion.Context;
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.ModelController;
+import io.stallion.dataAccess.StandardModelController;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.exceptions.ClientException;
 import io.stallion.utils.DateUtils;
@@ -30,13 +33,25 @@ import java.util.Base64;
 import java.util.List;
 
 
-public class SecureTempTokens {
-    public static TempToken getOrCreate(String key) throws Exception {
+public class SecureTempTokens extends StandardModelController<TempToken> {
+
+    public static SecureTempTokens instance() {
+        return (SecureTempTokens) DataAccessRegistry.instance().get("stallion_temp_tokens");
+    }
+
+    public static void register() {
+        DataAccessRegistry.instance().registerDbModel(TempToken.class, SecureTempTokens.class, false);
+    }
+
+
+
+    public TempToken getOrCreate(String key) {
         ZonedDateTime expires = DateUtils.utcNow();
         expires = expires.plusDays(7);
         return getOrCreate(key, expires);
     }
-    public static TempToken getOrCreate(String key, ZonedDateTime expiresAt) throws Exception {
+
+    public TempToken getOrCreate(String key, ZonedDateTime expiresAt) {
         List<TempToken> tokens = DB.instance().queryBean(TempToken.class,
                 "SELECT * FROM stallion_temp_tokens WHERE customKey=? LIMIT 1",
                 key);
@@ -63,13 +78,13 @@ public class SecureTempTokens {
         return token;
     }
 
-    public static TempToken markUsed(TempToken token) throws Exception {
+    public TempToken markUsed(TempToken token) {
         token.setUsedAt(DateUtils.utcNow());
         DB.instance().save(token);
         return token;
     }
 
-    public static TempToken fetchToken(String tokenString) throws Exception {
+    public TempToken fetchToken(String tokenString) {
         if (StringUtils.isBlank(tokenString)) {
             throw new ClientException("The passed in token is empty");
         }
@@ -89,7 +104,7 @@ public class SecureTempTokens {
         return token;
     }
 
-    public static String idToRandomString(Long id) {
+    public String idToRandomString(Long id) {
         SecureRandom random = new SecureRandom();
         Integer rand = random.nextInt();
         Long n = rand * 1000000000 + id;

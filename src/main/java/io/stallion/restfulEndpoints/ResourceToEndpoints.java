@@ -126,6 +126,7 @@ public class ResourceToEndpoints {
                 x++;
                 RequestArg arg = new RequestArg();
                 for (Annotation anno: param.getAnnotations()) {
+                    arg.setAnnotationInstance(anno);
                     Log.finer("Param Annotation is: {0}, {1}", anno, anno.getClass().getName());
                     if (BodyParam.class.isInstance(anno)) {
                         BodyParam bodyAnno = (BodyParam)(anno);

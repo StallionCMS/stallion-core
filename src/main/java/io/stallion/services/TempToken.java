@@ -28,6 +28,8 @@ import javax.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 
+import static io.stallion.utils.Literals.*;
+
 
 @Table(name="stallion_temp_tokens")
 public class TempToken extends ModelBase {
@@ -74,7 +76,12 @@ public class TempToken extends ModelBase {
 
     @JsonIgnore
     public void setData(String data) throws Exception {
-        this.data = (HashMap<String, Object>)JSON.parse(data, new TypeReference<HashMap<String, Object>>(){});
+        if (!empty(data)) {
+            this.data = (HashMap<String, Object>) JSON.parse(data, new TypeReference<HashMap<String, Object>>() {
+            });
+        } else {
+            this.data = new HashMap<>();
+        }
     }
 
 

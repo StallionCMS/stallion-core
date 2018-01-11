@@ -17,22 +17,28 @@
 
 package io.stallion.dataAccess.filtering;
 
+
 import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.Schema;
 import io.stallion.dataAccess.db.SmartQueryCache;
 import io.stallion.exceptions.UsageException;
+import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.Literals;
+import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.apply;
 import static io.stallion.utils.Literals.asArray;
+import static io.stallion.utils.Literals.map;
 
 /**
  * A filter chain that generates a MySQL query, rather than operating on
@@ -102,9 +108,9 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 } else {
                     String operatorSql = op.getOperatorForSql();
                     if (operatorSql.equals("=") && op.getOriginalValue() == null) {
-                        whereBuilder.append(MessageFormat.format(" ({0} IS NULL) ", op.getFieldName()));
+                        whereBuilder.append(MessageFormat.format(" (`{0}` IS NULL) ", op.getFieldName()));
                     } else {
-                        whereBuilder.append(MessageFormat.format(" ({0} {1} ?) ", op.getFieldName(), operatorSql));
+                        whereBuilder.append(MessageFormat.format(" (`{0}` {1} ?) ", op.getFieldName(), operatorSql));
                         params.add(formatParam(op));
                     }
 
@@ -146,6 +152,43 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             Object count = DB.instance().queryScalar(countSql, paramObjects);
             Integer countInt = count instanceof Integer ? (Integer)count : ((Long)count).intValue();
             setMatchingCount(countInt);
+        }
+
+        this.setAverages(map());
+        this.setSums(map());
+
+        if (getAverageColumns().size() > 0 || getSumColumns().size() > 0) {
+            List<String> columnNames = apply(getSchema().getColumns(), col->col.getName());
+            String sql = "";
+            for (String col: getAverageColumns()) {
+                if (!columnNames.contains(col)) {
+                    Log.warn("Tried to average column that doesn't exist " + col);
+                    continue;
+                }
+                sql += " AVG(`" + col + "`) AS `staverage_" + col + "`,";
+            }
+            for (String col: getSumColumns()) {
+                if (!columnNames.contains(col)) {
+                    Log.warn("Tried to sum column that doesn't exist " + col);
+                    continue;
+                }
+                sql += " SUM(`" + col + "`) AS `stsum_" + col + "`,";
+            }
+            if (!StringUtils.isEmpty(sql)) {
+                sql = " SELECT " + StringUtils.strip(sql, ",") + " FROM `" + getSchema().getName() + "` " + whereSql;
+                Map result = DB.instance().findRecord(sql, paramObjects);
+                for (String col : getAverageColumns()) {
+                    if (result.containsKey("staverage_" + col)) {
+                        getAverages().put(col, ((BigDecimal) result.get("staverage_" + col)).doubleValue());
+                    }
+                }
+                for (String col : getSumColumns()) {
+                    if (result.containsKey("stsum_" + col)) {
+                        getSums().put(col, ((BigDecimal) result.get("stsum_" + col)).doubleValue());
+                    }
+                }
+            }
+
         }
 
     }

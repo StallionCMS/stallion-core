@@ -20,10 +20,13 @@ package io.stallion.dataAccess.filtering;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.map;
 
 /**
  * A class holding the paged results from a filter operation.
@@ -39,6 +42,9 @@ public class Pager<T> {
     private boolean hasPreviousPage = false;
     private int nextPageNumber = 2;
     private int previousPageNumber = 0;
+    private Map<String, Double> averages = map();
+    private Map<String, Double> sums = map();
+
 
 
 
@@ -183,6 +189,23 @@ public class Pager<T> {
         return pages;
     }
 
+    public Map<String, Double> getAverages() {
+        return averages;
+    }
+
+    public Pager setAverages(Map<String, Double> averages) {
+        this.averages = averages;
+        return this;
+    }
+
+    public Map<String, Double> getSums() {
+        return sums;
+    }
+
+    public Pager setSums(Map<String, Double> sums) {
+        this.sums = sums;
+        return this;
+    }
 
 
     // surrounding(2)

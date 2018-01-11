@@ -22,6 +22,7 @@ import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
@@ -97,6 +98,42 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
         PaymentController.instance().hardDelete(payment);
         Payment paymentQ3 = PaymentController.instance().filter("onTime", "true").filter("accountId", "franklin-warzal-19380203").first();
         assertNull(paymentQ3);
+
+    }
+
+    @Test
+    public void testSumsAverages() {
+        DB.instance().execute("DELETE FROM stallion_test_payment WHERE accountId='franklin-bruce-19380203'");
+
+        Payment payment = new Payment()
+                .setAccountId("franklin-bruce-19380203")
+                .setAmount(90)
+                .setMemo("via check")
+                .setOnTime(true)
+                .setDate(DateUtils.mils())
+                ;
+        PaymentController.instance().save(payment);
+
+
+        payment = new Payment()
+                .setAccountId("franklin-bruce-19380203")
+                .setAmount(50)
+                .setMemo("via check")
+                .setOnTime(true)
+                .setDate(DateUtils.mils())
+                ;
+        PaymentController.instance().save(payment);
+
+        Pager<Payment> payments = PaymentController.instance()
+                .filter("accountId", "franklin-bruce-19380203")
+                .sum("amount")
+                .avg("amount")
+                .pager(1, 10);
+
+        assertEquals(payments.getAverages().get("amount"), (Double)70.0);
+        assertEquals(payments.getSums().get("amount"), (Double)140.0);
+
+
 
     }
 

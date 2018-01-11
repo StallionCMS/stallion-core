@@ -289,6 +289,15 @@ public class GeneralUtils {
         return s;
     }
 
+    public static String secureRandomNumeric(int length) {
+        SecureRandom test = new SecureRandom();
+        int result = test.nextInt(((Double)Math.pow(10, length)).intValue());
+        String resultStr = result + "";
+        if (resultStr.length() != length)
+            for (int x = resultStr.length(); x < length; x++) resultStr = "0" + resultStr;
+        return resultStr;
+    }
+
     /**
      * Generates a random string using the psuedo-random module, of the given length,
      * using URL safe base64 characters
