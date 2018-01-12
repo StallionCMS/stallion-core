@@ -357,6 +357,10 @@ public class FilterChain<T extends Model> implements Iterable<T> {
      */
     protected FilterChain<T> newCopy() {
         FilterChain<T> chain = new FilterChain<T>(this.getBucket(), originalObjects, stash);
+        return newCopy(chain);
+    }
+
+    protected FilterChain<T> newCopy(FilterChain<T> chain) {
         chain.setUseCache(this.isUseCache());
         chain.operations = (ArrayList<FilterOperation>)operations.clone();
         chain.setIncludeDeleted(getIncludeDeleted());

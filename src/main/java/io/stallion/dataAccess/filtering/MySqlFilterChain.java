@@ -29,6 +29,7 @@ import io.stallion.utils.Literals;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -67,9 +68,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
     protected FilterChain<T> newCopy() {
         FilterChain<T> chain = new MySqlFilterChain<T>(table, this.getBucket(), this.clazz);
-        chain.operations = (ArrayList<FilterOperation>)getOperations().clone();
-        chain.setIncludeDeleted(getIncludeDeleted());
-        return chain;
+        return newCopy(chain);
     }
 
     @Override
@@ -179,18 +178,35 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 Map result = DB.instance().findRecord(sql, paramObjects);
                 for (String col : getAverageColumns()) {
                     if (result.containsKey("staverage_" + col)) {
-                        getAverages().put(col, ((BigDecimal) result.get("staverage_" + col)).doubleValue());
+                        getAverages().put(col, toDouble(result.get("staverage_" + col)));
                     }
                 }
                 for (String col : getSumColumns()) {
                     if (result.containsKey("stsum_" + col)) {
-                        getSums().put(col, ((BigDecimal) result.get("stsum_" + col)).doubleValue());
+                        getSums().put(col, toDouble(result.get("stsum_" + col)));
                     }
                 }
             }
 
         }
 
+    }
+
+    public Double toDouble(Object obj) {
+        if (obj instanceof BigInteger) {
+            return ((BigInteger)obj).doubleValue();
+        } else if (obj instanceof BigDecimal) {
+            return ((BigDecimal)obj).doubleValue();
+        } else if (obj instanceof Double) {
+            return (Double)obj;
+        } else if (obj instanceof Long) {
+            ((Long)obj).longValue();
+        } else if (obj instanceof Integer) {
+            ((Integer)obj).intValue();
+        } else if (obj instanceof Float) {
+            ((Float)obj).doubleValue();
+        }
+        return (Double)obj;
     }
 
     private void addOrOperation(FilterOperation or, StringBuilder whereBuilder, List<Object> params) {

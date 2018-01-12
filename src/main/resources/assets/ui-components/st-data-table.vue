@@ -553,6 +553,7 @@
                          self.afterAttachedAndLoaded();
                      }
                  }
+                 self.$emit('pagerloaded', pager);
              };
              self.doFetchData(callback);
          },
@@ -577,7 +578,7 @@
                  self.hasMore = pager.hasNextPage;
                  self.fetchingMore = false;
                  self.isScrolling = false;
-                 
+                 self.$emit('pagerappended', pager);
              };
              this.scrollPage++;
              self.doFetchData(callback, this.scrollPage);
