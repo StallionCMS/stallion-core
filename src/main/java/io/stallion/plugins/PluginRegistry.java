@@ -21,6 +21,7 @@ import io.stallion.boot.StallionRunAction;
 import io.stallion.plugins.javascript.JsPluginEngine;
 
 import io.stallion.plugins.javascript.TestResults;
+import io.stallion.services.HostSettings;
 import io.stallion.services.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xbean.classloader.JarFileClassLoader;
@@ -184,7 +185,7 @@ public class PluginRegistry {
             JsPluginEngine engine = new JsPluginEngine(shouldWatchFiles);
             jsPlugins.put(pluginName, engine);
             engine.loadJavascript(pluginName, jsPath);
-
+            HostSettings.instance().initGroup(pluginName);
         }
 
 
@@ -238,6 +239,7 @@ public class PluginRegistry {
             Log.finer("Booter class was loaded from: {0} ", booterClass.getProtectionDomain().getCodeSource().getLocation());
             StallionJavaPlugin booter = (StallionJavaPlugin)booterClass.newInstance();
             loadPluginFromBooter(booter);
+            HostSettings.instance().initGroup(booter.getPluginName());
         }
     }
 

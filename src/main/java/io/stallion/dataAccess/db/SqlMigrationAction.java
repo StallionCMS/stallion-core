@@ -194,7 +194,9 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
                 "00020-create-audit-trail",
                 "00025-create-transaction-log",
                 "00030-job-status-new-columns",
-                "00035-uploaded-files"
+                "00035-uploaded-files",
+                "00040-short_code_tokens",
+                "00050-host_settings"
         ));
         if (PluginRegistry.instance() != null) {
             for (StallionJavaPlugin plugin : PluginRegistry.instance().getJavaPluginByName().values()) {
@@ -226,6 +228,9 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
     }
 
     void createMigrationTrackingTableIfNotExists() {
+        if (DB.instance() == null) {
+            throw new ConfigException("No database available. Did you configure a database in stallion.toml?");
+        }
         String sql = ResourceHelpers.loadResource("stallion", "/sql/migrations-table." + DB.instance().getDbImplementation().getName() + ".sql");
         DB.instance().execute(sql);
 

@@ -26,4 +26,4 @@ template = "template-direct.jinja"
 [database]
 url = "jdbc:mariadb://localhost:3306/stallion_test?allowMultiQueries=true&autoReConnect=true"
 username = "root"
-password = "tombrady12patriots"
+password = "TB12haz5rings"

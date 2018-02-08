@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `stallion_temp_tokens` (
     targetKey varchar(75) NOT NULL,
     createdAt datetime,
     usedAt datetime,
+    `deleted` bit(1) NOT NULL,
     `row_updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     data longtext,
   PRIMARY KEY (`id`),

@@ -23,8 +23,10 @@ import io.stallion.dataAccess.MappedModelBase;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.dataAccess.file.TextItem;
+import io.stallion.services.HostSettings;
 import io.stallion.testing.AppIntegrationCaseBase;
 import io.stallion.utils.DateUtils;
+import io.stallion.utils.GeneralUtils;
 import org.junit.*;
 
 import java.net.URL;
@@ -250,6 +252,18 @@ public class FilePersistenceTest extends AppIntegrationCaseBase {
         Assert.assertEquals(0, bios.filter("birthState", "IL").all().size());
         bios.reset();
         Assert.assertEquals(0, bios.filter("birthState", "IL").all().size());
+
+    }
+
+
+
+    @Test
+    public void testHostSettings() {
+        String val = GeneralUtils.randomTokenBase32(30);
+        String name = "somethingsomething";
+        HostSettings.instance().put("core", name, val);
+
+        Assert.assertEquals(val, HostSettings.instance().get("core", name));
 
     }
 

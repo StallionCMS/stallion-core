@@ -24,10 +24,12 @@ import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
+import io.stallion.services.HostSettings;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
 import io.stallion.testing.MockResponse;
 import io.stallion.utils.DateUtils;
+import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.JSON;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,6 +69,16 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
         );
         DB.instance().registerConverter(new PicnicAttendeesConverter());
         EndpointsRegistry.instance().addResource("/st-mysql-tests", new MySqlEndpoint());
+    }
+
+    @Test
+    public void testHostSettings() {
+        String val = GeneralUtils.randomTokenBase32(30);
+        String name = "somethingsomething";
+        HostSettings.instance().put("core", name, val);
+
+        assertEquals(val, HostSettings.instance().get("core", name));
+
     }
 
 

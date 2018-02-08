@@ -170,6 +170,8 @@ public class AppContextLoader {
         FilterCache.load();
         DataAccessRegistry.load();
         AssetsController.load();
+        HostSettings.load();
+
         //DefinedBundle.load();
         TemplateRenderer.load();
         TemplateRenderer.instance().getJinjaTemplating().registerTag(new SimpleFormTag());
@@ -259,6 +261,7 @@ public class AppContextLoader {
 
         DataAccessRegistry.shutdown();
         SiteMapController.shutdown();
+        HostSettings.shutdown();
 
         DB.shutdown();
 
