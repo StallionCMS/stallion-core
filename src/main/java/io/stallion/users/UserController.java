@@ -520,6 +520,9 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         if (user == null) {
             return false;
         }
+        if (!user.getApproved()) {
+            return false;
+        }
         if (user.isPredefined()) {
             throw new ClientException("You cannot reset the password for a builtin user. You must edit this user in your configuration files.");
         }
