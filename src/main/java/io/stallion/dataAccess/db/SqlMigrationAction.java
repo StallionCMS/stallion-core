@@ -196,7 +196,7 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
                 "00030-job-status-new-columns",
                 "00035-uploaded-files",
                 "00040-short_code_tokens",
-                "00050-host_settings"
+                "00050-dynamic_settings"
         ));
         if (PluginRegistry.instance() != null) {
             for (StallionJavaPlugin plugin : PluginRegistry.instance().getJavaPluginByName().values()) {

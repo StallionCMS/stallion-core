@@ -215,6 +215,20 @@ public class Log {
 
     }
 
+    public static void warn(Throwable ex, String message, Object ... args) {
+        if (getLogLevel().intValue() > Level.WARNING.intValue()) {
+            return;
+        }
+        if (args.length > 0) {
+            message = MessageFormat.format(message, args);
+        }
+        Throwable t = new Throwable();
+        StackTraceElement stackTraceElement = t.getStackTrace()[1];
+        String clz = stackTraceElement.getClassName().replace("io.stallion.", "");
+        String method = stackTraceElement.getMethodName() + ":" + t.getStackTrace()[1].getLineNumber();
+        logger.logp(Level.WARNING, clz, method, message, ex);
+    }
+
     /**
      * Logs a message, setting the class, method and source line number using the stack frame index passed in.
      * This is useful if you are wrapping a logging class, and want to include the line number from where

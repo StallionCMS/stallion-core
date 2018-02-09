@@ -35,10 +35,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 
-public class HostSettings {
-    private static HostSettings _instance;
+public class DynamicSettings {
+    private static DynamicSettings _instance;
 
-    public static HostSettings instance() {
+    public static DynamicSettings instance() {
         return _instance;
     }
 
@@ -46,7 +46,7 @@ public class HostSettings {
         if (_instance != null) {
             return;
         }
-        _instance = new HostSettings();
+        _instance = new DynamicSettings();
         _instance.initGroup("core");
         // Query the database for records
     }
@@ -60,9 +60,9 @@ public class HostSettings {
     private ZonedDateTime lastSyncAt = null;
     private String directory;
 
-    HostSettings () {
+    DynamicSettings() {
         dbAvailable = DB.available();
-        directory = Settings.instance().getDataDirectory() + "/host-settings";
+        directory = Settings.instance().getDataDirectory() + "/dynamic-settings";
         new File(directory).mkdirs();
         loadAll();
     }
@@ -77,7 +77,7 @@ public class HostSettings {
         }
     }
 
-    public HostSettings put(String group, String name, String value) {
+    public DynamicSettings put(String group, String name, String value) {
         group = GeneralUtils.slugify(group);
         if (!settingsMap.containsKey(group)) {
             synchronized (settingsMap) {
@@ -116,7 +116,7 @@ public class HostSettings {
     private void persistToDatabase(String group, String name, String value) {
         // Save to the database or to file
         DB.instance().execute(
-                "INSERT INTO stallion_host_settings (`group`, `name`, `value`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `value`=VALUES(`value`)",
+                "INSERT INTO stallion_dynamic_settings (`group`, `name`, `value`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `value`=VALUES(`value`)",
                 group, name, value
         );
     }
@@ -138,7 +138,7 @@ public class HostSettings {
         return settingsParsedObjectMap.get(group).getOrDefault(name, null);
     }
 
-    public HostSettings stashParsedObject(String group, String name, Object value) {
+    public DynamicSettings stashParsedObject(String group, String name, Object value) {
         group = GeneralUtils.slugify(group);
         if (!settingsParsedObjectMap.containsKey(group)) {
             settingsParsedObjectMap.put(group, map());
@@ -187,29 +187,33 @@ public class HostSettings {
     }
 
     public void loadUpdated(ZonedDateTime since) {
-        List<HostSetting> settings = list();
+        List<DynamicSetting> settings = list();
         if (since == null) {
             settings = DB.instance().queryBean(
-                    HostSetting.class,
-                    "SELECT * FROM stallion_host_settings"
+                    DynamicSetting.class,
+                    "SELECT * FROM stallion_dynamic_settings"
             );
         } else {
             settings = DB.instance().queryBean(
-                    HostSetting.class,
-                    "SELECT * FROM stallion_host_settings WHERE last_updated_at>=?",
+                    DynamicSetting.class,
+                    "SELECT * FROM stallion_dynamic_settings WHERE row_updated_at>=?",
                     DateUtils.SQL_FORMAT.format(since)
             );
         }
 
-        for (HostSetting hs: settings) {
+        for (DynamicSetting hs: settings) {
             if (!settingsMap.containsKey(hs.getGroup())) {
                 settingsMap.put(hs.getGroup(), map());
             }
             if (!settingsParsedObjectMap.containsKey(hs.getGroup())) {
                 settingsParsedObjectMap.put(hs.getGroup(), map());
             }
+            Object original = settingsMap.get(hs.getGroup()).getOrDefault(hs.getName(), null);
             settingsMap.get(hs.getGroup()).put(hs.getName(), hs.getValue());
-            settingsParsedObjectMap.get(hs.getGroup()).put(hs.getName(), null);
+
+            if (original == null || !original.equals(hs.getValue())) {
+                settingsParsedObjectMap.get(hs.getGroup()).put(hs.getName(), null);
+            }
         }
     }
 

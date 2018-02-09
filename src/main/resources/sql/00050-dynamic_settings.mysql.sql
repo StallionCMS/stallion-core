@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `stallion_host_settings` (
+CREATE TABLE IF NOT EXISTS `stallion_dynamic_settings` (
     `group`  varchar(40)  NOT NULL ,
     `name`  varchar(40)  NOT NULL ,
     `value` longtext,

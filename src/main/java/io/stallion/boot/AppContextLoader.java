@@ -170,7 +170,7 @@ public class AppContextLoader {
         FilterCache.load();
         DataAccessRegistry.load();
         AssetsController.load();
-        HostSettings.load();
+        DynamicSettings.load();
 
         //DefinedBundle.load();
         TemplateRenderer.load();
@@ -261,7 +261,7 @@ public class AppContextLoader {
 
         DataAccessRegistry.shutdown();
         SiteMapController.shutdown();
-        HostSettings.shutdown();
+        DynamicSettings.shutdown();
 
         DB.shutdown();
 

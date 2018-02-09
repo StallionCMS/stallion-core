@@ -17,17 +17,10 @@
 
 package io.stallion.services;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.services.Log;
-
 import javax.persistence.Column;
 
 
-public class HostSetting {
+public class DynamicSetting {
     private String group;
     private String name;
     private String value;
@@ -37,7 +30,7 @@ public class HostSetting {
         return group;
     }
 
-    public HostSetting setGroup(String group) {
+    public DynamicSetting setGroup(String group) {
         this.group = group;
         return this;
     }
@@ -47,7 +40,7 @@ public class HostSetting {
         return name;
     }
 
-    public HostSetting setName(String name) {
+    public DynamicSetting setName(String name) {
         this.name = name;
         return this;
     }
@@ -57,7 +50,7 @@ public class HostSetting {
         return value;
     }
 
-    public HostSetting setValue(String value) {
+    public DynamicSetting setValue(String value) {
         this.value = value;
         return this;
     }
