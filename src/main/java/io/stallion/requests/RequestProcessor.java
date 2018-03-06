@@ -456,7 +456,10 @@ class RequestProcessor {
     }
 
     private void validateRequestArgument(RequestArg arg, Object value) {
-        if ((arg.isRequired() || !arg.isAllowEmpty()) && value == null) {
+        if (!arg.isRequired() && value == null) {
+            return;
+        }
+        if (arg.isRequired() && value == null) {
             throw new ClientException("Body field " + arg.getName() + " must be provided.");
         }
         if (!arg.isAllowEmpty()) {
@@ -496,7 +499,9 @@ class RequestProcessor {
         } else if (obj instanceof jdk.nashorn.internal.runtime.ConsString) {
             return obj.toString();
         } else {
-            if (endpoint.getJsonViewClass() == null) {
+            if (obj instanceof Boolean) {
+                return JSON.stringify(map(val("succeeded", obj)));
+            } else if (endpoint.getJsonViewClass() == null) {
                 return JSON.stringify(obj, RestrictedViews.Member.class, false);
             } else if (endpoint.getJsonViewClass().isAssignableFrom(RestrictedViews.Unrestricted.class)) {
                 return JSON.stringify(obj);

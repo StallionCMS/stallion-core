@@ -34,6 +34,7 @@ import org.parboiled.common.FileUtils;
 
 import javax.script.ScriptEngine;
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -185,7 +186,7 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
 
     public List<SqlMigration> getDefaultMigrations() {
         List<SqlMigration> migrations = list();
-        Map<String, List<String>> pluginMigrations = map();
+        Map<String, List<String>> pluginMigrations =  new LinkedHashMap<>();
         pluginMigrations.put("stallion", list(
                 "00004-users",
                 "00006-async_tasks",
