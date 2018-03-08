@@ -212,7 +212,14 @@ public class PartialStash<T extends Model> extends Stash<T> {
 
     @Override
     public void hardDelete(T obj) {
+
+        T existing = itemByPrimaryKey.get(obj.getId());
+        if (existing != null) {
+            existing.setDeleted(true);
+            itemByPrimaryKey.remove(obj.getId());
+        }
         getPersister().hardDelete(obj);
+        FilterCache.clearBucket(getBucket());
     }
 
     @Override
