@@ -28,6 +28,7 @@ basic/stallion.js
 /vendor/bootstrap.js
 /material-icons-extra.css
 /stallion-ui.scss
+/loader.css
 /ui-components/common.js
 /directives/*.js
 /ui-components/*.vue
