@@ -18,6 +18,7 @@
 package io.stallion.dataAccess;
 
 import io.stallion.dataAccess.db.Col;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.exceptions.ConfigException;

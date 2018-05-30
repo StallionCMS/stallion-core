@@ -207,4 +207,14 @@ public class TaskRequest implements IRequest {
     public TaskRequest setScoped(boolean scoped) {
         return this;
     }
+
+    @Override
+    public Long getValetUserId() {
+        return null;
+    }
+
+    @Override
+    public String getValetEmail() {
+        return null;
+    }
 }

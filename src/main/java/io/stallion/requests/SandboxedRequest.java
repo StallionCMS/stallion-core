@@ -225,4 +225,15 @@ public class SandboxedRequest implements IRequest {
     public StRequest setScoped(boolean scoped) {
         return null;
     }
+
+
+    @Override
+    public Long getValetUserId() {
+        return null;
+    }
+
+    @Override
+    public String getValetEmail() {
+        return null;
+    }
 }

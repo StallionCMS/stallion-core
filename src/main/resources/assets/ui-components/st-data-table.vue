@@ -622,6 +622,7 @@
                  stallion.request({
                      url: url,
                      success: function(o) {
+                         self.$emit('dataLoaded', o);
                          o.pager.items.forEach(function(item) {
                              item.$isEditing = false;
                              item.$hidden = false;

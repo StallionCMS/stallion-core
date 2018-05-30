@@ -188,11 +188,11 @@ public class Context {
     }
 
     public static String getValetEmail() {
-        return _request.get().getValetEmail();
+        return request().getValetEmail();
     }
 
     public static Long getValetUserId() {
-        return _request.get().getValetUserId();
+        return request().getValetUserId();
     }
 
     public static void setValet(Long valetUserId, String valetEmail) {

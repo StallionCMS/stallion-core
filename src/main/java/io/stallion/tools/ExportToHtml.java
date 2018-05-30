@@ -17,6 +17,7 @@
 
 package io.stallion.tools;
 
+import com.amazonaws.util.IOUtils;
 import io.stallion.boot.AppContextLoader;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.boot.ServeCommandOptions;
@@ -32,6 +33,7 @@ import jodd.jerry.Jerry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
@@ -134,7 +136,15 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
             if (!folder.isDirectory()) {
                 folder.mkdirs();
             }
-            FileUtils.write(file, response.getContent(), UTF8);
+            if (url.getPath().endsWith(".js") || url.getPath().endsWith(".css")) {
+                FileUtils.write(file, response.getContent(), UTF8);
+            } else {
+                //ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                //response.getOutputStream()
+                //bos.writeTo(response.getOutputStream());
+                //bos.close();
+                //FileUtils.writeByteArrayToFile(file, response.getContent().getBytes());
+            }
         }
 
     }

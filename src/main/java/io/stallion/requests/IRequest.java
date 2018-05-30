@@ -296,4 +296,8 @@ public interface IRequest {
     public boolean isScoped();
 
     public IRequest setScoped(boolean scoped);
+
+    public Long getValetUserId();
+
+    public String getValetEmail();
 }

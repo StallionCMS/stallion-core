@@ -75,6 +75,7 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
         handlerCollection.setServer(server);
         handlerCollection.setHandlers(new Handler[] {});
 
+
         for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
             plugin.preStartJetty(server, handlerCollection, options);
         }
