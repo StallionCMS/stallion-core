@@ -1,11 +1,14 @@
 <template>
-    <textarea class="autogrow-textarea form-control" @input="onInput"></textarea>
+    <textarea class="autogrow-textarea form-control" @input="onInput" :required="required"></textarea>
 </template>
 
 <script>
  module.exports = {
      props: {
-         value: ''
+         value: '',
+         required: {
+             default: undefined
+         }
      },
      mounted: function() {
          this.$el.value = this.value;

@@ -5,13 +5,16 @@
 </style>
 
 <template>
-    <textarea @keydown.enter.prevent.stop="onEnter" class="autogrow-textarea form-control autogrow-single-line autogrow-short autogrow-text-vue" @input="onInput"></textarea>
+    <textarea @keydown.enter.prevent.stop="onEnter" class="autogrow-textarea form-control autogrow-single-line autogrow-short autogrow-text-vue" @input="onInput" :required="required"></textarea>
 </template>
 
 <script>
  module.exports = {
      props: {
-         value: ''
+         value: '',
+         required: {
+             default: undefined
+         }
      },
      mounted: function() {
          this.$el.value = this.value;
