@@ -61,7 +61,7 @@ import static io.stallion.utils.Literals.*;
  * The default subclass is SmtpEmailSender() which is used by default throughout Stallion.
  *
  */
-public abstract class EmailSender {
+public abstract class EmailSender implements Runnable {
     private List<String> tos;
     private String from;
     private String subject;
@@ -96,6 +96,11 @@ public abstract class EmailSender {
 
     protected void init(EmailSettings emailSettings) {
         this.emailSettings = emailSettings;
+    }
+
+    @Override
+    public void run() {
+        send();
     }
 
     /**

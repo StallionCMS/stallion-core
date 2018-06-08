@@ -18,6 +18,7 @@
 package io.stallion.email;
 
 import io.stallion.Context;
+import io.stallion.asyncTasks.SimpleAsyncRunner;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.plugins.javascript.Sandbox;
@@ -98,6 +99,10 @@ public abstract class ContactableEmailer<T extends Contactable> {
 
 
     public boolean sendEmail() {
+        return sendEmail(false);
+    }
+
+    public boolean sendEmail(boolean async) {
         if (user == null) {
             throw new UsageException("Tried to send email, but user is null!");
         }
@@ -143,7 +148,12 @@ public abstract class ContactableEmailer<T extends Contactable> {
                 .setCustomKey(transformMaybe(getUniqueKey()))
                 .setTo(user.getEmail());
         onPreSend();
-        return emailer.send();
+        if (async) {
+            SimpleAsyncRunner.instance().submit(emailer);
+            return true;
+        } else {
+            return emailer.send();
+        }
     }
 
     public boolean shouldLog() {
