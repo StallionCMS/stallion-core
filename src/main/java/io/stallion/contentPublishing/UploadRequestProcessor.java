@@ -19,11 +19,12 @@ package io.stallion.contentPublishing;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
 
 import static io.stallion.utils.Literals.*;
 
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.exceptions.ClientException;
@@ -32,17 +33,16 @@ import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.IRequest;
 import io.stallion.services.CloudStorageService;
 import io.stallion.services.Log;
-import io.stallion.services.S3StorageService;
 import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.UploadStorageType;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.imgscalr.Scalr;
 import org.parboiled.common.FileUtils;
 
 import javax.imageio.ImageIO;
-import javax.persistence.Column;
 import javax.servlet.http.Part;
 
 
@@ -51,6 +51,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
 
     private String uploadsFolder;
     private UploadedFileController<U> fileController;
+    private String urlToFetch;
 
 
     protected IRequest getStRequest() {
@@ -66,10 +67,10 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         return fileController;
     }
 
-    public UploadRequestProcessor(String uploadsFolder, IRequest stRequest) {
-        this(uploadsFolder, stRequest, UploadedFileController.instance());
+    public UploadRequestProcessor(String uploadsFolder) {
+        this(uploadsFolder, UploadedFileController.instance());
     }
-    public UploadRequestProcessor(String uploadsFolder, IRequest stRequest, UploadedFileController<U> fileController) {
+    public UploadRequestProcessor(String uploadsFolder, UploadedFileController<U> fileController) {
         this.stRequest = stRequest;
         if (!uploadsFolder.endsWith("/")) {
             uploadsFolder += "/";
@@ -79,7 +80,23 @@ public class UploadRequestProcessor<U extends UploadedFile> {
 
     }
 
-    public U upload() {
+    public U addFromUrl(String url, boolean isPublic) {
+        this.urlToFetch = url;
+        U uploaded = newUploadedFileInstance(isPublic);
+        File file = downloadExternalToLocalFile(uploaded);
+        if ("image".equals(uploaded.getType()) && Settings.instance().getUserUploads().getGenerateImageThumbnails() == true) {
+            generateImageSizes(uploaded, file.getAbsolutePath());
+        }
+        if (Settings.instance().getUserUploads().getStorageType().equals(UploadStorageType.Cloud)) {
+            transferAllToS3(uploaded);
+        }
+        uploaded.setProvisional(false);
+        fileController.save(uploaded);
+        return uploaded;
+    }
+
+    public U upload(IRequest stRequest) {
+        this.stRequest = stRequest;
         try {
             return doUpload();
         } catch (IOException e) {
@@ -88,7 +105,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
     }
 
     protected U doUpload() throws IOException {
-        U uploaded = newUploadedFileInstance();
+        U uploaded = newUploadedFileInstance("true".equals(stRequest.getQueryParams().getOrDefault("stUploadIsPublic", "")));
         File file = writeMultiPartToLocalFile(uploaded);
         if ("image".equals(uploaded.getType()) && Settings.instance().getUserUploads().getGenerateImageThumbnails() == true) {
             generateImageSizes(uploaded, file.getAbsolutePath());
@@ -101,7 +118,58 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         return uploaded;
     }
 
-    protected U newUploadedFileInstance() {
+    protected File downloadExternalToLocalFile(U uploaded) {
+
+        URI uri = URI.create(urlToFetch);
+
+
+
+        String fullFileName = FilenameUtils.getName(uri.getPath());
+        String extension = FilenameUtils.getExtension(fullFileName);
+        String fileName = truncate(fullFileName, 85);
+        String relativePath = GeneralUtils.slugify(truncate(FilenameUtils.getBaseName(fullFileName), 75)) + "-" + DateUtils.mils() + "." + extension;
+        relativePath = "stallion-file-" + uploaded.getId() + "/" + GeneralUtils.secureRandomToken(8) + "/" + relativePath;
+
+        String destPath = uploadsFolder + relativePath;
+        try {
+            FileUtils.forceMkdir(new File(destPath).getParentFile());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        uploaded
+                .setCloudKey(relativePath)
+                .setExtension(extension)
+                .setName(fileName)
+                .setOwnerId(Context.getUser().getId())
+                .setUploadedAt(DateUtils.utcNow())
+                .setType(fileController.getTypeForExtension(extension))
+        ;
+
+        // Make raw URL
+        String url = makeRawUrlForFile(uploaded, "org");
+        uploaded.setRawUrl(url);
+
+        fileController.save(uploaded);
+
+        File outFile = new File(destPath);
+
+        try {
+            IOUtils.copy(
+                    Unirest.get(urlToFetch).asBinary().getRawBody(),
+                    org.apache.commons.io.FileUtils.openOutputStream(outFile)
+            );
+        } catch (UnirestException e) {
+            throw new ClientException("Error downloading file from " + url + ": " + e.getMessage(), 400, e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return outFile;
+
+    }
+
+    protected U newUploadedFileInstance(boolean isPublic) {
         U uploaded = fileController.newModel();
         if (!empty(uploaded.getId())) {
             throw new WebException("You cannot reuse the same upload file processor twice.");
@@ -110,12 +178,10 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         String secret = GeneralUtils.randomTokenBase32(14);
         uploaded
                 .setSecret(secret)
+                .setPubliclyViewable(isPublic)
                 .setPubliclyViewable(Settings.instance().getUserUploads().getUploadsArePublic())
                 .setId(id)
                 ;
-        if ("true".equals(stRequest.getQueryParams().getOrDefault("stUploadIsPublic", ""))) {
-            uploaded.setPubliclyViewable(true);
-        }
         fileController.save(uploaded);
         return uploaded;
     }

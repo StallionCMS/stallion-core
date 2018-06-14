@@ -104,7 +104,7 @@ public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointRe
         if (!new File(folder).isDirectory()) {
             new File(folder).mkdirs();
         }
-        U uf = new UploadRequestProcessor<U>(folder, Context.getRequest(), fileController).upload();
+        U uf = new UploadRequestProcessor<U>(folder, fileController).upload(Context.getRequest());
         return uf;
     }
 
