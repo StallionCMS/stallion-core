@@ -12,7 +12,7 @@
 </style>
 
 <template>
-    <div :class="'modal-base-vue modal ' + cssClass + ' ' + classProp" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div :class="'modal-base-vue modal ' + cssClass + ' ' + classProp + ' ' + extraCssClass" role="dialog" aria-labelledby="myLargeModalLabel">
         <div :class="'modal-dialog ' + modalClass" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -25,7 +25,7 @@
                 </div><!-- end .modal-header -->
                 <div class="modal-body">
                     <slot name="body">
-                        <component ref="bodyComponent" :is="tag" :callback="modalCallback">
+                        <component ref="bodyComponent" :is="tag" :callback="modalCallback" @update-extra-css-class="setExtraCssClass">
                         </component>
                     </slot>
                 </div>
@@ -73,6 +73,7 @@
      data: function() {
          return {
              modal: null,
+             extraCssClass: '',
              modalClass: ''
          }
      },
@@ -111,6 +112,10 @@
      methods: {
          open: function() {
              
+         },
+         setExtraCssClass: function(cssClass) {
+             console.log('set extra cssClass ', cssClass);
+             this.extraCssClass = cssClass;
          },
          modalCallback: function() {
              console.log('modal close callback');
