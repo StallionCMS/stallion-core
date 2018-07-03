@@ -128,12 +128,8 @@ public abstract class AppIntegrationCaseBase {
         for(SelfMocking sm: mocks.values()) {
             sm.onSelfMockingAfterClass();
         }
-    }
 
 
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        Stubbing.verifyAndReset();
         cleanUpClass();
 
     }

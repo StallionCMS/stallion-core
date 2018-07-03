@@ -404,6 +404,10 @@ public abstract class AsyncCoordinator extends Thread {
         if (INSTANCE == null) {
             return;
         }
+        if (INSTANCE.synchronousMode) {
+            shutDownForTests();
+            return;
+        }
         INSTANCE.triggerShutDown = true;
         for(AsyncTaskExecuteRunnable runnable: INSTANCE.threads) {
             runnable.setTriggerShutdown(true);
