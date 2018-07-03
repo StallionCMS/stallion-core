@@ -212,6 +212,9 @@ public class UsersApiResource implements EndpointResource {
     @Path("/send-verify-email")
     @Produces("text/html")
     public Object sendVerifyEmail(@BodyParam("email") String email, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
+        if (!Settings.instance().isEmailConfigured()) {
+            throw new AppException("Cannot send verification email because there is no email server configured.");
+        }
         UserController.instance().sendEmailVerifyEmail(email, returnUrl);
         return true;
     }
@@ -311,6 +314,10 @@ public class UsersApiResource implements EndpointResource {
         if (!settings().getUsers().getPasswordResetEnabled()) {
             throw new ClientException("Password reset has been disabled. Please contact an administrator to reset your password.");
         }
+        if (!Settings.instance().isEmailConfigured()) {
+            throw new AppException("Cannot send reset email because there is no email server configured.");
+        }
+
         IUser user = UserController.instance().forEmail(email);
         if (user == null) {
             user = UserController.instance().forUsername(email);

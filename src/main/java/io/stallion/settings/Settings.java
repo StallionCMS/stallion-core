@@ -182,6 +182,10 @@ public class Settings implements ISettings {
 
     private static Settings _instance;
 
+    public boolean isEmailConfigured() {
+        return getEmail() != null && !empty(getEmail().getHost());
+    }
+
     public static boolean isNull() {
         return _instance == null;
     }
