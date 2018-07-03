@@ -177,6 +177,11 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return (U)this;
     }
 
+    /**
+     * Generated at user creation, used inside cookies to verify the user's authenticity.
+     * Can be reset to force all extant sessions to be invalid.
+     * @return
+     */
     @Override
     @Column
     @JsonView(RestrictedViews.Internal.class)
@@ -236,6 +241,12 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         this.filePath = filePath;
     }
 
+    /**
+     * Used to encrypt the user's cookie. Set this to a new value to make all
+     * extant sessions invalid.
+     *
+     * @return
+     */
     @JsonView(RestrictedViews.Internal.class)
     @Column
     public String getEncryptionSecret() {
@@ -260,6 +271,11 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return this;
     }
 
+    /**
+     * Has the user been approved or auto-approved by a staff? If false, user will not be treated
+     * as authorized.
+     * @return
+     */
     @Column
     @JsonView(RestrictedViews.Member.class)
     @Override
@@ -272,6 +288,10 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return (U)this;
     }
 
+    /**
+     * Has the email address of the user been verified?
+     * @return
+     */
     @Column
     @JsonView(RestrictedViews.Member.class)
     public boolean getEmailVerified() {
@@ -284,6 +304,11 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return (U)this;
     }
 
+    /**
+     * Token emailed to the user when resetting the password. Gets a new value every time
+     * a password reset is performed.
+     * @return
+     */
     @Override
     @Column
     @JsonView(RestrictedViews.Internal.class)
@@ -296,6 +321,13 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return (U)this;
     }
 
+    /**
+     * The User ID of the user that this user object is an alias for. Used so that multiple email addresses can
+     * point to the same user. There will be one master user object, and the other user objects will be empty
+     * except for this aliasForId which will point to the master user object. When loading by username or email,
+     * if this aliasForId is set, will look up the user of that ID and return it.
+     * @return
+     */
     @Column
     @AlternativeKey
     @JsonView(RestrictedViews.Internal.class)
@@ -310,6 +342,10 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return (U)this;
     }
 
+    /**
+     * Mr, Mrs, Dr, Honorable, etc.
+     * @return
+     */
     @Column
     @Override
     @JsonView(RestrictedViews.Member.class)
@@ -322,6 +358,11 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return this;
     }
 
+    /**
+     * Will block sending all emails via subclasses of ContactableEmailer, even transactional emails
+     * like password resets.
+     * @return
+     */
     @Column
     @JsonView(RestrictedViews.Owner.class)
     public boolean isTotallyOptedOut() {
@@ -333,6 +374,10 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return this;
     }
 
+    /**
+     * Will block all non-transactional emails sent via ContactableEmailer. Will still send emails such as password resets.
+     * @return
+     */
     @Column
     @Override
     @JsonView(RestrictedViews.Owner.class)
@@ -345,6 +390,10 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
         return this;
     }
 
+    /**
+     * If true, user won't be allowed to log in and access the site.
+     * @return
+     */
     @Column
     @JsonView(RestrictedViews.Owner.class)
     public boolean isDisabled() {

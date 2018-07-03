@@ -60,7 +60,7 @@ public abstract class AsyncCoordinator extends Thread {
 
 
     public static void initAndStart() {
-        init();
+        init(false);
         startup();
     }
 
@@ -68,7 +68,11 @@ public abstract class AsyncCoordinator extends Thread {
      * Load the coordinator class so that tasks and handlers can be registered, but
      * don't actually execute any tasks.
      */
-    public static void init() {
+    public static void init(boolean testMode) {
+        if (testMode) {
+            initEphemeralSynchronousForTests();
+            return;
+        }
         if (INSTANCE != null) {
             throw new UsageException("You cannot init the AsyncCoordinator twice!");
         }

@@ -158,6 +158,8 @@ public class JobStatusController extends StandardModelController<JobStatus> {
         ZonedDateTime next = definition.getSchedule().nextAt(now);
         jobStatus.setNextExecuteAt(next);
         jobStatus.setNextExecuteMinuteStamp(TIME_STAMP_FORMAT.format(next));
+        // Should definitely succeed by about 6 hours after the next scheduled run time
+        jobStatus.setShouldSucceedBy(next.toInstant().toEpochMilli() + 20000000);
         Log.fine("Job {0} set to run next at {1}", jobStatus.getName(), jobStatus.getNextExecuteMinuteStamp());
         save(jobStatus);
     }

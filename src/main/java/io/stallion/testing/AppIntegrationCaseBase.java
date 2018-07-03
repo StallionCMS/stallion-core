@@ -22,18 +22,29 @@ import io.stallion.boot.AppContextLoader;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.logging.Level;
 
 import static io.stallion.utils.Literals.empty;
 
 
 public abstract class AppIntegrationCaseBase {
+
+
+    static {
+        System.setProperty("java.awt.headless", "true");
+    }
+
+
 
     public static TestClient client;
 
@@ -67,8 +78,60 @@ public abstract class AppIntegrationCaseBase {
         Log.fine("--------------------------------------------------------------------------------------------------");
     }
 
+    private static Map<Class, SelfMocking> mocks;
+
+    public static void mockClass(Class<SelfMocking> cls) {
+        if (mocks.containsKey(cls)) {
+            return;
+        }
+        try {
+            SelfMocking sm = cls.newInstance();
+            mocks.put(cls, sm);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static <T> T getMockResults(Class<SelfMocking> cls) {
+        return mocks.get(cls).onSelfMockingGetResults();
+    }
+
+    @BeforeClass
+    public static void baseBeforeClass() throws Exception {
+        for(SelfMocking sm: mocks.values()) {
+            sm.onSelfMockingBeforeClass();
+        }
+    }
+
+
+    @Before
+    public void baseBefore() throws Exception {
+        for(SelfMocking sm: mocks.values()) {
+            sm.onSelfMockingBeforeTest();
+        }
+    }
+
+    @After
+    public void baseAfter() throws Exception {
+        for(SelfMocking sm: mocks.values()) {
+            sm.onSelfMockingAfter();
+        }
+    }
+
+    @AfterClass
+    public void baseAfterClass() throws Exception {
+        for(SelfMocking sm: mocks.values()) {
+            sm.onSelfMockingAfterClass();
+        }
+    }
+
+
     @AfterClass
     public static void tearDownClass() throws Exception {
+        Stubbing.verifyAndReset();
         cleanUpClass();
     }
 

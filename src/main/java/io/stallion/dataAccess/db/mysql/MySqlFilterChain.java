@@ -15,13 +15,16 @@
  *
  */
 
-package io.stallion.dataAccess.filtering;
+package io.stallion.dataAccess.db.mysql;
 
 
 import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.Schema;
 import io.stallion.dataAccess.db.SmartQueryCache;
+import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.dataAccess.filtering.FilterOperation;
+import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
@@ -32,7 +35,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

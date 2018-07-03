@@ -15,12 +15,37 @@
  *
  */
 
-package io.stallion.utils;
+package io.stallion.testing;
 
-@Deprecated
-public interface IUnsettable<T extends IUnsettable<T>> {
+import java.util.List;
+import java.util.Map;
 
-    public default T unsetInstance() {
-        return (T)this;
+import static io.stallion.utils.Literals.*;
+
+import io.stallion.services.Log;
+
+
+public interface SelfMocking {
+
+
+
+    void onSelfMockingBeforeClass();
+
+    default void onSelfMockingBeforeTest() {
+
     }
+
+    default <T> T onSelfMockingAfter() {
+        return null;
+    }
+
+    default <T> T onSelfMockingAfterClass() {
+        return null;
+    }
+
+    default <T> T onSelfMockingGetResults() {
+        return null;
+    }
+
+
 }

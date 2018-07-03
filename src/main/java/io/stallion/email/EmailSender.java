@@ -25,6 +25,8 @@ import io.stallion.services.TransactionLogController;
 import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.EmailSettings;
 import io.stallion.services.Log;
+import io.stallion.testing.SelfMocking;
+import io.stallion.testing.StubHandler;
 import io.stallion.testing.Stubbing;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
@@ -61,7 +63,7 @@ import static io.stallion.utils.Literals.*;
  * The default subclass is SmtpEmailSender() which is used by default throughout Stallion.
  *
  */
-public abstract class EmailSender implements Runnable {
+public abstract class EmailSender implements Runnable, SelfMocking {
     private List<String> tos;
     private String from;
     private String subject;
@@ -254,6 +256,8 @@ public abstract class EmailSender implements Runnable {
     }
 
 
+
+
     private void executeSend(MimeMessage message, Session session, EmailSettings settings) throws EmailSendException {
         try {
             Stubbing.checkExecuteStub(this, this, message, session, settings);
@@ -392,4 +396,37 @@ public abstract class EmailSender implements Runnable {
         this.type = type;
         return this;
     }
+
+
+
+    /* SelfMocking support. This allows us to call this.mockClass(EmailSender.class) from tests and automatically
+     * stub out the the final email sending step to make the tests go extra fast.
+     * */
+
+    private EmailStubHandler emailStubHandler;
+
+    @Override
+    public void onSelfMockingBeforeClass() {
+        emailStubHandler = new EmailStubHandler();
+        Stubbing.stub(EmailSender.class, "executeSend", emailStubHandler);
+    }
+
+
+    @Override
+    public List<MimeMessage> onSelfMockingGetResults() {
+        return emailStubHandler.messages;
+    }
+
+    public static class EmailStubHandler implements StubHandler {
+        private List<MimeMessage> messages = list();
+
+        @Override
+        public Object execute(Object... params) throws Exception {
+            MimeMessage message = (MimeMessage)params[1];
+            messages.add(message);
+            return true;
+        }
+    }
+
+    /* end self mocking support */
 }

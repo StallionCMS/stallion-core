@@ -35,7 +35,10 @@ import java.util.Scanner;
 
 import static io.stallion.utils.Literals.*;
 
-
+/**
+ * Command line action for adding a predfined user. User will be added as a flat-file configuration and included as a user
+ * anywhere the application is deployed.
+ */
 public class UserAdder implements StallionRunAction<CommandOptionsBase> {
     @Override
     public String getActionName() {

@@ -21,7 +21,7 @@ import io.stallion.Context;
 import io.stallion.dataAccess.*;
 import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.dataAccess.filtering.FilterChain;
-import io.stallion.dataAccess.filtering.MySqlFilterChain;
+import io.stallion.dataAccess.db.mysql.MySqlFilterChain;
 import io.stallion.requests.IRequest;
 import io.stallion.requests.JobRequest;
 import io.stallion.requests.TaskRequest;

@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Used internally by FilterChain to represent the application of one filter.
  */
-class FilterOperation {
+public class FilterOperation {
     private String fieldName = "";
     private FilterOperator operator = null;
     private Boolean isExclude = false;

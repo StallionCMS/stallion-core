@@ -41,8 +41,11 @@ public class SimpleAsyncRunner {
         return _instance;
     }
 
-    public static void load() {
+    public static void load(boolean testMode) {
         _instance = new SimpleAsyncRunner();
+        if (testMode) {
+            setSyncMode(true);
+        }
     }
 
     public static void setSyncMode(boolean isSyncMode) {

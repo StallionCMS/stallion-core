@@ -191,17 +191,11 @@ public class AppContextLoader {
 
         UploadedFileEndpoints.registerIfEnabled();
 
-        SimpleAsyncRunner.load();
+        SimpleAsyncRunner.load(true);
 
-        if (testMode) {
-            AsyncCoordinator.initEphemeralSynchronousForTests();
-        } else {
-            if (options instanceof ServeCommandOptions && ((ServeCommandOptions) options).isNoTasks()) {
 
-            } else {
-                AsyncCoordinator.init();
-            }
-        }
+        AsyncCoordinator.init(testMode);
+
 
         // Load plugins
         PluginRegistry.instance().bootJarPlugins();
@@ -237,7 +231,6 @@ public class AppContextLoader {
         PluginRegistry.loadWithJavaPlugins(options.getTargetPath());
         loadCompletely(options, false, true);
         _app.startServicesForTests();
-        SimpleAsyncRunner.setSyncMode(true);
         return _app;
     }
 
