@@ -31,6 +31,7 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -78,7 +79,7 @@ public abstract class AppIntegrationCaseBase {
         Log.fine("--------------------------------------------------------------------------------------------------");
     }
 
-    private static Map<Class, SelfMocking> mocks;
+    private static Map<Class, SelfMocking> mocks = new HashMap<>();
 
     public static void mockClass(Class<SelfMocking> cls) {
         if (mocks.containsKey(cls)) {
@@ -101,6 +102,7 @@ public abstract class AppIntegrationCaseBase {
 
     @BeforeClass
     public static void baseBeforeClass() throws Exception {
+
         for(SelfMocking sm: mocks.values()) {
             sm.onSelfMockingBeforeClass();
         }
@@ -122,7 +124,7 @@ public abstract class AppIntegrationCaseBase {
     }
 
     @AfterClass
-    public void baseAfterClass() throws Exception {
+    public static void baseAfterClass() throws Exception {
         for(SelfMocking sm: mocks.values()) {
             sm.onSelfMockingAfterClass();
         }
@@ -133,6 +135,7 @@ public abstract class AppIntegrationCaseBase {
     public static void tearDownClass() throws Exception {
         Stubbing.verifyAndReset();
         cleanUpClass();
+
     }
 
 
@@ -140,6 +143,7 @@ public abstract class AppIntegrationCaseBase {
         AppContextLoader.shutdown();
         Settings.shutdown();
         client = null;
+        mocks = new HashMap<>();
         Stubbing.reset();
     }
 
