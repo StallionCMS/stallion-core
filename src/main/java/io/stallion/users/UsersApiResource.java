@@ -430,7 +430,7 @@ public class UsersApiResource implements EndpointResource {
 
         response().getMeta().setTitle("Manage Users");
         Map<String, Object> ctx = map();
-        return TemplateRenderer.instance().renderTemplate("stallion:admin/admin-users2.jinja", ctx);
+        return TemplateRenderer.instance().renderTemplate("stallion:admin-app.jinja", ctx);
     }
 
 
