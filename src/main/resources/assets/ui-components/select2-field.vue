@@ -1,3 +1,9 @@
+<!--
+ * Stallion v1.0.0 (http://stallion.io)
+ * Copyright 2016-2018 Stallion Software LLC
+ * Licensed under GPL (https://github.com/StallionCMS/stallion-core/blob/master/LICENSE)
+-->
+
 <template>
     <select :class="'select2-field-vue select2-target ' + className" :multiple="multiple" >
         <option v-for="opt in selectOptions" :selected="opt.selected" :value="opt.value">{{ opt.label }}</option>

@@ -1,3 +1,9 @@
+<!--
+ * Stallion v1.0.0 (http://stallion.io)
+ * Copyright 2016-2018 Stallion Software LLC
+ * Licensed under GPL (https://github.com/StallionCMS/stallion-core/blob/master/LICENSE)
+-->
+
 <template>
     <div class="image-picker">
         <button class="btn btn-default" @click="modalShown=true">{{ image && image.thumbUrl ? labelSelected : label }}</button>
