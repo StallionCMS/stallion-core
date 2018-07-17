@@ -4,73 +4,46 @@
 
 <template>
     <div class="users-table-vue">
-        <h3>All Users</h3>
-        <table class="pure-table users-table">
-            <thead>
-                <tr>
-                    <th>
-                        Username
-                    </th>
-                    <th>
-                        Display name
-                    </th>
-                    <th>
-                        Email
-                    </th>
-                    <th>
-                        Role
-                    </th>
-                    <th>
-                        Created
-                    </th>
-                    <th>
-                        Status
-                    </th>
-                </tr>
-            </thead>
-            <tbody v-if="loading">
-                <tr>
-                    <td colspan="6">Loading users…</td>
-                </tr>
-            </tbody>
-            <tbody v-if="!loading && users.length === 0"">
-                <tr>
-                    <td colspan="6">No users found</td>
-                </tr>
-            </tbody>
-            <tbody v-if="!loading && users.length > 0">
-                <tr v-for="user in users""  :class="['clickable-row', 'user-row', 'user-row-' + user.id]" v-on:click="rowClick(user.id)" :data-user-id="user.id">
-                    <td>{{user.username}}</td>
-                    <td>{{user.displayName}}</td>
-                    <td>{{user.email}}</td>
-                    <td>{{user.role}}</td>
-                    <td>{{formatCreatedAt(user.createdAt)}}</td>
-                    <td class="user-status">
-                        <span v-if="!user.deleted && !user.disabled && user.approved && !user.predefined">normal</span>
-                        <span v-if="user.deleted">deleted</span>
-                        <span v-if="user.predefined">built-in user</span>
-                        <span v-if="user.disabled">disabled</span>
-                        <span v-if="!user.approved">pending approval</span>
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot v-if="pager"">
-                <tr>
-                    <td colspan="6" v-if="pager.pageCount > 0">
-                        <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==1}" href="#/1">First</a>
-                        <a v-for="num in pager.surroundingPages" :href="'#/' + num" v-bind:class="{'pager-link': true, 'current-page': num==page}">
-                            {{num}}
-                        </a>
-                        <a v-bind:class="{'pager-link-text': true, 'pager-link': true, 'current-page': page==pager.pageCount}" :href="'#/' +pager.pageCount">Last</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6">
-                        <label><input type="checkbox" id="include-deleted" @click="toggleIncludeDeleted"> Show deleted users?</label>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+        <div>
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item >All Users</el-breadcrumb-item>
+            </el-breadcrumb>
+        </div>
+        <div class="p">
+<el-table
+    :data="users"
+    stripe
+    border
+    style="width: 100%"
+    @row-click="onRowClick"
+    >
+    <el-table-column
+      prop="username"
+      label="Username"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="displayName"
+      label="Display Name"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="email"
+      label="Email">
+    </el-table-column>
+    <el-table-column
+      prop="role"
+      label="Role">
+    </el-table-column>
+    <el-table-column
+      prop="createdAt"
+      label="Created"
+      :formatter="formatCreatedAt"
+      >
+    </el-table-column>    
+    
+</el-table>
+        </div>
     </div>
 </template>
 
@@ -79,6 +52,7 @@ module.exports = {
     data: function() {
 
         return {
+            tableData: [],
             users: [],
             pager: null,
             page: 1,
@@ -104,32 +78,35 @@ module.exports = {
             this.fetchData();
         },
         fetchData: function() {
-            var self = this;
+            var that = this;
             console.log('fetchData');
-            stallion.request({
-                url: '/st-users/users-table?page=' + self.page + '&withDeleted=' + self.withDeleted,
-                success: function (o) {
-                    self.users = o.items;
-                    self.pager = o;
-                    self.loading = false;
-                }
+            that.$stajax({
+                url: '/st-users/users-table?page=' + that.page + '&withDeleted=' + that.withDeleted,
+                useDefaultCatch: true,
+            }).then(function(res) {
+                that.users = res.data.items;
+                that.pager = res.data.pager;
+                that.loading = false;
+                
             });
         },
-        formatCreatedAt: function(mils, format) {
-            var format = format || "mmm d, yyyy";
+        formatCreatedAt: function(row, column, mils, index) {
             if (mils === 0) {
                 return '';
             }
-            return dateFormat(new Date(mils), format);
+            return dateFns.format(mils, "MMM D, YYYY");
+        },
+        onRowClick: function(user, b, c, d) {
+            window.location.hash = "#/user/" + user.id;
         },
         rowClick: function(userId) {
-            window.location.hash = "#/edit-user/" + userId;
+            window.location.hash = "#/user/" + userId;
         },
         toggleIncludeDeleted: function(evt, a, b, c) {
-            var self = this;
-            self.withDeleted = true;
+            var that = this;
+            that.withDeleted = true;
             console.log('toggleIncludeDeleted', evt, a, b, c);
-            self.fetchData();
+            that.fetchData();
         }
     }
 }

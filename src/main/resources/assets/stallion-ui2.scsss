@@ -1,0 +1,78 @@
+
+
+.p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.p-none {
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+div.p-top {
+    margin-bottom: 0em;
+    margin-top: 1em;
+}
+div.p-bottom {
+    margin-bottom: 1em;
+    margin-top: 0em;
+}
+
+h1.p-top, h2.p-top, h3.p-top, h4.p-top, h5.p-top, h6.p-top {
+    margin-bottom: 0em;
+}
+
+h1.p-bottom, h2.p-bottom, h3.p-bottom, h4.p-bottom, h5.p-bottom, h6.p-bottom {
+    margin-top: 0em;
+}
+
+
+.autogrow-textarea.form-control.autogrow-single-line {
+    min-height: 36px;
+    height: 36px;
+}
+
+ .fade {
+   opacity: 0;
+   -webkit-transition: opacity 0.1s linear;
+      -moz-transition: opacity 0.1s linear;
+       -ms-transition: opacity 0.1s linear;
+        -o-transition: opacity 0.1s linear;
+           transition: opacity 0.1s linear;
+ }
+
+
+
+.stallion-locking:before {
+    height: 5px;
+    display: block;
+    background: transparent;
+    margin: auto;
+    width: 0px;
+    content: ''
+}
+.stallion-locking:after {
+    content: '';
+    display: block;
+    margin: auto;
+    height: .25em;
+    width: 0px;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.stallion-locking.stallion-locking-processing {
+    background-color: #BBB;
+    
+}
+
+.stallion-locking.stallion-locking-processing:after {
+    content: '';
+    display: block;
+    margin: auto;
+    height: .25em;
+    width: 0px;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: width .6s ease, background-color .6s ease;    
+} 

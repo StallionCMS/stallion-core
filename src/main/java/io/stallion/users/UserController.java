@@ -217,7 +217,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
      * @param rememberMe
      * @return
      */
-    public T loginUser(String username, String password, Boolean rememberMe) {
+    public T loginUser(String username, String password, boolean rememberMe) {
         T user = checkUserLoginValid(username, password);
         return addSessionCookieForUser(user, rememberMe);
     }
@@ -335,7 +335,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
      * @param rememberMe
      * @return
      */
-    public T addSessionCookieForUser(T user, Boolean rememberMe) {
+    public T addSessionCookieForUser(T user, boolean rememberMe) {
         return addSessionCookieForUser(user, rememberMe, null);
     }
     /**
@@ -345,7 +345,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
      * @param rememberMe
      * @return
      */
-    public T addSessionCookieForUser(T user, Boolean rememberMe, T valetUser) {
+    public T addSessionCookieForUser(T user, boolean rememberMe, T valetUser) {
         Long valetUserId = null;
         if (valetUser != null) {
             valetUserId = valetUser.getId();
@@ -573,15 +573,15 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     }
 
 
-    public String userToCookieString(T user, Boolean rememberMe) {
+    public String userToCookieString(T user, boolean rememberMe) {
         return userToCookieString(user, rememberMe, null);
     }
 
-    public String userToCookieString(T user, Boolean rememberMe, Long valetId) {
+    public String userToCookieString(T user, boolean rememberMe, Long valetId) {
         return userToCookieString(user, rememberMe, valetId, "");
     }
 
-    public String userToCookieString(T user, Boolean rememberMe, Long valetId, String sessionSecret) {
+    public String userToCookieString(T user, boolean rememberMe, Long valetId, String sessionSecret) {
         Long now = mils();
         Long expires = now + (86400L * 1000L);
         if (rememberMe) {

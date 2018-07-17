@@ -1,5 +1,5 @@
 /stallion-ui2.scss
-/stallion-admin.scss
+/stallion-public-pages.scss
 /general-helpers.js
 /vendor2/axios.0.18.0.min.js
 /vendor2/date_fns.1.29.0.min.js
@@ -10,8 +10,7 @@
 /vendor2/vue-router.3.0.1.min.js
 /vendor2/element-ui.2.4.4.min.js
 /stallion-utils-vue-plugin.js
-/admin/stallion-admin-app.vue
-/admin/users-edit.vue
-/admin/users-table.vue
-/admin/users-manage-main.js
+/public-screens/stallion-default-login-screen.vue
+/public-screens/stallion-default-register-screen.vue
+/public-pages.js
 

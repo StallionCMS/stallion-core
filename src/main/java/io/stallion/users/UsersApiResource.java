@@ -134,6 +134,9 @@ public class UsersApiResource implements EndpointResource {
     @Produces("application/json")
     @Path("/submit-login")
     public Object login(@BodyParam("username") String username, @BodyParam("password") String password, @BodyParam(value = "rememberMe", allowEmpty = true) Boolean rememberMe) {
+        if (rememberMe == null) {
+            rememberMe = false;
+        }
         return UserController.instance().loginUser(username, password, rememberMe);
     }
 
@@ -210,7 +213,7 @@ public class UsersApiResource implements EndpointResource {
 
     @POST
     @Path("/send-verify-email")
-    @Produces("text/html")
+    @Produces("application/json")
     public Object sendVerifyEmail(@BodyParam("email") String email, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
         if (!Settings.instance().isEmailConfigured()) {
             throw new AppException("Cannot send verification email because there is no email server configured.");
@@ -222,11 +225,14 @@ public class UsersApiResource implements EndpointResource {
     @GET
     @Path("/verify-email")
     @Produces("text/html")
-    public Object verifyEmailAddress( @QueryParam("email") String email, @QueryParam("returnUrl") String returnUrl, @QueryParam("alreadySent") Boolean alreadySent) {
-
+    public Object verifyEmailAddress( @QueryParam("email") String email, @QueryParam("returnUrl") String returnUrl, @QueryParam("alreadySent") Boolean alreadySent, @QueryParam("verifyToken") String verifyToken) {
+        if (!empty(verifyToken)) {
+            return verifyEmailAddress(verifyToken, email, returnUrl);
+        }
         email = or(email, Context.getUser().getEmail());
         alreadySent = or(alreadySent, false);
         Map ctx = map(val("email", Sanitize.stripAll(email)), val("alreadySent", alreadySent));
+        ctx.put("optionsJson", Sanitize.htmlSafeJson(ctx));
         String html = TemplateRenderer.instance().renderTemplate("stallion:/public/verify-email-address.jinja", ctx);
         return html;
     }
@@ -283,6 +289,8 @@ public class UsersApiResource implements EndpointResource {
         returnUrl = or(returnUrl, Settings.instance().getSiteUrl());
         ctx.put("returnUrl", Sanitize.stripAll(returnUrl));
         ctx.put("email", Sanitize.stripAll(email));
+        ctx.put("optionsJson", Sanitize.htmlSafeJson(ctx));
+
         URL url = getClass().getResource("/templates/public/verify-email-address.jinja");
         String html = TemplateRenderer.instance().renderTemplate(url.toString(), ctx);
         return html;
@@ -301,6 +309,7 @@ public class UsersApiResource implements EndpointResource {
                 ctx.put("tokenVerified", verified);
             }
         }
+        ctx.put("optionsJson", Sanitize.htmlSafeJson(ctx));
         URL url = getClass().getResource("/templates/public/reset-password.jinja");
         String html = TemplateRenderer.instance().renderTemplate(url.toString(), ctx);
         return html;
@@ -482,6 +491,7 @@ public class UsersApiResource implements EndpointResource {
     @Produces("application/json")
     @JsonView(RestrictedViews.Owner.class)
     public IUser updateUser(@PathParam("userId") Long userId, @ObjectParam(targetClass=User.class) User updatedUser) {
+
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {
             throw new io.stallion.exceptions.NotFoundException("User not found");
