@@ -68,7 +68,8 @@ public class Markdown {
     }
 
     private static Pattern rawHtmlPattern = Pattern.compile("<rawHtml>([\\s|\\S]*?)</rawHtml>");
-    private static String RAW_HTML_HOLDER = "@!RaWhTmL-FMLI5z0Ua9Hto-Qeum9b5UL3TCj=%s!@";
+    private static String RAW_HTML_HOLDER = "@!RaWhTmL!FMLI5z0Ua9HtoQeum9b5UL3TCj=%s!@";
+    protected static Pattern rawHtmlHolderPattern = Pattern.compile("@!RaWhTmL!FMLI5z0Ua9HtoQeum9b5UL3TCj=(\\d+)!@");
 
     protected ParsedContent parseOutRawHtml(String content) {
         ParsedContent parsed = new ParsedContent();
@@ -87,7 +88,7 @@ public class Markdown {
         return parsed;
     }
 
-    protected static Pattern rawHtmlHolderPattern = Pattern.compile("@!RaWhTmL=(\\d+)!@");
+
     protected String swapInRawHtml(String content, ParsedContent parsed) {
         if (parsed.rawHtmls.size() == 0) {
             return content;

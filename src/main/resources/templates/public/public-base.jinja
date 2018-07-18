@@ -9,7 +9,7 @@
     {% block extra_meta %}
     {% endblock %}
     {% block builtin_head_bundles %}
-    {{ assets.bundle("stallion", "stallion-default-assets.bundle.css") }}
+    {{ assets.bundle("stallion", "public-pages.bundle.css") }}
     <style>
         body {
             background-color: {{ styleSettings.backgroundColor }};
@@ -42,6 +42,11 @@
         h1, h2, h3, h4, h5 {
           font-family: {{ styleSettings.headerFont }};
         }
+        #footer {
+          text-align: center;
+          margin-top: 2em;
+          margin-bottom: 4em;
+        }
         {{ styleSettings.customCss }}
     </style>
     {% endblock %}
@@ -65,6 +70,9 @@
     {% endblock %}
   </div>
   {% endblock %}
+  {% block above_footer %}
+  
+  {% endblock %}
   <footer id="footer">
     {% if styleSettings.footer %}
     <div class="footer-info">{{ styleSettings.footer }}</div>
@@ -72,10 +80,12 @@
     <div class="footer-info">Powered by <a href="https://stallion.io">Stallion</a></div>
   </footer>
 {% block builtin_footer_bundles %}
-  {{ assets.bundle("stallion", "stallion-default-assets.bundle.js") }}
+  {{ assets.bundle("stallion", "public-pages.bundle.js") }}
 {% endblock %}
 {% block pre_end_body %}
 {% endblock %}
 
 </body>
 </html>
+
+

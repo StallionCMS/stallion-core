@@ -1,6 +1,6 @@
 /vendor/element-ui-theme-chalk.2.4.4.min.css
 /stallion-ui.scss
-/public-pages.scss
+/admin-app.scss
 /general-helpers.js
 /vendor/axios.0.18.0.min.js
 /vendor/date_fns.1.29.0.min.js
@@ -10,5 +10,8 @@
 /vendor/vue-router.3.0.1.min.js
 /vendor/element-ui.2.4.4.min.js
 /stallion-utils-vue-plugin.js
-/public-pages.js
+/admin/stallion-admin-app.vue
+/admin/users-edit.vue
+/admin/users-table.vue
+/admin/users-manage-main.js
 

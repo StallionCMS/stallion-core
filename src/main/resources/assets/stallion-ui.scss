@@ -1,90 +1,82 @@
+body.stallion-ui {
+    font-family: "Helvetica Neue", Helvetica, Arial,sans-serif;
+    font-size: 14px;
+    color: #333;
+    div, p {
+        box-sizing: border-box;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 500;
+    }
+    
+    h1 {
+        font-size: 20px;
+        
+    }
+    
+    h2 {
+        font-size: 18px;
+    }
+    
+    h3 {
+        font-size: 16px;
+    }
+    
+    small {
+        font-size: 13px;
+    }
+    
+}
 
 
 .p {
     margin-top: 1em;
     margin-bottom: 1em;
 }
-.space-top {
+.p-none {
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+div.p-top {
     margin-bottom: 0em;
     margin-top: 1em;
 }
-.space-bottom {
+div.p-bottom {
     margin-bottom: 1em;
     margin-top: 0em;
 }
 
-
-.autogrow-textarea.form-control {
-    min-height: 50px;
-}
-.autogrow-textarea.form-control {
-    height: 50px;
+h1.p-top, h2.p-top, h3.p-top, h4.p-top, h5.p-top, h6.p-top {
+    margin-bottom: 0em;
 }
 
-
-.st-data-table-vue {
-    table {
-        margin-top: 2em;
-    }
-    td:first-child {
-        padding-left: 20px;
-    }
+h1.p-bottom, h2.p-bottom, h3.p-bottom, h4.p-bottom, h5.p-bottom, h6.p-bottom {
+    margin-top: 0em;
 }
 
-
-.autogrow-textarea.form-control.autogrow-single-line {
-    min-height: 36px;
-    height: 36px;
+@keyframes stallionlockingspinner {
+    to {transform: rotate(360deg);}
 }
-
- .fade {
-   opacity: 0;
-   -webkit-transition: opacity 0.1s linear;
-      -moz-transition: opacity 0.1s linear;
-       -ms-transition: opacity 0.1s linear;
-        -o-transition: opacity 0.1s linear;
-           transition: opacity 0.1s linear;
- }
-
-.st-file-dropzone {
-    max-width: 600px;
-    background-color: #FCFCFC;
-    width: 100%;
-    border: 1px solid #999;
-    min-height: 200px;
-}
-.st-file-dropzone .dz-message {
-    font-size: 18px;
-}
-
-/* Image Library, Image collection widget */
-
-.small-image-upload-target-column image-uploader .title {
-    display: none;
-}
-.small-image-upload-target-column image-uploader .dz-default.dz-message {
-    margin: 0px;
-}
-.small-image-upload-target-column image-uploader .image-dropzone.st-file-dropzone {
-    min-height: 50px;
-}
-.add-image-button-column > div {
-    height: 94px;
-    line-height: 94px;
+ 
+.stallion-locking.stallion-locking-processing {
+    max-width: 100%;
+    overflow: hidden;
 }
 
 
-.vertical-tab {
-    display: block;
-    border: 1px solid #DDD;
-    padding: 1em;
-    background-color: #F3F3F3;
+.stallion-locking.stallion-locking-processing:after {
+  content: '';
+  box-sizing: border-box;
+  display: inline-block;
+  width: 1em;
+  height: calc(1em - 2px);
+  right: 10px;
+  top: 1em;
+  margin-left: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(220, 220, 220, .8);
+  border-top-color: rgba(70, 70, 70, .8);
+  animation: stallionlockingspinner .6s linear infinite;
 }
-
-.vertical-tab.active-tab {
-    border-right: 1px solid transparent;
-    background-color: #FFFFFF;
-}
-
-
-

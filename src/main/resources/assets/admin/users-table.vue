@@ -80,7 +80,7 @@ module.exports = {
         fetchData: function() {
             var that = this;
             console.log('fetchData');
-            that.$stajax({
+            that.$stAjax({
                 url: '/st-users/users-table?page=' + that.page + '&withDeleted=' + that.withDeleted,
                 useDefaultCatch: true,
             }).then(function(res) {

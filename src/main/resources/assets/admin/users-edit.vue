@@ -116,7 +116,7 @@ module.exports = {
             this.page = this.$route.params.page || 1;
             this.user = [];
             console.log('route changed!!!');
-            that.$stajax({
+            that.$stAjax({
                 url: '/st-users/view-user/' + that.$route.params.userId,
                 useDefaultCatch: true
             }).then(function(res) {
@@ -132,7 +132,7 @@ module.exports = {
             fields.forEach(function(field) {
                 data[field] = that.$data.user[field];
             });
-            that.$stajax({
+            that.$stAjax({
                 url: '/st-users/update-user/' + that.$data.user.id,
                 method: 'POST',
                 data: data,
@@ -154,7 +154,7 @@ module.exports = {
         forcePasswordReset: function() {
             var that = this;
             console.log('forcePasswordReset');
-            this.$stajax({
+            this.$stAjax({
                 url: '/st-users/force-password-reset/' + that.user.id,
                 method: 'POST',
                 useDefaultCatch: true,
@@ -167,7 +167,7 @@ module.exports = {
         approveUser: function() {
             var that = this;
             console.log('approveUser');
-            this.$stajax({
+            this.$stAjax({
                 url: '/st-users/toggle-user-approved/' + that.user.id,
                 method: 'POST',
                 data: {approved: true},
@@ -181,7 +181,7 @@ module.exports = {
         unapproveUser: function() {
             var that = this;
             console.log('unapproveUser');
-            this.$stajax({
+            this.$stAjax({
                 url: '/st-users/toggle-user-approved/' + that.user.id,
                 method: 'POST',
                 data: {approved: false },
@@ -195,7 +195,7 @@ module.exports = {
         disableUser: function() {
             var that = this;
             console.log('disableUser');
-            this.$stajax({
+            this.$stAjax({
                 url: '/st-users/toggle-user-disabled/' + that.user.id,
                 method: 'POST',
                 data: {disabled: true},
@@ -209,7 +209,7 @@ module.exports = {
         enableUser: function() {
             var that = this;
             console.log('enableUser');
-            this.$stajax({
+            this.$stAjax({
                 url: '/st-users/toggle-user-disabled/' + that.user.id,
                 method: 'POST',
                 data: {disabled: false },
@@ -222,7 +222,7 @@ module.exports = {
         deleteUser: function() {
             var that = this;
             console.log('deleteUser');
-            this.$stajax({
+            this.$stAjax({
                 url: '/st-users/toggle-user-deleted/' + that.user.id,
                 method: 'POST',
                 data: {deleted: true },
@@ -236,7 +236,7 @@ module.exports = {
         restoreUser: function() {
             var that = this;
             console.log('restoreUser');
-            this.$stajax({
+            this.$stAjax({
                 url: '/st-users/toggle-user-deleted/' + that.user.id,
                 method: 'POST',
                 data: {deleted: false },

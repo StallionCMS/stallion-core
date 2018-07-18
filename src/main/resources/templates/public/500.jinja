@@ -1,17 +1,18 @@
-{% extends "stallion:public/semipublic-single-box-page.jinja" %}
+{% extends "stallion:/public/public-base-single-box.jinja" %}
 {% block main_column %}
 <div id="layout" class="pure-g">
   <div class="pad pure-u-1">
     <h2 style="text-align:center;">{{ friendlyMessage }}</h2>
     <h3 style="text-align:center;"><a href="/">Return to the home page</a></h3>
-    {% if errorDebugMessage %}
-    <h4 style="text-align:center;">Debug information:</h4>
-    <div>{{ errorDebugMessage }}</div>
-    {% endif %}
   </div>
 </div><!-- pure-g -->
 {% endblock %}
 
-{% block pre_end_body %}
-<script src='{{ assets.resource("admin/screens/login-screen.js", "stallion") }}' type="text/javascript"></script>
+{% block above_footer %}
+    {% if errorDebugMessage %}
+    <h4 style="text-align:center;">Debug information:</h4>
+    <div style="padding:20px;"><code >{{ errorDebugMessage }}</code></div>
+    {% endif %}
 {% endblock %}
+
+

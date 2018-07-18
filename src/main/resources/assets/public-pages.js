@@ -6,6 +6,7 @@
 
     Vue.use(StallionUtilsVuePlugin);
 
+
     pp.loadLoginPage = function() {
         
         
@@ -19,7 +20,7 @@
                 }
             },
             created: function() {
-
+                debugger;
             },
             methods: {
                 onLoginSubmit: function() {

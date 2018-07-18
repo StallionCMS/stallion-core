@@ -1,10 +1,13 @@
 (function() {
 
-    var UsersManagePlugin = {};
+    window.StallionAdminUsersManageMain = {};
 
-    function bootVue() {
+    StallionAdminUsersManageMain.boot = function() {
+        
         Vue.use(StallionUtilsVuePlugin);
         Vue.use(Vuex);
+
+        var allComponents = Vue.options.components;
 
         const store = new Vuex.Store({
             state: {
@@ -18,8 +21,8 @@
         });
 
         const routes = [
-            { path: '/user/:userId', component: vueComponents['users-edit'] },
-            { path: '/', component: vueComponents['users-table'] }
+            { path: '/user/:userId', component: allComponents['users-edit'] },
+            { path: '/', component: allComponents['users-table'] }
         ]
 
         const router = new VueRouter({
@@ -41,7 +44,7 @@
 
 
 
-    document.addEventListener("DOMContentLoaded", bootVue); 
+
 
 
 

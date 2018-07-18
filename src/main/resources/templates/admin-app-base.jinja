@@ -15,7 +15,7 @@
 
     {% block builtin_head_bundles %}
     <link href='https://fonts.googleapis.com/css?family=Lato:100,200,300,400,700' rel='stylesheet' type='text/css'>
-    {{ assets.bundle("stallion", "user-admin2.bundle.css") }}
+    {{ assets.bundle("stallion", "admin-app.bundle.css") }}
     {% endblock %}
     {% block extra_head %}
     {% endblock %}
@@ -65,9 +65,10 @@
 {% endblock %}
 {% endblock %}
 {% block builtin_footer_bundles %}
-{{ assets.bundle("stallion", "user-admin2.bundle.js") }}
+{{ assets.bundle("stallion", "admin-app.bundle.js") }}
 {% endblock %}
 {% block pre_end_body %}
 {% endblock %}
+
 </body>
 </html>
