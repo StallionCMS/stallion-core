@@ -121,16 +121,22 @@ public class JobStatusController extends StandardModelController<JobStatus> {
     }
 
     public boolean isJobReadyToRun(JobDefinition job, ZonedDateTime now) {
-        List<JobStatus> js = DB.instance().query(
-                JobStatus.class,
-                "SELECT * FROM stallion_job_status WHERE nextexecuteminutestamp<=? AND name=? AND lockedAt=0 AND lockGuid='' LIMIT 1",
-                TIME_STAMP_FORMAT.format(now),
-                job.getName()
-        );
-        if (js.size() > 0) {
-            return true;
+        String nowFormatted = TIME_STAMP_FORMAT.format(now);
+        if (DB.available()) {
+            List<JobStatus> js = DB.instance().query(
+                    JobStatus.class,
+                    "SELECT * FROM stallion_job_status WHERE nextexecuteminutestamp<=? AND name=? AND lockedAt=0 AND lockGuid='' LIMIT 1",
+                    nowFormatted,
+                    job.getName()
+            );
+            if (js.size() > 0) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            return filter("nextExecuteMinuteStamp", nowFormatted)
+                    .filter("name", job.getName()).count() > 0;
         }
     }
 
