@@ -20,6 +20,7 @@ package io.stallion.restfulEndpoints;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ObjectParam {
     String name() default "";

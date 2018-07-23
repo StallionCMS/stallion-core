@@ -25,6 +25,10 @@ import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -131,7 +135,11 @@ public class ResourceToEndpoints {
                     if (BodyParam.class.isInstance(anno)) {
                         BodyParam bodyAnno = (BodyParam)(anno);
                         arg.setType("BodyParam");
-                        arg.setName(((BodyParam) anno).value());
+                        if (empty(bodyAnno.value())) {
+                            arg.setName(param.getName());
+                        } else {
+                            arg.setName(((BodyParam) anno).value());
+                        }
                         arg.setAnnotationClass(BodyParam.class);
                         arg.setRequired(bodyAnno.required());
                         arg.setEmailParam(bodyAnno.isEmail());
@@ -164,11 +172,26 @@ public class ResourceToEndpoints {
                         arg.setAnnotationClass(PathParam.class);
                     } else if (DefaultValue.class.isInstance(anno)) {
                         arg.setDefaultValue(((DefaultValue) anno).value());
+                    } else if (NotNull.class.isInstance(anno)) {
+                        arg.setRequired(true);
+                    } else if (Nullable.class.isInstance(anno)) {
+                        arg.setRequired(false);
+                    } else if (NotEmpty.class.isInstance(anno)) {
+                        arg.setRequired(true);
+                        arg.setAllowEmpty(false);
+                    } else if (Email.class.isInstance(anno)) {
+                        arg.setEmailParam(true);
                     }
                 }
-                if (StringUtils.isEmpty(arg.getType()) || StringUtils.isEmpty(arg.getName())) {
-                    throw new ConfigException("The endpoint " + endpoint.getMethod() + " " + endpoint.getRoute() + " (java method is " + endpoint.getJavaMethod().getName() + ")" +
-                            " has an invalid argument. Argument " + x + " does not have a proper Param annotation and/or name.");
+                if (StringUtils.isEmpty(arg.getType())) {
+                    arg.setType("ObjectParam");
+                    arg.setName(param.getName());
+                    arg.setTargetClass(param.getType());
+                    arg.setAnnotationClass(ObjectParam.class);
+                }
+
+                if (StringUtils.isEmpty(arg.getName())) {
+                    arg.setName(param.getName());
                 }
                 endpoint.getArgs().add(arg);
             }

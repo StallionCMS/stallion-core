@@ -73,6 +73,14 @@ public class EndpointResourceTest extends AppIntegrationCaseBase {
         String output = new RequestProcessor(request, new StResponse()).dispatchWsEndpoint(result);
         Assert.assertTrue(output.contains("Ni hao, phadraig"));
 
+
+        StRequest request2 = new MockRequest("/_stx/junit-endpoints/greetings/frank/foo?language=chinese", "GET");
+        RouteResult result2 = new RoutesRegistry().routeForEndpoints(request2, bEndpoints);
+        Assert.assertNotNull(result2);
+
+        String output2 = new RequestProcessor(request, new StResponse()).dispatchWsEndpoint(result2);
+        Assert.assertTrue(output2.contains("Hair for frank is unknown"));
+
     }
 
 

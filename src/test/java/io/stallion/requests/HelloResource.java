@@ -22,6 +22,7 @@ import io.stallion.restfulEndpoints.EndpointResource;
 
 import javax.ws.rs.*;
 
+import static io.stallion.utils.Literals.or;
 
 
 public class HelloResource implements EndpointResource {
@@ -47,5 +48,10 @@ public class HelloResource implements EndpointResource {
         return "New attitude for " + name + " is " + attitude;
     }
 
+    @GET()
+    @Path("/greetings/{person}/foo")
+    public String greetings(@PathParam("person") String name, @QueryParam("hair") String hair) {
+        return "Hair for " + name + " is " + or(hair, "unknown");
+    }
 
 }

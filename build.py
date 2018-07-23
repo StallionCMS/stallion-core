@@ -161,11 +161,11 @@ def copy():
     #!cp ~/st/flat-blog/target/stallion-flat-blog-.1-SNAPSHOT-jar-with-dependencies.jar ~/st/www/jars/flat-blog.jar
     #!cp ~/st/plugins/contacts/target/stallion-contacts-1.0-SNAPSHOT.jar ~/st/www/jars/contacts.jar
 
-    for folder in ['~/repos/patfitzsimmons', '~/st/www']:
+    for folder in []:
         folder = folder.replace('~/', os.environ['HOME'] + '/')
         shutil.copy(os.environ['HOME'] + '/st/distributions/dev/stallion-publisher', folder + '/bin/stallion-publisher')
         
-    for folder in ['~/repos/oldbooks', '~/repos/upfor', '~/repos/devinhelton', '~/st/sandbox-site', '~/repos/clubby-www']:
+    for folder in ['~/repos/oldbooks', '~/repos/upfor', '~/repos/devinhelton', '~/st/sandbox-site', '~/repos/clubby-www', '~/repos/patfitzsimmons', '~/st/www']:
         folder = folder.replace('~/', os.environ['HOME'] + '/')
         shutil.copy(os.environ['HOME'] + '/st/core/target/stallion', folder + '/bin/stallion')
 

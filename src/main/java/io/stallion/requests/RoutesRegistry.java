@@ -149,10 +149,18 @@ public class RoutesRegistry {
             if (routerPart.length() == 0) {
                 continue;
             }
-            if (routerPart.charAt(0) == ':') {
-                String key = routerPart.substring(1, routerPart.length());
+            if (routerPart.contains("{") && routerPart.contains("}")) {
+                int s = routerPart.indexOf("{");
+                int e = routerPart.indexOf("}");
+                String key = routerPart.substring(s + 1, e);
                 formatParams.put(key, givenPart);
                 continue;
+            } else {
+                if (routerPart.charAt(0) == ':') {
+                    String key = routerPart.substring(1, routerPart.length());
+                    formatParams.put(key, givenPart);
+                    continue;
+                }
             }
 
             if (!routerPart.equals(givenPart)) {
