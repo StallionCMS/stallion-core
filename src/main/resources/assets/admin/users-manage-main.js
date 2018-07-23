@@ -6,6 +6,13 @@
         
         Vue.use(StallionUtilsVuePlugin);
         Vue.use(Vuex);
+        Vue.use(Buefy);
+        Object.keys(Buefy.default).forEach(function(key) {
+            var c = Buefy.default[key];
+            if (c.name) {
+                Vue.component(c.name, c);
+            }
+        });
 
         var allComponents = Vue.options.components;
 

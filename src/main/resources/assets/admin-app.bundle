@@ -1,14 +1,13 @@
-/vendor/element-ui-theme-chalk.2.4.4.min.css
+/vendor/beufy-v0.6.6.min.css
 /stallion-ui.scss
 /admin-app.scss
 /general-helpers.js
 /vendor/axios.0.18.0.min.js
 /vendor/date_fns.1.29.0.min.js
-/vendor/pure-min.1.0.0.min.css
 /vendor/vue-v2.5.16.js
 /vendor/vuex.3.0.1.min.js
 /vendor/vue-router.3.0.1.min.js
-/vendor/element-ui.2.4.4.min.js
+/vendor/beufy-v0.6.6.min.js
 /stallion-utils-vue-plugin.js
 /admin/stallion-admin-app.vue
 /admin/users-edit.vue

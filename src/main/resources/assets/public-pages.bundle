@@ -1,3 +1,4 @@
+/vendor/beufy-v0.6.6.min.css
 /vendor/element-ui-theme-chalk.2.4.4.min.css
 /stallion-ui.scss
 /public-pages.scss
@@ -8,7 +9,7 @@
 /vendor/vue-v2.5.16.js
 /vendor/vuex.3.0.1.min.js
 /vendor/vue-router.3.0.1.min.js
-/vendor/element-ui.2.4.4.min.js
+/vendor/beufy-v0.6.6.min.js
 /stallion-utils-vue-plugin.js
 /public-pages.js
 

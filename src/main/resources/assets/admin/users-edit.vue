@@ -16,74 +16,91 @@
     <div>
         <div v-if="loading">Loading user …</div>
         <div>
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item :to="{ path: '/' }">All Users</el-breadcrumb-item>
-
-                <el-breadcrumb-item v-if="user && user.id">{{ user.username }}</el-breadcrumb-item>
-            </el-breadcrumb>
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="/st-users/manage" aria-current="page">All Users</a></li>
+                    <li v-if="user && user.id" class="is-active"><a href="'#/users/' + User.id">{{ user.username }}</a></li>
+                </ul>
+            </nav>            
         </div>
-        <div class="pure-g"  v-if="!loading" style="margin-top: 1em;">
-            <div class="pure-u-2-3" style="padding-right: 30px;">
+        <div class="pure-g columns"  v-if="!loading" style="margin-top: 1em;">
+            <div class="pure-u-2-3 column is-two-thirds" style="padding-right: 30px;">
                 <h2 class="p">Edit User <b>{{ user.displayName }}</b></h2>
-                <el-form ref="form" :model="user" label-width="120px" label-position="top" @submit.native.prevent="submit" size="small">
-                    <el-form-item label="Display Name">
-                        <el-input v-model="user.displayName" name="displayName" type="text" required="true" ></el-input>
-                    </el-form-item>
-                    <el-form-item label="Given Name">
-                        <el-input v-model="user.givenName" name="givenName" type="text" class="pure-input-1"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Family Name">
-                        <el-input v-model="user.familyName" name="familyName" type="text" class="pure-input-1"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Email">
-                        <el-input v-model="user.email" name="email" type="email" placeholder="Email" class="pure-input-1"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Username">
-                        <el-input v-model="user.username" name="username" type="text" class="pure-input-1"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Role">
-                        <el-select v-model="user.role" >
-                            <el-option value="ANON">ANON</el-option>
-                            <el-option value="CONTACT">CONTACT</el-option>
-                            <el-option value="REGISTERED">REGISTERED</el-option>
-                            <el-option value="MEMBER">MEMBER</el-option>
-                            <el-option value="STAFF_LIMITED">STAFF_LIMITED</el-option>
-                            <el-option value="STAFF">STAFF</el-option>
-                            <el-option value="ADMIN">ADMIN</el-option>
-                        </el-select>
-                    </el-form-item>
+                <form @submit.prevent="submit">
+                    <b-field label="Display Name">
+                        <b-input v-model="user.displayName"></b-input>
+                    </b-field>                    
+
+
+                    <b-field label="Given Name">
+                        <b-input v-model="user.givenName"></b-input>
+                    </b-field>                    
+
+                    <b-field label="Family Name">
+                        <b-input v-model="user.familyName"></b-input>
+                    </b-field>                    
+
+                    
+                    <b-field label="Email"
+                             type="email"
+                             >
+                        <b-input type="email"
+                                 v-model="user.email"
+                                 maxlength="60">
+                        </b-input>
+                    </b-field>
+
+                    <b-field label="Username">
+                        <b-input type="text"
+                                 v-model="user.username"
+                                 maxlength="60">
+                        </b-input>
+                    </b-field>
+                    
+                    <b-field label="Role">
+                        <b-select placeholder="Role">
+                            <option value="ANON">ANON</option>
+                            <option value="CONTACT">CONTACT</option>
+                            <option value="REGISTERED">REGISTERED</option>
+                            <option value="MEMBER">MEMBER</option>
+                            <option value="STAFF_LIMITED">STAFF_LIMITED</option>
+                            <option value="STAFF">STAFF</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </b-select>
+                    </b-field>
+                    
                     <p>
-                        <el-button type="primary" native-type="submit" v-stallion-locking="'saveUser.stay'" >Save changes</el-button>
-                        <el-button v-stallion-locking="'saveUser.return'" @click="submitAndReturn">Save and Return</el-button>
+                        <button class="button "type="primary" native-type="submit" v-stallion-locking="'saveUser.stay'" >Save changes</button>
+                        <button class="button" v-stallion-locking="'saveUser.return'" @click="submitAndReturn">Save and Return</button>
                     </p>
-                </el-form>        
+                </form>        
             </div>
-            <div class="pure-u-1-3 user-management-actions">
+            <div class="pure-u-1-3 user-management-actions column">
                 <h4>Actions</h4>
                 <div v-if="!resetSent && !user.deleted">
-                    <el-button v-on:click="forcePasswordReset" title="Will null-out the users password and send them an email asking them to reset it." v-stallion-locking="'reset'" >Force password reset.</el-button>
+                    <button class="button" v-on:click="forcePasswordReset" title="Will null-out the users password and send them an email asking them to reset it." v-stallion-locking="'reset'" >Force password reset.</button>
                 </div>
                 <div v-if="resetSent && !user.deleted">
                     Password reset!
                 </div>
                 <div v-if="!user.disabled">
                     
-                    <el-button v-on:click="disableUser" class="" v-stallion-locking="'disable'">Disable user</el-button>
+                    <button v-on:click="disableUser" class="button" v-stallion-locking="'disable'">Disable user</button>
                 </div>
                 <div v-if="user.disabled">
-                    <el-button v-on:click="enableUser" class="" v-stallion-locking="'disable'">Enable user</el-button>
+                    <button v-on:click="enableUser" class="button" v-stallion-locking="'disable'">Enable user</button>
                 </div>
                 <div v-if="!user.approved">
-                    <el-button v-on:click="approveUser" class="" v-stallion-locking="'approve'">Approve user</el-button>
+                    <button v-on:click="approveUser" class="button" v-stallion-locking="'approve'">Approve user</button>
                 </div>
                 <div v-if="user.approved">
-                    <el-button v-on:click="unapproveUser" class="" v-stallion-locking="'approve'">Un-approve user</el-button>
+                    <button v-on:click="unapproveUser" class="button" v-stallion-locking="'approve'">Un-approve user</button>
                 </div>
                 <div v-if="!user.deleted">
-                    <el-button v-on:click="deleteUser" class="" v-stallion-locking="'delete'">Delete user</el-button>
+                    <button v-on:click="deleteUser" class="button" v-stallion-locking="'delete'">Delete user</button>
                 </div>
                 <div v-if="user.deleted">
-                    <el-button v-on:click="restoreUser" class="" v-stallion-locking="'delete'">Restore user</el-button>
+                    <button v-on:click="restoreUser" class="button" v-stallion-locking="'delete'">Restore user</button>
                 </div>
             </div>
         </div>

@@ -5,11 +5,33 @@
 <template>
     <div class="users-table-vue">
         <div>
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item >All Users</el-breadcrumb-item>
-            </el-breadcrumb>
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li class="is-active"><a href="#" aria-current="page">All Users</a></li>
+                </ul>
+            </nav>            
         </div>
         <div class="p">
+            <b-table :data="users" hoverable is-striped striped @click="onRowClick">
+                <template slot-scope="props">
+                    <b-table-column field="username" label="Username" >
+                        {{ props.row.username }}
+                    </b-table-column>
+                    <b-table-column field="displayName" label="Display Name">
+                        {{ props.row.displayName }}
+                    </b-table-column>
+                    <b-table-column field="email" label="Email">
+                        {{ props.row.email }}
+                    </b-table-column>
+                    <b-table-column field="role" label="Role">
+                        {{ props.row.role }}
+                    </b-table-column>                    
+                    <b-table-column field="createdAt" label="Created At">
+                        {{ formatCreatedAt(props.row.createdAt) }}
+                    </b-table-column>                    
+                </template>
+            </b-table>
+<!--
 <el-table
     :data="users"
     stripe
@@ -43,6 +65,7 @@
     </el-table-column>    
     
 </el-table>
+ -->            
         </div>
     </div>
 </template>
@@ -54,6 +77,9 @@ module.exports = {
         return {
             tableData: [],
             users: [],
+            columns: [
+                
+            ],
             pager: null,
             page: 1,
             withDeleted: false,
@@ -90,7 +116,7 @@ module.exports = {
                 
             });
         },
-        formatCreatedAt: function(row, column, mils, index) {
+        formatCreatedAt: function(mils) {
             if (mils === 0) {
                 return '';
             }
