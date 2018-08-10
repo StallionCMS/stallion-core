@@ -54,4 +54,10 @@ public class HelloResource implements EndpointResource {
         return "Hair for " + name + " is " + or(hair, "unknown");
     }
 
+    @GET()
+    @Path("/booyah/{thingId}")
+    public String booyah(@PathParam("thingId") Long thingId, @QueryParam("hair") String hair) {
+        return "thingId is " + thingId;
+    }
+
 }

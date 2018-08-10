@@ -40,7 +40,7 @@ public class EndpointResourceTest extends AppIntegrationCaseBase {
     @Test
     public void testIntrospectResource() {
         List<JavaRestEndpoint> endpoints = new ResourceToEndpoints("/_stx/junit-endpoints").convert(new HelloResource());
-        Assert.assertEquals(2, endpoints.size());
+        Assert.assertEquals(4, endpoints.size());
         JavaRestEndpoint nameEndpoint;
         JavaRestEndpoint personEndpoint;
         if (endpoints.get(0).getRoute().endsWith("name")) {
@@ -74,12 +74,24 @@ public class EndpointResourceTest extends AppIntegrationCaseBase {
         Assert.assertTrue(output.contains("Ni hao, phadraig"));
 
 
-        StRequest request2 = new MockRequest("/_stx/junit-endpoints/greetings/frank/foo?language=chinese", "GET");
-        RouteResult result2 = new RoutesRegistry().routeForEndpoints(request2, bEndpoints);
-        Assert.assertNotNull(result2);
+        {
+            StRequest request2 = new MockRequest("/_stx/junit-endpoints/greetings/frank/foo?language=chinese", "GET");
+            RouteResult result2 = new RoutesRegistry().routeForEndpoints(request2, bEndpoints);
+            Assert.assertNotNull(result2);
 
-        String output2 = new RequestProcessor(request, new StResponse()).dispatchWsEndpoint(result2);
-        Assert.assertTrue(output2.contains("Hair for frank is unknown"));
+            String output2 = new RequestProcessor(request, new StResponse()).dispatchWsEndpoint(result2);
+            Assert.assertTrue(output2.contains("Hair for frank is unknown"));
+        }
+
+        {
+            StRequest request2 = new MockRequest("/_stx/junit-endpoints/booyah/12343210", "GET");
+            RouteResult result2 = new RoutesRegistry().routeForEndpoints(request2, bEndpoints);
+            Assert.assertNotNull(result2);
+
+            String output2 = new RequestProcessor(request, new StResponse()).dispatchWsEndpoint(result2);
+            Assert.assertTrue(output2.contains("thingId is 12343210"));
+
+        }
 
     }
 
