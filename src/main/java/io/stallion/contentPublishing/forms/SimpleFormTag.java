@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.forms;
+package io.stallion.contentPublishing.forms;
 
 import com.hubspot.jinjava.interpret.JinjavaInterpreter;
 import com.hubspot.jinjava.lib.tag.Tag;

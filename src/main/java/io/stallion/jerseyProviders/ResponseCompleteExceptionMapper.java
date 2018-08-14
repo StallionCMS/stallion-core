@@ -15,28 +15,20 @@
  *
  */
 
-package io.stallion.sitemaps;
+package io.stallion.jerseyProviders;
 
+import io.stallion.requests.ResponseComplete;
 
-public class SiteMapItem {
-    private String permalink;
-    private Long lastModTicks = 0L;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
-    public String getPermalink() {
-        return permalink;
-    }
+@Provider
+public class ResponseCompleteExceptionMapper extends BaseExceptionMapper<ResponseComplete> {
 
-    public SiteMapItem setPermalink(String permalink) {
-        this.permalink = permalink;
-        return this;
-    }
-
-    public Long getLastModTicks() {
-        return lastModTicks;
-    }
-
-    public SiteMapItem setLastModTicks(Long lastModTicks) {
-        this.lastModTicks = lastModTicks;
-        return this;
+    @Override
+    public Response toResponse(ResponseComplete exception) {
+        return null;
     }
 }
+
+

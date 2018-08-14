@@ -104,7 +104,7 @@ class RequestProcessor {
             // Do nothing, the response completed successfully
         } catch(RedirectException e) {
             response.addHeader("Location", e.getUrl());
-            response.setStatus(e.getStatusCode());
+           // response.setStatus(e.getStatusCode());
         } catch(NotFoundException e) {
             try {
                 handleNotFound(e.getMessage());
@@ -117,7 +117,7 @@ class RequestProcessor {
             } else if (e.getTargetException() instanceof RedirectException) {
                 RedirectException target = (RedirectException)e.getTargetException();
                 response.addHeader("Location", target.getUrl());
-                response.setStatus(target.getStatusCode());
+                //response.setStatus(target.getStatusCode());
             } else if (e.getTargetException() instanceof NotFoundException) {
                 try {
                     handleNotFound(e.getTargetException().getMessage());
@@ -527,6 +527,9 @@ class RequestProcessor {
      * Else, do nothing.
      */
     public void tryRouteAssetRequest() throws Exception{
+        return;
+
+        /*
         if (request.getPath().startsWith("/st-assets") && "true".equals(request.getParameter("isConcatenatedFileBundle"))) {
             serveFileBundle();
         } else if (request.getPath().startsWith("/st-assets") && "true".equals(request.getParameter("isBundleFile"))) {
@@ -545,7 +548,7 @@ class RequestProcessor {
         } else if (request.getPath().startsWith("/st-bundle-v2/")) {
             serveResourceBundle();
         }
-
+         */
     }
 
     public void serveFileBundleAsset() throws Exception {

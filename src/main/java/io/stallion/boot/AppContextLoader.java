@@ -20,11 +20,9 @@ import io.stallion.assets.AssetsController;
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
 
-import io.stallion.contentPublishing.UploadedFileEndpoints;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.Tickets;
-import io.stallion.dataAccess.file.ListingEndpoints;
 import io.stallion.dataAccess.file.ListingExporter;
 import io.stallion.dataAccess.file.TextItemController;
 import io.stallion.dataAccess.filtering.FilterCache;
@@ -32,7 +30,6 @@ import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherRunner;
 import io.stallion.fileSystem.FileSystemWatcherService;
-import io.stallion.forms.SimpleFormTag;
 import io.stallion.hooks.HookRegistry;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.jobs.JobStatusController;
@@ -42,7 +39,7 @@ import io.stallion.plugins.PluginRegistry;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.RoutesRegistry;
 import io.stallion.services.*;
-import io.stallion.sitemaps.SiteMapController;
+import io.stallion.contentPublishing.SiteMapController;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.settings.Settings;
@@ -51,7 +48,6 @@ import io.stallion.templating.JinjaTemplating;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.users.User;
 import io.stallion.users.UserController;
-import io.stallion.users.UsersApiResource;
 
 import java.io.File;
 
@@ -174,22 +170,25 @@ public class AppContextLoader {
 
         //DefinedBundle.load();
         TemplateRenderer.load();
-        TemplateRenderer.instance().getJinjaTemplating().registerTag(new SimpleFormTag());
+
         RoutesRegistry.load();
 
         // Load users, admin and other default functionality
         TransactionLogController.register();
         AuditTrailController.register();
         UserController.load();
-        UsersApiResource.register();
-        ListingEndpoints.register();
+
+        //ListingEndpoints.register();
         ListingExporter.register();
 
         JobStatusController.selfRegister();
 
 
 
-        UploadedFileEndpoints.registerIfEnabled();
+        //UploadedFileEndpoints.registerIfEnabled();
+
+       // EndpointsRegistry.instance().addResource("", new AssetsEndpointsResource());
+
 
         SimpleAsyncRunner.load(true);
 

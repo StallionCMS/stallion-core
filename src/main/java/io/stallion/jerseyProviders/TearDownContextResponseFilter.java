@@ -15,20 +15,27 @@
  *
  */
 
-package io.stallion.restfulEndpoints;
+package io.stallion.jerseyProviders;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.IOException;
 
-@Target(value={ElementType.PARAMETER, ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface BodyParam {
-    public String value();
-    public boolean required() default false;
-    public boolean allowEmpty() default true;
-    public boolean isEmail() default false;
-    public int minLength() default 0;
-    public String validationPattern() default "";
+import io.stallion.Context;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
+
+@Provider
+public class TearDownContextResponseFilter implements ContainerResponseFilter {
+
+    @Override
+    public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) throws IOException {
+        Context.setValet(null, null);
+        Context.setUser(null);
+        Context.setOrg(null);
+        Context.setResponse(null);
+        Context.setRequest(null);
+
+    }
 }

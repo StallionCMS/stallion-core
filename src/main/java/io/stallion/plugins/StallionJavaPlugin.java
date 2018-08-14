@@ -37,6 +37,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.IOException;
 import java.net.URL;
@@ -114,6 +115,11 @@ public abstract class StallionJavaPlugin {
     public void startServices() {
 
 
+    }
+
+    public void buildResourceConfig(ResourceConfig rc) {
+        String thisPackage = this.getClass().getPackage().getName();
+        rc.packages(thisPackage);
     }
 
     public void preStartJetty(Server server, HandlerCollection handlerCollection, ServeCommandOptions options) {

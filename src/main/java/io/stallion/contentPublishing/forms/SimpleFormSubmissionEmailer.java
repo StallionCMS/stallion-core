@@ -15,13 +15,10 @@
  *
  */
 
-package io.stallion.forms;
+package io.stallion.contentPublishing.forms;
 
 import io.stallion.email.ContactableEmailer;
 import io.stallion.users.User;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class SimpleFormSubmissionEmailer extends ContactableEmailer {

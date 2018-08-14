@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.sitemaps;
+package io.stallion.contentPublishing;
 
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.EndpointsRegistry;

@@ -17,13 +17,12 @@
 
 package io.stallion.tools;
 
-import com.amazonaws.util.IOUtils;
 import io.stallion.boot.AppContextLoader;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.boot.ServeCommandOptions;
 import io.stallion.requests.RequestHandler;
-import io.stallion.sitemaps.SiteMapController;
-import io.stallion.sitemaps.SiteMapItem;
+import io.stallion.contentPublishing.SiteMapController;
+import io.stallion.contentPublishing.SiteMapItem;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.testing.MockRequest;
@@ -33,7 +32,6 @@ import jodd.jerry.Jerry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.HashSet;

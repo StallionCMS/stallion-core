@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.forms;
+package io.stallion.contentPublishing.forms;
 
 import io.stallion.dataAccess.AlternativeKey;
 import io.stallion.dataAccess.ModelBase;

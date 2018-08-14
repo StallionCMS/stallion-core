@@ -19,7 +19,7 @@ package io.stallion.restfulEndpoints;
 
 import io.stallion.exceptions.UsageException;
 import io.stallion.monitoring.InternalEndpoints;
-import io.stallion.sitemaps.SiteMapEndpoints;
+import io.stallion.contentPublishing.SiteMapEndpoints;
 import io.stallion.services.Log;
 
 import java.util.ArrayList;

@@ -454,6 +454,9 @@ public final class PropertyUtils {
      */
     public static Object transform(Object value, Class destinationClass) {
         if (value == null) {
+            if (destinationClass.equals(boolean.class)) {
+                return false;
+            }
             return null;
         }
         if (value.getClass() == destinationClass)
@@ -508,6 +511,8 @@ public final class PropertyUtils {
                 return (Integer)value > 0;
             } else if (value instanceof Long) {
                 return (Long)value > 0;
+            }  else if (value == null) {
+                return false;
             }
         }
 

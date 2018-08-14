@@ -93,6 +93,36 @@ public class EndpointResourceTest extends AppIntegrationCaseBase {
 
         }
 
+        {
+            StRequest request2 = new MockRequest("/_stx/junit-endpoints/wildy/fripfah/3938383", "GET");
+            RouteResult result2 = new RoutesRegistry().routeForEndpoints(request2, bEndpoints);
+            Assert.assertNotNull(result2);
+
+            String output2 = new RequestProcessor(request, new StResponse()).dispatchWsEndpoint(result2);
+            Assert.assertTrue(output2.contains("Wildy wildcard endpoint"));
+
+        }
+
+    }
+
+    @Test
+    public void testWildcard() throws Exception {
+        StRequest request = new MockRequest("/_stx/junit-endpoints/hello/phadraig?language=chinese", "GET");
+        List<JavaRestEndpoint> endpoints = new ResourceToEndpoints("/_stx/junit-endpoints").convert(new HelloResource());
+        List<RestEndpointBase> bEndpoints = new ArrayList<>();
+        for(JavaRestEndpoint end: endpoints) {
+            bEndpoints.add(end);
+        }
+
+        {
+            StRequest request2 = new MockRequest("/_stx/junit-endpoints/wildy/fripfah/3938383", "GET");
+            RouteResult result2 = new RoutesRegistry().routeForEndpoints(request2, bEndpoints);
+            Assert.assertNotNull(result2);
+
+            String output2 = new RequestProcessor(request, new StResponse()).dispatchWsEndpoint(result2);
+            Assert.assertTrue(output2.contains("Wildy wildcard endpoint"));
+
+        }
     }
 
 

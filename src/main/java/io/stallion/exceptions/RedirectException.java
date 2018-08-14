@@ -17,18 +17,22 @@
 
 package io.stallion.exceptions;
 
+import javax.ws.rs.RedirectionException;
+import java.net.URI;
+
 /**
  * Short circuits the request and returns a 302 redirect.
  */
-public class RedirectException extends WebException {
+public class RedirectException extends RedirectionException {
     private String url = "";
+
     public RedirectException(String url) {
-        super("redirect to " + url, 302);
+        super(302, URI.create(url));
         this.setUrl(url);
     }
 
     public RedirectException(String url, int code) {
-        super("redirect to " + url, code);
+        super(code, URI.create(url));
         this.setUrl(url);
     }
 

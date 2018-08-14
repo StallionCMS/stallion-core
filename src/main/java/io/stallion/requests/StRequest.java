@@ -80,6 +80,14 @@ public class StRequest implements IRequest {
 
     }
 
+    public StRequest(HttpServletRequest request) {
+        this.path = request.getPathInfo().toString();
+        this.request = request;
+        this.query = request.getQueryString();
+        this.baseRequest = null;
+    }
+
+
     public StRequest(String path, Request baseRequest, HttpServletRequest request) {
         this.setPath(path);
         this.request = request;
@@ -91,7 +99,9 @@ public class StRequest implements IRequest {
     @Override
     public void setAsMultiPartRequest() {
         if (request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) {
-            baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+            if (baseRequest != null) {
+                baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+            }
         }
     }
 

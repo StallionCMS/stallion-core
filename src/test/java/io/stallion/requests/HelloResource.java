@@ -60,4 +60,10 @@ public class HelloResource implements EndpointResource {
         return "thingId is " + thingId;
     }
 
+
+    @GET
+    @Path("/wildy/*")
+    public String wildy() {
+        return "Wildy wildcard endpoint";
+    }
 }

@@ -32,7 +32,7 @@ public class MyResource implements EndpointResource {
     @POST()
     @Path("/hello/creatify")
     @JsonView(RestrictedViews.Member.class)
-    public Object creatify(@ObjectParam(targetClass = ExamplePojo.class) ExamplePojo rawThing) {
+    public Object creatify(ExamplePojo rawThing) {
         ExamplePojo pojo = SafeMerger.with()
                 .nonEmpty("userName", "displayName", "content", "age")
                 .optionalEmail("email")
@@ -48,7 +48,7 @@ public class MyResource implements EndpointResource {
 
     @POST()
     @Path("/:id/updatify")
-    public Object updateForId(@PathParam("id") Long id, @ObjectParam(targetClass = ExamplePojo.class) ExamplePojo thing) {
+    public Object updateForId(@PathParam("id") Long id, ExamplePojo thing) {
         thing.setId(id);
 
         return thing;
@@ -57,7 +57,7 @@ public class MyResource implements EndpointResource {
 
     @POST()
     @Path("/hello/updatifyHello")
-    public Object updatify(@ObjectParam(targetClass = ExamplePojo.class) ExamplePojo thing) {
+    public Object updatify(ExamplePojo thing) {
         ExamplePojo pojo = SafeMerger.with().optional("displayName", "age", "content").merge(thing);
         pojo.setUpdateMessage("This was updated by the method updatify");
         pojo.setUpdated(123456789L);
@@ -68,7 +68,7 @@ public class MyResource implements EndpointResource {
     @POST()
     @Path("/hello/moderatify")
     @JsonView(RestrictedViews.Owner.class)
-    public Object moderatify(@ObjectParam ExamplePojo thing) {
+    public Object moderatify(ExamplePojo thing) {
         ExamplePojo pojo = SafeMerger.with().optional("displayName", "age", "content", "userName", "email", "status").merge(thing);
         pojo.setUpdateMessage("This was updated by the method moderatify");
         pojo.setUpdated(123456789L);

@@ -30,6 +30,7 @@ import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.Sanitize;
 import io.stallion.utils.json.RestrictedViews;
 import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.*;
 
@@ -44,9 +45,12 @@ import static io.stallion.Context.*;
 @Path("/st-users")
 public class UsersApiResource implements EndpointResource {
 
-    public static void register() {
+    public static void registerMaybe(ResourceConfig config) {
+
+
         if (Settings.instance().getUsers().getEnableDefaultEndpoints()) {
-            EndpointsRegistry.instance().addResource("", new UsersApiResource());
+            config.register(UsersApiResource.class);
+
 
             /*
             DefinedBundle.register(new DefinedBundle(
@@ -490,7 +494,7 @@ public class UsersApiResource implements EndpointResource {
     @MinRole(Role.ADMIN)
     @Produces("application/json")
     @JsonView(RestrictedViews.Owner.class)
-    public IUser updateUser(@PathParam("userId") Long userId, @ObjectParam(targetClass=User.class) User updatedUser) {
+    public IUser updateUser(@PathParam("userId") Long userId, User updatedUser) {
 
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {

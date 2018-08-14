@@ -58,6 +58,10 @@ public class Log {
         System.setProperty("java.util.logging.config.file", "noop");
     }
 
+    public static Logger getLogger() {
+        return logger;
+    }
+
     /**
      * Disable logging to the console
      */

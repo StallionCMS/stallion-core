@@ -15,11 +15,10 @@
  *
  */
 
-package io.stallion.forms;
+package io.stallion.contentPublishing.forms;
 
 import io.stallion.exceptions.ClientException;
 import io.stallion.requests.validators.SafeMerger;
-import io.stallion.restfulEndpoints.ObjectParam;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.utils.Encrypter;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +34,7 @@ public class SimpleFormEndpoints {
 
     @POST
     @Path("/contacts/submit-form")
-    public Boolean submitForm(@ObjectParam(targetClass = SimpleFormSubmission.class) SimpleFormSubmission rawSubmission) {
+    public Boolean submitForm(SimpleFormSubmission rawSubmission) {
         SimpleFormSubmission submission = SafeMerger
                 .with()
                 .nonEmpty("antiSpamToken", "pageUrl", "data")

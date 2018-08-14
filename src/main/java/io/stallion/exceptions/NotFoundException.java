@@ -20,8 +20,8 @@ package io.stallion.exceptions;
 /**
  * Short circuits the request and returns a 404 error with the given message.
  */
-public class NotFoundException extends ClientException {
+public class NotFoundException extends javax.ws.rs.NotFoundException {
     public NotFoundException(String message) {
-        super(message, 404);
+        super(message);
     }
 }

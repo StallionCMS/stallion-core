@@ -128,6 +128,14 @@ public class ReadOnlyWrapper<T extends Model> implements ModelController<T> {
         return original.filter(name, value);
     }
 
+    public FilterChain<T> filterBy(String name, Object value) {
+        return original.filter(name, value);
+    }
+
+    public FilterChain<T> filterBy(String name, Object value, String op) {
+        return original.filter(name, value, op);
+    }
+
     @Override
     public FilterChain<T> filter(String name, Object value, String op) {
         return original.filter(name, value, op);

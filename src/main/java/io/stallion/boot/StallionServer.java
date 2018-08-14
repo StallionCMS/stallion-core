@@ -19,24 +19,28 @@ package io.stallion.boot;
 
 import io.stallion.Context;
 import io.stallion.asyncTasks.AsyncCoordinator;
+import io.stallion.jerseyProviders.StallionJerseyApplication;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
-import io.stallion.requests.RequestHandler;
-import io.stallion.restfulEndpoints.RestEndpointBase;
 import io.stallion.restfulEndpoints.SlugRegistry;
-import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.StdErrLog;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
-import javax.servlet.MultipartConfigElement;
+
 import java.text.MessageFormat;
-import java.util.Map;
 
 
 public class StallionServer implements StallionRunAction<ServeCommandOptions> {
@@ -62,11 +66,20 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
         return new ServeCommandOptions();
     }
 
+    public static ResourceConfig buildResourceConfig() {
+        return new StallionJerseyApplication();
+    }
+
     @Override
     public void execute(ServeCommandOptions options) throws Exception {
 
+        // https://stackoverflow.com/questions/25786592/how-to-enable-logging-in-jetty
+        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
 
 
+
+        Log.setLog(new StdErrLog());
 
         // Start the server
         Server server = new Server(Settings.instance().getPort());
@@ -75,16 +88,37 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
         handlerCollection.setServer(server);
         handlerCollection.setHandlers(new Handler[] {});
 
+        ResourceConfig rc = buildResourceConfig();
+
+
+
+        //rc.register(LoggingFeature.class);
+        //Logger logger = new L
+
+
+        //rc.register(new Trace())
+
+
+        ServletContextHandler ctx =
+                new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+
+        ctx.setInitParameter("com.sun.jersey.config.feature.Trace", "true");
+        ctx.setContextPath("/");
+        server.setHandler(ctx);
+
+        ServletContainer sc = new ServletContainer(rc);
+        ctx.addServlet(new ServletHolder(sc), "/*");
+
 
         for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
             plugin.preStartJetty(server, handlerCollection, options);
         }
 
-        handlerCollection.addHandler(RequestHandler.instance());
+        //handlerCollection.addHandler(RequestHandler.instance());
+        handlerCollection.addHandler(ctx);
 
 
 
-        server.setHandler(handlerCollection);
         server.start();
 
         System.out.print("-------------------------------------------------------\n");

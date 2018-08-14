@@ -17,6 +17,7 @@
 
 package io.stallion.exceptions;
 
+import javax.ws.rs.ClientErrorException;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.map;
@@ -25,7 +26,7 @@ import static io.stallion.utils.Literals.map;
  * The end user did something wrong and needs to correct their request.
  * Will short-circuit the request and return a 400 error by default.
  */
-public class ClientException extends WebException {
+public class ClientException extends ClientErrorException {
 
     /**
      * Message will get displayed to the end user, so make it polite and friendly.
@@ -44,10 +45,9 @@ public class ClientException extends WebException {
     }
 
 
+    @Deprecated
     public ClientException(String message, int statusCode, Map extra) {
-        super(message);
-        this.setStatusCode(statusCode);
-        setExtra(extra);
+        super(message, statusCode);
     }
 
 

@@ -84,6 +84,7 @@ public class RoutesRegistry {
             if (endpointParts.length > 0) {
                 if (endpointParts[endpointParts.length - 1].equals("*") && requestParts.length >= endpointParts.length) {
                     requestParts = ArrayUtils.subarray(requestParts, 0, endpointParts.length - 1);
+                    endpointParts = ArrayUtils.subarray(endpointParts, 0, endpointParts.length - 1);
                 }
             }
 

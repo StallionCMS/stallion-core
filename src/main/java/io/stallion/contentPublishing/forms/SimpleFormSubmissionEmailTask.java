@@ -15,7 +15,7 @@
  *
  */
 
-package io.stallion.forms;
+package io.stallion.contentPublishing.forms;
 
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.AsyncTaskHandlerBase;
@@ -25,7 +25,7 @@ import io.stallion.settings.Settings;
 import io.stallion.users.User;
 import io.stallion.users.UserController;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 
 public class SimpleFormSubmissionEmailTask extends AsyncTaskHandlerBase {

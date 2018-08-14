@@ -50,7 +50,7 @@ exec java -classpath "$DIR/../jars/*"  -jar $0 "$@"
 '''
         with open(os.environ['HOME'] + '/st/core/target/stallion', 'w') as f:
             f.write(script)
-        (cat[os.environ['HOME'] + '/st/core/target/stallion-core-1.0.0-SNAPSHOT-jar-with-dependencies.jar'] >> os.environ['HOME'] + '/st/core/target/stallion') & FG
+        (cat[os.environ['HOME'] + '/st/core/target/stallion-core-1.0.1-beta-01-SNAPSHOT-jar-with-dependencies.jar'] >> os.environ['HOME'] + '/st/core/target/stallion') & FG
         os.chmod(os.environ['HOME'] + '/st/core/target/stallion', 0o700)
         if '--dist' in sys.argv:
             make_dist(os.environ['HOME'] + "/st/core", 'stallion')

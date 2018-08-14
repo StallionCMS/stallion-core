@@ -15,20 +15,28 @@
  *
  */
 
-package io.stallion.restfulEndpoints;
+package io.stallion.contentPublishing;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
-@Target(value={ElementType.PARAMETER, ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface BodyParam {
-    public String value();
-    public boolean required() default false;
-    public boolean allowEmpty() default true;
-    public boolean isEmail() default false;
-    public int minLength() default 0;
-    public String validationPattern() default "";
+public class SiteMapItem {
+    private String permalink;
+    private Long lastModTicks = 0L;
+
+    public String getPermalink() {
+        return permalink;
+    }
+
+    public SiteMapItem setPermalink(String permalink) {
+        this.permalink = permalink;
+        return this;
+    }
+
+    public Long getLastModTicks() {
+        return lastModTicks;
+    }
+
+    public SiteMapItem setLastModTicks(Long lastModTicks) {
+        this.lastModTicks = lastModTicks;
+        return this;
+    }
 }

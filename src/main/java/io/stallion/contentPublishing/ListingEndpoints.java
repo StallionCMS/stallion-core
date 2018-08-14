@@ -15,11 +15,10 @@
  *
  */
 
-package io.stallion.dataAccess.file;
+package io.stallion.contentPublishing;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
@@ -27,11 +26,11 @@ import static io.stallion.utils.Literals.*;
 import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DisplayableModelController;
+import io.stallion.dataAccess.file.TextItem;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.restfulEndpoints.EndpointResource;
 import io.stallion.restfulEndpoints.EndpointsRegistry;
-import io.stallion.services.Log;
 import io.stallion.settings.ContentFolder;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;

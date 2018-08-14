@@ -36,6 +36,7 @@ import io.stallion.utils.Sanitize;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import javax.ws.rs.WebApplicationException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -91,7 +92,9 @@ public class TemplateRenderer {
 
     public String render500Html(Exception e) {
         String friendlyMessage = "There was an error trying to handle your request.";
-        if (e instanceof WebException) {
+        if (e instanceof WebApplicationException) {
+            friendlyMessage = e.getMessage();
+        } else if (e instanceof WebException) {
             friendlyMessage = ((WebException)e).getMessage();
         } else if (e instanceof InvocationTargetException) {
             if (((InvocationTargetException) e).getTargetException() != null) {
