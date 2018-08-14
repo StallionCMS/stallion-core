@@ -45,8 +45,8 @@ public class ContentPublishingResponseFilter implements ContainerResponseFilter 
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) throws IOException {
-        Log.info("Response filter");
         if (containerResponseContext.getStatus() == 404) {
+
             tryRenderForSlug(containerRequestContext, containerResponseContext);
         }
     }
@@ -64,6 +64,7 @@ public class ContentPublishingResponseFilter implements ContainerResponseFilter 
         if (path.equals("")) {
             path = "/";
         }
+        Log.finer("Did not match any resource endpoints, calling tryRenderforSlug: {0}", path);
         Displayable item = null;
         if (SlugRegistry.instance().hasUrl(path)) {
             item = SlugRegistry.instance().lookup(path);

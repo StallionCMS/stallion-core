@@ -35,7 +35,7 @@ public class StallionJerseyApplication extends ResourceConfig {
 
        // property("jersey.config.server.tracing.type", "ALL");
         //property("jersey.config.server.tracing.threshold", "VERBOSE");
-        register(new LoggingFeature(io.stallion.services.Log.getLogger(), Level.FINE, LoggingFeature.Verbosity.PAYLOAD_ANY, 1000000));
+        register(new LoggingFeature(io.stallion.services.Log.getLogger(), Level.FINEST, LoggingFeature.Verbosity.HEADERS_ONLY, 1000000));
 
 
         register(new BodyParamProvider<>());

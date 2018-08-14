@@ -73,13 +73,13 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
     @Override
     public void execute(ServeCommandOptions options) throws Exception {
 
+        // TODO: share the stallion logger
         // https://stackoverflow.com/questions/25786592/how-to-enable-logging-in-jetty
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
-        System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
-
-
-
+        System.setProperty("org.eclipse.jetty.LEVEL", "WARN");
         Log.setLog(new StdErrLog());
+
+
 
         // Start the server
         Server server = new Server(Settings.instance().getPort());
