@@ -65,11 +65,11 @@ public class ExceptionInfo {
         info.remoteAddr = request().getRemoteAddr();
         info.actualIp = request().getActualIp();
         info.requestHeaders = map();
-        for(String name: Collections.list(request().getHeaderNames())) {
+        for(String name: request().getHeaderNames()) {
             info.requestHeaders.put(name, request().getHeader(name));
         }
         try {
-            info.setRequestBody(request().getContent());
+            info.setRequestBody(request().getBodyString());
         } catch (RuntimeException e2) {
             Log.info("Error logging the exception - could not get the request body: {0}", e2);
         }

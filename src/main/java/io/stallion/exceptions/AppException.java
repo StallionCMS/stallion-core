@@ -22,6 +22,7 @@ import javax.ws.rs.ServerErrorException;
 /**
  * Generic fatal exception that is the fault of the application creator and will generate a 500 error
  */
+@Deprecated
 public class AppException extends ServerErrorException {
     public AppException(String message, int statusCode) {
         super(message, statusCode);

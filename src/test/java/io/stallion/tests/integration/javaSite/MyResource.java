@@ -19,19 +19,29 @@ package io.stallion.tests.integration.javaSite;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import io.stallion.requests.validators.SafeMerger;
-import io.stallion.restfulEndpoints.EndpointResource;
-import io.stallion.restfulEndpoints.ObjectParam;
+import io.stallion.dataAccess.SafeMerger;
+import io.stallion.utils.json.JSON;
 import io.stallion.utils.json.RestrictedViews;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 
-public class MyResource implements EndpointResource {
+@Path("/")
+@Consumes("application/json")
+@Produces("application/json")
+public class MyResource {
+
+    @GET
+    @Path("/my-hello/simple")
+    public String simpleHello(@QueryParam("name") String name) {
+        return "Hello, " + name;
+    }
+
+
     @POST()
-    @Path("/hello/creatify")
+    @Path("/my-hello/creatify")
     @JsonView(RestrictedViews.Member.class)
+    @Consumes("application/json")
+    @Produces("application/json")
     public Object creatify(ExamplePojo rawThing) {
         ExamplePojo pojo = SafeMerger.with()
                 .nonEmpty("userName", "displayName", "content", "age")
@@ -46,8 +56,10 @@ public class MyResource implements EndpointResource {
     }
 
 
-    @POST()
-    @Path("/:id/updatify")
+    @POST
+    @Path("/my-hello/{id}/updatify")
+    @Produces("application/json")
+    @JsonView(RestrictedViews.Member.class)
     public Object updateForId(@PathParam("id") Long id, ExamplePojo thing) {
         thing.setId(id);
 
@@ -56,7 +68,8 @@ public class MyResource implements EndpointResource {
 
 
     @POST()
-    @Path("/hello/updatifyHello")
+    @Path("/my-hello/updatifyHello")
+    @JsonView(RestrictedViews.Member.class)
     public Object updatify(ExamplePojo thing) {
         ExamplePojo pojo = SafeMerger.with().optional("displayName", "age", "content").merge(thing);
         pojo.setUpdateMessage("This was updated by the method updatify");
@@ -66,7 +79,7 @@ public class MyResource implements EndpointResource {
     }
 
     @POST()
-    @Path("/hello/moderatify")
+    @Path("/my-hello/moderatify")
     @JsonView(RestrictedViews.Owner.class)
     public Object moderatify(ExamplePojo thing) {
         ExamplePojo pojo = SafeMerger.with().optional("displayName", "age", "content", "userName", "email", "status").merge(thing);

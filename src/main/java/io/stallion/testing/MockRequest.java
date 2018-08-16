@@ -19,12 +19,17 @@ package io.stallion.testing;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.stallion.requests.StRequest;
+import io.stallion.requests.IRequest;
+import io.stallion.requests.Sandbox;
+import io.stallion.requests.SandboxedRequest;
 import io.stallion.services.Log;
+import io.stallion.users.IOrg;
+import io.stallion.users.IUser;
 import io.stallion.utils.json.JSON;
 import io.stallion.utils.json.RestrictedViews;
 
-import javax.servlet.http.Cookie;
+
+import javax.ws.rs.core.Cookie;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -34,11 +39,12 @@ import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.stallion.utils.Literals.*;
 
-
-public class MockRequest extends StRequest {
+@Deprecated
+public class MockRequest implements IRequest {
     private boolean handled = false;
     private Map<String, String> headers = new HashMap<>();
     private String path = "";
@@ -63,6 +69,126 @@ public class MockRequest extends StRequest {
 
     private void init() {
 
+    }
+
+    @Override
+    public String requestUrl() {
+        return null;
+    }
+
+    @Override
+    public String getScheme() {
+        return null;
+    }
+
+    @Override
+    public String getRemoteAddr() {
+        return null;
+    }
+
+    @Override
+    public String getHost() {
+        return null;
+    }
+
+    @Override
+    public Object getBodyObject(Class clazz) {
+        return null;
+    }
+
+    @Override
+    public String getQueryParam(String name) {
+        return null;
+    }
+
+    @Override
+    public String getBodyString() {
+        return null;
+    }
+
+    @Override
+    public Object getProperty(String name) {
+        return null;
+    }
+
+    @Override
+    public void setProperty(String name, Object obj) {
+
+    }
+
+    @Override
+    public Iterable<String> getHeaderNames() {
+        return null;
+    }
+
+    @Override
+    public String getQueryParam(String name, String defaultValue) {
+        return null;
+    }
+
+    @Override
+    public IUser getUser() {
+        return null;
+    }
+
+    @Override
+    public void setUser(IUser user) {
+
+    }
+
+    @Override
+    public IOrg getOrg() {
+        return null;
+    }
+
+    @Override
+    public void setOrg(IOrg org) {
+
+    }
+
+    @Override
+    public Boolean getIsJsonRequest() {
+        return null;
+    }
+
+    @Override
+    public void setIsJsonRequest(Boolean isJsonRequest) {
+
+    }
+
+    @Override
+    public SandboxedRequest getSandboxedRequest(Sandbox box) {
+        return null;
+    }
+
+    @Override
+    public Set<String> getScopes() {
+        return null;
+    }
+
+    @Override
+    public IRequest setScopes(Set<String> scopes) {
+        return null;
+    }
+
+    @Override
+    public boolean isScoped() {
+        return false;
+    }
+
+    @Override
+    public IRequest setScoped(boolean scoped) {
+        return null;
+    }
+
+    @Override
+    public Long getValetUserId() {
+        return null;
+    }
+
+    @Override
+    public String getValetEmail() {
+        return null;
     }
 
     public static Map<String, String> splitQuery(URL url) {
@@ -105,21 +231,7 @@ public class MockRequest extends StRequest {
         return this;
     }
 
-    @Override
-    public String getContent() {
-        if (content != null) {
-            return content;
-        }
-        if (dataObject != null) {
-            content = dataObjectToString();
-        } else if (data != null && data.size() > 0) {
-            content = dataToString();
-        }
-        if (content == null) {
-            content = "";
-        }
-        return content;
-    }
+
 
 
     public BufferedReader getReader() {
@@ -138,7 +250,7 @@ public class MockRequest extends StRequest {
     }
 
 
-    public StRequest setHandled(Boolean val) {
+    public IRequest setHandled(Boolean val) {
 
         handled = val;
         return this;
@@ -166,36 +278,13 @@ public class MockRequest extends StRequest {
         }
     }
 
-    @Override
-    public String getParameter(String paramName) {
-        return getQueryParams().getOrDefault(paramName, null);
-    }
 
     @Override
     public String getMethod() {
         return this.method;
     }
 
-    /* Private helpers */
-    @Override
-    public Map<String, String> getQueryParams()
-    {
-        if (queryMap == null) {
-            queryMap = new HashMap<String, String>();
-            String[] pairs = query.split("&");
-            for (String pair : pairs) {
-                int idx = pair.indexOf("=");
-                if (idx > -1) {
-                    try {
-                        queryMap.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
-                    } catch (UnsupportedEncodingException e) {
-                        Log.exception(e, "Error parsing query {0}", query);
-                    }
-                }
-            }
-        }
-        return queryMap;
-    }
+
 
     @Override
     public String getActualIp() {
@@ -238,12 +327,12 @@ public class MockRequest extends StRequest {
         return cookies.toArray(new Cookie[cookies.size()]);
     }
 
-    public StRequest setCookies(Cookie ...cookies) {
+    public MockRequest setCookies(Cookie ...cookies) {
         this.cookies = list(cookies);
         return this;
     }
 
-    @Override
+
     public void setQuery(String q) {
         this.query = q;
     }
@@ -251,7 +340,7 @@ public class MockRequest extends StRequest {
     @Override
     public String getQueryString() {
         if (query == null) {
-            if (!requestUrl().contains("?")) {
+            if (!this.getRequestUrl().contains("?")) {
                 query = "";
             } else {
                 query = requestUrl().split("\\?", 2)[1];

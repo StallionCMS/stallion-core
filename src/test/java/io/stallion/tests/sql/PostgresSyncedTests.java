@@ -29,7 +29,6 @@ import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
 import org.junit.BeforeClass;

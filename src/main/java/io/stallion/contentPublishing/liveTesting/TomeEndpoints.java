@@ -19,16 +19,12 @@ package io.stallion.contentPublishing.liveTesting;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.SortDirection;
 import io.stallion.exceptions.ClientException;
-import io.stallion.restfulEndpoints.EndpointResource;
-import io.stallion.restfulEndpoints.MinRole;
+import io.stallion.jerseyProviders.MinRole;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 import io.stallion.utils.json.JSON;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +36,7 @@ import static io.stallion.utils.Literals.*;
 @MinRole(Role.STAFF)
 @Path("/testing-tomes")
 @Produces("application/json")
-public class TomeEndpoints implements EndpointResource {
+public class TomeEndpoints {
 
 
     @GET
@@ -85,7 +81,7 @@ public class TomeEndpoints implements EndpointResource {
 
     public TomeController tomeController() {
         if (Settings.instance().getEnv().equals("prod")) {
-            throw new ClientException("This endpoint not available in production.");
+            throw new ClientErrorException("This endpoint not available in production.", 400);
         }
         if (TomeController.instance() == null) {
             TomeController.register();

@@ -18,7 +18,6 @@
 package io.stallion.contentPublishing;
 
 import io.stallion.dataAccess.Displayable;
-import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.settings.SecondaryDomain;
 
 import java.util.ArrayList;

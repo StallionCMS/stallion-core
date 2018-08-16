@@ -26,7 +26,6 @@
 package io.stallion.reflection;
 
 import io.stallion.dataAccess.MappedModel;
-import io.stallion.plugins.javascript.BaseJavascriptModel;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -610,9 +609,7 @@ public final class PropertyUtils {
 
     public static Method getGetter(Object target, String propertyName) {
         String cacheKey = "getGetter" + "|" + target.getClass().getCanonicalName() + "|" + propertyName;
-        if (target instanceof BaseJavascriptModel) {
-            cacheKey = "getGetter" + "|jsModel" + ((BaseJavascriptModel) target).getBucketName() + "|" + propertyName;
-        }
+
         if (lookupCache.containsKey(cacheKey)) {
             return (Method)lookupCache.get(cacheKey);
         }

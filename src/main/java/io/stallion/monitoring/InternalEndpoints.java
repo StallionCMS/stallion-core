@@ -26,15 +26,15 @@ import io.stallion.exceptions.WebException;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
-import io.stallion.restfulEndpoints.EndpointResource;
-import io.stallion.restfulEndpoints.MinRole;
-import io.stallion.restfulEndpoints.XSRF;
+import io.stallion.jerseyProviders.MinRole;
+import io.stallion.jerseyProviders.XSRF;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.users.Role;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 
 import java.io.IOException;
 import java.net.URL;
@@ -46,25 +46,25 @@ import static io.stallion.Context.*;
 
 @Path("/st-internal")
 @Produces("application/json")
-public class InternalEndpoints implements EndpointResource {
+public class InternalEndpoints  {
 
 
     @GET
     @Path("/health")
-
-    public HealthInfo checkHealth(@QueryParam("secret") String secret, @QueryParam("failOnWarnings") Boolean failOnWarnings, @QueryParam("sections") String sections) {
+    public Response checkHealth(@QueryParam("secret") String secret, @QueryParam("failOnWarnings") Boolean failOnWarnings, @QueryParam("sections") String sections) {
         failOnWarnings = or(failOnWarnings, false);
         sections = or(sections, "all");
         checkSecret(secret);
         HealthInfo info = buildHealthInfo(sections);
+        int status = 200;
         if (info.getErrors().size() > 0) {
-            response().setStatus(515);
+            status = 515;
         }
         if (failOnWarnings && info.getWarnings().size() > 0) {
-            response().setStatus(515);
+            status = 515;
         }
-        info.setHttpStatusCode(response().getStatus());
-        return info;
+        info.setHttpStatusCode(status);
+        return Response.status(status).entity(info).build();
     }
 
     @POST
@@ -107,16 +107,16 @@ public class InternalEndpoints implements EndpointResource {
 
     private void checkSecret(String secret) {
         if (empty(settings().getHealthCheckSecret())) {
-            throw new ClientException("You must define a setting value for 'healthCheckSecret' in your stallion.toml. This should be a random string that only you know. Then you should pass this in via the query string parameter 'secret' or the header 'X-Healthcheck-Secret", 500);
+            throw new ClientErrorException("You must define a setting value for 'healthCheckSecret' in your stallion.toml. This should be a random string that only you know. Then you should pass this in via the query string parameter 'secret' or the header 'X-Healthcheck-Secret", 500);
         }
         if (empty(secret)) {
             secret = request().getHeader("X-Healthcheck-Secret");
         }
         if (empty(secret)) {
-            throw new ClientException("You must pass in a either a query param 'secret' or a header 'X-Healthcheck-Secret'. The passed in secret should match the value defined in stallion.toml for the setting name 'healthCheckSecret'.  ", 403);
+            throw new ClientErrorException("You must pass in a either a query param 'secret' or a header 'X-Healthcheck-Secret'. The passed in secret should match the value defined in stallion.toml for the setting name 'healthCheckSecret'.  ", 403);
         }
         if (!secret.equals(Settings.instance().getHealthCheckSecret())) {
-            throw new ClientException("Invalid healthcheck secret");
+            throw new ClientErrorException("Invalid healthcheck secret", 400);
         }
     }
 

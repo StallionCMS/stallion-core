@@ -25,6 +25,7 @@ import static io.stallion.utils.Literals.map;
 /**
  * Generic web exception that will generate a 4xx or 5xx response to the client with a user friendly message.
  */
+@Deprecated
 public class WebException extends RuntimeException {
     private int statusCode = 500;
     private Map extra = map();

@@ -19,9 +19,7 @@ package io.stallion.monitoring;
 
 import com.sun.management.UnixOperatingSystemMXBean;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
-import io.stallion.exceptions.ClientException;
-import io.stallion.requests.StRequest;
-import io.stallion.requests.StResponse;
+import io.stallion.requests.IRequest;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.utils.DateUtils;
@@ -31,6 +29,8 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import javax.net.ssl.*;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.container.ContainerResponseContext;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -142,11 +142,11 @@ public class HealthTracker {
     }
 
     public void logException(Throwable e) {
-        if (e instanceof ClientException) {
+        if (e instanceof ClientErrorException) {
             return;
         }
         if (e instanceof InvocationTargetException) {
-            if (((InvocationTargetException) e).getTargetException() instanceof ClientException) {
+            if (((InvocationTargetException) e).getTargetException() instanceof ClientErrorException) {
                 return;
             }
         }
@@ -169,7 +169,7 @@ public class HealthTracker {
         return count;
     }
 
-    public void logResponse(StRequest request, StResponse response) {
+    public void logResponse(IRequest request, ContainerResponseContext response) {
         incrementQueue(responseCounts);
         if (response.getStatus() >= 500) {
             // If the health endpoint is treating us as down, don't log that

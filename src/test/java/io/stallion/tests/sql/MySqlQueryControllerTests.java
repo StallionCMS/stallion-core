@@ -23,14 +23,13 @@ import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.dataAccess.filtering.Pager;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.DynamicSettings;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
-import io.stallion.testing.MockResponse;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.JSON;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -68,7 +67,7 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
                         .setTableName("stallion_test_picnic")
         );
         DB.instance().registerConverter(new PicnicAttendeesConverter());
-        EndpointsRegistry.instance().addResource("/st-mysql-tests", new MySqlEndpoint());
+
     }
 
     @Test
@@ -171,6 +170,8 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
                 ;
         PaymentController.instance().save(payment);
 
+        throw new NotImplementedException("uncomment and fix");
+        /*
         MockResponse response = client.get("/st-mysql-tests/payment/" + payment.getId());
         payment = JSON.parse(response.getContent(), Payment.class);
         assertEquals(54321, payment.getAmount());
@@ -189,8 +190,8 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
 
         // Now the GET request will also be updated
         response = client.get("/st-mysql-tests/payment/" + payment.getId());
-        payment = JSON.parse(response.getContent(), Payment.class);
-        assertEquals(12345, payment.getAmount());
+        payment = JSON.parse(response.getContent(),
+        */
 
     }
 

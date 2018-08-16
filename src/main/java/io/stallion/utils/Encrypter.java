@@ -17,7 +17,6 @@
 
 package io.stallion.utils;
 
-import io.stallion.exceptions.ClientException;
 import io.stallion.exceptions.DecryptionException;
 import io.stallion.services.Log;
 import org.apache.commons.codec.DecoderException;

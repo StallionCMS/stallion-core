@@ -19,6 +19,7 @@ package io.stallion.contentPublishing;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
@@ -29,64 +30,102 @@ import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.file.TextItem;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
-import io.stallion.restfulEndpoints.EndpointResource;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
+
 import io.stallion.settings.ContentFolder;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.model.Resource;
+import org.glassfish.jersey.server.model.ResourceModelIssue;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Request;
 
 
-public class ListingEndpoints implements EndpointResource {
+public class ListingEndpoints  {
 
-    public static void register() {
+    private static Map<String, ContentFolder> configMap;
+
+    @javax.ws.rs.core.Context
+    private HttpServletRequest httpRequest;
+
+    @javax.ws.rs.core.Context
+    private ResourceContext resourceContext;
+
+    @javax.ws.rs.core.Context
+    private Request request;
+
+
+    public static void register(ResourceConfig rc) {
+        configMap = map();
         for(ContentFolder config: Settings.instance().getFolders()) {
             if (config.isListingEnabled()) {
                 String rootUrl = config.getListingRootUrl();
                 if (StringUtils.endsWith(rootUrl, "/")) {
                     rootUrl = rootUrl.substring(0, rootUrl.length()-1);
                 }
-                EndpointsRegistry.instance().addResource(rootUrl, new ListingEndpoints(config));
+
+                Resource.Builder resourceBuilder =
+                        Resource.builder(ListingEndpoints.class, false)
+                                .name(rootUrl)
+                                .path(rootUrl);
+                rc.registerResources(resourceBuilder.build());
+                configMap.put(rootUrl, config);
+                //EndpointsRegistry.instance().addResource(rootUrl, new ListingEndpoints(config));
             }
         }
     }
 
-    private ContentFolder config;
+    private ContentFolder currentConfig = null;
 
+    private ContentFolder getConfig() {
+        if (currentConfig == null) {
+            String resourcePath = (((ContainerRequest) request).getUriInfo())
+                    .getMatchedResourceMethod()
+                    .getParent()
+                    .getParent()
+                    .getPath();
+            currentConfig = configMap.get(resourcePath);
+        }
+        return currentConfig;
+    }
+
+    /*
     public ListingEndpoints(ContentFolder config) {
         this.config = config;
     }
+    */
 
     public Map<String, Object> makeContext() throws Exception {
         Map<String, Object> context = new HashMap<String, Object>();
-        context.put("blogConfig", config);
+        context.put("blogConfig", getConfig());
         context.put("postsFilter", filterChain());
-        if (!empty(config.getListingTitle())) {
-            Context.getResponse().getMeta().setTitle(config.getListingTitle());
+        // TODO fix hydration of meta
+        if (!empty(getConfig().getListingTitle())) {
+            //Context.getResponse().getMeta().setTitle(getConfig().getListingTitle());
         }
-        if (!empty(config.getListingMetaDescription())) {
-            Context.getResponse().getMeta().setDescription(config.getListingMetaDescription());
+        if (!empty(getConfig().getListingMetaDescription())) {
+            //Context.getResponse().getMeta().setDescription(getConfig().getListingMetaDescription());
         }
-        String blogRoot = GeneralUtils.slugify(config.getListingRootUrl());
+        String blogRoot = GeneralUtils.slugify(getConfig().getListingRootUrl());
         if (empty(blogRoot) || blogRoot.equals("-")) {
             blogRoot = "root";
         } else if (blogRoot.startsWith("-")) {
             blogRoot = blogRoot.substring(1);
         }
-        Context.getResponse().getMeta().setBodyCssId("flatBlog-" + blogRoot);
-        Context.getResponse().getMeta().getCssClasses().add("st-flatBlog-" + blogRoot);
+        //Context.getResponse().getMeta().setBodyCssId("flatBlog-" + blogRoot);
+        //Context.getResponse().getMeta().getCssClasses().add("st-flatBlog-" + blogRoot);
         return context;
     }
 
     private DisplayableModelController<TextItem> postsController() {
-        return (DisplayableModelController<TextItem>)DataAccessRegistry.instance().get(config.getPath());
+        return (DisplayableModelController<TextItem>)DataAccessRegistry.instance().get(getConfig().getPath());
     }
 
     private FilterChain<TextItem> filterChain() throws Exception {
@@ -101,18 +140,18 @@ public class ListingEndpoints implements EndpointResource {
     }
 
     @GET
-    @Path("/page/:page/")
+    @Path("/page/{page}/")
     @Produces("text/html")
     public String listHome(@PathParam("page") Integer page) throws Exception {
         Map<String, Object> context = makeContext();
         Pager pager = filterChain()
                 .sort("publishDate", "desc")
-                .pager(page, config.getItemsPerPage());
+                .pager(page, getConfig().getItemsPerPage());
         context.put("postsPager", pager);
         if (pager.getItems().size() == 0) {
-            Context.getResponse().setStatus(404);
+            throw new NotFoundException("Results page not found.");
         }
-        return TemplateRenderer.instance().renderTemplate(config.getListingTemplate(), context);
+        return TemplateRenderer.instance().renderTemplate(getConfig().getListingTemplate(), context);
     }
 
     @GET
@@ -131,7 +170,7 @@ public class ListingEndpoints implements EndpointResource {
                 .sort("publishDate", "desc")
                 .pager(0, 20);
         context.put("postsPager", pager);
-        context.put("blogUrl", Context.getSettings().getSiteUrl() + config.getFullPath());
+        context.put("blogUrl", Context.getSettings().getSiteUrl() + getConfig().getFullPath());
         ZonedDateTime buildTime = ZonedDateTime.of(2015, 1, 1, 12, 0, 0, 0, GeneralUtils.UTC);
         if (pager.getItems().size() > 0) {
             TextItem item = (TextItem) pager.getItems().get(0);
@@ -147,7 +186,7 @@ public class ListingEndpoints implements EndpointResource {
 
 
     @GET
-    @Path("/archives/:year/:month/")
+    @Path("/archives/{year}/{month}/")
     public String listByDate(@PathParam("year") String year, @PathParam("month") String month) throws Exception {
         Map<String, Object> context = makeContext();
         Pager pager = filterChain()
@@ -156,12 +195,12 @@ public class ListingEndpoints implements EndpointResource {
                 .sort("publishDate", "desc")
                 .pager(0, 5000);
         context.put("postsPager", pager);
-        return TemplateRenderer.instance().renderTemplate(config.getListingTemplate(), context);
+        return TemplateRenderer.instance().renderTemplate(getConfig().getListingTemplate(), context);
 
     }
 
     @GET
-    @Path("/by-tag/:tag/")
+    @Path("/by-tag/{tag}/")
     @Produces("text/html")
     public String listByTag(@PathParam("tag") String tag) throws Exception {
         Map<String, Object> context = makeContext();
@@ -170,6 +209,6 @@ public class ListingEndpoints implements EndpointResource {
                 .sort("publishDate", "desc")
                 .pager(0, 5000);
         context.put("postsPager", pager);
-        return TemplateRenderer.instance().renderTemplate(config.getListingTemplate(), context);
+        return TemplateRenderer.instance().renderTemplate(getConfig().getListingTemplate(), context);
     }
 }

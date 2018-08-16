@@ -18,11 +18,12 @@
 package io.stallion.contentPublishing.forms;
 
 import io.stallion.exceptions.ClientException;
-import io.stallion.requests.validators.SafeMerger;
+import io.stallion.dataAccess.SafeMerger;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.utils.Encrypter;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -54,7 +55,7 @@ public class SimpleFormEndpoints {
 
         String token = Encrypter.decryptString(settings().getAntiSpamSecret(), submission.getAntiSpamToken());
         if (empty(token) || !token.contains("|")) {
-            throw new ClientException("Anti-spam token is not in the correct format");
+            throw new ClientErrorException("Anti-spam token is not in the correct format", 400);
         }
         String[] parts = StringUtils.split(token, "|", 2);
         Long time = Long.parseLong(parts[0]);
@@ -66,7 +67,7 @@ public class SimpleFormEndpoints {
 
         Integer submissionCount = or((Integer)LocalMemoryCache.get("form_submissions", randomKey), 0);
         if (submissionCount > 0) {
-                throw new ClientException("You have already submitted this form once.");
+                throw new ClientErrorException("You have already submitted this form once.", 400);
         }
 
 

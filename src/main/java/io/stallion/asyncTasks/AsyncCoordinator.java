@@ -24,7 +24,6 @@ import io.stallion.exceptions.UsageException;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.jobs.JobDefinition;
 import io.stallion.jobs.Schedule;
-import io.stallion.plugins.javascript.JsAsyncTaskHandler;
 import io.stallion.services.Log;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
@@ -231,22 +230,7 @@ public abstract class AsyncCoordinator extends Thread {
         AsyncTaskExecuteRunnable.registerClass(name, cls);
     }
 
-    /**
-     * Register a handler that will run tasks of a given name.
-     *
-     * @param handler
-     */
-    public void registerHandler(Class<JsAsyncTaskHandler> handler) {
-        JsAsyncTaskHandler instance = null;
-        try {
-            instance = handler.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        AsyncTaskExecuteRunnable.registerClass(instance.getHandlerClassName(), handler);
-    }
+
 
     /**
      * Find the next task that is unlocked and ready for execution, lock it, and return it.

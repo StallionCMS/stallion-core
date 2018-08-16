@@ -17,14 +17,16 @@
 
 package io.stallion.exceptions;
 
+import javax.ws.rs.ClientErrorException;
+
 import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 /**
  * An error when decrypting a string usering utils.Encrypter
  */
-public class DecryptionException extends ClientException {
+public class DecryptionException extends ClientErrorException {
     public DecryptionException(String message) {
-        super(message);
+        super(message, 400);
     }
 }

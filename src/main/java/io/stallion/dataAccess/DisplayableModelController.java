@@ -17,7 +17,7 @@
 
 package io.stallion.dataAccess;
 
-import io.stallion.restfulEndpoints.SlugRegistry;
+import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.services.Log;
 import io.stallion.templating.TemplateRenderer;
 

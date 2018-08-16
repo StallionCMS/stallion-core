@@ -19,22 +19,26 @@ package io.stallion.tests.integration.javaSite;
 
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
-import io.stallion.testing.MockResponse;
+import io.stallion.testing.JerseyIntegrationBaseCase;
 import io.stallion.utils.json.JSON;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Assert;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JavaSiteTests extends AppIntegrationCaseBase {
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-
+public class JavaSiteTests extends JerseyIntegrationBaseCase {
     @BeforeClass
     public static void setUpClass() throws Exception {
-        startApp("/java_site");
+
         StallionJavaPlugin booter = new StallionJavaPlugin() {
             @Override
             public String getPluginName() {
@@ -43,14 +47,39 @@ public class JavaSiteTests extends AppIntegrationCaseBase {
 
             @Override
             public void boot() throws Exception {
+                ExamplePojoController.register();
+            }
 
+            @Override
+            public void buildResourceConfig(ResourceConfig rc) {
+                rc.register(MyResource.class);
             }
         };
-        booter.setPluginRegistry(PluginRegistry.instance());
-        ExamplePojoController.register();
-        EndpointsRegistry.instance().addResource("/_stx/java-site", new MyResource());
+        startApp("/java_site", booter);
+    }
+
+    @Test
+    public void testHelloWorld() {
+        /*
+        {
+
+        }
+        */
+
+        Response response = target("/my-hello/simple")
+                .queryParam("name", "Garfield")
+                .request()
+                .get();
+        String output = response.readEntity(String.class);
+        Log.info(output);
+        Assert.assertEquals(200, response.getStatus());
+        Assert.assertEquals("Hello, Garfield", output);
 
     }
+
+
+
+
 
     @Test
     public void testPostObject() throws Exception {
@@ -62,25 +91,40 @@ public class JavaSiteTests extends AppIntegrationCaseBase {
         pojo.setDisplayName("Marky Mark");
         pojo.setUserName("markymark");
         pojo.setStatus("fake-status-zzzxxx");
-        MockResponse response = client.post("/_stx/java-site/hello/creatify", pojo);
+        Response response = target("/my-hello/creatify")
+                .request()
+                .header("X-Requested-By", "XmlHttpRequest")
+                .post(
+                        Entity.json(pojo)
+                );
+
+        //MockResponse response = client.post("/_stx/java-site/hello/creatify", pojo);
         Assert.assertEquals(200, response.getStatus());
-        Log.finer("Response: {0}", response.getContent());
+        String output = response.readEntity(String.class);
+        Log.info("Response: {0}", output);
         // Status field should be dropped, because it was not settable
-        assertResponseDoesNotContain(response, "fake-status-zzzxxx");
-        ExamplePojo actual = responseToObject(response);
+        assertNotContains(output, "fake-status-zzzxxx");
+        ExamplePojo actual = JSON.parse(output, ExamplePojo.class);
         assertEquals("new", actual.getStatus());
         assertEquals("markymark", actual.getUserName());
         // secret is null because it is not included in the JSON response
         assertNull(actual.getInternalSecret());
 
 
+
         // Username should be the default (blank), since it is not updateable, but displayName will be updated
         pojo.setDisplayName("Mark W");
         pojo.setUserName("markw");
-        response = client.post("/_stx/java-site/hello/updatifyHello", pojo);
+        response = target("/my-hello/updatifyHello")
+                .request()
+                .header("X-Requested-By", "XmlHttpRequest")
+                .post(
+                        Entity.json(pojo)
+                );
         Assert.assertEquals(200, response.getStatus());
-        Log.finer("Updatify response: {0}", response.getContent());
-        actual = responseToObject(response);
+        output = response.readEntity(String.class);
+        Log.finer("Updatify response: {0}", output);
+        actual = JSON.parse(output, ExamplePojo.class);
         assertEquals("", actual.getUserName());
         assertEquals("Mark W", actual.getDisplayName());
         assertEquals("new", actual.getStatus());
@@ -88,10 +132,16 @@ public class JavaSiteTests extends AppIntegrationCaseBase {
         assertNull(actual.getInternalSecret());
 
         actual.setStatus("approved");
-        response = client.post("/_stx/java-site/hello/moderatify", actual);
+        response = target("/my-hello/moderatify")
+                .request()
+                .header("X-Requested-By", "XmlHttpRequest")
+                .post(
+                        Entity.json(actual)
+                );
         Assert.assertEquals(200, response.getStatus());
-        Log.finer("Response: {0}", response.getContent());
-        actual = responseToObject(response);
+        output = response.readEntity(String.class);
+        Log.finer("Response: {0}", output);
+        actual = JSON.parse(output, ExamplePojo.class);
         assertEquals("approved", actual.getStatus());
         assertEquals("theInternalSecret", actual.getInternalSecret());
 
@@ -104,17 +154,19 @@ public class JavaSiteTests extends AppIntegrationCaseBase {
         // Test endpoint with id
         ExamplePojo pojo = new ExamplePojo();
         pojo.setAge(41L);
-        MockResponse response = client.post("/_stx/java-site/123/updatify", pojo);
+        Response response = target("/my-hello/123/updatify")
+                .request()
+                .header("X-Requested-By", "XmlHttpRequest")
+                .post(
+                        Entity.json(pojo)
+                );
         Assert.assertEquals(200, response.getStatus());
-        ExamplePojo mypojo = JSON.parse(response.getContent(), ExamplePojo.class);
+
+        ExamplePojo mypojo = response.readEntity(ExamplePojo.class);
         Assert.assertEquals("123", mypojo.getId().toString());
         Assert.assertEquals(123L, (long)mypojo.getId());
-        Log.finer("Response: {0}", response.getContent());
+        //Log.finer("Response: {0}", response.getContent());
 
-    }
-
-    public ExamplePojo responseToObject(MockResponse response) throws Exception {
-        return JSON.parse(response.getContent(), ExamplePojo.class);
     }
 
 

@@ -24,21 +24,23 @@ import static org.junit.Assert.assertEquals;
 import io.stallion.dataAccess.file.TextFilePersister;
 import io.stallion.dataAccess.file.TextItem;
 import io.stallion.services.Log;
-import io.stallion.testing.MockResponse;
 import io.stallion.testing.AppIntegrationCaseBase;
+import io.stallion.testing.JerseyIntegrationBaseCase;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 
-public class AMinimalSiteTest extends AppIntegrationCaseBase {
+public class AMinimalSiteTest extends JerseyIntegrationBaseCase {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -63,26 +65,19 @@ public class AMinimalSiteTest extends AppIntegrationCaseBase {
 
     }
 
-    @Test
-    public void testRoutes() {
-        MockResponse response = client.get("/301-this");
-        assertEquals(301, response.getStatus());
-        assertEquals("http://localhost/301-endpoint", response.getHeader("Location"));
-
-        response = client.get("/template-direct");
-        assertEquals(200, response.getStatus());
-        Assert.assertTrue(response.getContent().contains(""));
-
-    }
 
     @Test
     public void testOnePage()
     {
-        MockResponse response = client.get("/faq");
-        assertResponseContains(response, "<h1>Frequently Asked Questions</h1>");
+        {
+            Response response = GET("/faq");
+            assertContains(response.readEntity(String.class), "<h1>Frequently Asked Questions</h1>");
+        }
 
-        response = client.get("/");
-        assertResponseContains(response, "<h1>The home.jinja template</h1>");
+        {
+            Response response = GET("/");
+            assertContains(response.readEntity(String.class), "<h1>The home.jinja template</h1>");
+        }
 
     }
 
@@ -90,17 +85,42 @@ public class AMinimalSiteTest extends AppIntegrationCaseBase {
     @Test
     public void testJinjaPage()
     {
-        MockResponse response = client.get("/jinja-page");
-        assertEquals(200, response.getStatus());
-        //Log.finer("JinjaPageResult: {0}", response.getContent());
-        Assert.assertTrue(response.getContent().contains("<h1>This is a base template using jinja</h1>"));
-        Assert.assertTrue(response.getContent().contains("This is a page written by: Maestro"));
-        Assert.assertTrue(response.getContent().contains("This is a page written using jinja. This is the page content."));
+        {
+            Response response = GET("/jinja-page");
+            assertEquals(200, response.getStatus());
+            String output = response.readEntity(String.class);
+            assertContains(output, "<h1>This is a base template using jinja</h1>");
+            assertContains(output, "This is a page written by: Maestro");
+            assertContains(output, "This is a page written using jinja. This is the page content.");
+        }
 
     }
 
     @Test
     public void testErrors() {
+
+        {
+            Response response = GET("/non-existent-page");
+            assertContains(response.readEntity(String.class), "This is a custom 404 template");
+            assertEquals(response.getStatus(), 404);
+        }
+
+        {
+            Response response = GET("/another-non-existent-page");
+            assertContains(response.readEntity(String.class), "This is a custom 404 template");
+            assertEquals(response.getStatus(), 404);
+        }
+
+
+        {
+            Response response = GET("/exception-generating-page");
+            assertEquals(500, response.getStatus());
+            assertContains(response.readEntity(String.class), "There was an error trying to handle your request");
+        }
+
+
+
+        /*
         MockResponse response = client.get("/non-existent-page");
         Log.finer("404 result: {0}", response.getContent());
         Assert.assertTrue(response.getContent().contains("This is a custom 404 template"));
@@ -111,17 +131,21 @@ public class AMinimalSiteTest extends AppIntegrationCaseBase {
         Log.finer("500 result: {0}", response.getContent());
         assertEquals(500, response.getStatus());
         Assert.assertTrue(response.getContent().contains("There was an error trying to handle your request"));
+        */
     }
 
 
     @Test
     public void testStaticAsset()
     {
-        MockResponse response = client.get("/st-assets/bootstrap.css?ts=1406396040000");
+        Response response = target("/st-assets/bootstrap.css")
+                .queryParam("ts", "1406396040000")
+                .request()
+                .get()
+                ;
         assertEquals(200, response.getStatus());
-        // TODO fix severletOutputStream for MockResponse
-        //Log.info("Response content {0} ", response.getContent());
-        //Assert.assertTrue(response.getContent().contains("Bootstrap v3.1.1"));
+        assertContains(response.readEntity(String.class), "Bootstrap v3.1.1");
+
 
     }
 

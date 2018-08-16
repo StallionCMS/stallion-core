@@ -19,56 +19,61 @@ package io.stallion.assets;
 
 import java.io.*;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
+import javax.ws.rs.NotFoundException;
 
 import static io.stallion.utils.Literals.*;
 
 import io.stallion.assetBundling.AssetHelpers;
-import io.stallion.exceptions.ClientException;
-import io.stallion.exceptions.NotFoundException;
+
 import io.stallion.exceptions.WebException;
+import io.stallion.jerseyProviders.LocalFileToResponse;
+import io.stallion.jerseyProviders.ServletFileSender;
 import io.stallion.requests.*;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.utils.ResourceHelpers;
 import org.apache.commons.io.IOUtils;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.Response;
+
 
 public class AssetServing {
     private IRequest request;
-    private StResponse response;
+    private HttpServletResponse response;
 
-    public AssetServing(IRequest request, StResponse response) {
+    public AssetServing(IRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
     }
 
 
-    public void serveFileBundleAsset() throws Exception {
+    public Response serveFileBundleAsset() throws Exception {
         String path = request.getPath();
         int i = path.indexOf("/st-");
         i = path.indexOf("/", i + 3);
         path = path.substring(i + 1);
 
         FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
-        String filePath = request.getParameter("bundleFilePath");
+        String filePath = request.getQueryParam("bundleFilePath");
         String content = br.renderFile(filePath);
-        sendContentResponse(content, request.getPath());
+        return contentToResponse(content, request.getPath());
     }
 
-    public void serveFileBundle() throws Exception {
+    public Response serveFileBundle() throws Exception {
         String path = request.getPath();
         int i = path.indexOf("/st-");
         i = path.indexOf("/", i + 3);
         path = path.substring(i + 1);
 
         FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
-        sendContentResponse(br.renderProductionContent(), path);
+        return contentToResponse(br.renderProductionContent(), path);
     }
 
-    public void serveResourceAsset() throws Exception  {
+
+    public Response serveResourceAsset() throws Exception  {
         String path = request.getPath();
         int i = path.indexOf("/st-");
         i = path.indexOf("/", i + 3);
@@ -78,12 +83,12 @@ public class AssetServing {
         String plugin = parts[0];
         assetPath = parts[1];
         if (parts.length < 2) {
-            throw new ClientException("Invalid resource path " + assetPath);
+            throw new ClientErrorException("Invalid resource path " + assetPath, 400);
         }
         assetPath = "/" + assetPath;
 
-        if (request.getQueryParams().containsKey("bundlePath")) {
-            String bundlePath = AssetsController.ensureSafeAssetsPath(request.getQueryParams().get("bundlePath"));
+        if (!empty(request.getQueryParam("bundlePath"))) {
+            String bundlePath = AssetsController.ensureSafeAssetsPath(request.getQueryParam("bundlePath"));
             URL url = ResourceHelpers.getUrlOrNotFound(plugin, bundlePath);
             String content = null;
             if (Settings.instance().getDevMode()) {
@@ -95,20 +100,20 @@ public class AssetServing {
             if (empty(content)) {
                 content = AssetHelpers.renderDebugModeBundleFileByPath(url.getPath(), assetPath);
             }
-            sendContentResponse(content, assetPath);
+            return new LocalFileToResponse().sendContentResponse(content, assetPath);
         } else {
             assetPath = AssetsController.ensureSafeAssetsPath(assetPath);
-            if (!empty(request.getParameter("processor"))) {
+            if (!empty(request.getQueryParam("processor"))) {
                 String content = ResourceHelpers.loadAssetResource(plugin, assetPath);
                 //if (!empty(request.getParameter("nocache"))) {
                 //content = AssetsController.instance().convertUsingProcessorNoCache(request.getParameter("processor"), path, content);
                 //} else {
                 //content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), assetPath, content);
                 //}
-                markHandled(200, "resource-asset");
-                sendContentResponse(content);
+
+                //sendContentResponse(content);
+                return new LocalFileToResponse().sendContentResponse(content, assetPath);
             } else {
-                markHandled(200, "resource-asset");
                 URL url = ResourceHelpers.pluginPathToUrl(plugin, assetPath);
                 // If not found, and no referer, throw generic 404
                 if (url == null && empty(request.getHeader("Referer"))) {
@@ -117,13 +122,12 @@ public class AssetServing {
                     // If not found, and referer, may mean there is a bug
                     throw new WebException("Requested linked resource that is not found: " + plugin + ":" + assetPath);
                 }
-                new ServletFileSender(request, response).sendResource(url, assetPath);
-                complete();
+                return new LocalFileToResponse().sendResource(url, assetPath);
             }
         }
     }
 
-    public void serveResourceBundle() throws Exception {
+    public Response serveResourceBundle() throws Exception {
         String path = request.getPath();
         int i = path.indexOf("/st-");
         i = path.indexOf("/", i + 3);
@@ -133,81 +137,33 @@ public class AssetServing {
         path = parts[1];
         path = AssetsController.ensureSafeAssetsPath(path);
         String content = new ResourceAssetBundleRenderer(plugin, path).renderProductionContent();
-        sendContentResponse(content, path);
+        return new LocalFileToResponse().sendContentResponse(content, path);
     }
 
-    public void serveFolderAsset(String path) throws Exception  {
+    public Response serveFolderAssetToResponse(String path) throws Exception  {
         String fullPath = Settings.instance().getTargetFolder() + "/assets/" + path;
         Log.fine("Asset path={0} fullPath={1}", path, fullPath);
         File file = new File(fullPath);
-        String preProcessor = request.getParameter("preprocessor");
-        if (!file.isFile() && empty(preProcessor)) {
-            notFound("Asset for path " + path + " is not found.");
+        if (!file.isFile()) {
+            throw new NotFoundException("Asset for path " + path + " is not found.");
         }
-        if (!empty(request.getParameter("processor"))) {
-            String contents = IOUtils.toString(new FileReader(fullPath));
-            //contents = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), path, contents);
-            markHandled(200, "folder-asset-with-processor");
-            sendContentResponse(contents, file.lastModified(), fullPath);
-        } else {
-            //if (!empty(preProcessor)) {
-            //    AssetsController.instance().externalPreprocessIfNecessary(preProcessor, path);
-            //}
-            markHandled(200, "folder-asset");
-            sendAssetResponse(file);
-        }
+
+        return new LocalFileToResponse().sendAssetResponse(file);
+
     }
 
 
-    private void sendContentResponse(String content) {
-        try {
-            response.getWriter().print(content);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        complete();
+
+    private Response contentToResponse(String s, String path) {
+        return new LocalFileToResponse().sendContentResponse(s, path);
     }
 
-    public void sendContentResponse(String content, String fullPath)  {
-        sendContentResponse(content, 0, fullPath);
+
+    private Response contentToResponse(String s, long modifyTime, String path) {
+        return new LocalFileToResponse().sendContentResponse(s, modifyTime, path);
     }
 
-    public void sendContentResponse(String content, long modifyTime, String fullPath)  {
-        new ServletFileSender(request, response).sendContentResponse(content, modifyTime, fullPath);
-        complete();
-    }
 
-    public void sendAssetResponse(File file) {
-        try {
-            sendAssetResponse(new FileInputStream(file), file.lastModified(), file.length(), file.getAbsolutePath());
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void sendAssetResponse(InputStream stream, long modifyTime, long contentLength, String fullPath)  {
-        new ServletFileSender(request, response).sendAssetResponse(stream, modifyTime, contentLength, fullPath);
-        complete();
-    }
-
-    public void markHandled(int status, String message) {
-        response.setStatus(status);
-        Log.logForFrame(2, Level.FINE, "status={0} handler=\"{1}\" {2}={3}", status, message, request.getMethod(), request.getPath());
-    }
-
-    public void notFound(String message) {
-        markHandled(404, message);
-        throw new NotFoundException(message);
-    }
-
-    public void complete(int status, String message, Object...args) {
-        markHandled(status, message);
-        throw new ResponseComplete();
-    }
-
-    public void complete() {
-        throw new ResponseComplete();
-    }
 
 
 

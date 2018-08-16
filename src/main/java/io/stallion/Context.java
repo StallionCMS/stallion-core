@@ -22,7 +22,6 @@ import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.requests.*;
-import io.stallion.restfulEndpoints.RestEndpointBase;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.users.*;
@@ -38,8 +37,7 @@ import static io.stallion.utils.Literals.emptyInstance;
  *
  */
 public class Context {
-    private static final ThreadLocal<StRequest> _request = new ThreadLocal<StRequest>();
-    private static final ThreadLocal<StResponse> _response = new ThreadLocal<StResponse>();
+    private static final ThreadLocal<IRequest> _request = new ThreadLocal<IRequest>();
 
 
     public static AppContextLoader app() {
@@ -89,7 +87,7 @@ public class Context {
         if (_request.get() == null) {
             return new EmptyRequest();
         }
-        return (StRequest)_request.get();
+        return (IRequest) _request.get();
     }
 
     /**
@@ -101,71 +99,16 @@ public class Context {
         return request();
     }
 
-    /**
-     * Alias for getResponse();
-     * @return
-     */
-    public static StResponse response() {
-        if (_response.get() == null) {
-            return new EmptyResponse();
-        }
-        return (StResponse)_response.get();
 
-    }
 
-    /**
-     * The current response, as stashed on a thread local variable. Returns a new EmptyResponse() object
-     * if called from outside a web request
-     * @return
-     */
-    public static StResponse getResponse() {
-        return response();
-    }
-
-    /**
-     * Determines if the currently active user, based on the current active request, is allowed
-     * to access the passed in endpoint.
-     *
-     * For a scoped, endpoint request, it will check the scope.
-     *
-     * For all other requests, it will check to see if the endpoint requires a mininum role, and
-     * if the user has that role.
-     *
-     * @param endpoint
-     * @return
-     */
-    public static boolean currentUserCanAccessEndpoint(RestEndpointBase endpoint) {
-        // Scoped request
-        if (request().isScoped()) {
-            // Endpoint not scoped, deny to scoped requests
-            if (!endpoint.isScoped()) {
-                return false;
-            }
-            // Endpoint has scope that the current user does not, deny
-            if (!"any".equals(endpoint.getScope()) && request().getScopes().contains(endpoint.getScope())) {
-                return false;
-            }
-        }
-        if (!emptyInstance(endpoint.getRole())) {
-            // User does not have role, deny
-            if (!getUser().isInRole(endpoint.getRole())) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     @Deprecated
     public static AppContextLoader getApp() {
         return app();
     }
 
-    public static void setRequest(StRequest request) {
+    public static void setRequest(IRequest request) {
         _request.set(request);
-    }
-
-    public static void setResponse(StResponse response) {
-        _response.set(response);
     }
 
     public static Settings settings() {
@@ -196,17 +139,23 @@ public class Context {
     }
 
     public static void setValet(Long valetUserId, String valetEmail) {
-        _request.get().setValetUserId(valetUserId);
-        _request.get().setValetEmail(valetEmail);
+        if (_request.get() != null) {
+            _request.get().setValetUserId(valetUserId);
+            _request.get().setValetEmail(valetEmail);
+        }
 
     }
 
     public static void setUser(IUser user) {
-        _request.get().setUser(user);
+        if (_request.get() != null) {
+            _request.get().setUser(user);
+        }
     }
 
     public static void setOrg(IOrg org) {
-        _request.get().setOrg(org);
+        if (_request.get() != null) {
+            _request.get().setOrg(org);
+        }
     }
 
     public static IUser getUser() {

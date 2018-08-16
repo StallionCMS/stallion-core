@@ -143,25 +143,7 @@ public class AssetsController {
         return Context.settings().getCdnUrl() + "/st-resource/" + plugin + "/" + path;
     }
 
-    /**
-     * Turn a list of additional strings that should be in the Footer section of the
-     * page and return as a string
-     *
-     * @return
-     */
-    public String pageFooterLiterals() {
-        return Context.getResponse().getPageFooterLiterals().stringify();
-    }
 
-    /**
-     * Turn a list of additional strings that should be in the HEAD section of the
-     * page and return as a string
-     *
-     * @return
-     */
-    public String pageHeadLiterals() {
-        return Context.getResponse().getPageHeadLiterals().stringify();
-    }
 
 
     public String bundle(String plugin, String path) {

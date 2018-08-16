@@ -17,7 +17,6 @@
 
 package io.stallion.requests;
 
-import io.stallion.plugins.javascript.Sandbox;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 
@@ -69,44 +68,18 @@ public class TaskRequest implements IRequest {
         return null;
     }
 
-    @Override
-    public Map<String, Object> getBodyMap() {
-        return map();
-    }
 
-    @Override
-    public Object getBodyParam(String name) {
-        return "";
-    }
-
-    @Override
-    public Map<String, String> getQueryParams() {
-        return map();
-    }
-
-    @Override
-    public Cookie[] getCookies() {
-        return new Cookie[0];
-    }
-
-    @Override
-    public Cookie getCookie(String cookieName) {
-        return null;
-    }
 
     @Override
     public String getPath() {
         return "";
     }
 
-    @Override
-    public void setPath(String path) {
 
-    }
 
     @Override
     public String getHost() {
-        return "localhost";
+        return "";
     }
 
     @Override
@@ -114,18 +87,9 @@ public class TaskRequest implements IRequest {
         return "";
     }
 
-    @Override
-    public BufferedReader getReader() throws IOException {
-        return null;
-    }
 
     @Override
-    public String getContent() {
-        return "";
-    }
-
-    @Override
-    public Enumeration<String> getHeaderNames() {
+    public Iterable<String> getHeaderNames() {
         return null;
     }
 
@@ -154,7 +118,7 @@ public class TaskRequest implements IRequest {
         return "";
     }
 
-    @Override
+
     public String getParameter(String paramName) {
         return "";
     }
@@ -169,19 +133,15 @@ public class TaskRequest implements IRequest {
 
     }
 
-    @Override
-    public void setQuery(String query) {
 
+    @Override
+    public String getQueryParam(String name) {
+        return null;
     }
 
     @Override
-    public Map<String, Object> getItems() {
-        return this.items;
-    }
-
-    @Override
-    public void setItems(Map<String, Object> items) {
-        this.items = items;
+    public javax.ws.rs.core.Cookie getCookie(String cookieName) {
+        return null;
     }
 
     public SandboxedRequest getSandboxedRequest(Sandbox box) {
@@ -215,6 +175,26 @@ public class TaskRequest implements IRequest {
 
     @Override
     public String getValetEmail() {
+        return null;
+    }
+
+    @Override
+    public String getBodyString() {
+        return null;
+    }
+
+    @Override
+    public Object getProperty(String name) {
+        return items.get(name);
+    }
+
+    @Override
+    public void setProperty(String name, Object obj) {
+        items.put(name, obj);
+    }
+
+    @Override
+    public String getQueryParam(String name, String defaultValue) {
         return null;
     }
 }

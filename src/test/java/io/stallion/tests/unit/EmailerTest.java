@@ -17,14 +17,14 @@
 
 package io.stallion.tests.unit;
 
-import io.stallion.testing.TestClient;
+
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class EmailerTest {
-    private static TestClient client;
+
 
     @BeforeClass
     public static void setUpClass() throws Exception {

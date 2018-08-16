@@ -25,7 +25,6 @@ import static io.stallion.utils.Literals.*;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.Displayable;
 import io.stallion.dataAccess.DisplayableModelController;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.Log;
 import io.stallion.settings.ContentFolder;
 import io.stallion.settings.Settings;

@@ -40,6 +40,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 
+import javax.ws.rs.*;
+
 
 public class ResourceAssetBundleRenderer {
 
@@ -142,10 +144,10 @@ public class ResourceAssetBundleRenderer {
             url = resourceClass.getResource(path + extension);
         }
         if (url == null) {
-            throw new UsageException("Could not find compiled bundle for path: " + path);
+            throw new javax.ws.rs.NotFoundException("Could not find compiled bundle for path: " + path);
         }
         if (extension.equals(".js") || extension.equals(".head.js")) {
-            Context.response().addHeader("X-Sourcemap", "/st-resource/" + this.plugin + path + ".min" + extension + ".map");
+            Context.getRequest().addResponseHeader("X-Sourcemap", "/st-resource/" + this.plugin + path + ".min" + extension + ".map");
         }
         try {
             return IOUtils.toString(url, "UTF-8");

@@ -20,6 +20,7 @@ package io.stallion.jerseyProviders;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import io.stallion.requests.RequestWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.glassfish.jersey.server.ExtendedUriInfo;
 
@@ -38,16 +39,12 @@ public class ProducesDetectionRequestFilter  implements ContainerRequestFilter {
     public static final String PRODUCES_PROPERTY_NAME = "_ENDPOINT_PRODUCES_GUESS";
     public static final String GUESS_IS_JSON_PROPERTY_NAME = "_GUESS_IS_JSON";
 
-    @javax.ws.rs.core.Context
-    private HttpServletRequest httpRequest;
-
-    @javax.ws.rs.core.Context
-    private HttpServletResponse httpResponse;
 
 
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+        RequestWrapper request = new RequestWrapper(containerRequestContext);
         ExtendedUriInfo uriInfo = ((ExtendedUriInfo)containerRequestContext.getUriInfo());
         Method method = uriInfo
                 .getMatchedResourceMethod()
@@ -62,7 +59,7 @@ public class ProducesDetectionRequestFilter  implements ContainerRequestFilter {
                     .getAnnotation(Produces.class);
         }
         String producesContentType = "text/html";
-        if ("XMLHttpRequest".equals(httpRequest.getHeader("X-Requested-With"))) {
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
             producesContentType = "application/json";
         }
 

@@ -26,13 +26,14 @@ import io.stallion.dataAccess.StandardModelController;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.exceptions.ClientException;
-import io.stallion.requests.StRequest;
+import io.stallion.requests.IRequest;
 import io.stallion.settings.Settings;
 import io.stallion.utils.Encrypter;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.ws.rs.ClientErrorException;
 import java.util.Set;
 
 import static io.stallion.utils.Literals.*;
@@ -65,7 +66,7 @@ public class OAuthApprovalController extends StandardModelController<OAuthApprov
         return (OAuthApprovalController) DataAccessRegistry.instance().get("oauth_approvals");
     }
 
-    public boolean checkHeaderAndAuthorizeUserForRequest(StRequest request) {
+    public boolean checkHeaderAndAuthorizeUserForRequest(IRequest request) {
         String header = request.getHeader("Authorization");
         if (empty(header)) {
             return false;
@@ -86,29 +87,29 @@ public class OAuthApprovalController extends StandardModelController<OAuthApprov
     }
     public OAuthUserLogin tokenToUser(String accessToken, boolean ignoreExpires) {
         if (!accessToken.contains("-")) {
-            throw new ClientException("Invalid access token format");
+            throw new ClientErrorException("Invalid access token format", 400);
         }
         String[] parts = StringUtils.split(accessToken, "-", 2);
         if (!StringUtils.isNumeric(parts[0])) {
-            throw new ClientException("Invalid access token format");
+            throw new ClientErrorException("Invalid access token format", 400);
         }
         long userId = Long.parseLong(parts[0]);
         IUser user = UserController.instance().forId(userId);
         if (user == null) {
-            throw new ClientException("User not found for access token");
+            throw new ClientErrorException("User not found for access token", 400);
         }
         String decrypted = Encrypter.decryptString(user.getEncryptionSecret(), parts[1]);
         OAuthAccesTokenData data = JSON.parse(decrypted, OAuthAccesTokenData.class);
         if (data.getUserId() != userId) {
-            throw new ClientException("Invalid access token");
+            throw new ClientErrorException("Invalid access token", 400);
         }
         if (!ignoreExpires && data.getExpires() < mils()) {
-            throw new ClientException("Access token has expired");
+            throw new ClientErrorException("Access token has expired", 400);
         }
         if (Settings.instance().getoAuth().getAlwaysCheckAccessTokenValid()) {
             OAuthApproval approval = OAuthApprovalController.instance().forId(data.getApprovalId());
             if (approval == null || approval.isRevoked() || (!ignoreExpires && approval.getAccessTokenExpiresAt() < mils())) {
-                throw new ClientException("Invalid approval");
+                throw new ClientErrorException("Invalid approval", 400);
             }
         }
         OAuthUserLogin login = new OAuthUserLogin()
@@ -125,26 +126,26 @@ public class OAuthApprovalController extends StandardModelController<OAuthApprov
 
     public OAuthApproval checkGrantApprovalForUser(GrantType grantType, IUser user, String fullClientId, Set<String> scopes, boolean isScoped, String redirectUri, String providedCode) {
         if (emptyInstance(user) || !user.isAuthorized() || empty(user.getId())) {
-            throw new ClientException("You are not logged in with a valid user.");
+            throw new ClientErrorException("You are not logged in with a valid user.", 400);
         }
 
         OAuthClient client = OAuthClientController.instance().clientForFullId(fullClientId);
 
         if (emptyInstance(client) || client.getFullClientId().equals(fullClientId) || client.isDisabled() || client.getDeleted()) {
-            throw new ClientException("Invalid client id");
+            throw new ClientErrorException("Invalid client id", 400);
         }
         if (!client.hasGrantType(grantType)) {
-            throw new ClientException("Cannot use this grant type with this client");
+            throw new ClientErrorException("Cannot use this grant type with this client", 400);
         }
         if (!client.getAllowedRedirectUris().contains(redirectUri)) {
-            throw new ClientException("Unauthorized redirect_uri");
+            throw new ClientErrorException("Unauthorized redirect_uri", 400);
         }
         if (!isScoped) {
             if (client.isScoped()) {
-                throw new ClientException("This client requires specific scopes.");
+                throw new ClientErrorException("This client requires specific scopes.", 400);
             }
         } else if (client.isScoped() && !client.getScopes().containsAll(scopes)) {
-            throw new ClientException("Invalid set of scopes for this client application.");
+            throw new ClientErrorException("Invalid set of scopes for this client application.", 400);
         }
         return generateNewApprovalForUser(user, client, scopes, isScoped, providedCode);
     }
@@ -177,10 +178,10 @@ public class OAuthApprovalController extends StandardModelController<OAuthApprov
 
 
         if (!approval.isScoped() && client.isScoped()) {
-            throw new ClientException("You must set specific scopes for this approval");
+            throw new ClientErrorException("You must set specific scopes for this approval", 400);
         } else if (approval.isScoped()) {
             if (!client.getScopes().containsAll(approval.getScopes())) {
-                throw new ClientException("This client cannot grant the given scopes");
+                throw new ClientErrorException("This client cannot grant the given scopes", 400);
             }
         }
 
@@ -211,15 +212,15 @@ public class OAuthApprovalController extends StandardModelController<OAuthApprov
     public OAuthApproval newAccessTokenForRefreshToken(String refreshToken, String accessToken, String fullClientId, String fullClientSecret) {
         OAuthClient client = OAuthClientController.instance().clientForFullId(fullClientId);
         if (client.getClientSecret().equals(fullClientSecret)) {
-            throw new ClientException("Invalid client secret");
+            throw new ClientErrorException("Invalid client secret", 400);
         }
         OAuthUserLogin login = tokenToUser(accessToken, true);
         OAuthApproval approval = forId(login.getApprovalId());
         if (approval.isRevoked()) {
-            throw new ClientException("Approval has been revoked. You will need to re-authorize");
+            throw new ClientErrorException("Approval has been revoked. You will need to re-authorize", 400);
         }
         if (!refreshToken.equals(approval.getRefreshToken())) {
-            throw new ClientException("Invalid refresh token");
+            throw new ClientErrorException("Invalid refresh token", 400);
         }
         return createOrUpdateApproval(approval, login.getUser(), client);
     }

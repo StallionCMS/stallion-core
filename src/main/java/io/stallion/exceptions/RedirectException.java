@@ -23,6 +23,7 @@ import java.net.URI;
 /**
  * Short circuits the request and returns a 302 redirect.
  */
+@Deprecated
 public class RedirectException extends RedirectionException {
     private String url = "";
 

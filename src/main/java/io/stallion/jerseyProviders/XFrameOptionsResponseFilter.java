@@ -39,7 +39,7 @@ public class XFrameOptionsResponseFilter implements ContainerResponseFilter {
 
         }
 
-        if (Context.getRequest().getItems().containsKey("!!stallion-skip-xframe-options")) {
+        if (Context.getRequest().getProperty("!!stallion-skip-xframe-options") != null) {
             return;
         }
         String options = Settings.instance().getxFrameOptions();

@@ -34,7 +34,6 @@ public class TearDownContextResponseFilter implements ContainerResponseFilter {
         Context.setValet(null, null);
         Context.setUser(null);
         Context.setOrg(null);
-        Context.setResponse(null);
         Context.setRequest(null);
 
     }

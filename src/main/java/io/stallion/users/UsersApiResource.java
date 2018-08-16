@@ -19,12 +19,12 @@ package io.stallion.users;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.Context;
-import io.stallion.assets.*;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.exceptions.*;
-import io.stallion.requests.validators.SafeMerger;
-import io.stallion.restfulEndpoints.*;
+import io.stallion.jerseyProviders.BodyParam;
+import io.stallion.jerseyProviders.MinRole;
+import io.stallion.dataAccess.SafeMerger;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.Sanitize;
@@ -43,7 +43,7 @@ import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
 
 @Path("/st-users")
-public class UsersApiResource implements EndpointResource {
+public class UsersApiResource {
 
     public static void registerMaybe(ResourceConfig config) {
 
@@ -103,7 +103,7 @@ public class UsersApiResource implements EndpointResource {
             ctx = map(
                     val("allowReset", settings().getUsers().getPasswordResetEnabled()),
                     val("allowRegister", settings().getUsers().getNewAccountsAllowCreation()),
-                    val("returnUrl", URLEncoder.encode((or(request().getParameter("stReturnUrl"), "")).replace("\"", ""), "UTF-8")),
+                    val("returnUrl", URLEncoder.encode((or(request().getQueryParam("stReturnUrl"), "")).replace("\"", ""), "UTF-8")),
                     val("email", Sanitize.escapeHtmlAttribute(email)));
         } catch (UnsupportedEncodingException e) {
            throw new RuntimeException(e);
@@ -150,7 +150,7 @@ public class UsersApiResource implements EndpointResource {
     @MinRole(Role.ANON)
     public String registerPage() {
         if (!settings().getUsers().getNewAccountsAllowCreation()) {
-            throw new ClientException("The default new account creation endpoint is not enabled for this site.");
+            throw new ClientErrorException("The default new account creation endpoint is not enabled for this site.", 400);
         }
         Map ctx = map();
         return TemplateRenderer.instance().renderTemplate("stallion:/public/register.jinja", ctx);
@@ -162,11 +162,11 @@ public class UsersApiResource implements EndpointResource {
     @Path("/do-register")
     public Object doRegister(@BodyParam("displayName") String displayName, @BodyParam("username") String email, @BodyParam("password") String password, @BodyParam("passwordConfirm") String passwordConfirm, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
         if (!settings().getUsers().getNewAccountsAllowCreation()) {
-            throw new ClientException("The default new account creation endpoint is not enabled for this site.");
+            throw new ClientErrorException("The default new account creation endpoint is not enabled for this site.", 400);
         }
         IUser existing = UserController.instance().forEmail(email);
         if (existing != null) {
-            throw new ClientException("A user with that email address already exists.");
+            throw new ClientErrorException("A user with that email address already exists.", 400);
         }
         User user = new User()
                 .setDisplayName(displayName)
@@ -195,7 +195,7 @@ public class UsersApiResource implements EndpointResource {
     @JsonView(RestrictedViews.Member.class)
     @MinRole(Role.ADMIN)
     @Path("/admin-create-user")
-    public Object adminCreateUser(@ObjectParam User newUser) {
+    public Object adminCreateUser(User newUser) {
         if (empty(newUser.getEmail())) {
             newUser.setEmail(newUser.getUsername());
         } else if (empty(newUser.getUsername())) {
@@ -207,7 +207,7 @@ public class UsersApiResource implements EndpointResource {
                 .merge(newUser);
         IUser existing = UserController.instance().forEmail(user.getEmail());
         if (existing != null) {
-            throw new ClientException("A user with that email address already exists.");
+            throw new ClientErrorException("A user with that email address already exists.", 400);
         }
 
         user.setApproved(true);
@@ -325,7 +325,7 @@ public class UsersApiResource implements EndpointResource {
     @Produces("application/json")
     public Object sendResetEmail(@BodyParam("email") String email, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
         if (!settings().getUsers().getPasswordResetEnabled()) {
-            throw new ClientException("Password reset has been disabled. Please contact an administrator to reset your password.");
+            throw new ClientErrorException("Password reset has been disabled. Please contact an administrator to reset your password.", 400);
         }
         if (!Settings.instance().isEmailConfigured()) {
             throw new AppException("Cannot send reset email because there is no email server configured.");
@@ -365,19 +365,19 @@ public class UsersApiResource implements EndpointResource {
     @Produces("application/json")
     public Object createNewAccount(@BodyParam("displayName") String displayName, @BodyParam(value = "email", isEmail = true) String email, @BodyParam(value = "password", minLength = 6) String password, @BodyParam(value = "passwordConfirm", minLength = 6) String passwordConfirm) {
         if (!settings().getUsers().getNewAccountsAllowCreation()) {
-            throw new ClientException("User creation is disabled for this application.");
+            throw new ClientErrorException("User creation is disabled for this application.");
         }
 
         String domain = StringUtils.split(email, "@", 2)[1];
         if (!empty(settings().getUsers().getNewAccountsDomainRestricted())) {
             if (!settings().getUsers().getNewAccountsDomainRestricted().equals(domain)) {
-                throw new ClientException("You can only register email accounts from domain " + domain);
+                throw new ClientErrorException("You can only register email accounts from domain " + domain);
             }
         }
 
         IUser user = UserController.instance().forEmail(email);
         if (user == null) {
-            throw new ClientException("User with that email address already exists.");
+            throw new ClientErrorException("User with that email address already exists.");
         }
         user = new User();
         user
@@ -421,7 +421,7 @@ public class UsersApiResource implements EndpointResource {
     @JsonView(RestrictedViews.Owner.class)
     public Object currentUserInfo() {
         if (Context.getUser() == null || empty(Context.getUser().getId())) {
-            throw new ClientException("You are not logged in", 401);
+            throw new ClientErrorException("You are not logged in", 401);
         }
         return Context.getUser();
     }
@@ -441,7 +441,6 @@ public class UsersApiResource implements EndpointResource {
     @Produces("text/html")
     public String manageUsers2() {
 
-        response().getMeta().setTitle("Manage Users");
         Map<String, Object> ctx = map();
         return TemplateRenderer.instance().renderTemplate("stallion:admin-app-users.jinja", ctx);
     }
@@ -503,14 +502,14 @@ public class UsersApiResource implements EndpointResource {
         if (!updatedUser.getEmail().equals(user.getEmail())) {
             IUser existing = UserController.instance().forEmail(updatedUser.getEmail());
             if (existing != null) {
-                throw new ClientException("User with email " + updatedUser.getEmail() + " already exists");
+                throw new ClientErrorException("User with email " + updatedUser.getEmail() + " already exists", 400);
             }
             user.setEmailVerified(false);
         }
         if (!updatedUser.getUsername().equals(user.getUsername())) {
             IUser existing = UserController.instance().forUsername(updatedUser.getUsername());
             if (existing != null) {
-                throw new ClientException("User with username " + updatedUser.getUsername() + " already exists");
+                throw new ClientErrorException("User with username " + updatedUser.getUsername() + " already exists", 400);
             }
         }
         user
@@ -598,10 +597,10 @@ public class UsersApiResource implements EndpointResource {
     @Produces("application/json")
     public Map getResetToken(@QueryParam("email") String email, @QueryParam("secret") String secret) {
         if (!Settings.instance().getHealthCheckSecret().equals(secret)) {
-            throw new ClientException("Invalid or missing ?secret= query param. Secret must equal the healthCheckSecret in settings.");
+            throw new ClientErrorException("Invalid or missing ?secret= query param. Secret must equal the healthCheckSecret in settings.", 400);
         }
         if (!email.startsWith("selenium+resettest+") || !email.endsWith("@stallion.io")) {
-            throw new ClientException("Invalid email address. Must be a stallion selenium email.");
+            throw new ClientErrorException("Invalid email address. Must be a stallion selenium email.", 400);
         }
         IUser user = UserController.instance().forEmail(email);
         String token = UserController.instance().makeEncryptedToken(user, "reset", user.getResetToken());

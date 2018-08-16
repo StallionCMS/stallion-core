@@ -22,10 +22,10 @@ import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.dataAccess.StandardModelController;
 import io.stallion.dataAccess.db.DB;
-import io.stallion.exceptions.ClientException;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.ws.rs.ClientErrorException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
@@ -86,20 +86,20 @@ public class SecureTempTokens extends StandardModelController<TempToken> {
 
     public TempToken fetchToken(String tokenString) {
         if (StringUtils.isBlank(tokenString)) {
-            throw new ClientException("The passed in token is empty");
+            throw new ClientErrorException("The passed in token is empty", 400);
         }
         TempToken token = DB.instance().fetchBean(TempToken.class,
                 "SELECT * FROM stallion_temp_tokens WHERE token=? LIMIT 1",
                 tokenString);
         if (token == null) {
-            throw new ClientException("Token not found");
+            throw new ClientErrorException("Token not found", 400);
         }
         ZonedDateTime now = DateUtils.utcNow();
         if (now.compareTo(token.getExpiresAt()) > 0) {
-            throw new ClientException("Token has expired");
+            throw new ClientErrorException("Token has expired", 400);
         }
         if (token.getUsedAt() != null) {
-            throw new ClientException("Token was already used");
+            throw new ClientErrorException("Token was already used", 400);
         }
         return token;
     }

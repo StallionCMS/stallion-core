@@ -20,7 +20,6 @@ package io.stallion.asyncTasks;
 import io.stallion.Context;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.UniqueKey;
-import io.stallion.plugins.javascript.JsAsyncTaskHandler;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 
@@ -118,14 +117,8 @@ public class AsyncTask extends ModelBase implements Comparable<AsyncTask> {
      */
     public AsyncTask setHandler(AsyncTaskHandler handler) {
 
-        if (handler instanceof JsAsyncTaskHandler) {
-            setHandlerName(((JsAsyncTaskHandler) handler).getHandlerClassName());
-            setDataJson(JSON.stringify(((JsAsyncTaskHandler) handler).getInternalMap()));
-            Log.info("STRIFIGYD {0}", JSON.stringify(((JsAsyncTaskHandler) handler).getInternalMap()));
-        } else {
-            setHandlerName(handler.getClass().getCanonicalName());
-            setDataJson(JSON.stringify(handler));
-        }
+        setHandlerName(handler.getClass().getCanonicalName());
+        setDataJson(JSON.stringify(handler));
 
         return this;
     }

@@ -24,11 +24,14 @@ import io.stallion.assets.FileSystemAssetBundleRenderer;
 import io.stallion.assets.ResourceAssetBundleRenderer;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
-import io.stallion.testing.MockResponse;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response;
+
 import static org.junit.Assert.*;
 
 
@@ -104,9 +107,10 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
 
     @Test
     public void fullTestWithEndpoints() {
-        MockResponse response;
+        Response response;
 
-
+        throw new NotImplementedException("uncomment and fix");
+                /*
         response = client.get("/an-assetful-page");
         assertEquals(200, response.getStatus());
         Log.finer("Page content: {0}", response.getContent());
@@ -120,7 +124,7 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
         Log.finer("Local asset content: {0}", response.getContent());
         assertEquals(200, response.getStatus());
         assertTrue(response.getContent().contains("Pure v0.5.0"));
-
+        */
     }
 
 }

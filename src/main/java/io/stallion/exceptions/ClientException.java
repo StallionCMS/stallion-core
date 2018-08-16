@@ -26,6 +26,7 @@ import static io.stallion.utils.Literals.map;
  * The end user did something wrong and needs to correct their request.
  * Will short-circuit the request and return a 400 error by default.
  */
+@Deprecated
 public class ClientException extends ClientErrorException {
 
     /**

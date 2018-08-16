@@ -24,7 +24,6 @@ import static io.stallion.utils.Literals.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.stallion.exceptions.ClientException;
 import io.stallion.reflection.PropertyUtils;
-import io.stallion.restfulEndpoints.BodyParam;
 import io.stallion.services.Log;
 
 
@@ -37,6 +36,8 @@ import org.glassfish.hk2.api.PerLookup;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.spi.internal.ValueParamProvider;
+
+import javax.ws.rs.ClientErrorException;
 
 
 /**
@@ -112,7 +113,7 @@ public class BodyParamProvider<T> implements Factory<T>, ValueParamProvider {
                 try {
                     jsonNode = JSON.getMapper().reader().readTree(IOUtils.toString(containerRequest.getEntityStream(), UTF8));
                 } catch (IOException e) {
-                    throw new ClientException("Could not read request as valid JSON string.");
+                    throw new ClientErrorException("Could not read request as valid JSON string.", 400);
                 }
                 containerRequest.setProperty("_bodyparam_json_node", jsonNode);
             }

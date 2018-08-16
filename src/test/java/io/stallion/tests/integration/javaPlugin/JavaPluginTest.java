@@ -21,9 +21,9 @@ import io.stallion.Context;
 import io.stallion.testing.AppIntegrationCaseBase;
 import io.stallion.services.Log;
 
-import io.stallion.testing.MockResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -63,6 +63,8 @@ public class JavaPluginTest extends AppIntegrationCaseBase {
     public void testPluginEndpoints() {
         //TODO: fix this test
         Log.info("testEndpoints");
+        throw new NotImplementedException("uncomment and fix");
+        /*
         MockResponse response = client.get("/_stx/timeit/speed/my-key1");
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("ThisIsACustomPerfGETEndpoint Key: my-key1", response.getContent());
@@ -70,6 +72,6 @@ public class JavaPluginTest extends AppIntegrationCaseBase {
         response = client.post("/_stx/timeit/speed/my-key2", new HashMap());
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals("ThisIsACustomPerfPOSTEndpoint Key: my-key2", response.getContent());
-
+*/
     }
 }

@@ -23,8 +23,8 @@ import java.net.URLEncoder;
 
 import io.stallion.Context;
 import io.stallion.exceptions.ClientException;
-import io.stallion.requests.StRequest;
-import io.stallion.restfulEndpoints.MinRole;
+import io.stallion.requests.IRequest;
+import io.stallion.requests.RequestWrapper;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 import org.glassfish.jersey.server.ExtendedUriInfo;
@@ -32,6 +32,7 @@ import org.glassfish.jersey.server.ExtendedUriInfo;
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.RedirectionException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -51,7 +52,7 @@ public class EndpointAuthorizationRequestFilter  implements ContainerRequestFilt
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        StRequest request = new StRequest(httpRequest);
+        IRequest request = new RequestWrapper(containerRequestContext);
 
         ExtendedUriInfo uriInfo = ((ExtendedUriInfo)containerRequestContext.getUriInfo());
 
@@ -85,7 +86,7 @@ public class EndpointAuthorizationRequestFilter  implements ContainerRequestFilt
             throw new RedirectionException(302, URI.create(Settings.instance().getUsers().getLoginPage() +
                     "?stReturnUrl=" + URLEncoder.encode(request.requestUrl(), "utf-8")));
         } else {
-            throw new ClientException("You are not authorized to access this resource.", 403);
+            throw new ClientErrorException("You are not authorized to access this resource.", 403);
         }
     }
 }

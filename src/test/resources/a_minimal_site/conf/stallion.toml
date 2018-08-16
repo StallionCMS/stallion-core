@@ -18,12 +18,3 @@ host = "noop"
 username = "noop"
 password = "basedefaultPassword"
 adminEmails = ["testing1@stallion.io"]
-
-[[routes]]
-route = "/301-this"
-destination = "http://localhost/301-endpoint"
-preempt = true
-
-[[routes]]
-route = "/template-direct"
-template = "template-direct.jinja"

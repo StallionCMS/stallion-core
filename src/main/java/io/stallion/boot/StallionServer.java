@@ -22,8 +22,7 @@ import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.jerseyProviders.StallionJerseyApplication;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
-import io.stallion.restfulEndpoints.SlugRegistry;
+import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.settings.Settings;
 
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -32,6 +31,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -75,9 +75,11 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
 
         // TODO: share the stallion logger
         // https://stackoverflow.com/questions/25786592/how-to-enable-logging-in-jetty
-        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
-        System.setProperty("org.eclipse.jetty.LEVEL", "WARN");
-        Log.setLog(new StdErrLog());
+        //System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
+       // System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
+
+        //Log.setLog(new StdErrLog());
+        //Log.setLog(new JavaUtilLog());
 
 
 
@@ -123,11 +125,10 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
 
         System.out.print("-------------------------------------------------------\n");
         System.out.print(MessageFormat.format(
-                "Final registration count: {1} controllers. {2} plugins. {3} endpoints. {4} slugs. V=3\n",
+                "Final registration count: {1} controllers. {2} plugins. {3} slugs. V=3\n",
                 Settings.instance().getPort(),
                 Context.dal().size(),
                 PluginRegistry.instance().getJavaPluginByName().size(),
-                EndpointsRegistry.instance().getEndpoints().size(),
                 SlugRegistry.instance().getSlugMap().size()
         ));
 

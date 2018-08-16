@@ -17,10 +17,13 @@
 
 package io.stallion.exceptions;
 
+import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.WebApplicationException;
+
 /**
  * Fatal exception caused by accessing an external service. Message should be friendly and end-user facing.
  */
-public class ExternalException extends WebException {
+public class ExternalException extends ServerErrorException {
     public ExternalException(String message) {
         super(message, 500);
     }

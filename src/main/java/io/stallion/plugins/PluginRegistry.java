@@ -18,9 +18,9 @@
 package io.stallion.plugins;
 
 import io.stallion.boot.StallionRunAction;
-import io.stallion.plugins.javascript.JsPluginEngine;
 
-import io.stallion.plugins.javascript.TestResults;
+
+
 import io.stallion.services.DynamicSettings;
 import io.stallion.services.Log;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +47,7 @@ public class PluginRegistry {
     private JarFileClassLoader classLoader;
 
     private Map<String, StallionJavaPlugin> javaPluginByName = map();
-    private Map<String, JsPluginEngine> jsPlugins = map();
+
 
     private static PluginRegistry _instance;
 
@@ -108,9 +108,7 @@ public class PluginRegistry {
 
     public static void shutdown() {
         if (_instance != null) {
-            for (JsPluginEngine engine: _instance.jsPlugins.values()) {
-                engine.shutdown();
-            }
+
             for (StallionJavaPlugin plugin: _instance.getJavaPluginByName().values()) {
                 plugin.shutdown();
             }
@@ -132,64 +130,7 @@ public class PluginRegistry {
         return actions;
     }
 
-    public void loadAndRunJavascriptPlugins() {
-        loadAndRunJavascriptPlugins(true);
-    }
 
-    public void loadAndRunJavascriptPlugins(Boolean shouldWatchFiles) {
-        try {
-            doLoadAndRunJavascriptPlugins(shouldWatchFiles);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void doLoadAndRunJavascriptPlugins(Boolean shouldWatchFiles) throws Exception {
-
-
-        // Load the main javascript file, if it exists
-        String jsMainPath = settings().getTargetFolder() + "/js/main.js";
-        File jsMain = new File(jsMainPath);
-        if (jsMain.exists() && jsMain.isFile()) {
-            JsPluginEngine engine = new JsPluginEngine(shouldWatchFiles);
-            jsPlugins.put("main.js", engine);
-            engine.loadJavascript("main.js", jsMainPath);
-        }
-
-
-        String path = settings().getTargetFolder() + "/plugins";
-
-        File folder = new File(path);
-        if (!folder.exists() || !folder.isDirectory()) {
-            return;
-        }
-        File[] children = folder.listFiles();
-        if (children != null) {
-            for (File child : children) {
-                if (child.isDirectory()) {
-
-                    loadScriptPlugin(child.getAbsolutePath(), child.getName(), shouldWatchFiles);
-                }
-            }
-        }
-
-    }
-
-    private void loadScriptPlugin(String folderPath, String pluginName, Boolean shouldWatchFiles) throws Exception {
-        //PluginDefinition definition = new Toml().parse(pluginTomlFile).to(PluginDefinition.class);
-        Log.info("Load plugin {0} name:{1}", folderPath, pluginName);
-
-        String jsPath = folderPath + "/plugin.js";
-        File jsFile = new File(jsPath);
-        if (jsFile.exists() && jsFile.isFile()) {
-            JsPluginEngine engine = new JsPluginEngine(shouldWatchFiles);
-            jsPlugins.put(pluginName, engine);
-            engine.loadJavascript(pluginName, jsPath);
-            DynamicSettings.instance().initGroup(pluginName);
-        }
-
-
-    }
 
     public void loadJarPlugins(String targetPath) {
         try {
@@ -265,14 +206,6 @@ public class PluginRegistry {
         }
         booter.setPluginRegistry(this);
         getJavaPluginByName().put(booter.getPluginName(), booter);
-    }
-
-    public List<TestResults> runJsTests(String plugin, String jsFile) {
-        return jsPlugins.get(plugin).runTestsInFile(jsFile);
-    }
-
-    public JsPluginEngine getEngine(String plugin) {
-        return jsPlugins.getOrDefault(plugin, null);
     }
 
 

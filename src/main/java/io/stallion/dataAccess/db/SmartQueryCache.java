@@ -26,7 +26,8 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.PersistenceConfiguration;
 
-import javax.servlet.http.Cookie;
+
+import javax.ws.rs.core.Cookie;
 
 import static io.stallion.utils.Literals.*;
 
@@ -101,11 +102,11 @@ public class SmartQueryCache {
     public static boolean checkShouldSkip(String bucket, String key) {
         // We only skip the cache at most once per lookup, per request
         // So we set a request context item to mark that we've done this check.
-        Boolean seen = (Boolean)Context.getRequest().getItems().get("checked-should-skip-for-key-" + bucket + "---" + key);
+        Boolean seen = (Boolean)Context.getRequest().getProperty("checked-should-skip-for-key-" + bucket + "---" + key);
         if (seen != null && seen) {
             return false;
         }
-        Context.getRequest().getItems().put("checked-should-skip-for-key-" + bucket + "---" + key, true);
+        Context.getRequest().setProperty("checked-should-skip-for-key-" + bucket + "---" + key, true);
 
         if (Context.getRequest() instanceof TaskRequest) {
             return true;

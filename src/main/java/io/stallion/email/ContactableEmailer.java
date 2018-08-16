@@ -21,7 +21,7 @@ import io.stallion.Context;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
-import io.stallion.plugins.javascript.Sandbox;
+import io.stallion.requests.Sandbox;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;

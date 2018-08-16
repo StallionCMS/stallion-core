@@ -71,6 +71,7 @@ public class GeneralUtils {
             val("css", "text/css"),
             val("js", "text/javascript"),
             val("tag", "text/javascript"),
+            val("png", "image/png"),
             val("woff", "application/font-woff"),
             val("otf", "application/octet-stream"),
             val("eot", "application/octet-stream"),

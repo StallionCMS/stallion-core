@@ -25,7 +25,7 @@ import static io.stallion.utils.Literals.*;
 
 import io.stallion.contentPublishing.forms.SimpleFormEndpoints;
 import io.stallion.monitoring.InternalEndpoints;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
+
 import io.stallion.services.Log;
 import io.stallion.contentPublishing.forms.SimpleFormTag;
 import io.stallion.settings.Settings;
@@ -48,15 +48,18 @@ public class ContentPublishingBooter {
         }
 
         if (!empty(Settings.instance().getFolders()) || new File(Settings.instance().getTargetFolder() + "/pages").exists()) {
-            rc.register(ContentPublishingResponseFilter.class);
-            rc.register(ListingEndpoints.class);
+            rc.register(ContentSlugCatchallResource.class);
+
             rc.register(SiteMapEndpoints.class);
+            ListingEndpoints.register(rc);
         }
 
         {
             rc.register(SimpleFormEndpoints.class);
             TemplateRenderer.instance().getJinjaTemplating().registerTag(new SimpleFormTag());
         }
+
+
 
     }
 }

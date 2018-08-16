@@ -23,9 +23,9 @@ import io.stallion.dataAccess.ModelController;
 import io.stallion.exceptions.UsageException;
 import io.stallion.exceptions.WebException;
 import io.stallion.fileSystem.FileSystemWatcherService;
-import io.stallion.hooks.HookRegistry;
 
-import io.stallion.plugins.javascript.Sandbox;
+import io.stallion.requests.MetaInformation;
+import io.stallion.requests.Sandbox;
 import io.stallion.requests.SandboxedRequest;
 import io.stallion.requests.Site;
 import io.stallion.services.Log;
@@ -180,6 +180,12 @@ public class TemplateRenderer {
         context.put("now", DateUtils.localNow());
         context.put("styleSettings", Settings.instance().getStyles());
 
+        // TODO: store meta information, css in request?
+        MetaInformation meta = new MetaInformation();
+        meta.getCssClasses().add("st-template-" + GeneralUtils.slugify(path));
+        context.put("meta", meta);
+
+        /*
         if (Context.response() != null) {
 
             Context.response().getMeta().getCssClasses().add("st-template-" + GeneralUtils.slugify(path));
@@ -187,6 +193,7 @@ public class TemplateRenderer {
         } else {
             context.put("meta", map());
         }
+        */
 
         Site site = new Site();
         site.setTitle(Settings.instance().getDefaultTitle());
@@ -206,8 +213,8 @@ public class TemplateRenderer {
 
 
 
-        // Dispatch context hydration hooks
-        HookRegistry.instance().dispatch(TemplateContextHookHandler.class, context);
+
+
 
 
         if (path.endsWith(".html") || path.endsWith(".jinja") || path.contains("\n")) {
@@ -226,6 +233,12 @@ public class TemplateRenderer {
         context.put("sanitize", new Sanitize());
         context.put("now", DateUtils.localNow());
 
+       // TODO: store meta information, css in request?
+        MetaInformation meta = new MetaInformation();
+        meta.getCssClasses().add("st-template-" + GeneralUtils.slugify(path));
+        context.put("meta", meta);
+
+        /*
         if (Context.response() != null) {
 
             Context.response().getMeta().getCssClasses().add("st-template-" + GeneralUtils.slugify(path));
@@ -233,6 +246,9 @@ public class TemplateRenderer {
         } else {
             context.put("meta", map());
         }
+        */
+
+
 
         Site site = new Site();
         site.setTitle(Settings.instance().getDefaultTitle());

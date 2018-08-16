@@ -20,7 +20,6 @@ import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DummyPersister;
 import io.stallion.dataAccess.StandardModelController;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
 
 
 public class TomeController extends StandardModelController<Tome> {
@@ -40,6 +39,6 @@ public class TomeController extends StandardModelController<Tome> {
 
     public static void registerAll() {
         //register();
-        EndpointsRegistry.instance().addResource("/st-ui-demo", new TomeEndpoints());
+        //EndpointsRegistry.instance().addResource("/st-ui-demo", new TomeEndpoints());
     }
 }

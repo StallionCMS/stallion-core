@@ -17,16 +17,17 @@
 
 package io.stallion.requests;
 
-import io.stallion.plugins.javascript.Sandbox;
+import io.stallion.requests.Sandbox;
 import io.stallion.services.Log;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 import org.eclipse.jetty.server.Request;
 
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.NewCookie;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -40,6 +41,7 @@ import java.util.Set;
 
 import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.map;
 
 public interface IRequest {
     public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";
@@ -161,30 +163,15 @@ public interface IRequest {
      */
     public Object getBodyObject(Class clazz);
 
-    /**
-     * Parse the request body based on the content-type, usually either form encoded or JSON,
-     * and then parse it into a Map
-     *
-     * @return
-     */
-    public Map<String, Object> getBodyMap();
 
-    /**
-     * Internally, gets the request body as Map, and then returns the value for the given key
-     *
-     * @param name
-     * @return
-     */
-    public Object getBodyParam(String name);
 
-    /**
-     * Parses the query string into a map
-     *
-     * @return
-     */
-    public Map<String, String> getQueryParams();
+    public String getQueryParam(String name);
 
-    public Cookie[] getCookies();
+    String getBodyString();
+
+    Object getProperty(String name);
+
+    void setProperty(String name, Object obj);
 
     public Cookie getCookie(String cookieName);
 
@@ -196,8 +183,6 @@ public interface IRequest {
     public String getPath();
 
 
-    public void setPath(String path);
-
     /**
      * Get the given request header, case insensitive
      * @param name
@@ -205,22 +190,10 @@ public interface IRequest {
      */
     public String getHeader(String name);
 
-    /**
-     * Get a Reader that reads the request body
-     *
-     * @return
-     * @throws IOException
-     */
-    public BufferedReader getReader() throws IOException;
 
-    /**
-     * Gets the request body as a string
-     *
-     * @return
-     */
-    public String getContent();
+    public Iterable<String> getHeaderNames();
 
-    public Enumeration<String> getHeaderNames();
+    String getQueryParam(String name, String defaultValue);
 
     /**
      * Gets the user associated with the current request
@@ -241,12 +214,7 @@ public interface IRequest {
      */
     public String getMethod();
 
-    /**
-     * Gets the parameter from either the query string or the request body
-     * @param paramName
-     * @return
-     */
-    public String getParameter(String paramName);
+
 
     /**
      * Returns true if this request is expected to produce JSON, used to determine
@@ -259,17 +227,43 @@ public interface IRequest {
     public void setIsJsonRequest(Boolean isJsonRequest);
 
 
-    public void setQuery(String query);
 
-    /**
-     * Get an arbitrary hashmap of data that lives the lifetime of this request,
-     * can be used as a very short lived cache, or for any other arbitrary use.
-     *
-     * @return
-     */
-    public Map<String, Object> getItems();
+    default void addResponseHeader(String header, String value) {
+        Map<String, String> responseHeaders = (Map<String, String>)getProperty("responseHeaders");
+        if (responseHeaders == null) {
+            responseHeaders = map();
+            setProperty("responseHeaders", responseHeaders);
+        }
+        responseHeaders.put("header", value);
+    }
 
-    public void setItems(Map<String, Object> items);
+    default public void addResponseCookie(String name, String value) {
+        NewCookie cookie = new NewCookie(name, value);
+        addResponseCookie(cookie);
+    }
+
+    default public void addResponseCookie(String name, String value, int expires) {
+        NewCookie cookie = new NewCookie(name, value, null, null, null, expires, false);
+        addResponseCookie(cookie);
+    }
+
+    default public void addResponseCookie(NewCookie cookie) {
+        Map<String, NewCookie> cookies = (Map<String, NewCookie>)getProperty("responseCookies");
+        if (cookies == null) {
+            cookies = map();
+            setProperty("responseCookies", cookie);
+        }
+        cookies.put(cookie.getName(), cookie);
+    }
+
+    default public Map<String, NewCookie> getResponseCookies() {
+        return (Map<String, NewCookie>)getProperty("responseCookies");
+    }
+
+    default public Map<String, String> getResponseHeaders() {
+        return (Map<String, String>)getProperty("responseHeaders");
+    }
+
 
     /**
      * Get a sandboxed version of this request object. Sandboxing usually limits
@@ -300,4 +294,12 @@ public interface IRequest {
     public Long getValetUserId();
 
     public String getValetEmail();
+
+    default void setValetUserId(Long valetUserId) {
+
+    }
+
+    default void setValetEmail(String email) {
+
+    }
 }

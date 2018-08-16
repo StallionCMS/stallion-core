@@ -18,10 +18,12 @@
 package io.stallion.jerseyProviders;
 
 import java.io.IOException;
+import java.util.Set;
 
 import io.stallion.Context;
-import io.stallion.requests.StRequest;
-import io.stallion.requests.StResponse;
+import io.stallion.requests.*;
+import io.stallion.users.IOrg;
+import io.stallion.users.IUser;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.Provider;
 
 @Provider
@@ -36,31 +39,17 @@ import javax.ws.rs.ext.Provider;
 @PreMatching
 public class PopulateContextRequestFilter implements ContainerRequestFilter {
 
-    @javax.ws.rs.core.Context
-    private HttpServletRequest httpRequest;
-
-    @javax.ws.rs.core.Context
-    private HttpServletResponse httpResponse;
-
-
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
         //containerRequestContext.getRequest();
 
-        StRequest req = new StRequest(
-                containerRequestContext.getUriInfo().getRequestUri().getPath(),
-                null,
-                httpRequest
-        );
+        IRequest req = new RequestWrapper(containerRequestContext);
 
         Context.setRequest(
                 req
         );
 
-        StResponse res = new StResponse(
-                httpResponse
-        );
-        Context.setResponse(res);
+
     }
 }

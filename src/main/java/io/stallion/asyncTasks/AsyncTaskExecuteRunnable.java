@@ -19,7 +19,6 @@ package io.stallion.asyncTasks;
 
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
-import io.stallion.plugins.javascript.JsAsyncTaskHandler;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 
@@ -56,9 +55,7 @@ public class AsyncTaskExecuteRunnable implements Runnable {
             Class cls = lookupClass(task.getHandlerName());
             Log.info("Loaded async handler class: {0}", cls.getName());
             AsyncTaskHandler handler = (AsyncTaskHandler)JSON.parse(task.getDataJson(), cls);
-            if (handler instanceof JsAsyncTaskHandler && !empty(task.getDataJson())) {
-                ((JsAsyncTaskHandler)handler).putAll(JSON.parseMap(task.getDataJson()));
-            }
+
             handler.setTask(task);
             handler.process();
             AsyncCoordinator.instance().markCompleted(task);

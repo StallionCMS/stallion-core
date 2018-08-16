@@ -25,12 +25,10 @@ import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
-import io.stallion.plugins.PluginTestsRunAction;
 import io.stallion.secrets.SecretsAction;
 import io.stallion.secrets.SecretsDecryptAction;
 import io.stallion.services.Log;
 import io.stallion.tools.ExportToHtml;
-import io.stallion.tools.ScriptExecBase;
 import io.stallion.users.UserAdder;
 import io.stallion.utils.Literals;
 import org.apache.commons.lang3.StringUtils;
@@ -54,8 +52,6 @@ public class Booter {
     private static final List<StallionRunAction> builtinActions = Literals.list(
             new StallionServer(),
             new UserAdder(),
-            new PluginTestsRunAction(),
-            new ScriptExecBase(),
             new NewProjectBuilder(),
             new NewDraftPageAction(),
             //new NewJavaPluginRunAction(),
@@ -64,7 +60,6 @@ public class Booter {
             new SqlMigrationAction(),
             new SqlCheckNeedsMigrationAction(),
             new SqlGenerationAction(),
-            new InteractiveJavascriptRunAction(),
             new ForceTaskAction(),
             new SecretsDecryptAction()
     );

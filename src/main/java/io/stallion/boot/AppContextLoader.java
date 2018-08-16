@@ -30,20 +30,16 @@ import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.fileSystem.FileSystemWatcherRunner;
 import io.stallion.fileSystem.FileSystemWatcherService;
-import io.stallion.hooks.HookRegistry;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.jobs.JobStatusController;
 import io.stallion.monitoring.HealthTracker;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.reflection.PropertyUtils;
-import io.stallion.requests.RoutesRegistry;
 import io.stallion.services.*;
 import io.stallion.contentPublishing.SiteMapController;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
-import io.stallion.restfulEndpoints.SlugRegistry;
+import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.settings.Settings;
-import io.stallion.requests.RequestHandler;
 import io.stallion.templating.JinjaTemplating;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.users.User;
@@ -156,10 +152,7 @@ public class AppContextLoader {
         // Load registries
         SiteMapController.load();
         FileSystemWatcherService.load();
-        HookRegistry.load();
         SlugRegistry.load();
-        EndpointsRegistry.load();
-
 
         // Data sources
         DB.load();
@@ -168,10 +161,7 @@ public class AppContextLoader {
         AssetsController.load();
         DynamicSettings.load();
 
-        //DefinedBundle.load();
         TemplateRenderer.load();
-
-        RoutesRegistry.load();
 
         // Load users, admin and other default functionality
         TransactionLogController.register();
@@ -183,22 +173,14 @@ public class AppContextLoader {
 
         JobStatusController.selfRegister();
 
-
-
-        //UploadedFileEndpoints.registerIfEnabled();
-
-       // EndpointsRegistry.instance().addResource("", new AssetsEndpointsResource());
-
-
         SimpleAsyncRunner.load(true);
-
 
         AsyncCoordinator.init(testMode);
 
 
         // Load plugins
         PluginRegistry.instance().bootJarPlugins();
-        PluginRegistry.instance().loadAndRunJavascriptPlugins(true);
+
 
         return _app;
     }
@@ -249,7 +231,7 @@ public class AppContextLoader {
         AssetsController.shutdown();
         TemplateRenderer.shutdown();
 
-        RoutesRegistry.shutdown();
+
 
         DataAccessRegistry.shutdown();
         SiteMapController.shutdown();
@@ -257,8 +239,6 @@ public class AppContextLoader {
 
         DB.shutdown();
 
-        HookRegistry.shutdown();
-        EndpointsRegistry.shutdown();
         SimpleAsyncRunner.shutdown();
         FilterCache.shutdown();
         HealthTracker.shutdown();
@@ -387,10 +367,6 @@ public class AppContextLoader {
     }
 
 
-    @Deprecated
-    public RequestHandler getHandler() {
-        return RequestHandler.instance();
-    }
 
     @Deprecated
     public FileSystemWatcherRunner getFileSystemWatcherRunner() {

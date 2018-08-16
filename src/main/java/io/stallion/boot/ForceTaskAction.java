@@ -17,23 +17,11 @@
 
 package io.stallion.boot;
 
-import io.stallion.Context;
 import io.stallion.asyncTasks.AsyncCoordinator;
-import io.stallion.asyncTasks.AsyncTaskController;
 import io.stallion.jobs.JobCoordinator;
-import io.stallion.plugins.PluginRegistry;
-import io.stallion.requests.RequestHandler;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
-import io.stallion.restfulEndpoints.SlugRegistry;
 import io.stallion.services.Log;
-import io.stallion.settings.Settings;
-import org.eclipse.jetty.server.Server;
-import sun.misc.Signal;
-
-import java.text.MessageFormat;
 
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class ForceTaskAction implements StallionRunAction<ForceActionOptions> {

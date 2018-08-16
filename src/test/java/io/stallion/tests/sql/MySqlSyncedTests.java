@@ -24,11 +24,10 @@ import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.dataAccess.db.SqlMigrationAction;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
-import io.stallion.testing.MockResponse;
 import io.stallion.utils.json.JSON;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -96,7 +95,7 @@ public class MySqlSyncedTests extends AppIntegrationCaseBase {
                         .setPersisterClass(DbPersister.class)
                         .setTableName("stallion_test_house")
         );
-        EndpointsRegistry.instance().addResource("/st-mysql-tests", new MySqlEndpoint());
+
     }
 
     @Test
@@ -151,6 +150,8 @@ public class MySqlSyncedTests extends AppIntegrationCaseBase {
                 .setCondemned(false)
                 .setTaxesPaid(false);
         HouseController.instance().save(house1);
+        throw new NotImplementedException("uncomment and fix");
+        /*
 
         MockResponse response = client.get("/st-mysql-tests/house/" + house1.getId());
         Log.info("House: {0}", response.getContent());
@@ -173,6 +174,7 @@ public class MySqlSyncedTests extends AppIntegrationCaseBase {
         response = client.get("/st-mysql-tests/house/" + house1.getId());
         house1result = JSON.parse(response.getContent(), House.class);
         assertEquals(1944, house1result.getBuildYear());
+        */
 
     }
 

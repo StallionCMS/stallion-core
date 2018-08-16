@@ -17,12 +17,12 @@
 
 package io.stallion.requests;
 
-import io.stallion.plugins.javascript.Sandbox;
+
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 
-import javax.servlet.http.Cookie;
 
+import javax.ws.rs.core.Cookie;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
@@ -57,6 +57,10 @@ public class SandboxedRequest implements IRequest {
         return request.getQueryString();
     }
 
+    @Override
+    public String getQueryParam(String name) {
+        return request.getQueryParam(name);
+    }
 
     @Override
     public String getRemoteAddr() {
@@ -73,33 +77,8 @@ public class SandboxedRequest implements IRequest {
         return request.getBodyObject(clazz);
     }
 
-    @Override
-    public Map<String, Object> getBodyMap() {
-        return request.getBodyMap();
-    }
 
-    @Override
-    public Object getBodyParam(String name) {
-        return request.getBodyParam(name);
-    }
 
-    @Override
-    public Map<String, String> getQueryParams() {
-        return request.getQueryParams();
-    }
-
-    @Override
-    public Cookie[] getCookies() {
-        List<Cookie> cookies = Arrays.asList(request.getCookies());
-        cookies = filter(cookies, cookie -> {
-            if (sandbox.getWhitelist().getCookies().contains(cookie.getName())) {
-                return true;
-            }
-            return false;
-        });
-        Cookie[] cookieArray = cookies.toArray(new Cookie[cookies.size()]);
-        return cookieArray;
-    }
 
     @Override
     public Cookie getCookie(String cookieName) {
@@ -114,10 +93,6 @@ public class SandboxedRequest implements IRequest {
         return request.getPath();
     }
 
-    @Override
-    public void setPath(String path) {
-
-    }
 
     @Override
     public String getHeader(String name) {
@@ -132,18 +107,9 @@ public class SandboxedRequest implements IRequest {
         return request.getHost();
     }
 
-    @Override
-    public BufferedReader getReader() throws IOException {
-        return null;
-    }
 
     @Override
-    public String getContent() {
-        return request.getContent();
-    }
-
-    @Override
-    public Enumeration<String> getHeaderNames() {
+    public Iterable<String> getHeaderNames() {
         return request.getHeaderNames();
     }
 
@@ -172,10 +138,7 @@ public class SandboxedRequest implements IRequest {
         return request.getMethod();
     }
 
-    @Override
-    public String getParameter(String paramName) {
-        return request.getParameter(paramName);
-    }
+
 
     @Override
     public Boolean getIsJsonRequest() {
@@ -184,21 +147,6 @@ public class SandboxedRequest implements IRequest {
 
     @Override
     public void setIsJsonRequest(Boolean isJsonRequest) {
-
-    }
-
-    @Override
-    public void setQuery(String query) {
-
-    }
-
-    @Override
-    public Map<String, Object> getItems() {
-        return request.getItems();
-    }
-
-    @Override
-    public void setItems(Map<String, Object> items) {
 
     }
 
@@ -212,7 +160,7 @@ public class SandboxedRequest implements IRequest {
     }
 
     @Override
-    public StRequest setScopes(Set<String> scopes) {
+    public SandboxedRequest setScopes(Set<String> scopes) {
         return null;
     }
 
@@ -222,7 +170,7 @@ public class SandboxedRequest implements IRequest {
     }
 
     @Override
-    public StRequest setScoped(boolean scoped) {
+    public SandboxedRequest setScoped(boolean scoped) {
         return null;
     }
 
@@ -235,5 +183,25 @@ public class SandboxedRequest implements IRequest {
     @Override
     public String getValetEmail() {
         return null;
+    }
+
+    @Override
+    public String getBodyString() {
+        return null;
+    }
+
+    @Override
+    public Object getProperty(String name) {
+        return null;
+    }
+
+    @Override
+    public void setProperty(String name, Object obj) {
+
+    }
+
+    @Override
+    public String getQueryParam(String name, String defaultValue) {
+        return request.getQueryParam(name);
     }
 }

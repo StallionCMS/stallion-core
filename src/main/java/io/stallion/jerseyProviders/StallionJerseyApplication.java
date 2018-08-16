@@ -17,30 +17,50 @@
 
 package io.stallion.jerseyProviders;
 
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import io.stallion.assets.AssetsEndpointsResource;
 import io.stallion.contentPublishing.ContentPublishingBooter;
-import io.stallion.contentPublishing.ContentPublishingResponseFilter;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.users.UsersApiResource;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
+import org.glassfish.jersey.test.TestProperties;
 
 
 public class StallionJerseyApplication extends ResourceConfig {
     public StallionJerseyApplication () {
 
-       // property("jersey.config.server.tracing.type", "ALL");
+
+        //property("jersey.config.server.tracing.type", "ALL");
         //property("jersey.config.server.tracing.threshold", "VERBOSE");
-        register(new LoggingFeature(io.stallion.services.Log.getLogger(), Level.FINEST, LoggingFeature.Verbosity.HEADERS_ONLY, 1000000));
+
+        //property("org.glassfish.jersey.tracing.handler", "java.util.logging.ConsoleHandler");
+        //register(new LoggingFeature());
+        {
+            //Logger logger = Logger.getLogger("io.stallion.jerseyProvier");
+            //ConsoleHandler handler = new ConsoleHandler();
+            //handler.setLevel(Level.FINEST);
+            //logger.addHandler(handler);
+            register(new LoggingFeature(
+                    io.stallion.services.Log.getLogger(),
+                    Level.FINEST,
+                    LoggingFeature.Verbosity.HEADERS_ONLY,
+                    1000000
+            ));
+        }
+
+
+
+
 
 
         register(new BodyParamProvider<>());
         register(AssetsEndpointsResource.class);
-        register(ContentPublishingResponseFilter.class);
         register(CsrfProtectionFilter.class);
         packages("io.stallion.assets");
         packages("io.stallion.jerseyProviders");

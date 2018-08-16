@@ -17,7 +17,9 @@
 
 package io.stallion.exceptions;
 
-public class JsonMappingException extends ClientException {
+import javax.ws.rs.ClientErrorException;
+
+public class JsonMappingException extends ClientErrorException {
     public JsonMappingException(String message, Throwable cause) {
         super(message, 400, cause);
     }

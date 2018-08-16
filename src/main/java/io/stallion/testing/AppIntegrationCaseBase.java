@@ -19,6 +19,7 @@ package io.stallion.testing;
 
 import io.stallion.boot.AppContextLoader;
 
+import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 
@@ -27,6 +28,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
@@ -47,13 +49,14 @@ public abstract class AppIntegrationCaseBase {
 
 
 
-    public static TestClient client;
+
 
     public static void startApp(String folderName) throws Exception {
         startApp(folderName, false);
     }
 
-    public static void startApp(String folderName, Boolean watchFolders) throws Exception {
+
+    public static void startApp(String folderName, Boolean watchFolders, StallionJavaPlugin[] ...plugins) throws Exception {
         Log.info("setUpClass client and app");
         Settings.shutdown();
         String path;
@@ -73,7 +76,7 @@ public abstract class AppIntegrationCaseBase {
         if (!empty(level)) {
             Log.setLogLevel(Level.parse(level.toUpperCase()));
         }
-        client = new TestClient(AppContextLoader.instance());
+
         Log.fine("--------------------------------------------------------------------------------------------------");
         Log.info("App booted for folder: {0} ", path);
         Log.fine("--------------------------------------------------------------------------------------------------");
@@ -138,7 +141,7 @@ public abstract class AppIntegrationCaseBase {
     public static void cleanUpClass() {
         AppContextLoader.shutdown();
         Settings.shutdown();
-        client = null;
+
         mocks = new HashMap<>();
         Stubbing.reset();
     }
@@ -157,36 +160,36 @@ public abstract class AppIntegrationCaseBase {
         assert !content.contains(unexpected);
     }
 
-    public void assertResponseDoesNotContain(MockResponse response, String content) {
+    public void assertResponseDoesNotContain(Response response, String content) {
         assertResponseDoesNotContain(response, content, 200);
     }
 
-    public void assertResponseDoesNotContain(MockResponse response, String content, int status) {
-        if (response.getContent().contains(content)) {
-            Log.warn("Unexpected string {0} found in response content!!\n{1}\n\n", content, response.getContent());
+    public void assertResponseDoesNotContain(Response response, String content, int status) {
+        if (response.getEntity().toString().contains(content)) {
+            Log.warn("Unexpected string {0} found in response content!!\n{1}\n\n", content, response.getEntity().toString());
         }
-        assert !response.getContent().contains(content);
+        assert !response.getEntity().toString().contains(content);
     }
 
-    public void assertResponseContains(MockResponse response, String content) {
+    public void assertResponseContains(Response response, String content) {
         assertResponseContains(response, content, 200);
     }
 
-    public void assertResponseSucceeded(MockResponse response) {
+    public void assertResponseSucceeded(Response response) {
         if (response.getStatus() != 200) {
-            throw new AssertionError("Response status was: " + response.getStatus() + " Content: " + response.getContent());
+            throw new AssertionError("Response status was: " + response.getStatus() + " Content: " + response.getEntity().toString());
         }
     }
 
-    public void assertResponseContains(MockResponse response, String content, int status) {
-        if (!response.getContent().contains(content)) {
-            Log.warn("String {0} not found in response content!!\n{1}\n\n", content, response.getContent());
+    public void assertResponseContains(Response response, String content, int status) {
+        if (!response.getEntity().toString().contains(content)) {
+            Log.warn("String {0} not found in response content!!\n{1}\n\n", content, response.getEntity().toString());
         }
         if (response.getStatus() != status) {
             Log.warn("Bad response status! expected={0} actual={1}", status, response.getStatus());
             assert response.getStatus() == status;
         }
-        assert response.getContent().contains(content);
+        assert response.getEntity().toString().contains(content);
     }
 
 }

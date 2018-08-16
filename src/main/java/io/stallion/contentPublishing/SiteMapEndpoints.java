@@ -17,8 +17,6 @@
 
 package io.stallion.contentPublishing;
 
-import io.stallion.restfulEndpoints.EndpointResource;
-import io.stallion.restfulEndpoints.EndpointsRegistry;
 import io.stallion.settings.SecondaryDomain;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -34,7 +32,7 @@ import static io.stallion.Context.request;
 import static io.stallion.utils.Literals.*;
 
 
-public class SiteMapEndpoints implements EndpointResource {
+public class SiteMapEndpoints  {
 
     @GET
     @Path("/sitemap.xml")
@@ -47,7 +45,7 @@ public class SiteMapEndpoints implements EndpointResource {
     }
 
     public static void registerEndpoints() {
-        EndpointsRegistry.instance().addResource("", new SiteMapEndpoints());
+
         for(SecondaryDomain sd: Settings.instance().getSecondaryDomains()) {
             SiteMapEndpoints sme = new SiteMapEndpoints();
             /*
@@ -58,7 +56,7 @@ public class SiteMapEndpoints implements EndpointResource {
                     .setMethod("GET")
                     .setRoute(sd.getRewriteRoot() + "/sitemap.xml");
              */
-            EndpointsRegistry.instance().addResource(sd.getRewriteRoot(), new SiteMapEndpoints());
+           // EndpointsRegistry.instance().addResource(sd.getRewriteRoot(), new SiteMapEndpoints());
 
         }
     }

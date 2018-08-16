@@ -18,7 +18,6 @@
 package io.stallion.tests.integration.postgresPersistence;
 
 import io.stallion.services.Log;
-import io.stallion.testing.TestClient;
 import io.stallion.utils.Encrypter;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -27,7 +26,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 
 
 public class UsersTest {
-    private static TestClient client;
+
 
 
     @BeforeClass

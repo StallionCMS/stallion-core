@@ -17,7 +17,7 @@
 
 package io.stallion.requests;
 
-import io.stallion.restfulEndpoints.RestEndpointBase;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class RouteResult {
     private Boolean preempt = false;
     private String name = "";
     private String group = "";
-    private RestEndpointBase endpoint = null;
+
     private String pageTitle = "";
     private String metaDescription = "";
 
@@ -90,14 +90,6 @@ public class RouteResult {
     }
 
 
-    public RestEndpointBase getEndpoint() {
-        return endpoint;
-    }
-
-    public RouteResult setEndpoint(RestEndpointBase endpoint) {
-        this.endpoint = endpoint;
-        return this;
-    }
 
     public String getPageTitle() {
         return pageTitle;

@@ -22,6 +22,7 @@ import java.util.Map;
 import static io.stallion.utils.Literals.*;
 
 import io.stallion.services.Log;
+import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.json.JSON;
 
@@ -33,17 +34,23 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class WebApplicationExceptionMapper extends BaseExceptionMapper<WebApplicationException> {
 
+
+
     @Override
     public Response toResponse(WebApplicationException exception) {
         if (exception.getResponse().getStatus() >= 300 && exception.getResponse().getStatus() < 400) {
             return exception.getResponse();
         }
-        if (exception.getResponse().getStatus() >= 500) {
-            Log.exception(exception, "ServerWebApplicationException in main request loop");
-        }
 
         try {
-            if (isJson()) {
+            if (exception.getResponse().getStatus() == 400) {
+                Log.exception(exception, "BadRequest exception in main request loop");
+            }
+            if (exception.getResponse().getStatus() >= 500) {
+                Log.exception(exception, "ServerWebApplicationException in main request loop");
+            }
+
+            if (isJson(exception.getResponse())) {
                 Map info = map(
                         val("succeeded", false),
                         val("status", exception.getResponse().getStatus()),

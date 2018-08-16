@@ -18,7 +18,6 @@
 package io.stallion.contentPublishing;
 
 import java.io.*;
-import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
@@ -28,22 +27,23 @@ import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.exceptions.ClientException;
 import io.stallion.exceptions.RedirectException;
-import io.stallion.exceptions.WebException;
+import io.stallion.jerseyProviders.MinRole;
+import io.stallion.jerseyProviders.XSRF;
 import io.stallion.requests.ResponseComplete;
-import io.stallion.requests.ServletFileSender;
-import io.stallion.restfulEndpoints.*;
+import io.stallion.jerseyProviders.ServletFileSender;
 import io.stallion.services.CloudStorageService;
-import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
+import io.stallion.dataAccess.filtering.QueryToPager;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 
 
 @MinRole(Role.MEMBER)
 @Produces("application/json")
 @Path("/st-user-uploads")
-public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointResource {
+public class UploadedFileEndpoints<U extends UploadedFile>  {
 
     private UploadedFileController<U> fileController;
 
@@ -54,6 +54,8 @@ public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointRe
         this.fileController = fileController;
     }
 
+    @javax.ws.rs.core.Context
+    HttpServletResponse response;
 
     @GET
     @Path("/library")
@@ -92,7 +94,7 @@ public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointRe
     @MinRole(Role.ANON)
     public Object uploadFile() {
         if (!Context.getUser().isInRole(Settings.instance().getUserUploads().getMinimumRole())) {
-            throw new ClientException("You need to be at least in the role " + Settings.instance().getUserUploads().getMinimumRole() + " in order to upload files.", 403);
+            throw new ClientErrorException("You need to be at least in the role " + Settings.instance().getUserUploads().getMinimumRole() + " in order to upload files.", 403);
         }
 
         String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
@@ -122,10 +124,10 @@ public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointRe
             throw new io.stallion.exceptions.NotFoundException("File not found.");
         }
         if (!uf.getSecret().equals(secret)) {
-            throw new ClientException("Invalid file token.");
+            throw new ClientErrorException("Invalid file token.", 400);
         }
         if (!fileController.fileViewable(Context.getUser(), uf)) {
-            throw new ClientException("You do not have permission to view this file.", 403);
+            throw new ClientErrorException("You do not have permission to view this file.", 403);
         }
 
         String url = CloudStorageService.instance().getSignedDownloadUrl(
@@ -154,10 +156,10 @@ public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointRe
             throw new io.stallion.exceptions.NotFoundException("File not found.");
         }
         if (!uf.getSecret().equals(secret)) {
-            throw new ClientException("Invalid file token.");
+            throw new ClientErrorException("Invalid file token.", 400);
         }
         if (!fileController.fileViewable(Context.getUser(), uf)) {
-            throw new ClientException("You do not have permission to view this file.", 403);
+            throw new ClientErrorException("You do not have permission to view this file.", 403);
         }
 
         String folder = Settings.instance().getDataDirectory() + "/uploaded-files/";
@@ -180,7 +182,7 @@ public class UploadedFileEndpoints<U extends UploadedFile> implements EndpointRe
     }
 
     private void sendAssetResponse(InputStream stream, long modifyTime, long contentLength, String fullPath) throws IOException {
-        new ServletFileSender(Context.getRequest(), Context.getResponse()).sendAssetResponse(stream, modifyTime, contentLength, fullPath);
+        new ServletFileSender(Context.getRequest(), response).sendAssetResponse(stream, modifyTime, contentLength, fullPath);
     }
 
 

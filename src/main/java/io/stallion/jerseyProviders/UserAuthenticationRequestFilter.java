@@ -20,7 +20,7 @@ package io.stallion.jerseyProviders;
 import java.io.IOException;
 
 import io.stallion.Context;
-import io.stallion.requests.StRequest;
+import io.stallion.requests.RequestWrapper;
 import io.stallion.settings.Settings;
 import io.stallion.users.OAuthApprovalController;
 import io.stallion.users.UserController;
@@ -38,11 +38,7 @@ import javax.ws.rs.ext.Provider;
 @PreMatching
 public class UserAuthenticationRequestFilter implements ContainerRequestFilter {
 
-    @javax.ws.rs.core.Context
-    private HttpServletRequest httpRequest;
 
-    @javax.ws.rs.core.Context
-    private HttpServletResponse httpResponse;
 
 
     @Override
@@ -50,11 +46,11 @@ public class UserAuthenticationRequestFilter implements ContainerRequestFilter {
         //containerRequestContext.getRequest();
         // Authorize via cookie?
         if (UserController.instance() != null) {
-            UserController.instance().checkCookieAndAuthorizeForRequest(new StRequest(httpRequest));
+            UserController.instance().checkCookieAndAuthorizeForRequest(new RequestWrapper(containerRequestContext));
         }
         // Authorize via an OAuth bearer token?
         if (!Context.getUser().isAuthorized() && Settings.instance().getoAuth().getEnabled()) {
-            OAuthApprovalController.instance().checkHeaderAndAuthorizeUserForRequest(new StRequest(httpRequest));
+            OAuthApprovalController.instance().checkHeaderAndAuthorizeUserForRequest(new RequestWrapper(containerRequestContext));
         }
     }
 }

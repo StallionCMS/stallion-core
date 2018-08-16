@@ -46,14 +46,6 @@ public class AssetsControllerSafeWrapper {
 
 
 
-    public String pageFooterLiterals() {
-        return assets.pageHeadLiterals();
-    }
-
-    public String pageHeadLiterals() {
-        return assets.pageHeadLiterals();
-    }
-
     public String bundle(String fileName) {
         return assets.bundle(fileName);
     }

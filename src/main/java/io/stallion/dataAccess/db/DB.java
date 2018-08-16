@@ -23,7 +23,6 @@ import io.stallion.dataAccess.*;
 import io.stallion.dataAccess.db.converters.*;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
-import io.stallion.plugins.javascript.BaseJavascriptModel;
 import io.stallion.services.Log;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.settings.Settings;
@@ -38,6 +37,7 @@ import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.jdbi.v3.core.Jdbi;
 
 
 import javax.persistence.Column;
@@ -67,6 +67,8 @@ public class DB {
     private DataSource dataSource;
     private Map<String, AttributeConverter> converters = new HashMap<String, AttributeConverter>();
     private Tickets tickets;
+
+    private Jdbi jdbi;
 
     private DbImplementation dbImplementation;
     private static boolean useDummyPersisterForSqlGenerationMode = false;
@@ -228,7 +230,7 @@ public class DB {
 
 
         this.dataSource = cpds;
-
+        this.jdbi = Jdbi.create(cpds);
 
         // Make sure the database server time is UTC and in sync with the local server time
         // or else stop execution to prevent nasty and insiduious errors.
@@ -255,6 +257,10 @@ public class DB {
 
         this.tickets = dbImplementation.initTicketsService(this);
 
+    }
+
+    public Jdbi getJdbi() {
+        return this.jdbi;
     }
 
     /**
@@ -915,19 +921,7 @@ public class DB {
 
 
     Schema getSchemaForModelClass(Class cls) {
-        if (BaseJavascriptModel.class.isAssignableFrom(cls)) {
-            String bucketName = null;
-            try {
-                bucketName = ((BaseJavascriptModel) cls.newInstance()).getBucketName();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-            return classToSchema.getOrDefault(bucketName, null);
-        } else {
-            return classToSchema.getOrDefault(cls.getCanonicalName(), null);
-        }
+        return classToSchema.getOrDefault(cls.getCanonicalName(), null);
     }
 
     public Schema modelToSchema(Class cls) {

@@ -33,10 +33,10 @@ public class DefaultExceptionMapper  extends BaseExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exception) {
-
+        Log.exception(exception, "Exception bubbled up to DefaultExceptionMapper");
         String friendlyMessage = "There was an internal server error while trying to serve your request.";
         try {
-            if (isJson()) {
+            if (isJson(null)) {
                 Map info = map(
                         val("succeeded", false),
                         val("status", 500),

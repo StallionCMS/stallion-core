@@ -28,7 +28,7 @@ import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.email.ContactableEmailer;
 import io.stallion.exceptions.ClientException;
-import io.stallion.requests.StRequest;
+import io.stallion.requests.IRequest;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -41,7 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.persistence.Column;
-import javax.servlet.http.Cookie;
+import javax.ws.rs.ClientErrorException;
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -139,11 +139,11 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     public void hydratePassword(T user, String password, String passwordConfirm) {
 
         if (empty(password) || password.length() < 6) {
-            throw new ClientException("Password is empty or too short");
+            throw new ClientErrorException("Password is empty or too short", 400);
         }
 
         if (!password.equals(passwordConfirm)) {
-            throw new ClientException("Confirmation password does not match!");
+            throw new ClientErrorException("Confirmation password does not match!", 400);
         }
 
         String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -175,8 +175,8 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
      * @param request
      * @return
      */
-    public boolean checkCookieAndAuthorizeForRequest(StRequest request) {
-        Cookie userCookie = request.getCookie(UserController.USER_COOKIE_NAME);
+    public boolean checkCookieAndAuthorizeForRequest(IRequest request) {
+        javax.ws.rs.core.Cookie userCookie = request.getCookie(UserController.USER_COOKIE_NAME);
         if (userCookie == null) {
             return false;
         }
@@ -205,7 +205,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
      * Void out the authentication cookie
      */
     public void logoff() {
-        Context.getResponse().addCookie(UserController.USER_COOKIE_NAME, "", 1);
+        Context.getRequest().addResponseCookie(UserController.USER_COOKIE_NAME, "", 1);
     }
 
     /**
@@ -230,7 +230,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             user = forUsername(email);
         }
         if (user == null) {
-            throw new ClientException("Could not find user matching email " + email);
+            throw new ClientErrorException("Could not find user matching email " + email, 400);
         }
         return valetLoginIfAllowed(user);
     }
@@ -242,25 +242,25 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
     public T valetLoginIfAllowed(T user) {
         if (!Settings.instance().getUsers().getAllowValetMode()) {
-            throw new ClientException("Valet mode not enabled for this site.");
+            throw new ClientErrorException("Valet mode not enabled for this site.", 400);
         }
         T valet = (T)Context.getUser();
         if (valet == null) {
-            throw new ClientException("You are not logged in, cannot use valet mode");
+            throw new ClientErrorException("You are not logged in, cannot use valet mode", 400);
         }
 
         Long valetId = null;
         if (!empty(Context.getValetUserId())) {
             valet = forId(Context.getValetUserId());
         } else if (!valet.isInRole(Role.ADMIN)) {
-            throw new ClientException("You must be an admin to use valet mode");
+            throw new ClientErrorException("You must be an admin to use valet mode", 400);
         }
         if (valet.getId().equals(user.getId())) {
             // Valet is switching out of valet mode, back to being their normal user
             return addSessionCookieForUser(user, true);
         }
         if (valet.getRole().getValue() <= user.getRole().getValue()) {
-            throw new ClientException("You cannot valet to a user who has the same role as you, only into a user of lesser role.");
+            throw new ClientErrorException("You cannot valet to a user who has the same role as you, only into a user of lesser role.", 400);
         }
         return addSessionCookieForUser(user, false, valet);
     }
@@ -271,16 +271,16 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     }
 
     /**
-     * Returns a user if the login information is valid, throws a ClientException exception otherwise.
+     * Returns a user if the login information is valid, throws a ClientErrorException exception otherwise.
      *
      * @param username
      * @param password
      * @return
      */
-    public T checkUserLoginValid(String username, String password) throws ClientException {
+    public T checkUserLoginValid(String username, String password) throws ClientErrorException {
         Integer failures = or((Integer)LocalMemoryCache.get(PROBLEM_LOG_CACHE_BUCKET, request().getActualIp()), 0);
         if (failures > MAX_PROBLEMS) {
-            throw new ClientException("You have too many login failures in the last 10 minutes. Please wait before trying again.", 429);
+            throw new ClientErrorException("You have too many login failures in the last 10 minutes. Please wait before trying again.", 429);
         }
 
 
@@ -288,16 +288,16 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         String err = "User not found or password invalid";
         if (user == null) {
             markFailed(username);
-            throw new ClientException(err, 403);
+            throw new ClientErrorException(err, 403);
         }
 
         failures = or((Integer)LocalMemoryCache.get(PROBLEM_LOG_CACHE_BUCKET, username), 0);
         if (failures > (MAX_PROBLEMS + 5)) { // We are more tolerant of user name failures, else easy to lock someone else out of account
-            throw new ClientException("You have too many login failures in the last 10 minutes. Please wait before trying again.", 429);
+            throw new ClientErrorException("You have too many login failures in the last 10 minutes. Please wait before trying again.", 429);
         }
 
         if (empty(user.getBcryptedPassword())) {
-            throw new ClientException("Password never confiruged for this user. Did you originally login with Google or Facebook? Otherwise, click on the password reset link to choose a new password.");
+            throw new ClientErrorException("Password never confiruged for this user. Did you originally login with Google or Facebook? Otherwise, click on the password reset link to choose a new password.", 400);
         }
 
         boolean valid = BCrypt.checkpw(password, user.getBcryptedPassword());
@@ -306,7 +306,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
         if (!valid) {
             markFailed(username);
-            throw new ClientException(err, 403);
+            throw new ClientErrorException(err, 403);
         }
         return user;
     }
@@ -353,9 +353,9 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
         String cookie = userToCookieString(user, rememberMe, valetUserId);
         int expires = (int)((mils() + (86400*30*1000))/1000);
         if (rememberMe) {
-            Context.getResponse().addCookie(UserController.USER_COOKIE_NAME, cookie, expires);
+            Context.getRequest().addResponseCookie(UserController.USER_COOKIE_NAME, cookie, expires);
         } else {
-            Context.getResponse().addCookie(UserController.USER_COOKIE_NAME, cookie);
+            Context.getRequest().addResponseCookie(UserController.USER_COOKIE_NAME, cookie);
         }
         return user;
     }
@@ -423,7 +423,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             return false;
         }
         if (user.isPredefined()) {
-            throw new ClientException("You cannot verify email for a builtin user. You must edit this user in your configuration files.");
+            throw new ClientErrorException("You cannot verify email for a builtin user. You must edit this user in your configuration files.", 400);
         }
         // send email
         String token = makeVerifyEmailToken(user);
@@ -495,7 +495,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
     public void markEmailVerified(T user, String token) {
         if (!verifyEmailVerifyToken(user, token)) {
-            throw new ClientException("Invalid verification token");
+            throw new ClientErrorException("Invalid verification token", 400);
         }
         user.setEmailVerified(true);
         user.setResetToken("");
@@ -524,7 +524,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             return false;
         }
         if (user.isPredefined()) {
-            throw new ClientException("You cannot reset the password for a builtin user. You must edit this user in your configuration files.");
+            throw new ClientErrorException("You cannot reset the password for a builtin user. You must edit this user in your configuration files.", 400);
         }
         if (empty(user.getResetToken())) {
             user.setResetToken(GeneralUtils.randomToken(14));
@@ -564,7 +564,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
     public T changePassword(T user, String token, String newPassword, String confirmNewPassword) {
         if (!verifyPasswordResetToken(user, token)) {
-            throw new ClientException("Invalid reset token");
+            throw new ClientErrorException("Invalid reset token", 400);
         }
         hydratePassword(user, newPassword, confirmNewPassword);
         user.setResetToken("");

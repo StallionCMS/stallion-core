@@ -17,14 +17,14 @@
 
 package io.stallion.tests.integration.postgresPersistence;
 
-import io.stallion.testing.TestClient;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class DbSiteTest {
-    private static TestClient client;
+
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -48,6 +48,7 @@ public class DbSiteTest {
 
     @Test
     public void testCrud() throws Exception {
+        throw new NotImplementedException("uncomment and fix");
         /*
         Wizbong wizbo = new Wizbong();
         String name = "Wz" + new DateTime().getMillis();

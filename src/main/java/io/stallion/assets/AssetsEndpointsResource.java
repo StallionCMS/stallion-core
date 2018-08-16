@@ -17,24 +17,20 @@
 
 package io.stallion.assets;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 
 import io.stallion.Context;
+import io.stallion.requests.RequestWrapper;
 import io.stallion.requests.ResponseComplete;
-import io.stallion.restfulEndpoints.BodyParam;
-import io.stallion.restfulEndpoints.EndpointResource;
+import io.stallion.jerseyProviders.BodyParam;
 import io.stallion.services.Log;
-import io.stallion.users.User;
-import org.glassfish.jersey.internal.inject.CustomAnnotationLiteral;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
@@ -45,14 +41,13 @@ public class AssetsEndpointsResource  {
     @javax.ws.rs.core.Context
     private UriInfo info;
 
-    @javax.ws.rs.core.Context
-    private HttpServletRequest servletRequest;
+
 
     @javax.ws.rs.core.Context
-    private HttpServletResponse servletResponse;
+    private Request requestContext;
 
     @javax.ws.rs.core.Context
-    private ServletContext servletContext;
+    private HttpServletResponse response;
 
     @Path("/st-inject")
     @POST
@@ -76,20 +71,24 @@ public class AssetsEndpointsResource  {
 
     @Path("/st-assets/{path:.*}")
     @GET
-    public Object stAssets(
+    public Response stAssets(
             @PathParam("path") String path,
             @QueryParam("isConcatenatedFileBundle") boolean isConcatenatedFileBundle,
             @QueryParam("isBundleFile") boolean isBundleFile
     ) throws Exception {
-        AssetServing assetServing = new AssetServing(Context.getRequest(), Context.getResponse());
+        // TODO: Clean up this requests mess
+        RequestWrapper request = new RequestWrapper((ContainerRequest)requestContext);
+        //request.setPath("/st-assets/" + path);
+        AssetServing assetServing = new AssetServing(request, response);
         if (isConcatenatedFileBundle) {
-            assetServing.serveFileBundle();
+            return assetServing.serveFileBundle();
         } else if (isBundleFile) {
-            assetServing.serveFileBundleAsset();
+            return assetServing.serveFileBundleAsset();
         } else {
-            assetServing.serveFolderAsset(Context.getRequest().getPath().substring(11));
+            //String path2 = (((ContainerRequest) requestContext).getUriInfo()).getPath().substring(11);
+            //assetServing.serveFolderAsset(path);
+            return assetServing.serveFolderAssetToResponse(path);
         }
-        throw new ResponseComplete();
     }
 
     @Path("/hello")
@@ -106,11 +105,10 @@ public class AssetsEndpointsResource  {
             @QueryParam("isFullResourceBundle") boolean isFullResourceBundle
     ) throws Exception {
         if (isFullResourceBundle) {
-            new AssetServing(Context.getRequest(), Context.getResponse()).serveResourceBundle();
+            return new AssetServing(Context.getRequest(), response).serveResourceBundle();
         } else {
-            new AssetServing(Context.getRequest(), Context.getResponse()).serveResourceAsset();
+            return new AssetServing(Context.getRequest(), response).serveResourceAsset();
         }
-        throw new ResponseComplete();
     }
     /*
     public void tryRouteAssetRequest() throws Exception{

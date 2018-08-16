@@ -27,7 +27,8 @@ import io.stallion.requests.JobRequest;
 import io.stallion.requests.TaskRequest;
 import io.stallion.utils.DateUtils;
 
-import javax.servlet.http.Cookie;
+
+import javax.ws.rs.core.Cookie;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -119,14 +120,14 @@ public class DbPersister<T extends Model> extends BasePersister<T> {
     public void onPreRead() {
         Long now = mils();
         // Check to see if we have read this bucket yet, for this request
-        if (Context.getRequest() == null || Context.getRequest().getItems() == null) {
+        if (Context.getRequest() == null) {
             return;
         }
-        Boolean bucketSynced = (Boolean)Context.getRequest().getItems().get(getBucketSyncedKey());
+        Boolean bucketSynced = (Boolean)Context.getRequest().getProperty(getBucketSyncedKey());
         if (bucketSynced != null && bucketSynced) {
             return;
         }
-        Context.getRequest().getItems().put(getBucketSyncedKey(), true);
+        Context.getRequest().setProperty(getBucketSyncedKey(), true);
         if (!checkNeedsSync()) {
             return;
         }

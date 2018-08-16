@@ -17,31 +17,47 @@
 
 package io.stallion.jerseyProviders;
 
+import io.stallion.Context;
+import io.stallion.requests.IRequest;
+import io.stallion.requests.RequestWrapper;
+import org.glassfish.jersey.server.ContainerRequest;
+
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 
 public abstract class BaseExceptionMapper<T extends Throwable>  implements ExceptionMapper<T> {
 
-    @javax.ws.rs.core.Context
-    protected HttpServletRequest httpRequest;
-
-    @javax.ws.rs.core.Context
-    protected HttpServletResponse httpResponse;
 
 
-    protected boolean isJson() {
-        if ("text/html".equals(httpResponse.getHeader("Content-type"))) {
-            return false;
+
+    protected boolean isJson(@Nullable  Response response) {
+        IRequest request = Context.getRequest();
+
+        if (response != null) {
+            if ("text/html".equals(response.getHeaderString("Content-type"))) {
+                return false;
+            }
+            if ("application/json".equals(response.getHeaderString("Content-type"))) {
+                return true;
+            }
+        }
+        if (request != null) {
+
+            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                return true;
+            }
+
+            Boolean guessIsJson = (Boolean) request.getProperty(ProducesDetectionRequestFilter.GUESS_IS_JSON_PROPERTY_NAME);
+            if (guessIsJson != null && guessIsJson) {
+                return true;
+            }
         }
 
-        if ("XMLHttpRequest".equals(httpRequest.getHeader("X-Requested-With"))) {
-            return true;
-        }
-        if ("application/json".equals(httpResponse.getHeader("Content-type"))) {
-            return true;
-        }
         return false;
     }
 }

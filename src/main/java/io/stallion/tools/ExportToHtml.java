@@ -20,16 +20,15 @@ package io.stallion.tools;
 import io.stallion.boot.AppContextLoader;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.boot.ServeCommandOptions;
-import io.stallion.requests.RequestHandler;
 import io.stallion.contentPublishing.SiteMapController;
 import io.stallion.contentPublishing.SiteMapItem;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.testing.MockRequest;
-import io.stallion.testing.MockResponse;
 import io.stallion.utils.DateUtils;
 import jodd.jerry.Jerry;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -67,6 +66,8 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
 
     @Override
     public void execute(ServeCommandOptions options) throws Exception {
+        throw new NotImplementedException("Need to implement mock request exporting");
+        /*
         Log.info("EXECUTE EXPORT ACTION!!");
         String exportFolder = Settings.instance().getTargetFolder() + "/export-" + DateUtils.formatNow("yyyy-MM-dd-HH-mm-ss");
         File export = new File(exportFolder);
@@ -98,7 +99,8 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
             Log.info("Export page {0}", path);
             MockRequest request = new MockRequest(path, "GET");
             MockResponse response = new MockResponse();
-            RequestHandler.instance().handleStallionRequest(request, response);
+
+            //RequestHandler.instance().handleStallionRequest(request, response);
             response.getContent();
 
             if (!path.contains(".")) {
@@ -123,7 +125,7 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
 
             MockRequest request = new MockRequest(src, "GET");
             MockResponse response = new MockResponse();
-            RequestHandler.instance().handleStallionRequest(request, response);
+            //RequestHandler.instance().handleStallionRequest(request, response);
             int min = 300;
             if (response.getContent().length() < 300) {
                 min = response.getContent().length();
@@ -144,7 +146,7 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
                 //FileUtils.writeByteArrayToFile(file, response.getContent().getBytes());
             }
         }
-
+*/
     }
 
     public Set<String> findAssetsInHtml(String html) {

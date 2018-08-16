@@ -19,11 +19,11 @@ package io.stallion.users;
 
 import io.stallion.exceptions.ClientException;
 import io.stallion.exceptions.RedirectException;
-import io.stallion.restfulEndpoints.BodyParam;
-import io.stallion.restfulEndpoints.MinRole;
+import io.stallion.jerseyProviders.BodyParam;
+import io.stallion.jerseyProviders.MinRole;
+import io.stallion.requests.ParamExtractor;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
-import io.stallion.requests.validators.ParamExtractor;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.*;
@@ -85,7 +85,7 @@ public class OAuthEndpoints {
         } else {
             scopes = set(or(scopesString, "").split(","));
         }
-        String providedCode = request().getBodyMap().getOrDefault("providedCode", "").toString();
+        String providedCode = request().getQueryParam("providedCode", "").toString();
         OAuthApproval approval = OAuthApprovalController.instance().checkGrantApprovalForUser(GrantType.CODE, getUser(), fullClientId, scopes, scoped, redirectUri, providedCode);
         if (!redirectUri.contains("?")) {
             redirectUri += "?";
@@ -175,11 +175,15 @@ public class OAuthEndpoints {
             case "password":
                 return passwordGrantToken();
             default:
-                throw new ClientException("Could not understand grant_type: " + grantType);
+                throw new ClientErrorException("Could not understand grant_type: " + grantType, 400);
         }
     }
 
     public Object authorizationCodeGrantToken() {
+
+        // TODO: fix me
+
+        /*
         ParamExtractor<String> params =
                 new ParamExtractor(request().getBodyMap(),
                 "Required post body parameter {0} was not found.");
@@ -189,27 +193,27 @@ public class OAuthEndpoints {
         String clientSecret = params.get("client_secret");
         OAuthClient client = OAuthClientController.instance().clientForFullId(fullClientId);
         if (emptyInstance(client)) {
-            throw new ClientException("Client not found with id :'" + fullClientId + "'");
+            throw new ClientErrorException("Client not found with id :'" + fullClientId + "'");
         }
         if (client.hasGrantType(GrantType.CODE)) {
-            throw new ClientException("Client cannot use password login.");
+            throw new ClientErrorException("Client cannot use password login.");
         }
         if (client.isRequiresSecret() && !clientSecret.equals(client.getClientSecret())) {
-            throw new ClientException("The client secret was not valid");
+            throw new ClientErrorException("The client secret was not valid");
         }
         if (!client.getAllowedRedirectUris().contains(redirectUri)) {
-            throw new ClientException("The URI '" + redirectUri + "' was not on the allowed list.");
+            throw new ClientErrorException("The URI '" + redirectUri + "' was not on the allowed list.");
         }
         OAuthApproval token = OAuthApprovalController.instance().forUniqueKey("code", code);
         if (emptyInstance(token)) {
-            throw new ClientException("No valid token found for code: '" + code + "'");
+            throw new ClientErrorException("No valid token found for code: '" + code + "'");
         }
         if (token.isVerified()) {
-            throw new ClientException("Code has already been used: '" + code + "'");
+            throw new ClientErrorException("Code has already been used: '" + code + "'");
         }
         // Tokens expire in 15 minutes if they are not verified
         if ((token.getCreatedAt() + (15 * 60 * 1000)) < mils() ) {
-            throw new ClientException("Code was not verified within fifteen minutes: '" + code + "'");
+            throw new ClientErrorException("Code was not verified within fifteen minutes: '" + code + "'");
         }
         token.setVerified(true);
         token.setCode(UUID.randomUUID().toString());
@@ -219,11 +223,13 @@ public class OAuthEndpoints {
                 val("access_token", token.getAccessToken()),
                 val("refresh_token", token.getRefreshToken())
         );
-
-
+*/
+        return null;
     }
 
     public Object passwordGrantToken() {
+        //TODO: fix me
+        /*
         ParamExtractor<String> params =
                 new ParamExtractor(request().getBodyMap(),
                         "Required post body paramater {0} was not found.");
@@ -232,10 +238,10 @@ public class OAuthEndpoints {
         String clientId = params.get("clientId");
         OAuthClient client = OAuthClientController.instance().forUniqueKey("clientKey", clientId);
         if (emptyInstance(client)) {
-            throw new ClientException("Client not found with id :'" + clientId + "'");
+            throw new ClientErrorException("Client not found with id :'" + clientId + "'");
         }
         if (client.hasGrantType(GrantType.PASSWORD)) {
-            throw new ClientException("Client cannot use password login.");
+            throw new ClientErrorException("Client cannot use password login.");
         }
         Set<String> scopes;
         boolean scoped = true;
@@ -249,6 +255,8 @@ public class OAuthEndpoints {
         IUser user = UserController.instance().checkUserLoginValid(username, password);
         OAuthApproval token = OAuthApprovalController.instance().generateNewApprovalForUser(user, client, scopes, scoped, "");
         return map(val("access_token", token.getAccessToken()));
+         */
+        return null;
     }
 
 

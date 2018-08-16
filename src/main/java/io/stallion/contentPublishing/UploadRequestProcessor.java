@@ -44,6 +44,7 @@ import org.parboiled.common.FileUtils;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.Part;
+import javax.ws.rs.ClientErrorException;
 
 
 public class UploadRequestProcessor<U extends UploadedFile> {
@@ -105,7 +106,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
     }
 
     protected U doUpload() throws IOException {
-        U uploaded = newUploadedFileInstance("true".equals(stRequest.getQueryParams().getOrDefault("stUploadIsPublic", "")));
+        U uploaded = newUploadedFileInstance("true".equals(stRequest.getQueryParam("stUploadIsPublic", "")));
         File file = writeMultiPartToLocalFile(uploaded);
         if ("image".equals(uploaded.getType()) && Settings.instance().getUserUploads().getGenerateImageThumbnails() == true) {
             generateImageSizes(uploaded, file.getAbsolutePath());
@@ -160,7 +161,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
                     org.apache.commons.io.FileUtils.openOutputStream(outFile)
             );
         } catch (UnirestException e) {
-            throw new ClientException("Error downloading file from " + url + ": " + e.getMessage(), 400, e);
+            throw new ClientErrorException("Error downloading file from " + url + ": " + e.getMessage(), 400, e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -189,7 +190,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
     protected File writeMultiPartToLocalFile(U uploaded) throws IOException {
         stRequest.setAsMultiPartRequest();
 
-        final String path = stRequest.getParameter("destination");
+        final String path = stRequest.getQueryParam("destination");
         final Part filePart = stRequest.getPart("file");
         String fullFileName = getFileNameFromPart(filePart);
         String extension = FilenameUtils.getExtension(fullFileName);
@@ -230,7 +231,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
             while ((read = filecontent.read(bytes)) != -1) {
                 amountRead += read;
                 if (amountRead > maxSize) {
-                    throw new ClientException("Uploaded file exceeded max size of " + maxSize + " bytes.");
+                    throw new ClientErrorException("Uploaded file exceeded max size of " + maxSize + " bytes.", 400);
                 }
                 out.write(bytes, 0, read);
             }
@@ -329,7 +330,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
             File originalImageFile = new File(path);
             BufferedImage image = ImageIO.read(originalImageFile);
             if (image == null) {
-                throw new ClientException("Could not interpret uploaded file as a valid image file.");
+                throw new ClientErrorException("Could not interpret uploaded file as a valid image file.", 400);
             }
             hydrateHeightAndWidth(uploaded, image);
             if (uploaded.getWidth() > 60) {
