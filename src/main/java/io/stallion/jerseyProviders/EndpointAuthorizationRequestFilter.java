@@ -28,6 +28,7 @@ import io.stallion.requests.RequestWrapper;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 import org.glassfish.jersey.server.ExtendedUriInfo;
+import org.glassfish.jersey.server.model.MethodList;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-@Priority(2000)
+@Priority(FilterPriorities.ENDPOINT_AUTHORIZATION_FILTER)
 public class EndpointAuthorizationRequestFilter  implements ContainerRequestFilter {
 
     @javax.ws.rs.core.Context

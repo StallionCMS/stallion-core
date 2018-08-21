@@ -31,7 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-@Priority(1500)
+@Priority(FilterPriorities.CORS_REQUEST_FILTER)
 public class CorsRequestFilter   implements ContainerRequestFilter {
 
     @Context

@@ -24,15 +24,18 @@ import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.CorsSettings;
 import org.apache.commons.io.FilenameUtils;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.ext.Provider;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import static io.stallion.utils.Literals.*;
 
-
+@Priority(FilterPriorities.CORS_RESPONSE_HANDLER)
+@Provider
 public class CorsResponseHandler {
 
     public void handleIfNecessary(IRequest request, HttpServletResponse response) {

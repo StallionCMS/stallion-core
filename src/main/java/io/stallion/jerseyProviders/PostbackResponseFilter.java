@@ -34,7 +34,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-@Priority(400)
+@Priority(FilterPriorities.POSTBACK_RESPONSE_FILTER)
 @PreMatching
 public class PostbackResponseFilter implements ContainerResponseFilter {
 

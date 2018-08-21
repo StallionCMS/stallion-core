@@ -35,7 +35,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-@Priority(500)
+@Priority(FilterPriorities.POPULATE_CONTEXT_REQUEST_FILTER)
 @PreMatching
 public class PopulateContextRequestFilter implements ContainerRequestFilter {
 

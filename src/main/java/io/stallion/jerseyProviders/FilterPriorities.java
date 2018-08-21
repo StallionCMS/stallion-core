@@ -32,6 +32,7 @@ public class FilterPriorities {
     public final static int POPULATE_CONTEXT_REQUEST_FILTER = 200;
     public final static int INTERNAL_REWRITE_REQUEST_FILTER = 600;
     public final static int CORS_REQUEST_FILTER = 800;
+    public final static int PRODUCES_DETECTION_FILTER = 900;
     public final static int USER_AUTHENTICATION_FILTER = 1000;
     public final static int ENDPOINT_AUTHORIZATION_FILTER = 2000;
 

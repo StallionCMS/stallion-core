@@ -33,7 +33,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-@Priority(1900)
+@Priority(FilterPriorities.PRODUCES_DETECTION_FILTER)
 public class ProducesDetectionRequestFilter  implements ContainerRequestFilter {
 
     public static final String PRODUCES_PROPERTY_NAME = "_ENDPOINT_PRODUCES_GUESS";

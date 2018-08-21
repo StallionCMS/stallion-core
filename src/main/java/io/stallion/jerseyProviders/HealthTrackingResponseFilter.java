@@ -29,13 +29,14 @@ import io.stallion.requests.RequestWrapper;
 
 import io.stallion.services.Log;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 
-
+@Priority(FilterPriorities.HEALTH_TRACKING_RESPONSE_FILTER)
 public class HealthTrackingResponseFilter implements ContainerResponseFilter {
 
 

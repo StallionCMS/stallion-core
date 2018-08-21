@@ -24,6 +24,7 @@ import static io.stallion.utils.Literals.*;
 import io.stallion.Context;
 import io.stallion.settings.Settings;
 
+import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -31,6 +32,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
+@Priority(FilterPriorities.XFRAME_OPTIONS_RESPONSE_FILTER)
 public class XFrameOptionsResponseFilter implements ContainerResponseFilter {
 
     @Override

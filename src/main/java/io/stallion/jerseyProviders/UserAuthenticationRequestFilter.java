@@ -34,7 +34,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-@Priority(1000)
+@Priority(FilterPriorities.USER_AUTHENTICATION_FILTER)
 @PreMatching
 public class UserAuthenticationRequestFilter implements ContainerRequestFilter {
 

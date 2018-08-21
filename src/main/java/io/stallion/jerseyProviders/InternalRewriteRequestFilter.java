@@ -40,7 +40,7 @@ import javax.ws.rs.ext.Provider;
 import static io.stallion.utils.Literals.empty;
 
 
-@Priority(700)
+@Priority(FilterPriorities.INTERNAL_REWRITE_REQUEST_FILTER)
 @PreMatching
 @Provider
 public class InternalRewriteRequestFilter  implements ContainerRequestFilter {
