@@ -27,7 +27,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.UUID;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.mils;
+import static io.stallion.utils.Literals.or;
 
 
 public class AsyncTaskDbPersister extends DbPersister<AsyncTask> implements AsyncTaskPersister {

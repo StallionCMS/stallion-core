@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 /**
  * A helper class for building interactive, command-line prompts.

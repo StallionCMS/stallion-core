@@ -17,8 +17,8 @@
 
 package io.stallion.utils;
 
-import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
 
 public class StallionClassLoader {
 

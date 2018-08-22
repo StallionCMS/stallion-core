@@ -17,14 +17,15 @@
 
 package io.stallion.dataAccess.db.converters;
 
+import com.fasterxml.jackson.databind.JavaType;
+import io.stallion.utils.json.JSON;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.stallion.utils.Literals.*;
-
-import com.fasterxml.jackson.databind.JavaType;
-import io.stallion.utils.json.JSON;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 public class JsonTypedListConverter extends TypedCollectionAttributeConverter<List, String> {

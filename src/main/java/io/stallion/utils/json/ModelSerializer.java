@@ -22,9 +22,6 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.ser.BeanSerializerBuilder;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 class ModelSerializer extends BeanSerializer {
     public ModelSerializer(JavaType type, BeanSerializerBuilder builder, BeanPropertyWriter[] properties, BeanPropertyWriter[] filteredProperties) {

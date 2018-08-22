@@ -22,7 +22,7 @@ import io.stallion.settings.SettingMeta;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 public class UserSettings implements SettingsSection {
     @SettingMeta(val = "/st-users/login")

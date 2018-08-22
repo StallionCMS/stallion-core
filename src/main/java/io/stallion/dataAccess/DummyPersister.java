@@ -21,7 +21,7 @@ import io.stallion.dataAccess.filtering.FilterChain;
 
 import java.util.List;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.list;
 
 /**
  * A persister that does absolutely nothing. Used for testing.

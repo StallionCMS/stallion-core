@@ -18,8 +18,8 @@
 package io.stallion.dataAccess.db;
 
 import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.StallionRunAction;
 import io.stallion.boot.SqlMigrateCommandOptions;
+import io.stallion.boot.StallionRunAction;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
@@ -38,8 +38,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.stallion.Context.settings;
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 /**
  * Runs all unexecuted database migrations.

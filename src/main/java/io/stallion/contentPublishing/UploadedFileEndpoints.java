@@ -17,27 +17,25 @@
 
 package io.stallion.contentPublishing;
 
-import java.io.*;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.Context;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
-import io.stallion.exceptions.ClientException;
-import io.stallion.exceptions.RedirectException;
+import io.stallion.dataAccess.filtering.QueryToPager;
 import io.stallion.jerseyProviders.MinRole;
+import io.stallion.jerseyProviders.ServletFileSender;
 import io.stallion.jerseyProviders.XSRF;
 import io.stallion.requests.ResponseComplete;
-import io.stallion.jerseyProviders.ServletFileSender;
 import io.stallion.services.CloudStorageService;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
-import io.stallion.dataAccess.filtering.QueryToPager;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import java.io.*;
+import java.net.URI;
+import java.util.Map;
+
+import static io.stallion.utils.Literals.*;
 
 
 @MinRole(Role.MEMBER)
@@ -121,7 +119,7 @@ public class UploadedFileEndpoints<U extends UploadedFile>  {
             cloudKey = uf.getCloudKey();
         }
         if (empty(cloudKey)) {
-            throw new io.stallion.exceptions.NotFoundException("File not found.");
+            throw new NotFoundException("File not found.");
         }
         if (!uf.getSecret().equals(secret)) {
             throw new ClientErrorException("Invalid file token.", 400);
@@ -134,7 +132,7 @@ public class UploadedFileEndpoints<U extends UploadedFile>  {
                 Settings.instance().getUserUploads().getUploadsBucket(),
                 uf.getCloudKey()
                 );
-        throw new RedirectException(url, 302);
+        throw new RedirectionException(302, URI.create(url));
     }
 
     @GET
@@ -153,7 +151,7 @@ public class UploadedFileEndpoints<U extends UploadedFile>  {
             cloudKey = uf.getCloudKey();
         }
         if (empty(cloudKey)) {
-            throw new io.stallion.exceptions.NotFoundException("File not found.");
+            throw new NotFoundException("File not found.");
         }
         if (!uf.getSecret().equals(secret)) {
             throw new ClientErrorException("Invalid file token.", 400);

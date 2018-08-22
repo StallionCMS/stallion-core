@@ -17,27 +17,23 @@
 
 package io.stallion.jerseyProviders;
 
+import io.stallion.services.Log;
+import io.stallion.utils.GeneralUtils;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.services.Log;
-import io.stallion.utils.GeneralUtils;
-
-import javax.servlet.ServletOutputStream;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import static io.stallion.utils.Literals.UTC;
+import static io.stallion.utils.Literals.empty;
 
 
 public class LocalFileToResponse {

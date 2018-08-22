@@ -22,7 +22,6 @@ import io.stallion.dataAccess.AlternativeKey;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.UniqueKey;
 import io.stallion.dataAccess.db.DefaultSort;
-import io.stallion.dataAccess.db.ExtraKeyDefinitions;
 import io.stallion.dataAccess.file.ModelWithFilePath;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.RestrictedViews;

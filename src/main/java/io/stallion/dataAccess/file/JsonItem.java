@@ -17,7 +17,6 @@
 
 package io.stallion.dataAccess.file;
 
-import io.stallion.dataAccess.MappedModel;
 import io.stallion.dataAccess.MappedModelBase;
 
 

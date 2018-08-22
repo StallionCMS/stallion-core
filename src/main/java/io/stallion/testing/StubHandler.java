@@ -17,9 +17,6 @@
 
 package io.stallion.testing;
 
-import static io.stallion.utils.Literals.*;
-
-
 public interface StubHandler {
     public Object execute(Object ...params) throws Exception;
 }

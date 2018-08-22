@@ -17,18 +17,12 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-
 import io.stallion.Context;
-import io.stallion.exceptions.ClientException;
 import io.stallion.requests.IRequest;
 import io.stallion.requests.RequestWrapper;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 import org.glassfish.jersey.server.ExtendedUriInfo;
-import org.glassfish.jersey.server.model.MethodList;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +32,9 @@ import javax.ws.rs.RedirectionException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
 
 @Provider
 @Priority(FilterPriorities.ENDPOINT_AUTHORIZATION_FILTER)

@@ -17,16 +17,19 @@
 
 package io.stallion.dataAccess.filtering;
 
-import java.util.*;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.requests.IRequest;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import static io.stallion.utils.Literals.*;
 
 
 public class QueryToPager<T extends Model> {

@@ -17,9 +17,5 @@
 
 package io.stallion.requests;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 public class ResponseComplete extends RuntimeException {
 }

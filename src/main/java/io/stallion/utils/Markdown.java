@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.safeLoop;
 
 /**
  * Default markdown processor for most stallion uses.

@@ -39,9 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.apply;
-import static io.stallion.utils.Literals.asArray;
-import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.*;
 
 /**
  * A filter chain that generates a MySQL query, rather than operating on

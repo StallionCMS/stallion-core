@@ -17,7 +17,6 @@
 
 package io.stallion.plugins;
 
-import io.stallion.Context;
 import io.stallion.services.Log;
 import io.stallion.settings.ISettings;
 import io.stallion.settings.SettingsLoader;

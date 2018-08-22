@@ -21,7 +21,7 @@ import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.services.Log;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 
 public class ForceTaskAction implements StallionRunAction<ForceActionOptions> {

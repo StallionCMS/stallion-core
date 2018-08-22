@@ -17,16 +17,12 @@
 
 package io.stallion.testing;
 
-import io.stallion.monitoring.ExceptionEmailRunnable;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 

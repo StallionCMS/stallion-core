@@ -25,8 +25,8 @@ import io.stallion.settings.Settings;
 import io.stallion.utils.Encrypter;
 import io.stallion.utils.GeneralUtils;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.Context.settings;
+import static io.stallion.utils.Literals.mils;
 
 
 public class SimpleFormTag implements Tag {

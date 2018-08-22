@@ -18,17 +18,14 @@
 package io.stallion.testing;
 
 import io.stallion.boot.AppContextLoader;
-
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
@@ -160,36 +157,5 @@ public abstract class AppIntegrationCaseBase {
         assert !content.contains(unexpected);
     }
 
-    public void assertResponseDoesNotContain(Response response, String content) {
-        assertResponseDoesNotContain(response, content, 200);
-    }
-
-    public void assertResponseDoesNotContain(Response response, String content, int status) {
-        if (response.getEntity().toString().contains(content)) {
-            Log.warn("Unexpected string {0} found in response content!!\n{1}\n\n", content, response.getEntity().toString());
-        }
-        assert !response.getEntity().toString().contains(content);
-    }
-
-    public void assertResponseContains(Response response, String content) {
-        assertResponseContains(response, content, 200);
-    }
-
-    public void assertResponseSucceeded(Response response) {
-        if (response.getStatus() != 200) {
-            throw new AssertionError("Response status was: " + response.getStatus() + " Content: " + response.getEntity().toString());
-        }
-    }
-
-    public void assertResponseContains(Response response, String content, int status) {
-        if (!response.getEntity().toString().contains(content)) {
-            Log.warn("String {0} not found in response content!!\n{1}\n\n", content, response.getEntity().toString());
-        }
-        if (response.getStatus() != status) {
-            Log.warn("Bad response status! expected={0} actual={1}", status, response.getStatus());
-            assert response.getStatus() == status;
-        }
-        assert response.getEntity().toString().contains(content);
-    }
 
 }

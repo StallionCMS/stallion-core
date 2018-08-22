@@ -20,14 +20,13 @@ package io.stallion.services;
 import io.stallion.Context;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.map;
 
 /**
  * A service that stores values semi-permanently both in the local file system

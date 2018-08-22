@@ -19,8 +19,8 @@ package io.stallion.slowTests;
 
 import io.stallion.Context;
 import io.stallion.asyncTasks.AsyncTaskHandlerBase;
-import io.stallion.exceptions.AppException;
 
+import javax.ws.rs.ServerErrorException;
 import java.io.File;
 
 public class LockAndErrorCheckingTaskHandler extends AsyncTaskHandlerBase {
@@ -34,6 +34,6 @@ public class LockAndErrorCheckingTaskHandler extends AsyncTaskHandlerBase {
         if (new File(lockedFilePath).exists()) {
             lockFileFound = true;
         }
-        throw new AppException(String.format("Intentionally fail to process task=%s", getTask().getId()));
+        throw new ServerErrorException(String.format("Intentionally fail to process task=%s", getTask().getId()), 500);
     }
 }

@@ -17,11 +17,10 @@
 
 package io.stallion.dataAccess.filtering;
 
-import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.LocalMemoryStash;
+import io.stallion.dataAccess.Model;
 import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.ModelPropertyComparator;
-import io.stallion.reflection.PropertyComparator;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
@@ -29,16 +28,12 @@ import io.stallion.utils.Literals;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
-
-import javax.persistence.Column;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
 
 import static io.stallion.utils.Literals.asArray;
-import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.list;
 
 /**

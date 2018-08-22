@@ -23,7 +23,6 @@ import io.stallion.dataAccess.UniqueKey;
 import io.stallion.dataAccess.db.Converter;
 
 import javax.persistence.Column;
-
 import java.util.HashSet;
 import java.util.Set;
 

@@ -17,25 +17,20 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.exceptions.ClientException;
 import io.stallion.requests.IRequest;
 import io.stallion.requests.RequestWrapper;
 import org.glassfish.jersey.server.ExtendedUriInfo;
 
-
-import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Cookie;
+import java.io.IOException;
+import java.util.UUID;
+
+import static io.stallion.utils.Literals.empty;
 
 //@Provider
 public class XsrfRequestFilter implements ContainerRequestFilter {

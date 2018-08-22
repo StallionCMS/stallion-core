@@ -18,16 +18,17 @@
 package io.stallion.asyncTasks;
 
 import io.stallion.Context;
-import io.stallion.exceptions.AppException;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.ws.rs.ServerErrorException;
 import java.util.HashSet;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 
 public class AsyncFileCoordinator extends AsyncCoordinator {
@@ -54,7 +55,7 @@ public class AsyncFileCoordinator extends AsyncCoordinator {
     @Override
     public void enqueue(AsyncTask task) {
         if (StringUtils.isEmpty(task.getHandlerName())) {
-            throw new AppException("A task was enqueued, but getHandlerName() was blank");
+            throw new ServerErrorException("A task was enqueued, but getHandlerName() was blank", 500);
         }
 
         //TODO: If the task handler is not registered, then add it

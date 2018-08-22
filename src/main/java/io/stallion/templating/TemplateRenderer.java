@@ -21,9 +21,7 @@ import io.stallion.Context;
 import io.stallion.assets.AssetsController;
 import io.stallion.dataAccess.ModelController;
 import io.stallion.exceptions.UsageException;
-import io.stallion.exceptions.WebException;
 import io.stallion.fileSystem.FileSystemWatcherService;
-
 import io.stallion.requests.MetaInformation;
 import io.stallion.requests.Sandbox;
 import io.stallion.requests.SandboxedRequest;
@@ -32,8 +30,8 @@ import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.users.EmptyUser;
 import io.stallion.utils.DateUtils;
-import io.stallion.utils.Sanitize;
 import io.stallion.utils.GeneralUtils;
+import io.stallion.utils.Sanitize;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.ws.rs.WebApplicationException;
@@ -43,8 +41,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.stallion.Context.*;
-import static io.stallion.utils.Literals.*;
+import static io.stallion.Context.dal;
+import static io.stallion.Context.settings;
+import static io.stallion.utils.Literals.empty;
 
 
 public class TemplateRenderer {
@@ -94,11 +93,9 @@ public class TemplateRenderer {
         String friendlyMessage = "There was an error trying to handle your request.";
         if (e instanceof WebApplicationException) {
             friendlyMessage = e.getMessage();
-        } else if (e instanceof WebException) {
-            friendlyMessage = ((WebException)e).getMessage();
         } else if (e instanceof InvocationTargetException) {
             if (((InvocationTargetException) e).getTargetException() != null) {
-                if (((InvocationTargetException) e).getTargetException() instanceof WebException) {
+                if (((InvocationTargetException) e).getTargetException() instanceof WebApplicationException) {
                     friendlyMessage = ((InvocationTargetException) e).getTargetException().getMessage();
                 }
             }

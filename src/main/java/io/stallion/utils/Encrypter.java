@@ -21,30 +21,19 @@ import io.stallion.exceptions.DecryptionException;
 import io.stallion.services.Log;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
-
-
-
 import org.springframework.security.crypto.keygen.KeyGenerators;
-
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.util.UUID;
-import java.security.SecureRandom;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.xml.bind.DatatypeConverter;
-import java.math.BigInteger;
 
 /**
  * A simple class for encrypting and decrypting an arbitrary bit of text

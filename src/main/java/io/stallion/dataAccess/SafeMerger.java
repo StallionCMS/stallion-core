@@ -18,7 +18,6 @@
 package io.stallion.dataAccess;
 
 
-import io.stallion.exceptions.ClientException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.Sanitize;

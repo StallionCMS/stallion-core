@@ -18,10 +18,6 @@
 package io.stallion.utils;
 
 import java.util.HashMap;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class DefaultMap<K, V> extends HashMap<K, V> {

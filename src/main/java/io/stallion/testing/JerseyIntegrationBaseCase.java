@@ -17,19 +17,7 @@
 
 package io.stallion.testing;
 
-import java.io.File;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.*;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.MainRunner;
 import io.stallion.boot.StallionServer;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
@@ -38,7 +26,10 @@ import io.stallion.settings.Settings;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -46,6 +37,15 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
+import static io.stallion.utils.Literals.empty;
 
 
 public abstract class JerseyIntegrationBaseCase  {

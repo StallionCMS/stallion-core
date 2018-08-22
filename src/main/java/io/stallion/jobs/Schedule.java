@@ -18,15 +18,14 @@
 package io.stallion.jobs;
 
 import io.stallion.Context;
-import io.stallion.exceptions.AppException;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.users.IUser;
 import io.stallion.users.UserController;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.ws.rs.ServerErrorException;
 import java.time.*;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -411,7 +410,7 @@ public class Schedule {
                     // Minute doesn't match the schedule, find the next viable minute
                     dt = dt.plusMinutes(minutesToAdd(dt));
                 } else {
-                    throw new AppException("This should never happen but it did. Invalid DealBreaker value: " + mismatched);
+                    throw new ServerErrorException("This should never happen but it did. Invalid DealBreaker value: " + mismatched, 500);
                 }
             }
             throw new ConfigException("This should never happen. A schedule was created from which a next date could not be found.");
@@ -452,7 +451,7 @@ public class Schedule {
                     }
                 } else {
                     // This should never happen
-                    throw new AppException("This should never happen but it did. Invalid intervalTye: " + _days.getIntervalType());
+                    throw new ServerErrorException("This should never happen but it did. Invalid intervalTye: " + _days.getIntervalType(), 500);
                 }
             }
             if (!_hours.isEvery() && !_hours.contains(dt.getHour())) {

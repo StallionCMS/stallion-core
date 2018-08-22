@@ -23,8 +23,9 @@ import io.stallion.templating.TemplateRenderer;
 
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.Context.settings;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 
 public class DisplayableModelController<T extends Displayable> extends StandardModelController<T> {

@@ -17,16 +17,12 @@
 
 package io.stallion.secrets;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.boot.CommandOptionsBase;
 import io.stallion.boot.StallionRunAction;
-import io.stallion.services.Log;
 import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+
+import static io.stallion.utils.Literals.UTF8;
 
 
 public class SecretsDecryptAction implements StallionRunAction<SecretsDecryptOptions> {

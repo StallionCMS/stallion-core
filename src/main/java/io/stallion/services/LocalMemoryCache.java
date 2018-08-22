@@ -19,7 +19,6 @@ package io.stallion.services;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
@@ -28,8 +27,7 @@ import net.sf.ehcache.config.PersistenceConfiguration;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.or;
 
 
 public class LocalMemoryCache {

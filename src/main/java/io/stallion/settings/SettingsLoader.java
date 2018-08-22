@@ -29,8 +29,6 @@ import io.stallion.settings.childSections.SettingsSection;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.empty;

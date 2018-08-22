@@ -19,8 +19,7 @@ package io.stallion.utils;
 
 import java.util.Set;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.set;
 
 
 public class ContentTypeUtils {

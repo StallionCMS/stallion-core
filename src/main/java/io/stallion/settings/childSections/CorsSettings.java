@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 /**

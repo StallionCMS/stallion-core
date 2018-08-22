@@ -17,8 +17,8 @@
 
 package io.stallion.dataAccess.db.postgres;
 
-import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.Tickets;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.services.Log;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;

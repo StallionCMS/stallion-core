@@ -19,10 +19,11 @@ package io.stallion.boot;
 import io.stallion.assets.AssetsController;
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.SimpleAsyncRunner;
-
+import io.stallion.contentPublishing.SiteMapController;
+import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.dataAccess.DataAccessRegistry;
-import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.Tickets;
+import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.file.ListingExporter;
 import io.stallion.dataAccess.file.TextItemController;
 import io.stallion.dataAccess.filtering.FilterCache;
@@ -33,12 +34,10 @@ import io.stallion.fileSystem.FileSystemWatcherService;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.jobs.JobStatusController;
 import io.stallion.monitoring.HealthTracker;
-import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.*;
-import io.stallion.contentPublishing.SiteMapController;
-import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.settings.Settings;
 import io.stallion.templating.JinjaTemplating;
 import io.stallion.templating.TemplateRenderer;
@@ -47,7 +46,8 @@ import io.stallion.users.UserController;
 
 import java.io.File;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 /**
  * Helper methods for loading all the settings and services we need

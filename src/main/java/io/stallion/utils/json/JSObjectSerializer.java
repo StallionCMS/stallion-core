@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import io.stallion.services.Log;
 import jdk.nashorn.api.scripting.JSObject;
 
 import java.io.IOException;

@@ -20,16 +20,16 @@ package io.stallion.dataAccess;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Or;
-import io.stallion.exceptions.NotFoundException;
-import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.AuditTrailController;
 
+import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.val;
 
 
 public interface ModelController<T extends Model> {

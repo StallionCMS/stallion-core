@@ -17,20 +17,16 @@
 
 package io.stallion.contentPublishing;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.contentPublishing.forms.SimpleFormEndpoints;
-import io.stallion.monitoring.InternalEndpoints;
-
-import io.stallion.services.Log;
 import io.stallion.contentPublishing.forms.SimpleFormTag;
+import io.stallion.monitoring.InternalEndpoints;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import java.io.File;
+
+import static io.stallion.utils.Literals.empty;
 
 
 public class ContentPublishingBooter {

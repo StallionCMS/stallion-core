@@ -17,10 +17,6 @@
 
 package io.stallion.settings;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 public class SecondaryDomain {
     private String domain = "";
     private String rewriteRoot = "";

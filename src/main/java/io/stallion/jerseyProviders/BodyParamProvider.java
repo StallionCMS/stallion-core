@@ -17,18 +17,9 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-
-import static io.stallion.utils.Literals.*;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import io.stallion.exceptions.ClientException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
-
-
-import java.util.function.Function;
-
 import io.stallion.utils.json.JSON;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.hk2.api.Factory;
@@ -38,6 +29,11 @@ import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.spi.internal.ValueParamProvider;
 
 import javax.ws.rs.ClientErrorException;
+import java.io.IOException;
+import java.util.function.Function;
+
+import static io.stallion.utils.Literals.UTF8;
+import static io.stallion.utils.Literals.empty;
 
 
 /**

@@ -21,13 +21,11 @@ import io.stallion.boot.AppContextLoader;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.plugins.PluginRegistry;
-import io.stallion.requests.*;
+import io.stallion.requests.EmptyRequest;
+import io.stallion.requests.IRequest;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.users.*;
-
-import static io.stallion.utils.Literals.empty;
-import static io.stallion.utils.Literals.emptyInstance;
 
 /**
  * A static helper class providing short-cut access to the most common services and data objects running

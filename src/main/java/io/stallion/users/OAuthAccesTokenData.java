@@ -20,9 +20,6 @@ package io.stallion.users;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public class OAuthAccesTokenData {
     private Long userId;

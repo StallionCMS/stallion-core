@@ -19,7 +19,6 @@ package io.stallion.fileSystem;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
 import io.stallion.services.Log;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,14 +26,13 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.list;
 import static io.stallion.utils.Literals.safeLoop;
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * A side thread that watches the file system, and responds to file change

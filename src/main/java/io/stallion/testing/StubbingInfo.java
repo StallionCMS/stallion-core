@@ -17,9 +17,6 @@
 
 package io.stallion.testing;
 
-import static io.stallion.utils.Literals.*;
-
-
 public class StubbingInfo {
     private int minCount = 1;
     private int maxCount = 99;

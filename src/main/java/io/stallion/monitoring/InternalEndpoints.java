@@ -21,13 +21,11 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.stallion.asyncTasks.AsyncTaskController;
-import io.stallion.exceptions.ClientException;
-import io.stallion.exceptions.WebException;
-import io.stallion.jobs.JobCoordinator;
-import io.stallion.plugins.StallionJavaPlugin;
-import io.stallion.plugins.PluginRegistry;
 import io.stallion.jerseyProviders.MinRole;
 import io.stallion.jerseyProviders.XSRF;
+import io.stallion.jobs.JobCoordinator;
+import io.stallion.plugins.PluginRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -35,14 +33,14 @@ import io.stallion.users.Role;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.jar.Manifest;
 
+import static io.stallion.Context.request;
+import static io.stallion.Context.settings;
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 @Path("/st-internal")
 @Produces("application/json")
@@ -211,7 +209,7 @@ public class InternalEndpoints  {
     @XSRF(false)
     public String forceException(@QueryParam("secret") String secret) {
         checkSecret(secret);
-        throw new WebException("A forced exception!", 500);
+        throw new WebApplicationException("A forced exception!", 500);
     }
 
     @GET
@@ -220,6 +218,6 @@ public class InternalEndpoints  {
     @XSRF(false)
     public String forceExceptionGet(@QueryParam("secret") String secret) {
         checkSecret(secret);
-        throw new WebException("A forced exception!", 500);
+        throw new WebApplicationException("A forced exception!", 500);
     }
 }

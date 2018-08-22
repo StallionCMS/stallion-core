@@ -17,10 +17,6 @@
 
 package io.stallion.monitoring;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 public class EndpointHealthInfo {
     private String url = "";
     private int statusCode = 0;

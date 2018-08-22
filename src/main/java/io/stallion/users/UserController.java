@@ -27,7 +27,6 @@ import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.email.ContactableEmailer;
-import io.stallion.exceptions.ClientException;
 import io.stallion.requests.IRequest;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.services.Log;
@@ -40,17 +39,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.persistence.Column;
 import javax.ws.rs.ClientErrorException;
 import java.io.File;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.UUID;
 
+import static io.stallion.Context.request;
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 @AuditTrailEnabled
 public class UserController<T extends IUser> extends StandardModelController<T> {

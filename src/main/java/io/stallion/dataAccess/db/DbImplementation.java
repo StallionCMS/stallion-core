@@ -17,15 +17,7 @@
 
 package io.stallion.dataAccess.db;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-import java.util.List;
-import java.util.Map;
-
 import io.stallion.dataAccess.Tickets;
-import io.stallion.dataAccess.db.mysql.MySqlTickets;
-import io.stallion.services.Log;
 
 
 public interface DbImplementation {

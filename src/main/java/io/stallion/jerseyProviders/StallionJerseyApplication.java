@@ -17,10 +17,6 @@
 
 package io.stallion.jerseyProviders;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import io.stallion.assets.AssetsEndpointsResource;
 import io.stallion.contentPublishing.ContentPublishingBooter;
 import io.stallion.plugins.PluginRegistry;
@@ -29,7 +25,8 @@ import io.stallion.users.UsersApiResource;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
-import org.glassfish.jersey.test.TestProperties;
+
+import java.util.logging.Level;
 
 
 public class StallionJerseyApplication extends ResourceConfig {

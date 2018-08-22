@@ -28,7 +28,6 @@ import io.stallion.reflection.PropertyComparator;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,7 +40,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 /**
  * A base persister that handles retrieving and saving model objects to the file sytem.

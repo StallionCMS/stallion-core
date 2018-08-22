@@ -27,16 +27,16 @@ import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.DateUtils;
-import io.stallion.utils.SimpleTemplate;
 import io.stallion.utils.GeneralUtils;
+import io.stallion.utils.SimpleTemplate;
 
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import static io.stallion.Context.settings;
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 /**
  * This class a helper class for defining a way to send emails to a

@@ -17,15 +17,11 @@
 
 package io.stallion.dataAccess.filtering;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.services.Log;
 import net.sf.ehcache.pool.Size;
 import net.sf.ehcache.pool.SizeOfEngine;
+
+import java.util.Collection;
 
 
 public class EstimatedSizeOfEngine implements SizeOfEngine {

@@ -15,22 +15,14 @@
  */
 package io.stallion.utils.json;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.RawSerializer;
-import io.stallion.exceptions.*;
-import io.stallion.utils.DateUtils;
+import io.stallion.exceptions.JsonWriteException;
 import jdk.nashorn.api.scripting.JSObject;
 import jdk.nashorn.internal.runtime.ScriptObject;
-import org.parboiled.common.FileUtils;
-
 
 import java.io.IOException;
 import java.util.ArrayList;

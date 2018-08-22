@@ -25,7 +25,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.map;
 
 
 public class Stubbing {

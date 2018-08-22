@@ -17,8 +17,6 @@
 
 package io.stallion.exceptions;
 
-import javax.ws.rs.WebApplicationException;
-
 /**
  * Used when a plugin writer or some developer using Stallion makes a mistake
  */

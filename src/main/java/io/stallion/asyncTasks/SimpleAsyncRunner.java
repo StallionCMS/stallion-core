@@ -17,13 +17,9 @@
 
 package io.stallion.asyncTasks;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 /**
  * The SimpleAsyncRunner is an alternative way to run asynchronous tasks from AsyncCoordinator.

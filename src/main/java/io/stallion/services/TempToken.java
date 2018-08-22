@@ -28,7 +28,7 @@ import javax.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 
 @Table(name="stallion_temp_tokens")

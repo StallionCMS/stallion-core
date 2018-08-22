@@ -17,23 +17,18 @@
 
 package io.stallion.jerseyProviders;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import io.stallion.requests.IRequest;
+import io.stallion.utils.GeneralUtils;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.Map;
 
-import io.stallion.requests.IRequest;
-import io.stallion.services.Log;
-import io.stallion.utils.GeneralUtils;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
+import static io.stallion.utils.Literals.empty;
 
 /**
  * A collection of methods for sending static assets files as a buffered servlet responses.

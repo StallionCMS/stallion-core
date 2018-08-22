@@ -23,12 +23,6 @@ import io.stallion.services.Log;
 import io.stallion.settings.SecondaryDomain;
 import io.stallion.settings.Settings;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +30,11 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.stallion.utils.Literals.empty;
 

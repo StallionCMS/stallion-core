@@ -18,14 +18,15 @@
 package io.stallion.dataAccess.db;
 
 import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.StallionRunAction;
 import io.stallion.boot.SqlMigrateCommandOptions;
+import io.stallion.boot.StallionRunAction;
 import io.stallion.services.Log;
 
 import javax.script.ScriptEngine;
 import java.util.List;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.or;
 
 /**
  * A command-line action that checks to see if a database migration needs to be run, that is

@@ -17,12 +17,11 @@
 
 package io.stallion.services;
 
-import java.time.ZonedDateTime;
-
 import io.stallion.dataAccess.ModelBase;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import java.time.ZonedDateTime;
 
 @Table(name="stallion_audit_trail")
 public class AuditTrail extends ModelBase {

@@ -17,8 +17,6 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-
 import io.stallion.Context;
 
 import javax.annotation.Priority;
@@ -26,6 +24,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 @Priority(FilterPriorities.TEARDOWN_CONTEXT_RESPONSE_FILTER)
 @Provider

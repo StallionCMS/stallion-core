@@ -21,15 +21,13 @@ import io.stallion.Context;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.monitoring.HealthTracker;
 import io.stallion.settings.Settings;
-import org.apache.commons.io.FilenameUtils;
 
-import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.logging.*;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 public class Log {
     //private static Logger logger = LogManager.getLogManager().getLogger("stallion");

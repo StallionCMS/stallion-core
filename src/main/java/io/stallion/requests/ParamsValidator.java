@@ -22,7 +22,7 @@ import io.stallion.reflection.PropertyUtils;
 import javax.ws.rs.ClientErrorException;
 import java.util.List;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.list;
 
 /**
  * Validates a bunch of variables and raises an informative exception if any are invalid.

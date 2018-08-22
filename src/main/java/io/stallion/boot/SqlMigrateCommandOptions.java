@@ -17,9 +17,6 @@
 
 package io.stallion.boot;
 
-import org.kohsuke.args4j.Option;
-
-
 public class SqlMigrateCommandOptions extends CommandOptionsBase {
 
 

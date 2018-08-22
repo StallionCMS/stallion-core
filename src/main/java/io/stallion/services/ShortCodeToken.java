@@ -17,23 +17,12 @@
 
 package io.stallion.services;
 
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.UniqueKey;
-import io.stallion.services.Log;
-import io.stallion.utils.json.JSON;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import java.time.ZonedDateTime;
 
 @Table(name="stallion_short_code_tokens")
 public class ShortCodeToken extends ModelBase {

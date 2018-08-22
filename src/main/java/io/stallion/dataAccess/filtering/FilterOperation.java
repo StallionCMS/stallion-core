@@ -19,7 +19,6 @@ package io.stallion.dataAccess.filtering;
 
 import org.apache.commons.beanutils.BeanComparator;
 
-import javax.persistence.Column;
 import java.util.List;
 
 /**

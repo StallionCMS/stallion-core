@@ -17,9 +17,6 @@
 
 package io.stallion.asyncTasks;
 
-import static io.stallion.utils.Literals.*;
-
-
 public interface AsyncTaskPersister {
 
     /**

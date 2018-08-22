@@ -24,11 +24,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.Context.request;
+import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.utcNow;
 
 
 public class ExceptionInfo {

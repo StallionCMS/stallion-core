@@ -18,13 +18,12 @@
 package io.stallion.dataAccess.db;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import io.stallion.dataAccess.*;
 import io.stallion.dataAccess.db.converters.*;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
-import io.stallion.services.Log;
 import io.stallion.reflection.PropertyUtils;
+import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.DbConfig;
 import io.stallion.utils.Literals;
@@ -39,22 +38,21 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.jdbi.v3.core.Jdbi;
 
-
 import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.Field;
-import java.sql.*;
 import java.lang.reflect.Method;
+import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static io.stallion.Context.dal;
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 /**
  * A singleton that stores the database connection pool, registered model schemas,

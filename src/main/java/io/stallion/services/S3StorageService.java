@@ -28,11 +28,11 @@ import io.stallion.settings.childSections.CloudStorageSettings;
 import io.stallion.utils.GeneralUtils;
 
 import java.io.File;
-import java.lang.annotation.Documented;
 import java.sql.Date;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.utcNow;
 
 
 public class S3StorageService extends CloudStorageService {
@@ -54,6 +54,7 @@ public class S3StorageService extends CloudStorageService {
         accessToken = settings.getAccessToken();
         secret = settings.getSecret();
         AWSCredentials credentials = new BasicAWSCredentials(accessToken, secret);
+        //AmazonS3ClientBuilder.standard().withCredentials(credentials).build();
         client =  new AmazonS3Client(credentials);
     }
 

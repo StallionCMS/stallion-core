@@ -17,27 +17,22 @@
 
 package io.stallion.assets;
 
-import java.io.*;
-import java.net.URL;
-import java.util.logging.Level;
-import javax.ws.rs.NotFoundException;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.assetBundling.AssetHelpers;
-
-import io.stallion.exceptions.WebException;
 import io.stallion.jerseyProviders.LocalFileToResponse;
-import io.stallion.jerseyProviders.ServletFileSender;
-import io.stallion.requests.*;
+import io.stallion.requests.IRequest;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.utils.ResourceHelpers;
-import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.net.URL;
+
+import static io.stallion.utils.Literals.empty;
 
 
 public class AssetServing {
@@ -120,7 +115,7 @@ public class AssetServing {
                     throw new NotFoundException("Asset resource not found: " + plugin + ":" + assetPath);
                 } else if (url == null) {
                     // If not found, and referer, may mean there is a bug
-                    throw new WebException("Requested linked resource that is not found: " + plugin + ":" + assetPath);
+                    throw new ServerErrorException("Requested linked resource that is not found: " + plugin + ":" + assetPath, 500);
                 }
                 return new LocalFileToResponse().sendResource(url, assetPath);
             }

@@ -17,15 +17,13 @@
 
 package io.stallion.asyncTasks;
 
-import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static io.stallion.utils.Literals.empty;
 
 public class AsyncTaskExecuteRunnable implements Runnable {
 

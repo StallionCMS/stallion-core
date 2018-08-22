@@ -18,15 +18,11 @@
 package io.stallion.utils;
 
 
-import com.google.common.collect.Lists;
-import io.stallion.exceptions.AppException;
-import io.stallion.settings.Settings;
-
+import javax.ws.rs.ServerErrorException;
 import java.nio.charset.Charset;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -483,13 +479,13 @@ public class Literals {
             if (index < max) {
                 return true;
             }
-            throw new AppException("A safeLoop() has run more times than expected. Emergency stop triggered after " + index + " loops");
+            throw new ServerErrorException("A safeLoop() has run more times than expected. Emergency stop triggered after " + index + " loops", 500);
             //implement...
         }
 
         public Integer next() {
             if (index >= max) {
-                throw new AppException("A safeLoop() has run more times than expected. Emergency stop triggered after " + index + " loops");
+                throw new ServerErrorException("A safeLoop() has run more times than expected. Emergency stop triggered after " + index + " loops", 500);
             }
             return index++;
         }

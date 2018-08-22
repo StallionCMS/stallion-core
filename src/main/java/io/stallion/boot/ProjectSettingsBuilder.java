@@ -17,12 +17,6 @@
 
 package io.stallion.boot;
 
-import javax.persistence.Column;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 class ProjectSettingsBuilder {
     // Ask for site name
     // Ask for site description

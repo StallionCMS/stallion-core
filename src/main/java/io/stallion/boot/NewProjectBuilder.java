@@ -22,8 +22,8 @@ import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 import io.stallion.templating.JinjaTemplating;
 import io.stallion.users.UserAdder;
-import io.stallion.utils.Prompter;
 import io.stallion.utils.GeneralUtils;
+import io.stallion.utils.Prompter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 

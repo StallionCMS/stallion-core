@@ -20,7 +20,6 @@ package io.stallion.tests.integration.users;
 import io.stallion.Context;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
-import io.stallion.testing.MockRequest;
 import io.stallion.users.UserController;
 import io.stallion.users.User;
 import org.junit.BeforeClass;

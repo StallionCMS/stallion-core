@@ -19,10 +19,6 @@ package io.stallion.boot;
 
 import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.jobs.JobCoordinator;
-import io.stallion.settings.Settings;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class WorkerCommandAction  implements StallionRunAction<ServeCommandOptions> {

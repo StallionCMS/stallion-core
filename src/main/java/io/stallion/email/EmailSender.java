@@ -20,11 +20,11 @@ package io.stallion.email;
 import io.stallion.Context;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.ValidationException;
+import io.stallion.services.Log;
 import io.stallion.services.TransactionLog;
 import io.stallion.services.TransactionLogController;
 import io.stallion.settings.Settings;
 import io.stallion.settings.childSections.EmailSettings;
-import io.stallion.services.Log;
 import io.stallion.testing.SelfMocking;
 import io.stallion.testing.StubHandler;
 import io.stallion.testing.Stubbing;
@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.*;
 
 /**

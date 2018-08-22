@@ -17,13 +17,7 @@
 
 package io.stallion.secrets;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.boot.CommandOptionsBase;
-import io.stallion.services.Log;
 import org.kohsuke.args4j.Option;
 
 

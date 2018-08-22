@@ -17,10 +17,6 @@
 
 package io.stallion.email;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 public class EmailSendException extends Exception {
     public EmailSendException(String msg, Throwable e) {
         super(msg, e);

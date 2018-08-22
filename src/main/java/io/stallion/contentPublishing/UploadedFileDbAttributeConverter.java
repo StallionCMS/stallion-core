@@ -17,14 +17,10 @@
 
 package io.stallion.contentPublishing;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.dataAccess.db.converters.AttributeConverter;
-import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
+
+import static io.stallion.utils.Literals.empty;
 
 
 public class UploadedFileDbAttributeConverter  implements AttributeConverter<UploadedFile, String> {

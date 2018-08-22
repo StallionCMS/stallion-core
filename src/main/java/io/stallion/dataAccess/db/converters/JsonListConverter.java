@@ -22,7 +22,8 @@ import io.stallion.utils.json.JSON;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 public class JsonListConverter implements JsonAttributeConverter<List> {

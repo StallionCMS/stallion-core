@@ -19,9 +19,6 @@ package io.stallion.boot;
 
 import org.kohsuke.args4j.Option;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public class ForceActionOptions extends CommandOptionsBase {
     @Option(name="-localMode", usage="Set to 'false' if you want to simulate a server environment, with bundled assets, logging to file instead of console, etc.")

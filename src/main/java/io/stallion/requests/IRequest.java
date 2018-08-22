@@ -17,31 +17,23 @@
 
 package io.stallion.requests;
 
-import io.stallion.requests.Sandbox;
 import io.stallion.services.Log;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
-import org.eclipse.jetty.server.Request;
 
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.stallion.utils.Literals.empty;
-import static io.stallion.utils.Literals.list;
-import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.*;
 
 public interface IRequest {
     public static final String RECENT_POSTBACK_COOKIE = "st-recent-postback";

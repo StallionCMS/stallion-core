@@ -22,11 +22,10 @@ import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.emptyInstance;
+import static io.stallion.utils.Literals.list;
 
 
 public class Sandbox {

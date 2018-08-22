@@ -29,8 +29,6 @@ import io.stallion.dataAccess.MappedModel;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import static io.stallion.utils.Literals.*;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,9 +36,11 @@ import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+
+import static io.stallion.utils.Literals.UTC;
+import static io.stallion.utils.Literals.list;
 
 /**
  * Utility class for getting and setting bean properties via reflection.

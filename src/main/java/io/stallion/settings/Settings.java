@@ -28,7 +28,6 @@ import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.Column;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -36,7 +35,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.*;
 
 public class Settings implements ISettings {

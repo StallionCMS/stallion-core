@@ -20,7 +20,7 @@ package io.stallion.settings.childSections;
 import io.stallion.settings.SettingMeta;
 import io.stallion.settings.Settings;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 /**
  * Inserted into the global template context with the "styles" variable. This is used to customize the colors and

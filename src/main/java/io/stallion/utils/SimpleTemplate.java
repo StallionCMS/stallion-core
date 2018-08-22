@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.safeLoop;
 
 
 /**

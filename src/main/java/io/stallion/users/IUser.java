@@ -24,7 +24,6 @@ import io.stallion.dataAccess.file.ModelWithFilePath;
 import io.stallion.email.Contactable;
 import io.stallion.utils.json.RestrictedViews;
 
-import java.lang.String;
 import java.util.List;
 
 public interface IUser extends Contactable, Model, ModelWithFilePath {

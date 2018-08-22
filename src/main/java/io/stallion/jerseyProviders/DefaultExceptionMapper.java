@@ -17,16 +17,16 @@
 
 package io.stallion.jerseyProviders;
 
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.services.Log;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.json.JSON;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.util.Map;
+
+import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.val;
 
 @Provider
 public class DefaultExceptionMapper  extends BaseExceptionMapper<Exception> {

@@ -20,9 +20,6 @@ package io.stallion.fileSystem;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 /**
  * Starts and stops a separate thread that watches the file system
  * for changes.

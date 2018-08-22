@@ -17,7 +17,6 @@
 
 package io.stallion.jerseyProviders;
 
-import io.stallion.exceptions.ClientException;
 import io.stallion.requests.IRequest;
 import io.stallion.requests.ResponseComplete;
 import io.stallion.settings.Settings;

@@ -17,20 +17,18 @@
 
 package io.stallion.jerseyProviders;
 
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.services.Log;
-import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.json.JSON;
 
-import javax.annotation.Priority;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.util.Map;
+
+import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.val;
 
 @Provider
 public class WebApplicationExceptionMapper extends BaseExceptionMapper<WebApplicationException> {

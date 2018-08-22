@@ -17,11 +17,7 @@
 
 package io.stallion.settings.childSections;
 
-import io.stallion.services.S3StorageService;
 import io.stallion.settings.SettingMeta;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class CloudStorageSettings implements SettingsSection {

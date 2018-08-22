@@ -42,7 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 /**
  * Does the main work of booting up Stallion, and executing one of the boot actions.

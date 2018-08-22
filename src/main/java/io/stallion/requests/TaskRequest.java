@@ -20,14 +20,11 @@ package io.stallion.requests;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 
-import javax.servlet.http.Cookie;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.set;
 
 /**
  * A dummy request object that is put in the context for the duration of executing

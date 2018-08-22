@@ -17,20 +17,17 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-
 import io.stallion.requests.RequestWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.glassfish.jersey.server.ExtendedUriInfo;
 
 import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+import java.lang.reflect.Method;
 
 @Provider
 @Priority(FilterPriorities.PRODUCES_DETECTION_FILTER)

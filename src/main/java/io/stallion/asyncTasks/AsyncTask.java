@@ -20,7 +20,6 @@ package io.stallion.asyncTasks;
 import io.stallion.Context;
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.UniqueKey;
-import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 
 import javax.persistence.Column;

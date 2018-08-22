@@ -19,14 +19,11 @@ package io.stallion.assets;
 
 
 import io.stallion.Context;
-import io.stallion.requests.RequestWrapper;
-import io.stallion.requests.ResponseComplete;
 import io.stallion.jerseyProviders.BodyParam;
+import io.stallion.requests.RequestWrapper;
 import io.stallion.services.Log;
 import org.glassfish.jersey.server.ContainerRequest;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Request;

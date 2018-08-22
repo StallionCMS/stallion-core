@@ -17,14 +17,6 @@
 
 package io.stallion.jerseyProviders;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.services.Log;
-
-
 public class FilterPriorities {
 
     // Request Filters, executed in ascending order

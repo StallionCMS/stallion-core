@@ -19,26 +19,20 @@ package io.stallion.boot;
 
 import io.stallion.Context;
 import io.stallion.asyncTasks.AsyncCoordinator;
+import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.jerseyProviders.StallionJerseyApplication;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
-import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.settings.Settings;
-
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-
-import org.eclipse.jetty.util.log.JavaUtilLog;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.StdErrLog;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
-
 
 import java.text.MessageFormat;
 

@@ -18,22 +18,23 @@
 package io.stallion.dataAccess;
 
 
-import io.stallion.dataAccess.db.*;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.dataAccess.file.*;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
-import io.stallion.settings.Settings;
 import io.stallion.settings.ContentFolder;
+import io.stallion.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Table;
 import java.io.File;
 import java.util.*;
 
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.Context.settings;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 /**
  * The DalRegistry, or Data Access Layer Registry, allows for ModelControllers to be

@@ -29,7 +29,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -49,7 +48,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.UTF8;
 import static io.stallion.utils.Literals.map;
 import static io.stallion.utils.Literals.val;
 

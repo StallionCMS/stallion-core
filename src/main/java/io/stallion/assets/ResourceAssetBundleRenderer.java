@@ -17,8 +17,14 @@
 
 package io.stallion.assets;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import io.stallion.Context;
+import io.stallion.assetBundling.AssetBundle;
+import io.stallion.assetBundling.AssetFile;
+import io.stallion.exceptions.UsageException;
+import io.stallion.plugins.PluginRegistry;
+import io.stallion.settings.Settings;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,20 +33,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
 
-import io.stallion.Context;
-import io.stallion.assetBundling.*;
-import io.stallion.exceptions.UsageException;
-import io.stallion.plugins.PluginRegistry;
-import io.stallion.services.Log;
-import io.stallion.settings.Settings;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-
-import javax.ws.rs.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 
 public class ResourceAssetBundleRenderer {

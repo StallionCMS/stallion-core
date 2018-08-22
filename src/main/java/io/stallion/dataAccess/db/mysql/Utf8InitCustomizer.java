@@ -17,16 +17,10 @@
 
 package io.stallion.dataAccess.db.mysql;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.services.Log;
-
-import java.sql.*;
-import com.mchange.v2.log.*;
 import com.mchange.v2.c3p0.AbstractConnectionCustomizer;
+
+import java.sql.Connection;
+import java.sql.Statement;
 
 public class Utf8InitCustomizer extends AbstractConnectionCustomizer
 {

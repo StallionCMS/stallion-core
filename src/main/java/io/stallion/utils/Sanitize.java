@@ -24,11 +24,10 @@ import io.stallion.services.Log;
 import io.stallion.users.Role;
 import io.stallion.utils.json.JSON;
 import io.stallion.utils.json.RestrictedViews;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
-
 
 import java.util.regex.Pattern;
 

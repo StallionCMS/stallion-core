@@ -17,15 +17,14 @@
 
 package io.stallion.users;
 
-import io.stallion.boot.AppContextLoader;
 import io.stallion.Context;
+import io.stallion.boot.AppContextLoader;
 import io.stallion.boot.CommandOptionsBase;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.utils.GeneralUtils;
-import jline.console.ConsoleReader;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
@@ -33,7 +32,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.Console;
 import java.util.Scanner;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 /**
  * Command line action for adding a predfined user. User will be added as a flat-file configuration and included as a user

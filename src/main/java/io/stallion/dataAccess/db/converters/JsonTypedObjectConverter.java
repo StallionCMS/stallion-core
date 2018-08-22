@@ -17,13 +17,13 @@
 
 package io.stallion.dataAccess.db.converters;
 
-import java.io.IOException;
-
-import static io.stallion.utils.Literals.*;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.stallion.utils.json.JSON;
+
+import java.io.IOException;
+
+import static io.stallion.utils.Literals.empty;
 
 
 public class JsonTypedObjectConverter extends TypedCollectionAttributeConverter<Object, String> {

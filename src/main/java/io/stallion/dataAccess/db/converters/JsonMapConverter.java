@@ -23,7 +23,8 @@ import io.stallion.utils.json.JSON;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.map;
 
 
 public class JsonMapConverter implements JsonAttributeConverter<Map> {

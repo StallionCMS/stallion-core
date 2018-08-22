@@ -17,12 +17,12 @@
 
 package io.stallion.fileSystem;
 
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.FileVisitResult;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**

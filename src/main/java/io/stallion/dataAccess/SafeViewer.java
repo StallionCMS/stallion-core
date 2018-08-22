@@ -17,7 +17,6 @@
 
 package io.stallion.dataAccess;
 
-import io.stallion.dataAccess.Model;
 import io.stallion.reflection.PropertyUtils;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.asArray;
 
 
 public class SafeViewer<T extends Model> {

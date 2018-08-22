@@ -17,10 +17,6 @@
 
 package io.stallion.monitoring;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 public class HttpHealthInfo {
     private int error500s = 0;
     private int error400s = 0;

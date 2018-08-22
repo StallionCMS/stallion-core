@@ -17,15 +17,11 @@
 
 package io.stallion.services;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-
-import static io.stallion.utils.Literals.*;
 
 
 public class LogFilter implements Filter {

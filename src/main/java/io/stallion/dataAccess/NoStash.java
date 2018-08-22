@@ -20,7 +20,6 @@ package io.stallion.dataAccess;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.exceptions.UsageException;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**

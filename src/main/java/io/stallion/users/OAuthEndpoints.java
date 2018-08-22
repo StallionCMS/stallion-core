@@ -17,23 +17,23 @@
 
 package io.stallion.users;
 
-import io.stallion.exceptions.ClientException;
-import io.stallion.exceptions.RedirectException;
+
 import io.stallion.jerseyProviders.BodyParam;
 import io.stallion.jerseyProviders.MinRole;
-import io.stallion.requests.ParamExtractor;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.*;
-
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
+import static io.stallion.Context.getUser;
+import static io.stallion.Context.request;
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class OAuthEndpoints {
@@ -98,7 +98,7 @@ public class OAuthEndpoints {
             throw new RuntimeException(e);
         }
         ;
-        throw new RedirectException(redirectUri, 302);
+        throw new RedirectionException(302, URI.create(redirectUri));
     }
 
     @POST
@@ -126,7 +126,7 @@ public class OAuthEndpoints {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-        throw new RedirectException(redirectUri, 302);
+        throw new RedirectionException(302, URI.create(redirectUri));
     }
 
     @POST

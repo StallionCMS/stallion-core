@@ -17,15 +17,7 @@
 
 package io.stallion.requests;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.*;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.Context;
-import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.users.EmptyOrg;
 import io.stallion.users.EmptyUser;
@@ -33,10 +25,14 @@ import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 import org.glassfish.jersey.server.ContainerRequest;
 
-
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MultivaluedMap;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.or;
 
 
 public class RequestWrapper implements IRequest {

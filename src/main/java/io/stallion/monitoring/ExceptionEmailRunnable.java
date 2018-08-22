@@ -21,15 +21,11 @@ import io.stallion.email.ContactableEmailer;
 import io.stallion.users.User;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
-import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.StringUtils;
 
-import java.net.MalformedURLException;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.Context.getSettings;
+import static io.stallion.Context.settings;
+import static io.stallion.utils.Literals.utcNow;
 
 
 public class ExceptionEmailRunnable implements Runnable {

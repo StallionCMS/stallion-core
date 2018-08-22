@@ -19,12 +19,11 @@ package io.stallion.users;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.Context;
+import io.stallion.dataAccess.SafeMerger;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
-import io.stallion.exceptions.*;
 import io.stallion.jerseyProviders.BodyParam;
 import io.stallion.jerseyProviders.MinRole;
-import io.stallion.dataAccess.SafeMerger;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.Sanitize;
@@ -33,14 +32,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.*;
-
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
 import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.*;
 
 @Path("/st-users")
 public class UsersApiResource {
@@ -130,7 +129,7 @@ public class UsersApiResource {
     @Produces("text/html")
     public Object logoff() {
         UserController.instance().logoff();
-        throw new RedirectException(Settings.instance().getUsers().getLoginPage(), 302);
+        throw new RedirectionException(302, URI.create(Settings.instance().getUsers().getLoginPage()));
     }
 
     @POST
@@ -220,7 +219,7 @@ public class UsersApiResource {
     @Produces("application/json")
     public Object sendVerifyEmail(@BodyParam("email") String email, @BodyParam(value = "returnUrl", allowEmpty = true) String returnUrl) {
         if (!Settings.instance().isEmailConfigured()) {
-            throw new AppException("Cannot send verification email because there is no email server configured.");
+            throw new ServerErrorException("Cannot send verification email because there is no email server configured.", 500);
         }
         UserController.instance().sendEmailVerifyEmail(email, returnUrl);
         return true;
@@ -261,7 +260,7 @@ public class UsersApiResource {
             try {
                 String loginUrl = settings().getUsers().getFullLoginUrl() + "?email=" + email +
                         "&returnUrl=" + URLEncoder.encode(request().requestUrl(), "UTF-8");
-                throw new RedirectException(loginUrl, 302);
+                throw new RedirectionException(302, URI.create(loginUrl));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -328,7 +327,7 @@ public class UsersApiResource {
             throw new ClientErrorException("Password reset has been disabled. Please contact an administrator to reset your password.", 400);
         }
         if (!Settings.instance().isEmailConfigured()) {
-            throw new AppException("Cannot send reset email because there is no email server configured.");
+            throw new ServerErrorException("Cannot send reset email because there is no email server configured.", 500);
         }
 
         IUser user = UserController.instance().forEmail(email);
@@ -483,7 +482,7 @@ public class UsersApiResource {
     public IUser viewUser(@PathParam("userId") Long userId) {
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {
-            throw new io.stallion.exceptions.NotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
         return user;
     }
@@ -497,7 +496,7 @@ public class UsersApiResource {
 
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {
-            throw new io.stallion.exceptions.NotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
         if (!updatedUser.getEmail().equals(user.getEmail())) {
             IUser existing = UserController.instance().forEmail(updatedUser.getEmail());
@@ -534,7 +533,7 @@ public class UsersApiResource {
     public Object toggleDisableUser(@PathParam("userId") Long userId, @BodyParam("disabled") boolean disabled) {
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {
-            throw new io.stallion.exceptions.NotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
         user.setDisabled(disabled);
         UserController.instance().save(user);
@@ -549,7 +548,7 @@ public class UsersApiResource {
     public Object toggleUserApproved(@PathParam("userId") Long userId, @BodyParam("approved") boolean approved) {
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {
-            throw new io.stallion.exceptions.NotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
         user.setApproved(approved);
         UserController.instance().save(user);
@@ -564,7 +563,7 @@ public class UsersApiResource {
     public Object toggleUserDeleted(@PathParam("userId") Long userId, @BodyParam("deleted") boolean deleted) {
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {
-            throw new io.stallion.exceptions.NotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
         if (deleted == true) {
             UserController.instance().softDelete(user);
@@ -584,7 +583,7 @@ public class UsersApiResource {
     public Object triggerPasswordReset(@PathParam("userId") Long userId) {
         IUser user = UserController.instance().forIdWithDeleted(userId);
         if (user == null) {
-            throw new io.stallion.exceptions.NotFoundException("User not found");
+            throw new NotFoundException("User not found");
         }
         user.setBcryptedPassword("");
         UserController.instance().save(user);

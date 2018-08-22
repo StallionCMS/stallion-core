@@ -19,7 +19,6 @@ package io.stallion.dataAccess;
 
 import io.stallion.dataAccess.filtering.FilterChain;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

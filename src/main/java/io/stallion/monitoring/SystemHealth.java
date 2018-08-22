@@ -18,7 +18,6 @@
 package io.stallion.monitoring;
 
 import com.sun.management.UnixOperatingSystemMXBean;
-import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 
 import java.io.File;

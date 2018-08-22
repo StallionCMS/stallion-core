@@ -17,11 +17,7 @@
 
 package io.stallion.reflection;
 
-import java.io.Serializable;
 import java.util.Comparator;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 /**
  * A comparator that compares objects based on the passed in property name, using

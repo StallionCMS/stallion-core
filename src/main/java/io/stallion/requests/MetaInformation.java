@@ -18,10 +18,9 @@
 package io.stallion.requests;
 
 import io.stallion.Context;
-import io.stallion.dataAccess.MappedModel;
 import io.stallion.dataAccess.ModelBase;
-import io.stallion.utils.rss.RssLink;
 import io.stallion.settings.Settings;
+import io.stallion.utils.rss.RssLink;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;

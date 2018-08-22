@@ -17,28 +17,19 @@
 
 package io.stallion.assets;
 
-import io.stallion.Context;
 import io.stallion.assetBundling.AssetBundle;
 import io.stallion.assetBundling.AssetFile;
-import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
-import io.stallion.plugins.PluginRegistry;
 import io.stallion.settings.Settings;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
 
+import javax.ws.rs.NotFoundException;
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
 
 import static io.stallion.utils.Literals.empty;
-import static io.stallion.utils.Literals.or;
 
 
 public class FileSystemAssetBundleRenderer {
@@ -72,7 +63,7 @@ public class FileSystemAssetBundleRenderer {
         fileSystemPath = Settings.instance().getTargetFolder() + "/" + path;
         bundleFile = new File(fileSystemPath);
         if (!bundleFile.exists()) {
-            throw new NotFoundException("The bundle for path " + path + " was not found in the site /assets folder.");
+            throw new javax.ws.rs.NotFoundException("The bundle for path " + path + " was not found in the site /assets folder.");
         }
 
     }

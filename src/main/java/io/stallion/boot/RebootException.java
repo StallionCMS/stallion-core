@@ -17,9 +17,5 @@
 
 package io.stallion.boot;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 public class RebootException extends InterruptedException {
 }

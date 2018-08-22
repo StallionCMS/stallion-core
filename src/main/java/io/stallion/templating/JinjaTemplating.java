@@ -18,7 +18,6 @@
 package io.stallion.templating;
 
 import com.hubspot.jinjava.Jinjava;
-import com.hubspot.jinjava.JinjavaConfig;
 import com.hubspot.jinjava.interpret.InterpretException;
 import com.hubspot.jinjava.interpret.RenderResult;
 import com.hubspot.jinjava.interpret.TemplateError;
@@ -26,7 +25,6 @@ import com.hubspot.jinjava.lib.filter.Filter;
 import com.hubspot.jinjava.lib.tag.Tag;
 import com.hubspot.jinjava.loader.ResourceNotFoundException;
 import io.stallion.exceptions.UsageException;
-import io.stallion.exceptions.WebException;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.list;
 
 public class JinjaTemplating implements Templating {
     private static String targetFolder = "";

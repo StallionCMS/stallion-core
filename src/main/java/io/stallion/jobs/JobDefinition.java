@@ -19,8 +19,6 @@ package io.stallion.jobs;
 
 import io.stallion.plugins.PluginRegistry;
 
-import java.time.ZonedDateTime;
-
 public class JobDefinition {
     private String name;
     private Schedule schedule;

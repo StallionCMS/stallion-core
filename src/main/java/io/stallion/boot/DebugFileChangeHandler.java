@@ -23,9 +23,6 @@ import sun.misc.Signal;
 
 import java.nio.file.WatchEvent;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 class DebugFileChangeHandler extends BaseWatchEventHandler {
     @Override

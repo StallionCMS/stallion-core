@@ -17,12 +17,6 @@
 
 package io.stallion.assets;
 
-import io.stallion.exceptions.UsageException;
-
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 /**
  * A wrapper around AssetsController that only allows access to particular methods.
  *

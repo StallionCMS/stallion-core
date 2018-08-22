@@ -17,14 +17,6 @@
 
 package io.stallion.jobs;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.services.Log;
-
-
 public abstract class JobComplete implements Job {
     public abstract String getName();
     public abstract int getAlertThresholdMinutes();

@@ -18,22 +18,20 @@
 package io.stallion.secrets;
 
 
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.stallion.exceptions.UsageException;
 import io.stallion.settings.childSections.SecretsSettings;
 import io.stallion.utils.Encrypter;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.springframework.security.crypto.keygen.KeyGenerators;
+import org.apache.commons.text.WordUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.UTF8;
+import static io.stallion.utils.Literals.empty;
 
 
 public class SecretsVault {

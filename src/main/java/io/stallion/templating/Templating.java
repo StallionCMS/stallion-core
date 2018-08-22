@@ -19,9 +19,6 @@ package io.stallion.templating;
 
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public interface Templating {
     public void init(String folder);

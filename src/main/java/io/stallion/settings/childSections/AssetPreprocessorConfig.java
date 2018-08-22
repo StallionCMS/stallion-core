@@ -19,9 +19,6 @@ package io.stallion.settings.childSections;
 
 import io.stallion.services.Log;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public class AssetPreprocessorConfig implements SettingsSection {
     private String name = "";

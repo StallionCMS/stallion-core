@@ -22,10 +22,12 @@ import io.stallion.dataAccess.UniqueKey;
 import io.stallion.dataAccess.db.Converter;
 
 import javax.persistence.Column;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
-
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.set;
 
 
 public class OAuthClient extends ModelBase {

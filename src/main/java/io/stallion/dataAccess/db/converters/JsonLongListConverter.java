@@ -17,15 +17,13 @@
 
 package io.stallion.dataAccess.db.converters;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
+
+import java.util.List;
+
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 

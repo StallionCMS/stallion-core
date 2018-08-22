@@ -24,7 +24,7 @@ import io.stallion.settings.Settings;
 import java.io.File;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
 
 
 public abstract class CloudStorageService {

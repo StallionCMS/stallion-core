@@ -17,22 +17,16 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-import java.util.Set;
-
 import io.stallion.Context;
-import io.stallion.requests.*;
-import io.stallion.users.IOrg;
-import io.stallion.users.IUser;
+import io.stallion.requests.IRequest;
+import io.stallion.requests.RequestWrapper;
 
 import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 @Provider
 @Priority(FilterPriorities.POPULATE_CONTEXT_REQUEST_FILTER)

@@ -18,7 +18,6 @@
 package io.stallion.utils;
 
 
-
 import io.stallion.services.Log;
 import org.apache.commons.io.IOUtils;
 
@@ -29,7 +28,8 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.UTF8;
+import static io.stallion.utils.Literals.empty;
 
 /**
  * A helper class for running external programs.

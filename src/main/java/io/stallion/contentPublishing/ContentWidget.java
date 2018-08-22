@@ -20,9 +20,8 @@ package io.stallion.contentPublishing;
 import java.util.List;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.services.Log;
+import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.map;
 
 
 public class ContentWidget {

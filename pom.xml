@@ -163,7 +163,11 @@
             <version>2.5.0-b42</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.4</version>
+        </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>

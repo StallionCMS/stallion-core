@@ -19,13 +19,13 @@ package io.stallion.dataAccess;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.stallion.reflection.PropertyUtils;
-//import org.apache.commons.beanutils.PropertyUtils;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+//import org.apache.commons.beanutils.PropertyUtils;
 
 
 /**

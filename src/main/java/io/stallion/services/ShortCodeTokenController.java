@@ -17,22 +17,19 @@
 
 package io.stallion.services;
 
+import io.stallion.dataAccess.DataAccessRegistry;
+import io.stallion.dataAccess.StandardModelController;
+import io.stallion.dataAccess.db.DB;
+import io.stallion.exceptions.UsageException;
+import io.stallion.utils.GeneralUtils;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.util.Base64;
-import java.util.List;
-import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.dataAccess.DataAccessRegistry;
-import io.stallion.dataAccess.StandardModelController;
-import io.stallion.dataAccess.db.DB;
-import io.stallion.exceptions.ConfigException;
-import io.stallion.exceptions.UsageException;
-import io.stallion.services.Log;
-import io.stallion.utils.GeneralUtils;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.utcNow;
 
 
 public class ShortCodeTokenController extends StandardModelController<ShortCodeToken> {

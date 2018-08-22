@@ -17,14 +17,9 @@
 
 package io.stallion.reflection;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.dataAccess.Model;
-import io.stallion.services.Log;
+
+import java.util.Comparator;
 
 
 public class ModelPropertyComparator <T extends Model> implements Comparator<T> {

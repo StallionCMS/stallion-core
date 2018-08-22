@@ -17,7 +17,6 @@
 
 package io.stallion.contentPublishing.forms;
 
-import io.stallion.exceptions.ClientException;
 import io.stallion.dataAccess.SafeMerger;
 import io.stallion.services.LocalMemoryCache;
 import io.stallion.utils.Encrypter;
@@ -27,8 +26,8 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import static io.stallion.Context.settings;
 import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
 
 
 public class SimpleFormEndpoints {
@@ -62,7 +61,7 @@ public class SimpleFormEndpoints {
         String randomKey = parts[1];
 
         if (time == null || ((time + 60 * 60 * 1000) < mils())) {
-            throw new ClientException("Anti-spam token has expired. Please reload the page and submit again.");
+            throw new ClientErrorException("Anti-spam token has expired. Please reload the page and submit again.", 400);
         }
 
         Integer submissionCount = or((Integer)LocalMemoryCache.get("form_submissions", randomKey), 0);

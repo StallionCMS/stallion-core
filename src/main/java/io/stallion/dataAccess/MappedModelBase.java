@@ -17,14 +17,11 @@
 
 package io.stallion.dataAccess;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.stallion.services.Log;
+import static io.stallion.utils.Literals.map;
 
 
 public class MappedModelBase extends ModelBase implements MappedModel {

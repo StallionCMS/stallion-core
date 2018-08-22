@@ -18,7 +18,6 @@
 package io.stallion.asyncTasks;
 
 import io.stallion.dataAccess.Model;
-import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.file.ItemFileChangeEventHandler;
 import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.fileSystem.FileSystemWatcherService;
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

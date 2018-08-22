@@ -22,7 +22,8 @@ import io.stallion.utils.json.JSON;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.set;
 
 
 public class JsonSetConverter implements JsonAttributeConverter<Set> {

@@ -17,14 +17,7 @@
 
 package io.stallion.settings.childSections;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.services.Log;
 import io.stallion.settings.SettingMeta;
-import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 
 

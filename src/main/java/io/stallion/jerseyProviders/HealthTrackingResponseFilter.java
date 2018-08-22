@@ -17,24 +17,14 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.Context;
 import io.stallion.monitoring.HealthTracker;
 import io.stallion.requests.RequestWrapper;
 
-import io.stallion.services.Log;
-
 import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import java.io.IOException;
 
 @Priority(FilterPriorities.HEALTH_TRACKING_RESPONSE_FILTER)
 public class HealthTrackingResponseFilter implements ContainerResponseFilter {

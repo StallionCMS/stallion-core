@@ -17,10 +17,6 @@
 
 package io.stallion.exceptions;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 /**
  * Thrown when a method is passed in data that is not valid in some way.
  */

@@ -17,7 +17,6 @@
 
 package io.stallion.utils;
 
-import io.stallion.services.Log;
 import org.pegdown.PegDownProcessor;
 
 import java.text.MessageFormat;
@@ -28,8 +27,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.emptyInstance;
 
 
 class MarkdownFootnotesProcessor {

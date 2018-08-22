@@ -17,18 +17,15 @@
 
 package io.stallion.jerseyProviders;
 
-import java.io.IOException;
-
 import io.stallion.requests.RequestWrapper;
 
-
 import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 @Provider
 @Priority(FilterPriorities.CORS_REQUEST_FILTER)

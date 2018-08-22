@@ -24,12 +24,11 @@ import io.stallion.templating.TemplateRenderer;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-
 import java.util.List;
 import java.util.Map;
 
 import static io.stallion.Context.request;
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.map;
 
 
 public class SiteMapEndpoints  {

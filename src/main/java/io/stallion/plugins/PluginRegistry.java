@@ -18,9 +18,6 @@
 package io.stallion.plugins;
 
 import io.stallion.boot.StallionRunAction;
-
-
-
 import io.stallion.services.DynamicSettings;
 import io.stallion.services.Log;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +31,6 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import static io.stallion.Context.*;
 import static io.stallion.utils.Literals.*;
 
 /**

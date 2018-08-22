@@ -17,9 +17,7 @@
 
 package io.stallion.settings;
 
-import io.stallion.Context;
 import io.stallion.fileSystem.BaseWatchEventHandler;
-import io.stallion.services.Log;
 
 import java.nio.file.WatchEvent;
 

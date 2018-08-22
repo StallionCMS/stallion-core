@@ -18,24 +18,17 @@
 package io.stallion.assets;
 
 
-
 import io.stallion.Context;
-import io.stallion.assetBundling.BundleRegistry;
-import io.stallion.exceptions.ClientException;
 import io.stallion.exceptions.UsageException;
-import io.stallion.fileSystem.FileSystemWatcherService;
-import io.stallion.services.Log;
-import io.stallion.services.PermaCache;
 import io.stallion.settings.Settings;
-import io.stallion.utils.GeneralUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.HashMap;
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+
+import static io.stallion.utils.Literals.empty;
 
 /**
  * Manages assets that can be included on web pages. Takes care of cache-busting URL's

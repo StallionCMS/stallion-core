@@ -17,8 +17,6 @@
 
 package io.stallion.exceptions;
 
-import static io.stallion.utils.Literals.*;
-
 /**
  * An exception for when a command line action fails due to something correctable
  * by the user.

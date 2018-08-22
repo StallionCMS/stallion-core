@@ -23,7 +23,6 @@ import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.Schema;
 import io.stallion.reflection.PropertyUtils;
 
-
 import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.ResultSet;

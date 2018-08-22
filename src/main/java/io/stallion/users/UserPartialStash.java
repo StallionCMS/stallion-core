@@ -26,9 +26,6 @@ import io.stallion.settings.Settings;
 import java.io.File;
 import java.util.List;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public class UserPartialStash<T extends IUser> extends PartialStash<T> {
     private PredefinedUsersPersister<T> predefinedUserPersister;

@@ -17,13 +17,7 @@
 
 package io.stallion.dataAccess.db.converters;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.dataAccess.Model;
-import io.stallion.services.Log;
 
 
 public class JavascriptDbColumnConverter {

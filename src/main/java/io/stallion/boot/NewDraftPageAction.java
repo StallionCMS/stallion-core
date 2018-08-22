@@ -17,17 +17,10 @@
 
 package io.stallion.boot;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.file.TextFilePersister;
 import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.UsageException;
-import io.stallion.services.Log;
 import io.stallion.settings.ContentFolder;
 import io.stallion.settings.Settings;
 import io.stallion.utils.DateUtils;
@@ -36,6 +29,10 @@ import io.stallion.utils.Prompter;
 import io.stallion.utils.SimpleTemplate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+
+import static io.stallion.utils.Literals.empty;
 
 
 public class NewDraftPageAction implements StallionRunAction<CommandOptionsBase>  {

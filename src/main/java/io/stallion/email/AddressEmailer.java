@@ -19,11 +19,9 @@ package io.stallion.email;
 
 import io.stallion.users.User;
 
-import java.net.MalformedURLException;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.map;
 
 /**
  * Simple implementation of ContactableEmailer that can send an email

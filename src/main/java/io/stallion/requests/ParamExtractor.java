@@ -17,14 +17,12 @@
 
 package io.stallion.requests;
 
-import io.stallion.exceptions.ClientException;
-
 import javax.ws.rs.ClientErrorException;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.emptyObject;
 
 /**
  * A helper class for extracting required parameters from a user provided

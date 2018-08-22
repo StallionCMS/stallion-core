@@ -17,18 +17,18 @@
 
 package io.stallion.monitoring;
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import io.stallion.asyncTasks.TaskHealthInfo;
 import io.stallion.jobs.JobHealthInfo;
 import io.stallion.settings.Settings;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.stallion.utils.Literals.*;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import com.sun.management.UnixOperatingSystemMXBean;
 
 public class HealthInfo {
     private HttpHealthInfo http = null;

@@ -17,16 +17,9 @@
 
 package io.stallion.dataAccess.db.postgres;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-import java.util.List;
-import java.util.Map;
-
 import io.stallion.dataAccess.Tickets;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbImplementation;
-import io.stallion.services.Log;
 
 
 public class PostgresDbImplementation implements DbImplementation {

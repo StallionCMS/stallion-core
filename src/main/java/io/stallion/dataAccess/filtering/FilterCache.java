@@ -24,7 +24,6 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.PersistenceConfiguration;
-import net.sf.ehcache.config.SizeOfPolicyConfiguration;
 
 import java.util.Timer;
 import java.util.TimerTask;

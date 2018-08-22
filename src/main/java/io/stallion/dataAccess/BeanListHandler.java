@@ -17,20 +17,17 @@
 
 package io.stallion.dataAccess;
 
+import io.stallion.reflection.PropertyUtils;
+import org.apache.commons.dbutils.ResultSetHandler;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import static io.stallion.utils.Literals.*;
-
-import io.stallion.reflection.PropertyUtils;
-import io.stallion.services.Log;
-import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.RowProcessor;
-import org.apache.commons.dbutils.handlers.ArrayHandler;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 public class BeanListHandler<T> implements ResultSetHandler<List<T>> {

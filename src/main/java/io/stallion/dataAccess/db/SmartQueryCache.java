@@ -26,10 +26,10 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.PersistenceConfiguration;
 
-
 import javax.ws.rs.core.Cookie;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.mils;
 
 /**
  * SmartQueryCache is used by the DB singleton to cache query results.

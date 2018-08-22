@@ -21,13 +21,8 @@ package io.stallion.requests;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 
-
 import javax.ws.rs.core.Cookie;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.*;
-
-import static io.stallion.utils.Literals.*;
+import java.util.Set;
 
 
 public class SandboxedRequest implements IRequest {

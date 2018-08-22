@@ -19,7 +19,6 @@ package io.stallion.jobs;
 
 import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistration;
-import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.StandardModelController;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
@@ -27,7 +26,6 @@ import io.stallion.dataAccess.file.JsonFilePersister;
 import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
-import io.stallion.utils.GeneralUtils;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,7 +33,6 @@ import java.util.*;
 
 import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.list;
-import static io.stallion.utils.Literals.utcNow;
 
 /**
  * Handles the storing and retrieval of JobStatus records in either the database

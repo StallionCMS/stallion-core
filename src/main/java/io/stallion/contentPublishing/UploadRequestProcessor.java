@@ -17,18 +17,10 @@
 
 package io.stallion.contentPublishing;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URI;
-
-import static io.stallion.utils.Literals.*;
-
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
-import io.stallion.exceptions.ClientException;
-import io.stallion.exceptions.WebException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.IRequest;
 import io.stallion.services.CloudStorageService;
@@ -45,6 +37,12 @@ import org.parboiled.common.FileUtils;
 import javax.imageio.ImageIO;
 import javax.servlet.http.Part;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.WebApplicationException;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URI;
+
+import static io.stallion.utils.Literals.*;
 
 
 public class UploadRequestProcessor<U extends UploadedFile> {
@@ -173,7 +171,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
     protected U newUploadedFileInstance(boolean isPublic) {
         U uploaded = fileController.newModel();
         if (!empty(uploaded.getId())) {
-            throw new WebException("You cannot reuse the same upload file processor twice.");
+            throw new WebApplicationException("You cannot reuse the same upload file processor twice.");
         }
         Long id = DataAccessRegistry.instance().getTickets().nextId();
         String secret = GeneralUtils.randomTokenBase32(14);

@@ -17,11 +17,6 @@
 
 package io.stallion.contentPublishing;
 
-import java.util.List;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.Context;
 import io.stallion.dataAccess.Displayable;
 import io.stallion.dataAccess.DisplayableModelController;
@@ -36,9 +31,10 @@ import org.glassfish.jersey.server.ContainerRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.Response;
+import java.util.Map;
+
+import static io.stallion.utils.Literals.*;
 
 @Path("/")
 public class ContentSlugCatchallResource {

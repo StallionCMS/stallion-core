@@ -17,10 +17,6 @@
 
 package io.stallion.secrets;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
-
 public class SecretsConf {
     private String s3key = "";
     private String s3bucket = "";

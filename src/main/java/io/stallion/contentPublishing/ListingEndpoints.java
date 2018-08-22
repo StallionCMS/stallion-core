@@ -17,20 +17,12 @@
 
 package io.stallion.contentPublishing;
 
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.file.TextItem;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
-
 import io.stallion.settings.ContentFolder;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -40,12 +32,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.model.Resource;
-import org.glassfish.jersey.server.model.ResourceModelIssue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Request;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.map;
 
 
 public class ListingEndpoints  {

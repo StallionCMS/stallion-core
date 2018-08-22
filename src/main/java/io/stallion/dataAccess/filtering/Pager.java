@@ -20,7 +20,6 @@ package io.stallion.dataAccess.filtering;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -17,14 +17,8 @@
 
 package io.stallion.dataAccess.file;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.fasterxml.jackson.databind.SerializationFeature;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.Model;
-
-import static io.stallion.utils.Literals.*;
-
 import io.stallion.utils.json.JSON;
 import org.apache.commons.io.FileUtils;
 
@@ -32,6 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import static io.stallion.utils.Literals.UTF8;
+import static io.stallion.utils.Literals.list;
 
 public class JsonFilePersister<T extends Model> extends FilePersisterBase<T> {
 

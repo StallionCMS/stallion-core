@@ -20,9 +20,6 @@ package io.stallion.boot;
 import io.stallion.settings.Settings;
 import org.kohsuke.args4j.Option;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class ServeCommandOptions extends CommandOptionsBase {
 

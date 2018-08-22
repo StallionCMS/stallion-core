@@ -21,9 +21,6 @@ import com.hubspot.jinjava.interpret.JinjavaInterpreter;
 import com.hubspot.jinjava.lib.filter.Filter;
 import io.stallion.utils.Markdown;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public class MarkdownFilter implements Filter {
     @Override

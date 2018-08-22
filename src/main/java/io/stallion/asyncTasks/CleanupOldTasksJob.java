@@ -19,9 +19,6 @@ package io.stallion.asyncTasks;
 
 import io.stallion.jobs.Job;
 
-import static io.stallion.utils.Literals.*;
-import static io.stallion.Context.*;
-
 
 public class CleanupOldTasksJob implements Job {
 

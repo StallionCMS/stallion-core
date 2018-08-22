@@ -32,9 +32,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import static io.stallion.utils.Literals.UTF8;
-import static io.stallion.utils.Literals.empty;
-import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.*;
 
 public abstract class StallionJavaPlugin {
     private PluginRegistry pluginRegistry;

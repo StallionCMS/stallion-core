@@ -17,15 +17,14 @@
 
 package io.stallion.services;
 
-import java.time.ZonedDateTime;
-import java.util.Map;
-
 import io.stallion.dataAccess.ModelBase;
 import io.stallion.dataAccess.db.Converter;
 import io.stallion.dataAccess.db.converters.JsonMapConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import java.time.ZonedDateTime;
+import java.util.Map;
 
 @Table(name="stallion_transaction_log")
 public class TransactionLog extends ModelBase {

@@ -19,7 +19,6 @@ package io.stallion.asyncTasks;
 
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.db.DB;
-import io.stallion.exceptions.NotFoundException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.jobs.JobCoordinator;
 import io.stallion.jobs.JobDefinition;
@@ -27,13 +26,15 @@ import io.stallion.jobs.Schedule;
 import io.stallion.services.Log;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
-import static io.stallion.utils.Literals.*;
-
+import javax.ws.rs.NotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.mils;
 
 /**
  * The AsyncCoordinator handles the running of asychronous tasks. The coordinator

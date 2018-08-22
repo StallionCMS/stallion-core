@@ -17,7 +17,6 @@
 
 package io.stallion.dataAccess.db;
 
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 

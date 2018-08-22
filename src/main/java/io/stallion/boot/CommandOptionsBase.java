@@ -23,8 +23,6 @@ import io.stallion.settings.StrictnessLevel;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
-
-import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 

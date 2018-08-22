@@ -17,10 +17,10 @@
 
 package io.stallion.utils;
 
-import io.stallion.exceptions.NotFoundException;
+
 import io.stallion.exceptions.UsageException;
-import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.plugins.PluginRegistry;
+import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import org.apache.commons.io.FilenameUtils;
@@ -28,7 +28,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.parboiled.common.FileUtils;
 
-import java.io.*;
+import javax.ws.rs.NotFoundException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -36,7 +40,8 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static io.stallion.utils.Literals.*;
+import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.list;
 
 
 public class ResourceHelpers {
