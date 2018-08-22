@@ -90,10 +90,10 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
         String html;
         String content;
 
-        br = new ResourceAssetBundleRenderer("stallion", "stallion-default-assets.bundle.css");
+        br = new ResourceAssetBundleRenderer("stallion", "testing.bundle.css");
         html = br.renderDebugHtml();
-        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-resource/stallion/vendor/grids-responsive-min.css.css?bundlePath=%2Fassets%2Fstallion-default-assets.bundle&ts=");
-        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-resource/stallion/basic/stallion.css.css?bundlePath=%2Fassets%2Fstallion-default-assets.bundle&ts=");
+        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-resource/stallion/css/one.css.css?bundlePath=%2Fassets%2Ftesting.bundle&ts=");
+        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-resource/stallion/css/second.css.css?bundlePath=%2Fassets%2Ftesting.bundle&ts=");
         assertNotContains(html, "jquery");
 
 

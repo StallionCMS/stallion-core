@@ -27,25 +27,25 @@ import javax.ws.rs.PathParam;
 
 public class MySqlEndpoint implements EndpointResource {
     @GET
-    @Path("/house/:id")
+    @Path("/house/{id}")
     public House fetchHouse(@PathParam("id") Long id) {
         return HouseController.instance().forId(id);
     }
 
     @POST
-    @Path("/house/:id")
+    @Path("/house/{id}")
     public House updateHouse(@PathParam("id") Long id) {
         return HouseController.instance().forId(id);
     }
 
     @GET
-    @Path("/payment/:id")
+    @Path("/payment/{id}")
     public Payment fetchPayment(@PathParam("id") Long id) {
         return PaymentController.instance().forId(id);
     }
 
     @POST
-    @Path("/payment/:id")
+    @Path("/payment/{id}")
     public Payment updatePayment(@PathParam("id") Long id) {
         return PaymentController.instance().forId(id);
     }

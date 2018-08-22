@@ -132,6 +132,17 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         return filter(name, val, "eq");
     }
 
+
+    public FilterChain<T> chain(String name, Object val) {
+        return filter(name, val, "eq");
+    }
+
+    public FilterChain<T> chain(String name, Object val, String op) {
+        return filter(name, val, op);
+    }
+
+
+
     /**
      * Do a basic equality filter.
      *

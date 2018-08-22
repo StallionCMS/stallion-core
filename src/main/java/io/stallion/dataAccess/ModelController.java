@@ -275,6 +275,16 @@ public interface ModelController<T extends Model> {
      */
     public FilterChain<T> filter(String name, Object value, String op);
 
+    default FilterChain<T> find(String name, Object value, String op) {
+        return filterChain().filter(name, value, op);
+    }
+
+
+    default FilterChain<T> find(String name, Object value) {
+        return filterChain().filter(name, value);
+    }
+
+
     /**
      *
      * Create a new FilterChain and initialize with an initial filter.
