@@ -159,11 +159,19 @@ public class Context {
     }
 
     public static IUser getUser() {
-        return request().getUser();
+        IUser user = request().getUser();
+        if (user == null) {
+            return new EmptyUser();
+        }
+        return user;
     }
 
     public static IOrg getOrg() {
-        return request().getOrg();
+        IOrg org = request().getOrg();
+        if (org == null) {
+            return new EmptyOrg();
+        }
+        return org;
     }
 
 

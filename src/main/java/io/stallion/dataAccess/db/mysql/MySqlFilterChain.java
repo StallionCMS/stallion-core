@@ -54,7 +54,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
     private String table;
 
     public MySqlFilterChain(String table, String bucket, Class<T> clazz) {
-        super(bucket, new ArrayList<T>(), null);
+        super(bucket);
         this.clazz = clazz;
         this.table = table;
     }

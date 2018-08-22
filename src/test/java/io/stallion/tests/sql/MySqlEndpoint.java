@@ -19,33 +19,34 @@ package io.stallion.tests.sql;
 
 
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 
-
+@Produces("application/json")
+@Consumes("application/json")
+@Path("/st-mysql-tests")
 public class MySqlEndpoint   {
     @GET
-    @Path("/house/:id")
+    @Path("/house/{id}")
     public House fetchHouse(@PathParam("id") Long id) {
         return HouseController.instance().forId(id);
     }
 
     @POST
-    @Path("/house/:id")
+    @Path("/house/{id}")
     public House updateHouse(@PathParam("id") Long id) {
         return HouseController.instance().forId(id);
     }
 
     @GET
-    @Path("/payment/:id")
+    @Path("/payment/{id}")
+    @Produces("application/json")
     public Payment fetchPayment(@PathParam("id") Long id) {
         return PaymentController.instance().forId(id);
     }
 
     @POST
-    @Path("/payment/:id")
+    @Path("/payment/{id}")
+    @Produces("application/json")
     public Payment updatePayment(@PathParam("id") Long id) {
         return PaymentController.instance().forId(id);
     }

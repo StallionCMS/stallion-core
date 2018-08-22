@@ -79,6 +79,9 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     private Map<String, Double> averages = null;
     private Map<String, Double> sums = null;
 
+    public FilterChain(String bucket) {
+        this.bucket = bucket;
+    }
 
     public FilterChain(String bucket, List<T> originalObjects) {
         this.bucket = bucket;
@@ -131,6 +134,17 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     public FilterChain<T> filter(String name, Object val) {
         return filter(name, val, "eq");
     }
+
+
+    public FilterChain<T> chain(String name, Object val) {
+        return filter(name, val, "eq");
+    }
+
+    public FilterChain<T> chain(String name, Object val, String op) {
+        return filter(name, val, op);
+    }
+
+
 
     /**
      * Do a basic equality filter.
@@ -1120,7 +1134,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         builder.append(methodName + Literals.GSEP);
         if (this.stash != null) {
             builder.append(this.stash.getBucket() + Literals.GSEP);
-        } else if (this.originalObjects.size() > 0) {
+        } else if (this.originalObjects != null && this.originalObjects.size() > 0) {
             builder.append(this.originalObjects.get(0).getClass().getCanonicalName());
         }
 

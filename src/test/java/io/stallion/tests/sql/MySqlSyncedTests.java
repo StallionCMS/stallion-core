@@ -26,11 +26,16 @@ import io.stallion.dataAccess.db.DbPersister;
 import io.stallion.dataAccess.db.SqlMigrationAction;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
+import io.stallion.testing.JerseyIntegrationBaseCase;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.Response;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -43,7 +48,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 
-public class MySqlSyncedTests extends AppIntegrationCaseBase {
+public class MySqlSyncedTests extends JerseyIntegrationBaseCase {
 
     public static void setupMysql() {
         SqlMigrateCommandOptions options = new SqlMigrateCommandOptions();
@@ -86,7 +91,13 @@ public class MySqlSyncedTests extends AppIntegrationCaseBase {
     @BeforeClass
     public static void setUpClass() throws Exception {
         setupMysql();
-        startApp("/mysql_site");
+        startApp("/mysql_site", new Feature() {
+            @Override
+            public boolean configure(FeatureContext context) {
+                context.register(MySqlEndpoint.class);
+                return true;
+            }
+        });
         DataAccessRegistry.instance().register(
                 new DataAccessRegistration()
                         .setModelClass(House.class)
@@ -150,31 +161,43 @@ public class MySqlSyncedTests extends AppIntegrationCaseBase {
                 .setCondemned(false)
                 .setTaxesPaid(false);
         HouseController.instance().save(house1);
-        throw new NotImplementedException("uncomment and fix");
-        /*
 
-        MockResponse response = client.get("/st-mysql-tests/house/" + house1.getId());
-        Log.info("House: {0}", response.getContent());
-        House house1result = JSON.parse(response.getContent(), House.class);
-        assertEquals(1803, house1result.getBuildYear());
+        {
+            Response response = GET("/st-mysql-tests/house/" + house1.getId());
+            House house1result = response.readEntity(House.class);
+            assertEquals(1803, house1result.getBuildYear());
 
-        DB.instance().newQuery().update("UPDATE stallion_test_house SET buildYear=1944 WHERE id=?", house1result.getId());
+            DB.instance().newQuery().update("UPDATE stallion_test_house SET buildYear=1944 WHERE id=?", house1result.getId());
+        }
 
-        // This will still be 1803, since we do not resync on a GET request
-        response = client.get("/st-mysql-tests/house/" + house1.getId());
-        house1result = JSON.parse(response.getContent(), House.class);
-        assertEquals(1803, house1result.getBuildYear());
 
-        // This will be 1944, since we do resync on a POST
-        response = client.post("/st-mysql-tests/house/" + house1.getId(), map());
-        house1result = JSON.parse(response.getContent(), House.class);
-        assertEquals(1944, house1result.getBuildYear());
 
-        // This will be 1944, since we have resynced
-        response = client.get("/st-mysql-tests/house/" + house1.getId());
-        house1result = JSON.parse(response.getContent(), House.class);
-        assertEquals(1944, house1result.getBuildYear());
-        */
+        {
+            // This will still be 1803, since we do not resync on a GET request
+            Response response = GET("/st-mysql-tests/house/" + house1.getId());
+            House house1result = response.readEntity(House.class);
+            assertEquals(1803, house1result.getBuildYear());
+        }
+        {
+
+            // This will be 1944, since we do resync on a POST
+            Response response = target("/st-mysql-tests/house/" + house1.getId())
+                    .request()
+                    .header("X-Requested-By", "test")
+                    .post(Entity.entity("{}", "application/json"));
+            assertEquals(200, response.getStatus());
+            House house1result = response.readEntity(House.class);
+            assertEquals(1944, house1result.getBuildYear());
+        }
+
+        {
+
+            // This will be 1944, since we have resynced
+            Response response = GET("/st-mysql-tests/house/" + house1.getId());
+            House house1result = response.readEntity(House.class);
+            assertEquals(1944, house1result.getBuildYear());
+        }
+
 
     }
 

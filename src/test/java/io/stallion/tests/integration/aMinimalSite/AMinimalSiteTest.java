@@ -55,7 +55,7 @@ public class AMinimalSiteTest extends JerseyIntegrationBaseCase {
     @Test
     public void testSettings() {
         assertEquals("http://localhost:8090", Context.settings().getSiteUrl());
-        assertEquals("http://localhost:8090/testing", Context.settings().getCdnUrl());
+        assertEquals("http://localhost:8090", Context.settings().getCdnUrl());
         assertEquals("testoverriden", Context.settings().getCustom().get("foobar"));
         assertEquals("notoverriden", Context.settings().getCustom().get("bar"));
         assertEquals("noop", getSettings().getEmail().getUsername());

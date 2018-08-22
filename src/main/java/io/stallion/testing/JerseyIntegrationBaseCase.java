@@ -44,11 +44,13 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.Response;
 
 
 public abstract class JerseyIntegrationBaseCase  {
     private static InnerJerseyTest jerseyTest;
+    private static Feature[] features;
 
     static {
         System.setProperty("java.awt.headless", "true");
@@ -95,35 +97,24 @@ public abstract class JerseyIntegrationBaseCase  {
     }
 
 
-    public static class InnerJerseyTest extends JerseyTest {
-        @Override
-        protected Application configure() {
-            enable(TestProperties.LOG_TRAFFIC);
-            enable(TestProperties.DUMP_ENTITY);
-            enable("trace");
-
-
-            ResourceConfig rc = new StallionServer().buildResourceConfig();
-            //extraConfigure(rc);
-
-            return rc;
-        }
-    }
-
     protected void extraConfigure(ResourceConfig rc) {
 
     }
 
     public static void startApp(String folderName) throws Exception {
-        startApp(folderName, false);
+        startApp(folderName, false, new Feature[0], new StallionJavaPlugin[0]);
+    }
+
+    public static void startApp(String folderName,  Feature ...features) throws Exception {
+        startApp(folderName, false, features, new StallionJavaPlugin[0]);
     }
 
     public static void startApp(String folderName,  StallionJavaPlugin ...plugins) throws Exception {
-        startApp(folderName, false, plugins);
+        startApp(folderName, false,  new Feature[0], plugins);
     }
 
 
-    public static void startApp(String folderName, Boolean watchFolders,  StallionJavaPlugin ...plugins) throws Exception {
+    public static void startApp(String folderName, Boolean watchFolders, Feature[] theFeatures, StallionJavaPlugin ...plugins) throws Exception {
         Log.info("setUpClass client and app");
         Settings.shutdown();
         String path;
@@ -148,6 +139,11 @@ public abstract class JerseyIntegrationBaseCase  {
             plugin.boot();
         }
 
+        if (theFeatures != null) {
+            features = theFeatures;
+        } else {
+            features = new Feature[0];
+        }
         jerseyTest = new InnerJerseyTest();
         jerseyTest.setUp();
 
@@ -157,6 +153,29 @@ public abstract class JerseyIntegrationBaseCase  {
         Log.info("App booted for folder: {0} ", path);
         Log.fine("--------------------------------------------------------------------------------------------------");
 
+    }
+
+
+
+    public static class InnerJerseyTest extends JerseyTest {
+
+
+        @Override
+        protected Application configure() {
+            enable(TestProperties.LOG_TRAFFIC);
+            enable(TestProperties.DUMP_ENTITY);
+            enable("trace");
+
+
+            ResourceConfig rc = new StallionServer().buildResourceConfig();
+            if (features != null) {
+                for (Feature feature : features) {
+                    rc.register(feature);
+                }
+            }
+
+            return rc;
+        }
     }
 
     private static Map<Class, SelfMocking> mocks = new HashMap<>();
@@ -215,7 +234,10 @@ public abstract class JerseyIntegrationBaseCase  {
 
     @AfterClass
     public static void baseAfterClass() throws Exception {
+        features = new Feature[0];
         jerseyTest.tearDown();
+        jerseyTest = null;
+
 
         for(SelfMocking sm: mocks.values()) {
             sm.onSelfMockingAfterClass();
@@ -253,31 +275,34 @@ public abstract class JerseyIntegrationBaseCase  {
     }
 
     public void assertResponseDoesNotContain(Response response, String content, int status) {
-        if (response.getEntity().toString().contains(content)) {
-            Log.warn("Unexpected string {0} found in response content!!\n{1}\n\n", content, response.getEntity().toString());
+        String out = response.readEntity(String.class);
+        if (!out.contains(content)) {
+            Log.warn("Unexpected string {0} found in response content!!\n{1}\n\n", content, out);
         }
-        assert !response.getEntity().toString().contains(content);
+        assert !out.contains(content);
     }
 
-    public void assertResponseContains(Response response, String content) {
-        assertResponseContains(response, content, 200);
-    }
+
 
     public void assertResponseSucceeded(Response response) {
         if (response.getStatus() != 200) {
             throw new AssertionError("Response status was: " + response.getStatus() + " Content: " + response.getEntity().toString());
         }
     }
+    public void assertResponseContains(Response response, String content) {
+        assertResponseContains(response, content, 200);
+    }
 
     public void assertResponseContains(Response response, String content, int status) {
-        if (!response.getEntity().toString().contains(content)) {
-            Log.warn("String {0} not found in response content!!\n{1}\n\n", content, response.getEntity().toString());
+        String out = response.readEntity(String.class);
+        if (!out.contains(content)) {
+            Log.warn("String {0} not found in response content!!\n{1}\n\n", content, out);
         }
         if (response.getStatus() != status) {
             Log.warn("Bad response status! expected={0} actual={1}", status, response.getStatus());
             assert response.getStatus() == status;
         }
-        assert response.getEntity().toString().contains(content);
+        assert out.contains(content);
     }
 
 

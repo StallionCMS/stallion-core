@@ -22,12 +22,15 @@ import io.stallion.dataAccess.file.TextItem;
 import io.stallion.dataAccess.file.TextItemController;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
+import io.stallion.testing.JerseyIntegrationBaseCase;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.eclipse.jetty.http.MetaData;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static io.stallion.utils.Literals.*;
 
 
-public class TextFileTest extends AppIntegrationCaseBase {
+public class TextFileTest extends JerseyIntegrationBaseCase {
 
 
     @BeforeClass
@@ -48,8 +51,8 @@ public class TextFileTest extends AppIntegrationCaseBase {
 
     @Test
     public void testPageParsing() {
-        /*
-        MockResponse response = client.get("/toml-meta-things");
+
+        Response response = GET("/toml-meta-things");
         Assert.assertEquals(200, response.getStatus());
 
         TextItemController controller = (TextItemController)Context.dal().get("pages");
@@ -58,8 +61,8 @@ public class TextFileTest extends AppIntegrationCaseBase {
         assertEquals("Peter", ((List<Map>) item.get("editors")).get(0).get("name"));
         assertEquals("onething", ((List<String>) item.get("listOfThings")).get(0));
         assertEquals("This is a multiline string\n", item.get("multiString").toString());
-        */
-        throw new NotImplementedException("uncomment and fix");
+
+
     }
 
     @Test
@@ -83,46 +86,57 @@ public class TextFileTest extends AppIntegrationCaseBase {
 
     @Test
     public void testRawHtml() {
-        /*
-        MockResponse response = client.get("/with-raw-html");
-        assertResponseContains(response, expectedRawHtml);
-        assertResponseContains(response, secondExpectedRawHtml);
-        assertResponseContains(response, "To wash my face clean after the dust of the road, and to drink, so the dry bread will not stick in my throat.");
-          */
-        throw new NotImplementedException("uncomment and fix");
+
+        Response response = GET("/with-raw-html");
+        String out = response.readEntity(String.class);
+        assertContains(out, expectedRawHtml);
+        assertContains(out, secondExpectedRawHtml);
+        assertContains(out, secondExpectedRawHtml);
+        assertContains(out, "To wash my face clean after the dust of the road, and to drink, so the dry bread will not stick in my throat.");
+
     }
 
 
 
 
     @Test
-    public void testOnePage()
-    {
-        throw new NotImplementedException("uncomment and fix");
-        /*
-        MockResponse response = client.get("/faq");
-        assertResponseContains(response, "<h1>Frequently Asked Questions</h1>");
+    public void testOnePage() {
 
-        response = client.get("/");
-        assertResponseContains(response, "This is the home page for the text_site page collection.");
-          */
+        {
+            Response response = GET("/faq");
+            String out = response.readEntity(String.class);
+            assertContains(out, "<h1>Frequently Asked Questions</h1>");
+        }
+
+        {
+
+            Response response = GET("/");
+            String out = response.readEntity(String.class);
+            assertContains(out, "This is the home page for the text_site page collection.");
+        }
+
     }
 
 
     @Test
     public void testPageVisible()
     {
-        throw new NotImplementedException("uncomment and fix");
-        /*
-        MockResponse response = client.get("/faq");
-        assertResponseContains(response, "<h1>Frequently Asked Questions</h1>");
 
-        response = client.get("/draft-page");
-        assertResponseDoesNotContain(response, "The Draft Page", 404);
+        {
+            Response response = GET("/faq");
+            assertResponseContains(response, "<h1>Frequently Asked Questions</h1>");
+        }
 
-        response = client.get("/future-dated");
-        assertResponseDoesNotContain(response, "The Future Page", 404);
-          */
+        {
+            Response response = GET("/draft-page");
+            assertResponseDoesNotContain(response, "The Draft Page", 404);
+        }
+
+        {
+            Response response = GET("/future-dated");
+            assertResponseDoesNotContain(response, "The Future Page", 404);
+        }
+
 
     }
 
@@ -130,11 +144,11 @@ public class TextFileTest extends AppIntegrationCaseBase {
     @Test
     public void testListing()
     {
-        throw new NotImplementedException("uncomment and fix");
-        /*
-        MockResponse response = client.get("/posts");
+
+
+        Response response = GET("/posts");
         assertResponseContains(response, "<a href=\"/sane-blogging\">Sane Blogging</a>");
-        */
+
     }
 
     protected static String secondExpectedRawHtml = "A second rawHtml section.\n" +

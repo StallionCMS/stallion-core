@@ -1,12 +1,10 @@
 pageTemplate = "page.jinja"
 
-[[routes]]
-route = "/posts"
-template = "listing.jinja"
-name = "blog-main"
 
 [[folders]]
 path="posts"
 type="markdown"
 defaultTemplate="post.jinja"
-
+listingRootUrl = "/posts"
+listingTemplate = "listing.jinja"
+listingEnabled = true

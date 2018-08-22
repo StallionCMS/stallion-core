@@ -1,4 +1,4 @@
-cdnUrl = "http://localhost:{port}/testing"
+cdnUrl = "http://localhost:{port}"
 siteName = "The quite overriden site name"
 
 [custom]

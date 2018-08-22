@@ -24,6 +24,7 @@ import io.stallion.assets.FileSystemAssetBundleRenderer;
 import io.stallion.assets.ResourceAssetBundleRenderer;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
+import io.stallion.testing.JerseyIntegrationBaseCase;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
@@ -35,7 +36,7 @@ import javax.ws.rs.core.Response;
 import static org.junit.Assert.*;
 
 
-public class AssetBundlingTests extends AppIntegrationCaseBase {
+public class AssetBundlingTests extends JerseyIntegrationBaseCase {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -59,8 +60,8 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
         br = new FileSystemAssetBundleRenderer("site.bundle.css");
 
         html = br.renderDebugHtml();
-        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-assets/site.bundle.css?isBundleFile=true&bundleFilePath=%2Fpure-min.css.css&ts=");
-        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-assets/site.bundle.css?isBundleFile=true&bundleFilePath=%2Fcustom.css.css&ts=");
+        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/st-assets/site.bundle.css?isBundleFile=true&bundleFilePath=%2Fpure-min.css.css&ts=");
+        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/st-assets/site.bundle.css?isBundleFile=true&bundleFilePath=%2Fcustom.css.css&ts=");
 
         html = br.renderProductionHtml();
         assertContains(html, "site.bundle.css?");
@@ -79,7 +80,7 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
         br = new FileSystemAssetBundleRenderer("site.bundle.js");
 
         html = br.renderDebugHtml();
-        assertContains(html, "<script src=\"http://localhost:8090/testing/st-assets/site.bundle.js?isBundleFile=true&bundleFilePath=%2Fsite.js.js&ts=");
+        assertContains(html, "<script src=\"http://localhost:8090/st-assets/site.bundle.js?isBundleFile=true&bundleFilePath=%2Fsite.js.js&ts=");
 
         content = br.renderProductionContent();
         assertNotContains(content, "body.a-minimal-site{color:#333;");
@@ -93,10 +94,10 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
         String html;
         String content;
 
-        br = new ResourceAssetBundleRenderer("stallion", "stallion-default-assets.bundle.css");
+        br = new ResourceAssetBundleRenderer("stallion", "testing.bundle.css");
         html = br.renderDebugHtml();
-        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-resource/stallion/vendor/grids-responsive-min.css.css?bundlePath=%2Fassets%2Fstallion-default-assets.bundle&ts=");
-        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-resource/stallion/basic/stallion.css.css?bundlePath=%2Fassets%2Fstallion-default-assets.bundle&ts=");
+        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/st-resource/stallion/css/one.css.css?bundlePath=%2Fassets%2Ftesting.bundle&ts=");
+        assertContains(html, "<link rel=\"stylesheet\" href=\"http://localhost:8090/st-resource/stallion/css/second.css.css?bundlePath=%2Fassets%2Ftesting.bundle&ts=");
         assertNotContains(html, "jquery");
 
 
@@ -107,24 +108,30 @@ public class AssetBundlingTests extends AppIntegrationCaseBase {
 
     @Test
     public void fullTestWithEndpoints() {
-        Response response;
-
-        throw new NotImplementedException("uncomment and fix");
-                /*
-        response = client.get("/an-assetful-page");
-        assertEquals(200, response.getStatus());
-        Log.finer("Page content: {0}", response.getContent());
-
-        assertContains(response.getContent(), "<link rel=\"stylesheet\" href=\"http://localhost:8090/testing/st-assets/site.bundle.css?isBundleFile=true&bundleFilePath=%2Fpure-min.css.css&ts=");
-        //assertContains(response.getContent(), "/st-resource/stallion/always/stallion.js");
 
 
+        String expectedUrl = "http://localhost:8090/st-assets/site.bundle.css?isBundleFile=true&bundleFilePath=%2Fpure-min.css.css&ts=";
 
-        response = client.get("/st-assets/site.bundle.css?isBundleFile=true&bundleFilePath=%2Fpure-min.css.css&ts=sdf");
-        Log.finer("Local asset content: {0}", response.getContent());
-        assertEquals(200, response.getStatus());
-        assertTrue(response.getContent().contains("Pure v0.5.0"));
-        */
+        {
+            Response response = GET("/an-assetful-page");
+            assertEquals(200, response.getStatus());
+            String content = response.readEntity(String.class);
+
+            assertContains(content, "<link rel=\"stylesheet\" href=\"" + expectedUrl + "");
+        }
+
+        {
+            Response response = target("/st-assets/site.bundle.css")
+                    .queryParam("isBundleFile", "true")
+                    .queryParam("bundleFilePath", "/pure-min.css.css")
+                    .queryParam("ts", "123")
+                    .request()
+                    .get();
+            String content = response.readEntity(String.class);
+            assertEquals(200, response.getStatus());
+            assertTrue(content.contains("Pure v0.5.0"));
+        }
+
     }
 
 }

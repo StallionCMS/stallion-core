@@ -26,6 +26,7 @@ import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.services.DynamicSettings;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
+import io.stallion.testing.JerseyIntegrationBaseCase;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.json.JSON;
@@ -33,6 +34,10 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -43,11 +48,17 @@ import static org.junit.Assert.*;
 
 
 
-public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
+public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        startApp("/mysql_site");
+        startApp("/mysql_site", new Feature() {
+            @Override
+            public boolean configure(FeatureContext context) {
+                context.register(MySqlEndpoint.class);
+                return true;
+            }
+        });
         DataAccessRegistry.instance().register(
                 new DataAccessRegistration()
                         .setModelClass(Payment.class)
@@ -69,6 +80,8 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
         DB.instance().registerConverter(new PicnicAttendeesConverter());
 
     }
+
+
 
     @Test
     public void testHostSettings() {
@@ -151,7 +164,7 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
     @Test
     public void testComplexQueries() {
         Log.warn("Implement me");
-
+        //TODO implement me
         // Test exclude
         // Test less than, greater than
         // Test
@@ -170,28 +183,46 @@ public class MySqlQueryControllerTests extends AppIntegrationCaseBase {
                 ;
         PaymentController.instance().save(payment);
 
-        throw new NotImplementedException("uncomment and fix");
-        /*
-        MockResponse response = client.get("/st-mysql-tests/payment/" + payment.getId());
-        payment = JSON.parse(response.getContent(), Payment.class);
-        assertEquals(54321, payment.getAmount());
+        {
+            Response response = GET("/st-mysql-tests/payment/" + payment.getId());
+            assertEquals(200, response.getStatus());
+            payment = response.readEntity(Payment.class);
+            assertEquals(54321, payment.getAmount());
+        }
 
         DB.instance().newQuery().update("UPDATE stallion_test_payment SET amount=12345 WHERE id=?", payment.getId());
 
-        // This will still be 54321, since we do not resync on a GET request
-        response = client.get("/st-mysql-tests/payment/" + payment.getId());
-        payment = JSON.parse(response.getContent(), Payment.class);
-        assertEquals(54321, payment.getAmount());
+        {
+            // This will still be 54321, since we do not resync on a GET request
+            Response response = GET("/st-mysql-tests/payment/" + payment.getId());
+            assertEquals(200, response.getStatus());
+            payment = response.readEntity(Payment.class);//JSON.parse(response.getContent(), Payment.class);
 
-        // POST request, so we skip the cache. This will now be the updated value 12345
-        response = client.post("/st-mysql-tests/payment/" + payment.getId(), map());
-        payment = JSON.parse(response.getContent(), Payment.class);
-        assertEquals(12345, payment.getAmount());
+            assertEquals(54321, payment.getAmount());
+        }
 
-        // Now the GET request will also be updated
-        response = client.get("/st-mysql-tests/payment/" + payment.getId());
-        payment = JSON.parse(response.getContent(),
-        */
+        {
+            // POST request, so we skip the cache. This will now be the updated value 12345
+            Response response = target("/st-mysql-tests/payment/" + payment.getId())
+                    .request()
+                    .header("X-Requested-By", "test")
+                    .post(Entity.entity(map(), "application/json"))
+                    ;
+            assertEquals(200, response.getStatus());
+            payment = response.readEntity(Payment.class);
+            assertEquals(12345, payment.getAmount());
+        }
+
+        {
+
+            // Now the GET request will also be updated
+            Response response = target("/st-mysql-tests/payment/" + payment.getId())
+                    .request()
+                    .get();
+            assertEquals(200, response.getStatus());
+            payment = response.readEntity(Payment.class);
+            assertEquals(12345, payment.getAmount());
+        }
 
     }
 
