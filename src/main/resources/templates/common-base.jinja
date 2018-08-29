@@ -21,14 +21,12 @@
   {% for rss_link in meta.rssLinks %}
   <link rel="alternate" type="application/rss+xml" title="{{ rss_link.title }}" href="{{ rss_link.link }}" />
   {% endfor %}
-  {% block builtin_head_bundles %}
-    {{ assets.bundle("stallion", "stallion-default-assets.bundle.css") }}
-  {% endblock %}
+
   {% block bundle_css %}
   {{ assets.bundle("site.bundle.css") }}
   {% endblock %}
   {% block per_request_head_literals %}
-    {{ assets.pageHeadLiterals() }}
+
   {% endblock %}
   {% block extra_head %}
   {% endblock %}
@@ -39,13 +37,13 @@
   {% block body_content %}
   {% endblock %}
   {%-- block builtin_footer_bundles --%}
-    {{ assets.bundle("stallion", "stallion-default-assets.bundle.js") }}
+
   {%-- endblock --%}
   {%-- block bundle_js --%}
     {{ assets.bundle("site.bundle.js") }}
   {%-- endblock --%}
   {%-- block per_request_footer_literals --%}
-    {{ assets.pageFooterLiterals() }}
+
   {%-- endblock --%}
 
   {% block pre_end_body %}

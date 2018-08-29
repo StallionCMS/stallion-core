@@ -70,21 +70,23 @@ public class AssetsEndpointsResource  {
     @GET
     public Response stAssets(
             @PathParam("path") String path,
+            @HeaderParam("referer") String referer,
             @QueryParam("isConcatenatedFileBundle") boolean isConcatenatedFileBundle,
-            @QueryParam("isBundleFile") boolean isBundleFile
+            @QueryParam("isBundleFile") boolean isBundleFile,
+            @QueryParam("bundleFilePath") String bundleFilePath
     ) throws Exception {
         // TODO: Clean up this requests mess
         RequestWrapper request = new RequestWrapper((ContainerRequest)requestContext);
         //request.setPath("/st-assets/" + path);
-        AssetServing assetServing = new AssetServing(request, response);
+        AssetServing assetServing = new AssetServing(null, path, referer);
         if (isConcatenatedFileBundle) {
             return assetServing.serveFileBundle();
         } else if (isBundleFile) {
-            return assetServing.serveFileBundleAsset();
+            return assetServing.serveFileBundleAsset(bundleFilePath);
         } else {
             //String path2 = (((ContainerRequest) requestContext).getUriInfo()).getPath().substring(11);
             //assetServing.serveFolderAsset(path);
-            return assetServing.serveFolderAssetToResponse(path);
+            return assetServing.serveFolderAssetToResponse();
         }
     }
 
@@ -99,12 +101,15 @@ public class AssetsEndpointsResource  {
     public Object stAssets(
             @PathParam("pluginName") String pluginName,
             @PathParam("path") String path,
-            @QueryParam("isFullResourceBundle") boolean isFullResourceBundle
+            @HeaderParam("referer") String referer,
+            @QueryParam("isFullResourceBundle") boolean isFullResourceBundle,
+            @QueryParam("bundlePath") String bundlePath
     ) throws Exception {
+        Log.info("Serve resource for plugin {0} path {1} isFullresourecBundle: {2}", pluginName, path, isFullResourceBundle);
         if (isFullResourceBundle) {
-            return new AssetServing(Context.getRequest(), response).serveResourceBundle();
+            return new AssetServing(pluginName, path, referer).serveResourceBundle();
         } else {
-            return new AssetServing(Context.getRequest(), response).serveResourceAsset();
+            return new AssetServing(pluginName, path, referer).serveResourceAsset(bundlePath);
         }
     }
     /*

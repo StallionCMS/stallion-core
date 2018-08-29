@@ -45,6 +45,7 @@ import io.stallion.users.User;
 import io.stallion.users.UserController;
 
 import java.io.File;
+import java.util.Map;
 
 import static io.stallion.utils.Literals.empty;
 import static io.stallion.utils.Literals.or;
@@ -84,6 +85,10 @@ public class AppContextLoader {
         }
 
         Settings.init(options.getEnv(), options);
+
+        for(Map.Entry<String, String> entry: Settings.instance().getSystemProperties().entrySet()) {
+            System.setProperty(entry.getKey(), entry.getValue());
+        }
 
         Settings.instance().setDevMode(options.isDevMode());
 

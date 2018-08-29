@@ -36,54 +36,35 @@ import static io.stallion.utils.Literals.empty;
 
 
 public class AssetServing {
-    private IRequest request;
-    private HttpServletResponse response;
+    private String plugin;
+    private String path;
+    private String referer;
 
-    public AssetServing(IRequest request, HttpServletResponse response) {
-        this.request = request;
-        this.response = response;
+    public AssetServing(String plugin, String path, String referer) {
+        this.path = AssetsController.ensureSafeAssetsPath(path);
+        this.plugin = plugin;
+        this.referer = referer;
     }
 
 
-    public Response serveFileBundleAsset() throws Exception {
-        String path = request.getPath();
-        int i = path.indexOf("/st-");
-        i = path.indexOf("/", i + 3);
-        path = path.substring(i + 1);
+    public Response serveFileBundleAsset(String bundleFilePath) throws Exception {
 
         FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
-        String filePath = request.getQueryParam("bundleFilePath");
-        String content = br.renderFile(filePath);
-        return contentToResponse(content, request.getPath());
+        String content = br.renderFile(bundleFilePath);
+        return contentToResponse(content, path);
     }
 
     public Response serveFileBundle() throws Exception {
-        String path = request.getPath();
-        int i = path.indexOf("/st-");
-        i = path.indexOf("/", i + 3);
-        path = path.substring(i + 1);
-
         FileSystemAssetBundleRenderer br = new FileSystemAssetBundleRenderer(path);
         return contentToResponse(br.renderProductionContent(), path);
     }
 
 
-    public Response serveResourceAsset() throws Exception  {
-        String path = request.getPath();
-        int i = path.indexOf("/st-");
-        i = path.indexOf("/", i + 3);
-        String assetPath = path.substring(i + 1);
+    public Response serveResourceAsset(String bundlePath) throws Exception  {
+        String assetPath = path;
 
-        String[] parts = assetPath.split("/", 2);
-        String plugin = parts[0];
-        assetPath = parts[1];
-        if (parts.length < 2) {
-            throw new ClientErrorException("Invalid resource path " + assetPath, 400);
-        }
-        assetPath = "/" + assetPath;
-
-        if (!empty(request.getQueryParam("bundlePath"))) {
-            String bundlePath = AssetsController.ensureSafeAssetsPath(request.getQueryParam("bundlePath"));
+        if (!empty(bundlePath)) {
+            bundlePath = AssetsController.ensureSafeAssetsPath(bundlePath);
             URL url = ResourceHelpers.getUrlOrNotFound(plugin, bundlePath);
             String content = null;
             if (Settings.instance().getDevMode()) {
@@ -97,46 +78,27 @@ public class AssetServing {
             }
             return new LocalFileToResponse().sendContentResponse(content, assetPath);
         } else {
-            assetPath = AssetsController.ensureSafeAssetsPath(assetPath);
-            if (!empty(request.getQueryParam("processor"))) {
-                String content = ResourceHelpers.loadAssetResource(plugin, assetPath);
-                //if (!empty(request.getParameter("nocache"))) {
-                //content = AssetsController.instance().convertUsingProcessorNoCache(request.getParameter("processor"), path, content);
-                //} else {
-                //content = AssetsController.instance().convertUsingProcessor(request.getParameter("processor"), assetPath, content);
-                //}
-
-                //sendContentResponse(content);
-                return new LocalFileToResponse().sendContentResponse(content, assetPath);
-            } else {
-                URL url = ResourceHelpers.pluginPathToUrl(plugin, assetPath);
-                // If not found, and no referer, throw generic 404
-                if (url == null && empty(request.getHeader("Referer"))) {
-                    throw new NotFoundException("Asset resource not found: " + plugin + ":" + assetPath);
-                } else if (url == null) {
-                    // If not found, and referer, may mean there is a bug
-                    throw new ServerErrorException("Requested linked resource that is not found: " + plugin + ":" + assetPath, 500);
-                }
-                return new LocalFileToResponse().sendResource(url, assetPath);
+            URL url = ResourceHelpers.pluginPathToUrl(plugin, assetPath);
+            // If not found, and no referer, throw generic 404
+            if (url == null && empty(referer)) {
+                throw new NotFoundException("Asset resource not found: " + plugin + ":" + assetPath);
+            } else if (url == null) {
+                // If not found, and referer, may mean there is a bug
+                throw new ServerErrorException("Requested linked resource that is not found: " + plugin + ":" + assetPath, 500);
             }
+            return new LocalFileToResponse().sendResource(url, assetPath);
         }
     }
 
     public Response serveResourceBundle() throws Exception {
-        String path = request.getPath();
-        int i = path.indexOf("/st-");
-        i = path.indexOf("/", i + 3);
-        path = path.substring(i + 1);
-        String[] parts = path.split("/", 2);
-        String plugin = parts[0];
-        path = parts[1];
-        path = AssetsController.ensureSafeAssetsPath(path);
+        Log.info("path : {0} plugin: {1}", path, plugin);
+
         String content = new ResourceAssetBundleRenderer(plugin, path).renderProductionContent();
         return new LocalFileToResponse().sendContentResponse(content, path);
     }
 
-    public Response serveFolderAssetToResponse(String path) throws Exception  {
-        String fullPath = Settings.instance().getTargetFolder() + "/assets/" + path;
+    public Response serveFolderAssetToResponse() throws Exception  {
+        String fullPath = Settings.instance().getTargetFolder() + path;
         Log.fine("Asset path={0} fullPath={1}", path, fullPath);
         File file = new File(fullPath);
         if (!file.isFile()) {

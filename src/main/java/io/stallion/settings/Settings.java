@@ -28,6 +28,7 @@ import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.Column;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -104,11 +105,18 @@ public class Settings implements ISettings {
     private StrictnessLevel strictnessLevel;
     @SettingMeta(val="INFO")
     private String logLevel;
-    private Map<String, String> packageLogLevels = new HashMap<>();
+    @SettingMeta(cls=HashMap.class)
+    private Map<String, String> packageLogLevels;
     private Integer nodeNumber = 1;
     @SettingMeta(val="x-Real-Ip", help="The HTTP header that contains the original client IP address, by default, with nginx proxying, this is x-Real-Ip")
     private String ipHeaderName;
 
+
+    @SettingMeta(cls=HashMap.class)
+    private Map<String, String> systemProperties;
+
+    @SettingMeta(cls=HashMap.class)
+    private Map<String, String> jerseyInitParams;
 
 
     private String env;
@@ -220,6 +228,12 @@ public class Settings implements ISettings {
             bundleDebug = getLocalMode();
         }
 
+        if (systemProperties != null) {
+            stripKeyQuotes(systemProperties);
+        }
+        if (jerseyInitParams != null) {
+            stripKeyQuotes(jerseyInitParams);
+        }
 
 
         if (getDebug() == null) {
@@ -365,6 +379,20 @@ public class Settings implements ISettings {
 
 
 
+    }
+
+    private void stripKeyQuotes(Map<String, String> theMap) {
+        Set<String> keysCopy = set();
+        for(String key: theMap.keySet()) {
+            keysCopy.add(key);
+        }
+
+        for(String key :keysCopy) {
+            if (key.startsWith("\"") && key.endsWith("\"")) {
+                theMap.put(key.substring(1, key.length()-1), theMap.get(key));
+            }
+            theMap.remove(key);
+        }
     }
 
     /**
@@ -1163,6 +1191,24 @@ public class Settings implements ISettings {
 
     public Settings setNginxProxyReadTimeout(String nginxProxyReadTimeout) {
         this.nginxProxyReadTimeout = nginxProxyReadTimeout;
+        return this;
+    }
+
+    public Map<String, String> getSystemProperties() {
+        return systemProperties;
+    }
+
+    public Settings setSystemProperties(Map<String, String> systemProperties) {
+        this.systemProperties = systemProperties;
+        return this;
+    }
+
+    public Map<String, String> getJerseyInitParams() {
+        return jerseyInitParams;
+    }
+
+    public Settings setJerseyInitParams(Map<String, String> jerseyInitParams) {
+        this.jerseyInitParams = jerseyInitParams;
         return this;
     }
 }
