@@ -942,12 +942,21 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         }
 
         // Filter out nulls
-        if (propValue == null && op.getOriginalValue() != null) {
-            return false;
+        if (propValue == null) {
+            if (propValue == null && op.getOriginalValue() != null) {
+                return false;
+            }
+            if (propValue == null && op.getOriginalValue() == null && op.getOperator().equals(FilterOperator.EQUAL)) {
+                return true;
+            }
+        } else if (op.getOriginalValue() == null) {
+            if (op.getOperator().equals(FilterOperator.NOT_EQUAL)) {
+                return true;
+            } else {
+                return false;
+            }
         }
-        if (propValue == null && op.getOriginalValue() == null && op.getOperator().equals(FilterOperator.EQUAL)) {
-            return true;
-        }
+        if (propValue != null && op.getOriginalValue() == null )
 
         if (op.isCaseInsensitive() && propValue instanceof String) {
             propValue = ((String) propValue).toLowerCase();

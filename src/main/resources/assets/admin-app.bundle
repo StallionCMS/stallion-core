@@ -10,6 +10,7 @@
 /vendor/beufy-v0.6.6.min.js
 /stallion-utils-vue-plugin.js
 /admin/stallion-admin-app.vue
+/admin/ui-demo.vue
 /admin/users-edit.vue
 /admin/users-table.vue
 /admin/users-manage-main.js

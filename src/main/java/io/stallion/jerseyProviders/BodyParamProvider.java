@@ -28,12 +28,15 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.spi.internal.ValueParamProvider;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.ClientErrorException;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
-import static io.stallion.utils.Literals.UTF8;
-import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.*;
 
 
 /**
@@ -118,14 +121,15 @@ public class BodyParamProvider<T> implements Factory<T>, ValueParamProvider {
             }
             JsonNode valNode = jsonNode.get(jsonFieldName);
 
+            if (valNode.isNull()) {
+                return null;
+            }
 
-            Object value = null;
-            if (valNode.isTextual())  {
-                value = valNode.textValue();
-            } else if (valNode.isDouble()) {
-                value = valNode.asDouble();
-            } else if (valNode.canConvertToLong()) {
-                value = valNode.asLong();
+            Object value = jsonNodeToJavaObject(valNode, 1);
+
+
+            if (value == null) {
+                throw new ClientErrorException("Passed in value for " + bpAnno.value() + " was not of an expected type.", 400);
             }
 
 
@@ -135,5 +139,45 @@ public class BodyParamProvider<T> implements Factory<T>, ValueParamProvider {
             return value;
 
         }
+    }
+
+    public static Object jsonNodeToJavaObject(JsonNode valNode, int depth) {
+        if (depth > 10) {
+            Log.warn("Node depth too great for a body param.");
+            return null;
+        }
+        Object value = null;
+        if (valNode.isNull()) {
+            return null;
+        } else if (valNode.isTextual())  {
+            value = valNode.textValue();
+        } else if (valNode.isDouble()) {
+            value = valNode.doubleValue();
+        } else if (valNode.canConvertToLong()) {
+            value = valNode.asLong();
+        } else if (valNode.isBoolean()) {
+            value = valNode.booleanValue();
+        } else if (valNode.isBigDecimal()) {
+            value = valNode.decimalValue();
+        } else if (valNode.isBigInteger()) {
+            value = valNode.bigIntegerValue();
+        } else if (valNode.isFloat()) {
+            value = valNode.doubleValue();
+        } else if (valNode.isArray()) {
+            List listVal = list();
+            for(int x = 0; x<valNode.size(); x++) {
+                listVal.add(jsonNodeToJavaObject(valNode.get(x), depth + 1));
+            }
+            value = listVal;
+        } else if (valNode.isObject()) {
+            Map mapVal = map();
+            Iterator<Map.Entry<String, JsonNode>> fields = valNode.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                mapVal.put(field.getKey(), jsonNodeToJavaObject(field.getValue(), depth + 1));
+            }
+            value = mapVal;
+        }
+        return value;
     }
 }

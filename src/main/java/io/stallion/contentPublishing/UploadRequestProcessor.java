@@ -23,6 +23,7 @@ import io.stallion.Context;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.requests.IRequest;
+import io.stallion.requests.RequestWrapper;
 import io.stallion.services.CloudStorageService;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -31,6 +32,9 @@ import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.imgscalr.Scalr;
 import org.parboiled.common.FileUtils;
 
@@ -47,6 +51,9 @@ import static io.stallion.utils.Literals.*;
 
 public class UploadRequestProcessor<U extends UploadedFile> {
     private IRequest stRequest;
+    private ContainerRequest request;
+    private InputStream fileInputStream;
+    private FormDataContentDisposition fileMetaData;
 
     private String uploadsFolder;
     private UploadedFileController<U> fileController;
@@ -94,8 +101,12 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         return uploaded;
     }
 
-    public U upload(IRequest stRequest) {
-        this.stRequest = stRequest;
+    public U upload(ContainerRequest request, InputStream fileInputStream,
+                    @FormDataParam("file") FormDataContentDisposition fileMetaData) {
+        this.stRequest = new RequestWrapper(request);
+        this.request = request;
+        this.fileMetaData = fileMetaData;
+        this.fileInputStream = fileInputStream;
         try {
             return doUpload();
         } catch (IOException e) {
@@ -186,11 +197,12 @@ public class UploadRequestProcessor<U extends UploadedFile> {
     }
 
     protected File writeMultiPartToLocalFile(U uploaded) throws IOException {
-        stRequest.setAsMultiPartRequest();
+       // stRequest.setAsMultiPartRequest();
 
-        final String path = stRequest.getQueryParam("destination");
-        final Part filePart = stRequest.getPart("file");
-        String fullFileName = getFileNameFromPart(filePart);
+        //final String path = stRequest.getQueryParam("destination");
+        //final Part filePart = stRequest.getPart("file");
+
+        String fullFileName = fileMetaData.getFileName(); //getFileNameFromPart(filePart);
         String extension = FilenameUtils.getExtension(fullFileName);
         String fileName = truncate(fullFileName, 85);
         String relativePath = GeneralUtils.slugify(truncate(FilenameUtils.getBaseName(fullFileName), 75)) + "-" + DateUtils.mils() + "." + extension;
@@ -222,7 +234,8 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         Long maxSize = Settings.instance().getUserUploads().getMaxFileSizeBytes();
         try {
             out = new FileOutputStream(destPath);
-            filecontent = filePart.getInputStream();
+            //filecontent = filePart.getInputStream();
+            filecontent = fileInputStream;
 
             int read = 0;
             final byte[] bytes = new byte[1024];
@@ -235,7 +248,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
             }
             failed = false;
             Log.info("File{0}being uploaded to {1}",
-                    new Object[]{fileName, path});
+                    new Object[]{fileName, destPath});
             uploaded.setSizeBytes(amountRead);
         } finally {
             if (out != null) {

@@ -6,6 +6,9 @@
 
     plugin.install = function(Vue, options) {
 
+        axios.defaults.headers.post['X-Requested-By'] = 'XMLHttpRequest';
+        
+
         /*
         // 1. add global method or property
         Vue.myGlobalMethod = function () {

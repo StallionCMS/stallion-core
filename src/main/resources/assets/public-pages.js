@@ -20,7 +20,7 @@
                 }
             },
             created: function() {
-                debugger;
+                
             },
             methods: {
                 onLoginSubmit: function() {

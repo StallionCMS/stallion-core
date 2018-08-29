@@ -28,6 +28,9 @@ import io.stallion.requests.ResponseComplete;
 import io.stallion.services.CloudStorageService;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
@@ -54,6 +57,9 @@ public class UploadedFileEndpoints<U extends UploadedFile>  {
 
     @javax.ws.rs.core.Context
     HttpServletResponse response;
+
+    @javax.ws.rs.core.Context
+    ContainerRequest request;
 
     @GET
     @Path("/library")
@@ -90,7 +96,8 @@ public class UploadedFileEndpoints<U extends UploadedFile>  {
     @Produces("application/json")
     @XSRF(false)
     @MinRole(Role.ANON)
-    public Object uploadFile() {
+    public Object uploadFile(@FormDataParam("file") InputStream fileInputStream,
+                             @FormDataParam("file") FormDataContentDisposition fileMetaData) {
         if (!Context.getUser().isInRole(Settings.instance().getUserUploads().getMinimumRole())) {
             throw new ClientErrorException("You need to be at least in the role " + Settings.instance().getUserUploads().getMinimumRole() + " in order to upload files.", 403);
         }
@@ -99,12 +106,12 @@ public class UploadedFileEndpoints<U extends UploadedFile>  {
         if (!new File(folder).isDirectory()) {
             new File(folder).mkdirs();
         }
-        U uf = new UploadRequestProcessor<U>(folder, fileController).upload(Context.getRequest());
+        U uf = new UploadRequestProcessor<U>(folder, fileController).upload(request, fileInputStream, fileMetaData);
         return uf;
     }
 
     @GET
-    @Path("/view-cloud-file/:secret/:fileId/:size/:slug")
+    @Path("/view-cloud-file/{secret}/{fileId}/{size}/{slug}")
     @MinRole(Role.ANON)
     public Object viewCloudFile(@PathParam("secret") String secret, @PathParam("fileId") Long fileId, @PathParam("size") String size) {
         U uf = fileController.forId(fileId);
@@ -136,7 +143,7 @@ public class UploadedFileEndpoints<U extends UploadedFile>  {
     }
 
     @GET
-    @Path("/view-file/:secret/:fileId/:size/:slug")
+    @Path("/view-file/{secret}/{fileId}/{size}/{slug}")
     @MinRole(Role.ANON)
     public Object viewFile(@PathParam("secret") String secret, @PathParam("fileId") Long fileId, @PathParam("size") String size) throws FileNotFoundException {
         U uf = fileController.forIdOrNotFound(fileId);

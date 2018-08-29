@@ -32,8 +32,8 @@ public class FilterPriorities {
     // Response Filters, executed in descending order
     public final static int CORS_RESPONSE_HANDLER = 4000;
     public final static int XFRAME_OPTIONS_RESPONSE_FILTER = 4100;
-    public final static int COOKIES_AND_HEADERS_RESPONSE_FILTER = 3000;
     public final static int POSTBACK_RESPONSE_FILTER = 3050;
+    public final static int COOKIES_AND_HEADERS_RESPONSE_FILTER = 3000;
     public final static int HEALTH_TRACKING_RESPONSE_FILTER = 750;
     public final static int TEARDOWN_CONTEXT_RESPONSE_FILTER = 500;
 }

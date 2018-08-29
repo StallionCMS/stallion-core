@@ -230,12 +230,12 @@ public interface IRequest {
     }
 
     default public void addResponseCookie(String name, String value) {
-        NewCookie cookie = new NewCookie(name, value);
+        NewCookie cookie = new NewCookie(name, value, "/", null, null, NewCookie.DEFAULT_MAX_AGE, false);
         addResponseCookie(cookie);
     }
 
     default public void addResponseCookie(String name, String value, int expires) {
-        NewCookie cookie = new NewCookie(name, value, null, null, null, expires, false);
+        NewCookie cookie = new NewCookie(name, value, "/", null, null, expires, false);
         addResponseCookie(cookie);
     }
 
@@ -243,13 +243,14 @@ public interface IRequest {
         Map<String, NewCookie> cookies = (Map<String, NewCookie>)getProperty("responseCookies");
         if (cookies == null) {
             cookies = map();
-            setProperty("responseCookies", cookie);
         }
         cookies.put(cookie.getName(), cookie);
+        setProperty("responseCookies", cookies);
     }
 
     default public Map<String, NewCookie> getResponseCookies() {
-        return (Map<String, NewCookie>)getProperty("responseCookies");
+        Object rc = getProperty("responseCookies");
+        return (Map<String, NewCookie>)rc;
     }
 
     default public Map<String, String> getResponseHeaders() {

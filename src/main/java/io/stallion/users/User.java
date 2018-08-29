@@ -17,6 +17,7 @@
 
 package io.stallion.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.stallion.dataAccess.AlternativeKey;
 import io.stallion.dataAccess.ModelBase;
@@ -36,6 +37,7 @@ import static io.stallion.utils.Literals.empty;
 
 @Table(name="stallion_users")
 @DefaultSort(field="email", direction = "ASC")
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class User extends ModelBase implements IUser, ModelWithFilePath {
     private String username = "";
     private String displayName = "";

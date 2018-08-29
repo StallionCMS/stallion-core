@@ -23,6 +23,7 @@ import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.users.UsersApiResource;
 import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
 
@@ -53,7 +54,7 @@ public class StallionJerseyApplication extends ResourceConfig {
 
 
 
-
+        register(MultiPartFeature.class);
 
 
         register(new BodyParamProvider<>());

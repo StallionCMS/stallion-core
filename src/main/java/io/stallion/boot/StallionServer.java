@@ -26,6 +26,7 @@ import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.settings.Settings;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -70,7 +71,7 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
         // TODO: share the stallion logger
         // https://stackoverflow.com/questions/25786592/how-to-enable-logging-in-jetty
         //System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
-       // System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
+        //System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
 
         //Log.setLog(new StdErrLog());
         //Log.setLog(new JavaUtilLog());
@@ -84,36 +85,37 @@ public class StallionServer implements StallionRunAction<ServeCommandOptions> {
         handlerCollection.setServer(server);
         handlerCollection.setHandlers(new Handler[] {});
 
-        ResourceConfig rc = buildResourceConfig();
-
-
-
-        //rc.register(LoggingFeature.class);
-        //Logger logger = new L
-
-
-        //rc.register(new Trace())
-
-
-        ServletContextHandler ctx =
-                new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-
-        ctx.setInitParameter("com.sun.jersey.config.feature.Trace", "true");
-        ctx.setContextPath("/");
-        server.setHandler(ctx);
-
-        ServletContainer sc = new ServletContainer(rc);
-        ctx.addServlet(new ServletHolder(sc), "/*");
 
 
         for(StallionJavaPlugin plugin: PluginRegistry.instance().getJavaPluginByName().values()) {
             plugin.preStartJetty(server, handlerCollection, options);
         }
 
-        //handlerCollection.addHandler(RequestHandler.instance());
+
+        // Initialize Jersey and add Jersey context as the default handler
+        ResourceConfig rc = buildResourceConfig();
+
+        ServletContextHandler ctx =
+                new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+
+        ctx.setInitParameter("com.sun.jersey.config.feature.Trace", "true");
+
+        //ctx.setInitParameter("jersey.config.server.provider.classnames", "org.glassfish.jersey.media.multipart.MultiPartFeature");
+
+
+
+        ctx.setContextPath("/");
+        ServletContainer sc = new ServletContainer(rc);
+        ctx.addServlet(new ServletHolder(sc), "/*");
+
         handlerCollection.addHandler(ctx);
 
 
+
+
+
+        // Add the handler collection and start the server
+        server.setHandler(handlerCollection);
 
         server.start();
 

@@ -28,6 +28,7 @@
         });
 
         const routes = [
+            { path: '/ui-demo', component: allComponents['ui-demo'] },
             { path: '/user/:userId', component: allComponents['users-edit'] },
             { path: '/', component: allComponents['users-table'] }
         ]

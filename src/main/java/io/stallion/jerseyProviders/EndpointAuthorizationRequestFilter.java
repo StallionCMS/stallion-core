@@ -52,29 +52,13 @@ public class EndpointAuthorizationRequestFilter  implements ContainerRequestFilt
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
         IRequest request = new RequestWrapper(containerRequestContext);
 
-        ExtendedUriInfo uriInfo = ((ExtendedUriInfo)containerRequestContext.getUriInfo());
+        MinRole mr = JerseyHelpers.getAnnotationForRequestContext(containerRequestContext, MinRole.class);
 
-
-
-        MinRole mr = uriInfo
-                .getMatchedResourceMethod()
-                .getInvocable()
-                .getHandlingMethod()
-                .getAnnotation(MinRole.class);
-
-        if (mr == null) {
-            mr = uriInfo
-                    .getMatchedResourceMethod()
-                    .getParent()
-                    .getClass()
-                    .getAnnotation(MinRole.class)
-            ;
-
-        }
         Role minRole = Settings.instance().getUsers().getDefaultEndpointRoleObj();
         if (mr != null) {
             minRole = mr.value();
         }
+
         if (Context.getUser().isInRole(minRole)) {
             return;
         }

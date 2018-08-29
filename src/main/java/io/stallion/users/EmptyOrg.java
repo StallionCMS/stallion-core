@@ -17,7 +17,9 @@
 
 package io.stallion.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class EmptyOrg implements IOrg {
 
     @Override

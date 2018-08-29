@@ -38,7 +38,8 @@ public class CookiesAndHeadersResponseFilter implements ContainerResponseFilter 
         RequestWrapper req = new RequestWrapper(requestContext);
         if (req.getResponseCookies() != null) {
             for (Map.Entry<String, NewCookie> entry : req.getResponseCookies().entrySet()) {
-                responseContext.getCookies().put(entry.getKey(), entry.getValue());
+                //responseContext.getCookies().put(entry.getKey(), entry.getValue());
+                responseContext.getHeaders().add("Set-Cookie", entry.getValue());
             }
         }
         if (req.getResponseHeaders() != null) {
