@@ -117,8 +117,8 @@ public class LocalFileToResponse {
                             output.write(buffer, 0, byteRead);
 
                             totalBytesRead += (byteRead + 1);
-                            if (totalBytesRead > contentLength) {
-                                Log.warn("Read more bytes than expected, breaking out of loop");
+                            if (totalBytesRead > (contentLength + 1000)) {
+                                Log.warn("Read one thousand more bytes than expected, breaking out of loop. Content length was {0} for file {1}", contentLength, fullPath);
                                 output.flush();
                                 stream.close();
                                 break;

@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,16 +50,6 @@ public class ListingEndpoints  {
 
     private static Map<String, ContentFolder> configMap;
 
-    @javax.ws.rs.core.Context
-    private HttpServletRequest httpRequest;
-
-    @javax.ws.rs.core.Context
-    private ResourceContext resourceContext;
-
-    @javax.ws.rs.core.Context
-    private Request request;
-
-
     public static void register(ResourceConfig rc) {
         configMap = map();
         for(ContentFolder config: Settings.instance().getFolders()) {
@@ -67,74 +58,39 @@ public class ListingEndpoints  {
                 if (StringUtils.endsWith(rootUrl, "/")) {
                     rootUrl = rootUrl.substring(0, rootUrl.length()-1);
                 }
-
                 Resource.Builder resourceBuilder =
                         Resource.builder(ListingEndpoints.class, false)
                                 .name(rootUrl)
                                 .path(rootUrl);
                 rc.registerResources(resourceBuilder.build());
                 configMap.put(rootUrl, config);
-                //EndpointsRegistry.instance().addResource(rootUrl, new ListingEndpoints(config));
             }
         }
     }
 
-    private ContentFolder currentConfig = null;
+    @javax.ws.rs.core.Context
+    private ContainerRequest request;
 
-    private ContentFolder getConfig() {
-        if (currentConfig == null) {
-            String resourcePath = (((ContainerRequest) request).getUriInfo())
-                    .getMatchedResourceMethod()
-                    .getParent()
-                    .getParent()
-                    .getPath();
-            currentConfig = configMap.get(resourcePath);
-        }
-        return currentConfig;
-    }
-
-    /*
-    public ListingEndpoints(ContentFolder config) {
-        this.config = config;
-    }
-    */
-
-    public Map<String, Object> makeContext() throws Exception {
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put("blogConfig", getConfig());
-        context.put("postsFilter", filterChain());
-        // TODO fix hydration of meta
-        if (!empty(getConfig().getListingTitle())) {
-            //Context.getResponse().getMeta().setTitle(getConfig().getListingTitle());
-        }
-        if (!empty(getConfig().getListingMetaDescription())) {
-            //Context.getResponse().getMeta().setDescription(getConfig().getListingMetaDescription());
-        }
-        String blogRoot = GeneralUtils.slugify(getConfig().getListingRootUrl());
-        if (empty(blogRoot) || blogRoot.equals("-")) {
-            blogRoot = "root";
-        } else if (blogRoot.startsWith("-")) {
-            blogRoot = blogRoot.substring(1);
-        }
-        //Context.getResponse().getMeta().setBodyCssId("flatBlog-" + blogRoot);
-        //Context.getResponse().getMeta().getCssClasses().add("st-flatBlog-" + blogRoot);
-        return context;
-    }
-
-    private DisplayableModelController<TextItem> postsController() {
-        return (DisplayableModelController<TextItem>)DataAccessRegistry.instance().get(getConfig().getPath());
-    }
-
-    private FilterChain<TextItem> filterChain() throws Exception {
-        return postsController().filter("published", true);
+    /**
+     * For rendering any individual content page that has a slug that matches the root URL of this listing.
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    @GET
+    @Path("{path:.*}")
+    @Produces("text/html")
+    public Response renderForSlugCatchAll(@PathParam("path") String path) throws Exception {
+        return new ContentSlugCatchallResource().setRequest(request).renderPageForPath(path);
     }
 
     @GET
-    @Path("/")
     @Produces("text/html")
     public String listHome() throws Exception {
         return listHome(0);
     }
+
 
     @GET
     @Path("/page/{page}/")
@@ -208,4 +164,53 @@ public class ListingEndpoints  {
         context.put("postsPager", pager);
         return TemplateRenderer.instance().renderTemplate(getConfig().getListingTemplate(), context);
     }
+
+    private ContentFolder currentConfig = null;
+
+    private ContentFolder getConfig() {
+        if (currentConfig == null) {
+            Resource parent = (((ContainerRequest) request).getUriInfo())
+                    .getMatchedResourceMethod()
+                    .getParent();
+            if (parent.getParent() != null) {
+                parent = parent.getParent();
+            }
+            String resourcePath = parent.getPath();
+
+            currentConfig = configMap.get(resourcePath);
+        }
+        return currentConfig;
+    }
+
+
+    public Map<String, Object> makeContext() throws Exception {
+        Map<String, Object> context = new HashMap<String, Object>();
+        context.put("blogConfig", getConfig());
+        context.put("postsFilter", filterChain());
+        // TODO fix hydration of meta
+        if (!empty(getConfig().getListingTitle())) {
+            //Context.getResponse().getMeta().setTitle(getConfig().getListingTitle());
+        }
+        if (!empty(getConfig().getListingMetaDescription())) {
+            //Context.getResponse().getMeta().setDescription(getConfig().getListingMetaDescription());
+        }
+        String blogRoot = GeneralUtils.slugify(getConfig().getListingRootUrl());
+        if (empty(blogRoot) || blogRoot.equals("-")) {
+            blogRoot = "root";
+        } else if (blogRoot.startsWith("-")) {
+            blogRoot = blogRoot.substring(1);
+        }
+        //Context.getResponse().getMeta().setBodyCssId("flatBlog-" + blogRoot);
+        //Context.getResponse().getMeta().getCssClasses().add("st-flatBlog-" + blogRoot);
+        return context;
+    }
+
+    private DisplayableModelController<TextItem> postsController() {
+        return (DisplayableModelController<TextItem>)DataAccessRegistry.instance().get(getConfig().getPath());
+    }
+
+    private FilterChain<TextItem> filterChain() throws Exception {
+        return postsController().filter("published", true);
+    }
+
 }

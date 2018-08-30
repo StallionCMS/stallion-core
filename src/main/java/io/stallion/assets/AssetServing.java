@@ -63,7 +63,11 @@ public class AssetServing {
     public Response serveResourceAsset(String bundlePath) throws Exception  {
         String assetPath = path;
 
+
         if (!empty(bundlePath)) {
+            if (assetPath.startsWith("/assets/")) {
+                assetPath = assetPath.substring(8);
+            }
             bundlePath = AssetsController.ensureSafeAssetsPath(bundlePath);
             URL url = ResourceHelpers.getUrlOrNotFound(plugin, bundlePath);
             String content = null;

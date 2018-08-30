@@ -96,6 +96,7 @@ public class InternalRewriteRequestFilter  implements ContainerRequestFilter {
 
         String fullPath = "";
         String query = null;
+        String originalQueryString = request.getQueryString();
         if (!empty(request.getQueryString())) {
             fullPath = path + "?" + request.getQueryString();
         } else {
@@ -125,15 +126,15 @@ public class InternalRewriteRequestFilter  implements ContainerRequestFilter {
                         containerRequestContext.setRequestUri(newUri);
                     } else {
                         //request.setPath(newPath);
+                        if (!empty(originalQueryString)) {
+                            newPath = newPath + "?" + originalQueryString;
+                        }
                         newUri = URI.create(newPath);
                         containerRequestContext.setRequestUri(newUri);
                     }
-                    String newFullPath = request.getPath();
-                    if (!empty(request.getQueryString())) {
-                        newFullPath += "?" + request.getQueryString();
-                    }
 
                     Log.fine("Rewrote {0} to {1}", fullPath, newUri);
+                    break;
                 }
             }
         }

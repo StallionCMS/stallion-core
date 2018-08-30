@@ -37,16 +37,20 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
-@Path("/")
+@Path("{path:.*}")
 public class ContentSlugCatchallResource {
 
     @javax.ws.rs.core.Context
     private ContainerRequest request;
 
-    @Path("{path:.*}")
+    public ContentSlugCatchallResource setRequest(ContainerRequest request) {
+        this.request = request;
+        return this;
+    }
+
     @GET
     public Response renderPageForPath(@PathParam("path") String path) {
-        Response response = tryRenderForSlug();
+        Response response = tryRenderForSlug(path);
         if (response != null) {
             return response;
         }
@@ -61,12 +65,11 @@ public class ContentSlugCatchallResource {
      *
      * @throws Exception
      */
-    public Response tryRenderForSlug()  {
-        IRequest stRequest = new RequestWrapper(request);
-        //String path = request.getUriInfo().getPath();
-        String path = ((ContainerRequest) request).getRequestUri().getPath();
-        if (path.equals("")) {
-            path = "/";
+    public Response tryRenderForSlug(String path)  {
+
+        RequestWrapper stRequest = new RequestWrapper(request);
+        if (!path.startsWith("/")) {
+            path = "/" + path;
         }
         Log.finer("Did not match any resource endpoints, calling tryRenderforSlug: {0}", path);
         Displayable item = null;
@@ -83,7 +86,7 @@ public class ContentSlugCatchallResource {
 
         // Item has an override domain, but we are accessing from a different domain
         if (!empty(item.getOverrideDomain())) {
-            if (!item.getOverrideDomain().equals(new RequestWrapper(request).getHost())) {
+            if (!item.getOverrideDomain().equals(stRequest.getHost())) {
                 return null;
             }
         }

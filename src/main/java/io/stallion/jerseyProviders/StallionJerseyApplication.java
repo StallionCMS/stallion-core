@@ -17,18 +17,23 @@
 
 package io.stallion.jerseyProviders;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import io.stallion.assets.AssetsEndpointsResource;
+import io.stallion.assets.AssetsFolderEndpointsResource;
+import io.stallion.assets.AssetsResourceEndpointsResource;
 import io.stallion.contentPublishing.ContentPublishingBooter;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.settings.Settings;
+import io.stallion.testing.UIDemoResource;
 import io.stallion.users.UsersApiResource;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.TracingConfig;
 import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
 
 import java.util.Map;
@@ -47,12 +52,15 @@ public class StallionJerseyApplication extends ResourceConfig {
             property(param.getKey(), param.getValue());
         }
 
+
+
         //property("jersey.config.server.tracing.type", "ALL");
         //property("jersey.config.server.tracing.threshold", "VERBOSE");
 
         //property("org.glassfish.jersey.tracing.handler", "java.util.logging.ConsoleHandler");
         //register(new LoggingFeature());
         {
+
             //Logger logger = Logger.getLogger("io.stallion.jerseyProvier");
             //ConsoleHandler handler = new ConsoleHandler();
             //handler.setLevel(Level.FINEST);
@@ -65,14 +73,22 @@ public class StallionJerseyApplication extends ResourceConfig {
             ));
         }
 
+        register(UIDemoResource.class);
 
 
         register(MultiPartFeature.class);
 
-        register(JacksonFeature.class);
+        //register(JacksonFeature.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
+        register(provider);
+
 
         register(new BodyParamProvider<>());
-        register(AssetsEndpointsResource.class);
+        register(AssetsFolderEndpointsResource.class);
+        register(AssetsResourceEndpointsResource.class);
 
         // Disabled, because wasn't being picked up by fat jar,
         // we have to register everything manually
@@ -80,7 +96,6 @@ public class StallionJerseyApplication extends ResourceConfig {
 
 
         register(CsrfProtectionFilter.class);
-        register(AssetsEndpointsResource.class);
         register(BodyParamProvider.class);
         register(CookiesAndHeadersResponseFilter.class);
         register(CorsRequestFilter.class);

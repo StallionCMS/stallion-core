@@ -12,7 +12,16 @@
             <h4>Upload Files</h4>
             <input type="file" name="file" multiple>
             <input type="submit" value="Upload File" name="submit">
-        </form>            
+        </form>
+        <hr>
+        <div>
+            <table>
+                <tr v-for="thing in things">
+                    <td>{{ thing.name }}</td>
+                    <td>{{ thing.createdAt }}</td>
+                </tr>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -21,6 +30,7 @@
      data: function() {
          return {
              isLoading: true,
+             things: []
          };
      },
      created: function() {
@@ -58,7 +68,11 @@
          },
          fetchData: function() {
              var self = this;
-             
+             this.$stAjax({
+                 url: '/st-ui-demo/demo-data'
+             }).then(function(o) {
+                 self.things = o.data.demoThings;
+             })
          }
      }
  };
