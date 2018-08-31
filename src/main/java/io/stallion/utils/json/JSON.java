@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import io.stallion.exceptions.JsonWriteException;
 import jdk.nashorn.api.scripting.JSObject;
 import jdk.nashorn.internal.runtime.ScriptObject;
@@ -43,6 +44,7 @@ public class JSON {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
         mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new JaxbAnnotationModule());
         //mapper.findAndRegisterModules();
 
         SimpleModule mod = new SimpleModule("nashornConverter", Version.unknownVersion());

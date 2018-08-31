@@ -22,6 +22,9 @@ import io.stallion.dataAccess.ModelBase;
 
 import io.stallion.utils.json.RestrictedViews;
 
+import javax.persistence.Column;
+import java.time.ZonedDateTime;
+
 public class ExamplePojo extends ModelBase {
     private String displayName;
     private String email = "";
@@ -34,6 +37,7 @@ public class ExamplePojo extends ModelBase {
     private String updateMessage = "";
     private Long updated;
     private String internalSecret;
+    private ZonedDateTime dueAt;
 
 
 
@@ -134,5 +138,14 @@ public class ExamplePojo extends ModelBase {
 
     public void setInternalSecret(String internalSecret) {
         this.internalSecret = internalSecret;
+    }
+
+    public ZonedDateTime getDueAt() {
+        return dueAt;
+    }
+
+    public ExamplePojo setDueAt(ZonedDateTime dueAt) {
+        this.dueAt = dueAt;
+        return this;
     }
 }

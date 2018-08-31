@@ -472,6 +472,9 @@ public final class PropertyUtils {
         if ((destinationClass == Long.class || destinationClass == long.class) && (value.getClass() == int.class || value.getClass() == Integer.class)) {
             return new Long((int)value);
         }
+        if (destinationClass == Integer.class || destinationClass == int.class && (value.getClass() == Long.class)) {
+            return ((Long)value).intValue();
+        }
         // Convert ints and longs to ZonedDateTime, if ZonedDateTime was a long
         if (destinationClass == ZonedDateTime.class && (
                 value.getClass() == long.class ||

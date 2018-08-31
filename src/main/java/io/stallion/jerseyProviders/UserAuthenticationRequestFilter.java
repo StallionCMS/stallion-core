@@ -18,17 +18,23 @@
 package io.stallion.jerseyProviders;
 
 import io.stallion.Context;
+import io.stallion.exceptions.UsageException;
 import io.stallion.requests.RequestWrapper;
 import io.stallion.settings.Settings;
+import io.stallion.users.IUser;
 import io.stallion.users.OAuthApprovalController;
+import io.stallion.users.User;
 import io.stallion.users.UserController;
 
 import javax.annotation.Priority;
+import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+
+import static io.stallion.utils.Literals.empty;
 
 @Provider
 @Priority(FilterPriorities.USER_AUTHENTICATION_FILTER)
@@ -36,10 +42,32 @@ import java.io.IOException;
 public class UserAuthenticationRequestFilter implements ContainerRequestFilter {
 
 
-
+    @javax.ws.rs.core.Context
+    private ClientRequestContext clientRequestContext;
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+
+        if (!"prod".equals(Settings.instance().getEnv())) {
+            String username = (String)containerRequestContext.getProperty("testUsername");
+            if (!empty(username)) {
+                IUser user = UserController.instance().forUsername(username);
+                if (user == null) {
+                    throw new UsageException("Could not find test user " + username);
+                }
+                Context.setUser(user);
+            } else {
+                Long userId = (Long) containerRequestContext.getProperty("testUserId");
+                if (!empty(userId)) {
+                    IUser user = UserController.instance().forId(userId);
+                    if (user == null) {
+                        throw new UsageException("Could not find test user for id " + userId);
+                    }
+                    Context.setUser(user);
+                }
+            }
+        }
+
         //containerRequestContext.getRequest();
         // Authorize via cookie?
         if (UserController.instance() != null) {

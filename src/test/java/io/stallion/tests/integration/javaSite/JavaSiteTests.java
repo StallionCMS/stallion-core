@@ -25,12 +25,18 @@ import io.stallion.testing.JerseyIntegrationBaseCase;
 import io.stallion.utils.json.JSON;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Assert;
+
+import static io.stallion.utils.Literals.UTC;
+import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.val;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
+import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,6 +97,7 @@ public class JavaSiteTests extends JerseyIntegrationBaseCase {
         pojo.setDisplayName("Marky Mark");
         pojo.setUserName("markymark");
         pojo.setStatus("fake-status-zzzxxx");
+        pojo.setDueAt(ZonedDateTime.of(2020, 2, 20, 12, 0, 0, 0, UTC));
         Response response = target("/my-hello/creatify")
                 .request()
                 .header("X-Requested-By", "XmlHttpRequest")
@@ -167,6 +174,83 @@ public class JavaSiteTests extends JerseyIntegrationBaseCase {
         Assert.assertEquals(123L, (long)mypojo.getId());
         //Log.finer("Response: {0}", response.getContent());
 
+    }
+
+    @Test
+    public void testBodyParam() {
+        {
+            Response response = target("/my-hello/body-slam")
+                    .request()
+                    .header("X-Requested-By", "XmlHttpRequest")
+                    .post(
+                            Entity.json(
+                                    map(
+                                            val("thingId", 102L)
+                                    )
+                            )
+                    );
+            assertEquals(200, response.getStatus());
+            Map result = JSON.parseMap(response.readEntity(String.class));
+            assertEquals(102, result.get("thingId"));
+            assertNull(result.get("secretNote"));
+        }
+        {
+            Response response = target("/my-hello/body-slam")
+                    .request()
+                    .header("X-Requested-By", "XmlHttpRequest")
+                    .post(
+                            Entity.json(
+                                    map(
+                                            val("note", "foobar"),
+                                            val("thingId", 102L),
+                                            val("score", 23L),
+                                            val("approved", false)
+                                    )
+                            )
+                    );
+            assertEquals(200, response.getStatus());
+            Map result = JSON.parseMap(response.readEntity(String.class));
+            assertEquals(102, result.get("thingId"));
+            assertEquals("foobar", result.get("note"));
+            assertNull(result.get("secretNote"));
+        }
+
+        // TODO make validation work
+        /*
+        {
+            Response response = target("/my-hello/body-slam")
+                    .request()
+                    .header("X-Requested-By", "XmlHttpRequest")
+                    .post(
+                            Entity.json(
+                                    map(
+                                            val("thingId", 101L),
+                                            val("email", "bademail")
+
+                                    )
+                            )
+                    );
+            assertEquals(400, response.getStatus());
+
+        }
+
+
+        {
+            Response response = target("/my-hello/body-slam")
+                    .request()
+                    .header("X-Requested-By", "XmlHttpRequest")
+                    .post(
+                            Entity.json(
+                                    map(
+                                            val("note", "foobar")
+
+                                    )
+                            )
+                    );
+            assertEquals(400, response.getStatus());
+
+        }
+        */
     }
 
 

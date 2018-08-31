@@ -17,12 +17,18 @@
 
 package io.stallion.testing;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import io.stallion.boot.AppContextLoader;
 import io.stallion.boot.StallionServer;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
+import io.stallion.utils.json.JSON;
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
@@ -159,12 +165,22 @@ public abstract class JerseyIntegrationBaseCase  {
 
     public static class InnerJerseyTest extends JerseyTest {
 
+        @Override
+        protected void configureClient(ClientConfig config) {
+            config.property(org.glassfish.jersey.CommonProperties.METAINF_SERVICES_LOOKUP_DISABLE, true);
+
+
+
+            JacksonJsonProvider provider = new JacksonJsonProvider(JSON.getMapper());
+            config.register(provider);
+        }
 
         @Override
         protected Application configure() {
             enable(TestProperties.LOG_TRAFFIC);
             enable(TestProperties.DUMP_ENTITY);
             enable("trace");
+
 
 
             ResourceConfig rc = new StallionServer().buildResourceConfig();
@@ -223,6 +239,7 @@ public abstract class JerseyIntegrationBaseCase  {
         for(SelfMocking sm: mocks.values()) {
             sm.onSelfMockingBeforeTest();
         }
+
     }
 
     @After

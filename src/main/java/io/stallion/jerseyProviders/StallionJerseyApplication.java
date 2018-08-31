@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import io.stallion.assets.AssetsFolderEndpointsResource;
 import io.stallion.assets.AssetsResourceEndpointsResource;
 import io.stallion.contentPublishing.ContentPublishingBooter;
@@ -29,6 +30,7 @@ import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.settings.Settings;
 import io.stallion.testing.UIDemoResource;
 import io.stallion.users.UsersApiResource;
+import io.stallion.utils.json.JSON;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -80,9 +82,7 @@ public class StallionJerseyApplication extends ResourceConfig {
 
         //register(JacksonFeature.class);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
+        JacksonJsonProvider provider = new JacksonJsonProvider(JSON.getMapper());
         register(provider);
 
 
