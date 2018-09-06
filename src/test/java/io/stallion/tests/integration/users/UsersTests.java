@@ -50,7 +50,7 @@ public class UsersTests extends AppIntegrationCaseBase {
         //String hashed = BCrypt.hashpw("a", BCrypt.gensalt());
         //Log.info("Hashed: \"{0}\"", hashed);
         //assertTrue(BCrypt.checkpw("a", hashed));
-        Context.getSettings().setDevMode(true);
+
 
         //TODO fix me
         /*

@@ -17,7 +17,8 @@
 
 package io.stallion.testing;
 
-import io.stallion.boot.AppContextLoader;
+
+import io.stallion.StallionApplication;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -26,6 +27,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import javax.ws.rs.core.Feature;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
@@ -37,7 +39,7 @@ import java.util.logging.Level;
 import static io.stallion.utils.Literals.empty;
 
 
-public abstract class AppIntegrationCaseBase {
+public abstract class AppIntegrationCaseBase extends JerseyIntegrationBaseCase {
 
 
     static {
@@ -49,113 +51,13 @@ public abstract class AppIntegrationCaseBase {
 
 
     public static void startApp(String folderName) throws Exception {
-        startApp(folderName, false);
+        startApp(folderName,  null, new Feature[0], true);
     }
 
-
-    public static void startApp(String folderName, Boolean watchFolders, StallionJavaPlugin[] ...plugins) throws Exception {
-        Log.info("setUpClass client and app");
-        Settings.shutdown();
-        String path;
-        if (new File(folderName).exists()) {
-            path = folderName;
-        } else {
-            URL resourceUrl = AppIntegrationCaseBase.class.
-                    getResource(folderName);
-            Path resourcePath = Paths.get(resourceUrl.toURI());
-            path = resourcePath.toString();
-        }
-        Log.fine("--------------------------------------------------------------------------------------------------");
-        Log.info("Booting app from folder: {0} ", path);
-        Log.fine("--------------------------------------------------------------------------------------------------");
-        AppContextLoader.loadAndStartForTests(path);
-        String level = System.getenv("stallionLogLevel");
-        if (!empty(level)) {
-            Log.setLogLevel(Level.parse(level.toUpperCase()));
-        }
-
-        Log.fine("--------------------------------------------------------------------------------------------------");
-        Log.info("App booted for folder: {0} ", path);
-        Log.fine("--------------------------------------------------------------------------------------------------");
+    public static void startApp(String folderName, StallionApplication app) throws Exception {
+        startApp(folderName,  app, new Feature[0], true);
     }
 
-    private static Map<Class, SelfMocking> mocks = new HashMap<>();
-
-    public static void mockClass(Class<SelfMocking> cls) {
-        if (mocks.containsKey(cls)) {
-            return;
-        }
-        try {
-            SelfMocking sm = cls.newInstance();
-            mocks.put(cls, sm);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public static <T> T getMockResults(Class<SelfMocking> cls) {
-        return mocks.get(cls).onSelfMockingGetResults();
-    }
-
-    @BeforeClass
-    public static void baseBeforeClass() throws Exception {
-
-        for(SelfMocking sm: mocks.values()) {
-            sm.onSelfMockingBeforeClass();
-        }
-    }
-
-
-    @Before
-    public void baseBefore() throws Exception {
-        for(SelfMocking sm: mocks.values()) {
-            sm.onSelfMockingBeforeTest();
-        }
-    }
-
-    @After
-    public void baseAfter() throws Exception {
-        for(SelfMocking sm: mocks.values()) {
-            sm.onSelfMockingAfter();
-        }
-    }
-
-    @AfterClass
-    public static void baseAfterClass() throws Exception {
-        for(SelfMocking sm: mocks.values()) {
-            sm.onSelfMockingAfterClass();
-        }
-
-
-        cleanUpClass();
-
-    }
-
-
-    public static void cleanUpClass() {
-        AppContextLoader.shutdown();
-        Settings.shutdown();
-
-        mocks = new HashMap<>();
-        Stubbing.reset();
-    }
-
-    public void assertContains(String content, String expected) {
-        if (!content.contains(expected)) {
-            Log.warn("Content ''{0}'' does not contain string ''{1}''!!", content, expected);
-        }
-        assert content.contains(expected);
-    }
-
-    public void assertNotContains(String content, String unexpected) {
-        if (content.contains(unexpected)) {
-            Log.warn("Content ''{0}'' erroneously contains string ''{1}''!!", content, unexpected);
-        }
-        assert !content.contains(unexpected);
-    }
 
 
 }

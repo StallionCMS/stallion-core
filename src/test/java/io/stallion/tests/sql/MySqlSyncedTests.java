@@ -17,8 +17,8 @@
 
 package io.stallion.tests.sql;
 
-import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.SqlMigrateCommandOptions;
+import io.stallion.StallionApplication;
+import io.stallion.dataAccess.db.SqlMigrateCommandOptions;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.db.DB;
@@ -27,8 +27,6 @@ import io.stallion.dataAccess.db.SqlMigrationAction;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
 import io.stallion.testing.JerseyIntegrationBaseCase;
-import io.stallion.utils.json.JSON;
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -43,7 +41,6 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import static io.stallion.utils.Literals.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -62,7 +59,13 @@ public class MySqlSyncedTests extends JerseyIntegrationBaseCase {
         }
         String path = resourcePath.toString();
         options.setTargetPath(path);
-        AppContextLoader.loadWithSettingsOnly(options);
+        StallionApplication app = new StallionApplication.DefaultApplication();
+        try {
+            app.loadForTestsLightweight(path, null, "test");
+        } catch (Exception e) {
+            app.shutdownAll();
+            throw new RuntimeException(e);
+        }
 
         try {
             DB.load();
@@ -86,12 +89,15 @@ public class MySqlSyncedTests extends JerseyIntegrationBaseCase {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        app.shutdownAll();
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         setupMysql();
-        startApp("/mysql_site", new Feature() {
+        StallionApplication app = new StallionApplication.DefaultApplication();
+        startApp("/mysql_site", app, new Feature() {
             @Override
             public boolean configure(FeatureContext context) {
                 context.register(MySqlEndpoint.class);
@@ -106,6 +112,8 @@ public class MySqlSyncedTests extends JerseyIntegrationBaseCase {
                         .setPersisterClass(DbPersister.class)
                         .setTableName("stallion_test_house")
         );
+
+        DataAccessRegistry.instance().get("stallion_test_house").getStash().loadAll();
 
     }
 

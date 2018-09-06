@@ -17,8 +17,9 @@
 
 package io.stallion.dataAccess.db;
 
-import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.SqlGenerateCommandOptions;
+import io.stallion.StallionApplication;
+import io.stallion.boot.ActionModeFlags;
+import io.stallion.boot.ModeFlags;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
@@ -59,12 +60,17 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
     }
 
     @Override
-    public void loadApp(SqlGenerateCommandOptions options) {
-        //AppContextLoader.loadWithSettingsOnly(options);
-        //DB.load();
+    public ActionModeFlags[] getActionModeFlags() {
+        return array(ActionModeFlags.NO_JOB_AND_TASK_EXECUTION, ActionModeFlags.NO_JERSEY, ActionModeFlags.NO_PRELOADED_DATA);
+    }
+
+    @Override
+    public void initializeRegistriesAndServices(StallionApplication app, ModeFlags flags) {
 
         DB.setUseDummyPersisterForSqlGenerationMode(true);
-        AppContextLoader.loadCompletely(options);
+
+        app.initializeRegistriesAndServices(flags.isTest());
+
         if (!DB.available()) {
             if (Settings.instance().getDatabase() == null || empty(Settings.instance().getDatabase().getUrl())) {
                 throw new ConfigException("No database url defined in your settings");
@@ -73,6 +79,8 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
             }
         }
     }
+
+
 
     @Override
     public void execute(SqlGenerateCommandOptions options) throws Exception {

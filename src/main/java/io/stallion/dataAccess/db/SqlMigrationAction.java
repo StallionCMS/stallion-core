@@ -17,8 +17,8 @@
 
 package io.stallion.dataAccess.db;
 
-import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.SqlMigrateCommandOptions;
+import io.stallion.StallionApplication;
+import io.stallion.boot.ModeFlags;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.plugins.PluginRegistry;
@@ -64,8 +64,7 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
     }
 
     @Override
-    public void loadApp(SqlMigrateCommandOptions options) {
-        AppContextLoader.loadWithSettingsOnly(options);
+    public void initializeRegistriesAndServices(StallionApplication app, ModeFlags flags) {
         DB.load();
     }
 
@@ -201,7 +200,7 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
         ));
         if (PluginRegistry.instance() != null) {
             for (StallionJavaPlugin plugin : PluginRegistry.instance().getJavaPluginByName().values()) {
-                pluginMigrations.put(plugin.getPluginName(), plugin.getSqlMigrations());
+                pluginMigrations.put(plugin.getName(), plugin.getSqlMigrations());
             }
         }
         for (Map.Entry<String, List<String>> entry: pluginMigrations.entrySet()) {

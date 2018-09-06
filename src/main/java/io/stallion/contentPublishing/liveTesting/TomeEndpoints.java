@@ -18,7 +18,7 @@ package io.stallion.contentPublishing.liveTesting;
 
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.SortDirection;
-import io.stallion.jerseyProviders.MinRole;
+import io.stallion.http.MinRole;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 import io.stallion.utils.json.JSON;

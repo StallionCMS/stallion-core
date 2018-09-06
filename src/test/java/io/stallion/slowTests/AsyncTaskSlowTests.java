@@ -22,6 +22,7 @@ import io.stallion.asyncTasks.AsyncCoordinator;
 import io.stallion.asyncTasks.AsyncFileCoordinator;
 import io.stallion.asyncTasks.AsyncTask;
 import io.stallion.asyncTasks.AsyncTaskController;
+import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.fileSystem.FileSystemWatcherService;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
@@ -45,7 +46,7 @@ public class AsyncTaskSlowTests extends AppIntegrationCaseBase {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        startApp("/a_minimal_site", true);
+        startApp("/a_minimal_site");
         AsyncCoordinator.shutDownForTests();
         File tasksDir = new File(Context.getSettings().getDataDirectory() + "/async-tasks");
         if (tasksDir.isDirectory()) {
@@ -54,6 +55,7 @@ public class AsyncTaskSlowTests extends AppIntegrationCaseBase {
         FileSystemWatcherService.start();
         AsyncCoordinator.initAndStart();
         AsyncCoordinator.instance().registerClassLoader(AsyncTaskSlowTests.class.getClassLoader());
+        DataAccessRegistry.instance().get("async_tasks").getStash().loadAll();
     }
 
     @AfterClass

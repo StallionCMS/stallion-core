@@ -20,8 +20,7 @@ package io.stallion.tests.integration.javaSite;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import io.stallion.dataAccess.SafeMerger;
-import io.stallion.jerseyProviders.BodyParam;
-import io.stallion.utils.json.JSON;
+import io.stallion.http.BodyParam;
 import io.stallion.utils.json.RestrictedViews;
 
 import javax.validation.constraints.Email;

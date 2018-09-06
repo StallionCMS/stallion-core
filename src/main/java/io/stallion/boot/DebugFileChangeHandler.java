@@ -24,7 +24,7 @@ import sun.misc.Signal;
 import java.nio.file.WatchEvent;
 
 
-class DebugFileChangeHandler extends BaseWatchEventHandler {
+public class DebugFileChangeHandler extends BaseWatchEventHandler {
     @Override
     public void handle(String relativePath, String fullPath, WatchEvent.Kind<?> kind, WatchEvent<?> event) throws Exception {
         if (!relativePath.endsWith(".js") && !relativePath.endsWith(".toml")) {

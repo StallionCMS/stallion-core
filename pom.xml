@@ -74,7 +74,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.stallion.boot.MainRunner</mainClass>
+                            <mainClass>io.stallion.Main</mainClass>
 
                         </manifest>
                         <manifestEntries>

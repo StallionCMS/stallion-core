@@ -17,8 +17,11 @@
 
 package io.stallion.secrets;
 
+import io.stallion.boot.ActionModeFlags;
 import io.stallion.boot.CommandOptionsBase;
 import io.stallion.boot.StallionRunAction;
+
+import static io.stallion.utils.Literals.array;
 
 
 public class SecretsAction implements StallionRunAction<CommandOptionsBase> {
@@ -34,9 +37,11 @@ public class SecretsAction implements StallionRunAction<CommandOptionsBase> {
     }
 
     @Override
-    public void loadApp(CommandOptionsBase options) {
-
+    public ActionModeFlags[] getActionModeFlags() {
+        return array(ActionModeFlags.SETTINGS_ONLY);
     }
+
+
 
     @Override
     public void execute(CommandOptionsBase options) throws Exception {

@@ -23,6 +23,7 @@ import io.stallion.settings.StrictnessLevel;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,14 +46,19 @@ public class CommandOptionsBase {
     @Option(name="-autoReload", usage="If a javascript file is touched, the entire server will reload. Use this only during development")
     private boolean autoReload = false;
 
-    @Option(name="-env", usage="The environment you are running in. The file settings.(env).toml will be merged into your settings.")        // no usage
+    @Option(name="-env", usage="The name of the environment you are running in. The file settings.(env).toml will be merged into your settings.")        // no usage
     private String env = "local";
 
-    @Option(name="-devMode", usage="Set to 'true' if you want to use the development URL for resource assets")
-    private Boolean devMode = false;
+
+
+
+    @Option(name="-runningFrom", usage="Running from DEVELOPER, MANUAL_COMMAND, or DEPLOYED_SERVICE? Inferred from environmental queues if not set explicitly.")
+    private RunningFrom runningFrom;
 
     @Option(name="-lightweightMode", usage="Set to 'true' if you don't want all data to be synced from the database.")
     private Boolean lightweightMode = false;
+
+
 
 
 
@@ -63,12 +69,18 @@ public class CommandOptionsBase {
 
     private List<StallionJavaPlugin> extraPlugins = list();
 
+    public void onPostLoadModeFlags(ModeFlags modeFlags, Settings settings, StallionRunAction runAction) {
+
+    }
 
     public Settings hydrateSettings(Settings settings) {
         if (strictnessLevel != null) {
             settings.setStrictnessLevel(strictnessLevel);
         }
-        settings.setLightweightMode(lightweightMode);
+
+
+
+
         return settings;
     }
 
@@ -148,14 +160,7 @@ public class CommandOptionsBase {
     }
 
 
-    public Boolean isDevMode() {
-        return devMode;
-    }
 
-
-    public void setDevMode(Boolean devMode) {
-        this.devMode = devMode;
-    }
 
     public boolean isLoggingAlwaysIncludesLineNumber() {
         return loggingAlwaysIncludesLineNumber;
@@ -173,6 +178,16 @@ public class CommandOptionsBase {
 
     public CommandOptionsBase setLightweightMode(Boolean lightweightMode) {
         this.lightweightMode = lightweightMode;
+        return this;
+    }
+
+
+    public RunningFrom getRunningFrom() {
+        return runningFrom;
+    }
+
+    public CommandOptionsBase setRunningFrom(RunningFrom runningFrom) {
+        this.runningFrom = runningFrom;
         return this;
     }
 }

@@ -21,6 +21,7 @@ import io.stallion.dataAccess.db.Col;
 import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.exceptions.ConfigException;
+import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -55,6 +56,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
     protected Map<String, Map<Object, T>> keyNameToUniqueKeyToValue;
     protected List<Col> columns;
     protected Set<String> uniqueFieldsCaseInsensitive = set();
+    protected boolean dataPreloaded = false;
 
     @Override
     public void init(DataAccessRegistration registration, ModelController<T> controller, Persister<T> persister) {
@@ -281,6 +283,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         for(T item: items) {
             loadItem(item);
         }
+        dataPreloaded = true;
     }
 
 
@@ -376,9 +379,11 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
                 keyNameToKeyToValue.put(keyFieldName, keyToValues);
             }
         }
+        dataPreloaded = false;
         initialize();
         loadAll();
         FilterCache.clearBucket(getBucket());
+
     }
 
     @Override
@@ -463,6 +468,11 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
 
     @Override
     public void onPreRead() {
+        if (!dataPreloaded) {
+            throw new UsageException(
+                    "Tried to read data from local stash for bucket " + getBucket() + " but the data was never preloaded. You are either" +
+                            " running an action with the NO_PRELOADED_DATA flag set, or have some sort of bug in your code.");
+        }
         getPersister().onPreRead();
     }
 

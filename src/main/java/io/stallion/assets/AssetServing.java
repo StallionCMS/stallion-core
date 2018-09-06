@@ -18,14 +18,11 @@
 package io.stallion.assets;
 
 import io.stallion.assetBundling.AssetHelpers;
-import io.stallion.jerseyProviders.LocalFileToResponse;
-import io.stallion.requests.IRequest;
+import io.stallion.http.LocalFileToResponse;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import io.stallion.utils.ResourceHelpers;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;

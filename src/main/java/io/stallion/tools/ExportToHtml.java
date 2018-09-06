@@ -17,8 +17,8 @@
 
 package io.stallion.tools;
 
-import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.ServeCommandOptions;
+
+import io.stallion.http.ServeCommandOptions;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -50,12 +50,7 @@ public class ExportToHtml implements StallionRunAction<ServeCommandOptions> {
         return new ServeCommandOptions();
     }
 
-    @Override
-    public void loadApp(ServeCommandOptions options) {
-        options.setDevMode(false);
-        options.setLocalMode("false");
-        AppContextLoader.loadCompletely(options);
-    }
+
 
     @Override
     public void execute(ServeCommandOptions options) throws Exception {

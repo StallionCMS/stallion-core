@@ -18,7 +18,7 @@
 package io.stallion.users;
 
 import io.stallion.Context;
-import io.stallion.boot.AppContextLoader;
+
 import io.stallion.boot.CommandOptionsBase;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.exceptions.UsageException;
@@ -49,10 +49,7 @@ public class UserAdder implements StallionRunAction<CommandOptionsBase> {
         return "Add admin users or edit existing users";
     }
 
-    @Override
-    public void loadApp(CommandOptionsBase options) {
-        AppContextLoader.loadCompletely(options);
-    }
+
 
     public void execute(CommandOptionsBase options) throws Exception {
         execute(options, "");

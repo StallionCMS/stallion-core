@@ -27,6 +27,7 @@ import io.stallion.services.Log;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
@@ -45,9 +46,8 @@ public class AssetsResourceEndpointsResource {
     private HttpServletResponse response;
 
 
-    @Path("/st-resource/{pluginName}/{path:.*}")
     @GET
-    public Object stAssets(
+    public Response stAssets(
             @PathParam("pluginName") String pluginName,
             @PathParam("path") String path,
             @HeaderParam("referer") String referer,

@@ -330,8 +330,6 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
         Log.info("Register model {0}", registration.getModelClass().getCanonicalName());
         modelClassToBucketName.put(registration.getModelClass().getCanonicalName(), registration.getBucket());
 
-        // Load all the items into the local stash
-        stash.loadAll();
 
 
         // Attach any file system watchers
@@ -344,6 +342,17 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
             }
         }
         return controller;
+    }
+
+    /*
+    Load all the data into the local stash
+     */
+    public void preloadStashData() {
+        Log.info("Preload stash data for all data controllers.");
+        for (Map.Entry<String, ModelController> entry: internalMap.entrySet()) {
+            Log.fine("Load data for {0} {1}", entry.getKey(), entry.getClass().getCanonicalName());
+            entry.getValue().getStash().loadAll();
+        }
     }
 
     @Deprecated

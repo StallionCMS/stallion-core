@@ -17,12 +17,14 @@
 
 package io.stallion.secrets;
 
+import io.stallion.boot.ActionModeFlags;
 import io.stallion.boot.StallionRunAction;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 
 import static io.stallion.utils.Literals.UTF8;
+import static io.stallion.utils.Literals.array;
 
 
 public class SecretsDecryptAction implements StallionRunAction<SecretsDecryptOptions> {
@@ -36,11 +38,11 @@ public class SecretsDecryptAction implements StallionRunAction<SecretsDecryptOpt
         return "Decrypts the file conf/secrets.json.aes to conf/secrets.json";
     }
 
+
     @Override
-    public void loadApp(SecretsDecryptOptions options) {
-
+    public ActionModeFlags[] getActionModeFlags() {
+        return array(ActionModeFlags.SETTINGS_ONLY);
     }
-
 
     @Override
     public SecretsDecryptOptions newCommandOptions() {

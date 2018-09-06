@@ -17,8 +17,8 @@
 
 package io.stallion.dataAccess.db;
 
-import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.SqlMigrateCommandOptions;
+import io.stallion.StallionApplication;
+import io.stallion.boot.ModeFlags;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.services.Log;
 
@@ -54,9 +54,9 @@ public class SqlCheckNeedsMigrationAction implements StallionRunAction<SqlMigrat
         return new SqlMigrateCommandOptions();
     }
 
+
     @Override
-    public void loadApp(SqlMigrateCommandOptions options) {
-        AppContextLoader.loadWithSettingsOnly(options);
+    public void initializeRegistriesAndServices(StallionApplication app, ModeFlags flags) {
         DB.load();
     }
 

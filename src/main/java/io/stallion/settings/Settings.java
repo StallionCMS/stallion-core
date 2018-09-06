@@ -18,6 +18,9 @@
 package io.stallion.settings;
 
 import io.stallion.boot.CommandOptionsBase;
+import io.stallion.boot.DataEnvironmentType;
+import io.stallion.boot.ModeFlags;
+import io.stallion.boot.StallionRunAction;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
@@ -40,7 +43,7 @@ import static io.stallion.utils.Literals.*;
 
 public class Settings implements ISettings {
 
-
+    private ModeFlags modeFlags = null;
 
     // Child sections
     private DbConfig database = null;
@@ -82,11 +85,6 @@ public class Settings implements ISettings {
     @SettingMeta()
     private String targetFolder = null;
 
-    // Runtime mode config
-    @SettingMeta()
-    private Boolean localMode;
-    @SettingMeta()
-    private Boolean devMode;
 
     @SettingMeta()
     private Boolean lightweightMode;
@@ -122,6 +120,8 @@ public class Settings implements ISettings {
     private String env;
     @SettingMeta()
     private Boolean bundleDebug;
+    @SettingMeta(help="Is this settings file for a PRODUCTION, STAGING, TEST, or SANDBOX environment? Will be inferred from the environment name if left null.")
+    private DataEnvironmentType dataEnvironmentType;
 
     // Routes and rewrites
     @SettingMeta(val="SAMEORIGIN")
@@ -207,25 +207,24 @@ public class Settings implements ISettings {
         return _instance;
     }
 
-    public static Settings init(String env, CommandOptionsBase options) {
-        _instance = new SettingsLoader().loadSettings(env, options.getTargetPath(), "stallion", Settings.class, options);
+    public static Settings init(String env, CommandOptionsBase options, StallionRunAction action) {
+        _instance = new SettingsLoader().loadSettings(env, options.getTargetPath(), "stallion", Settings.class, options, action);
 
         _instance.setCdnUrl(_instance.getCdnUrl().replace("{port}", _instance.getPort().toString()));
         _instance.setSiteUrl(_instance.getSiteUrl().replace("{port}", _instance.getPort().toString()));
+
+
+
+
         return _instance;
     }
 
+
     public void assignDefaults() {
-        if (getLocalMode() == null) {
-            if (empty(System.getenv().getOrDefault("STALLION_DEPLOY_TIME", ""))) {
-                setLocalMode(true);
-            } else {
-                setLocalMode(false);
-            }
-        }
+
 
         if (bundleDebug == null) {
-            bundleDebug = getLocalMode();
+            bundleDebug = getModeFlags().isDeveloperMode();
         }
 
         if (systemProperties != null) {
@@ -237,7 +236,7 @@ public class Settings implements ISettings {
 
 
         if (getDebug() == null) {
-            if (getEnv().equals("prod") && !getLocalMode()) {
+            if ((getModeFlags().isProduction() || getModeFlags().isStaging()) && !getModeFlags().isDeveloperMode()) {
                 setDebug(false);
             } else {
                 setDebug(true);
@@ -318,14 +317,8 @@ public class Settings implements ISettings {
         }
 
         if (getRedirects() != null) {
-            // THe Toml library has a bug whereby if a map key is quoted, it keeps the
-            // quotes as part of the key, rather than using the String inside the quotes
-            Set<String> keys = new HashSet<>(getRedirects().keySet());
-            for(String key: keys) {
-                if (key.startsWith("\"") && key.endsWith("\"")) {
-                    getRedirects().put(key.substring(1, key.length()-1), getRedirects().get(key));
-                }
-            }
+            stripKeyQuotes(getRedirects());
+
         }
 
         if (getRewritePatterns() != null && getRewritePatterns().size() > 0) {
@@ -625,12 +618,9 @@ public class Settings implements ISettings {
      * @return
      */
     public Boolean getDevMode() {
-        return devMode;
+        return getModeFlags().isDeveloperMode();
     }
 
-    public void setDevMode(Boolean devMode) {
-        this.devMode = devMode;
-    }
 
     /**
      * Set the log level - INFO, FINE, FINER, FINEST
@@ -879,12 +869,9 @@ public class Settings implements ISettings {
      * @return
      */
     public Boolean getLocalMode() {
-        return localMode;
+        return getModeFlags().isLocalMode();
     }
 
-    public void setLocalMode(Boolean localMode) {
-        this.localMode = localMode;
-    }
 
 
     public Boolean getLightweightMode() {
@@ -1209,6 +1196,25 @@ public class Settings implements ISettings {
 
     public Settings setJerseyInitParams(Map<String, String> jerseyInitParams) {
         this.jerseyInitParams = jerseyInitParams;
+        return this;
+    }
+
+
+    public ModeFlags getModeFlags() {
+        return modeFlags;
+    }
+
+    public Settings setModeFlags(ModeFlags modeFlags) {
+        this.modeFlags = modeFlags;
+        return this;
+    }
+
+    public DataEnvironmentType getDataEnvironmentType() {
+        return dataEnvironmentType;
+    }
+
+    public Settings setDataEnvironmentType(DataEnvironmentType dataEnvironmentType) {
+        this.dataEnvironmentType = dataEnvironmentType;
         return this;
     }
 }

@@ -17,6 +17,8 @@
 
 package io.stallion.boot;
 
+import io.stallion.StallionApplication;
+
 /**
  * A way to implement executable actions that can be run via the command line.
  * When you run Stallion from the command line you pass in an action
@@ -50,9 +52,23 @@ public interface StallionRunAction<T extends CommandOptionsBase> {
      * all the former plus need to start jobs and the async task coordinator. Call exactly
      * what you need to load in this method.
      *
-     * @param options
+     *
      */
-    public void loadApp(T options);
+    default void initializeRegistriesAndServices(StallionApplication app, ModeFlags flags) {
+        if (flags.isSettingsOnly()) {
+            return;
+        }
+        app.initializeRegistriesAndServices(flags.isTest());
+
+        if (flags.isPreloadedData()) {
+            app.preloadData(flags);
+        }
+
+
+        if (flags.isStartJobAndTaskExecution()) {
+            app.startJobAndTaskProcessingServices(flags.isTest());
+        }
+    }
 
     public default String getSubActionName() {
         return "";
@@ -77,5 +93,9 @@ public interface StallionRunAction<T extends CommandOptionsBase> {
      * @throws Exception
      */
     public void execute(T options) throws Exception;
+
+    public default ActionModeFlags[] getActionModeFlags() {
+        return new ActionModeFlags[] {ActionModeFlags.NO_JOB_AND_TASK_EXECUTION};
+    }
 
 }

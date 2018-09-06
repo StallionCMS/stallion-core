@@ -51,6 +51,7 @@ public class BooksController extends StandardModelController<Book> {
     static final String[] authors = {"Mark Twain", "Charles Dickens", "Jane Austen", "William Shakespeare", "James Joyce", "Emily Dickinson"};
 
     public void populate() {
+        getStash().loadAll();
         for(int x = 0; x<1000; x++) {
             String author = authors[x % 6];
             String title = titleParts[x % 8] + " " + titleParts[(x * x + x + x) % 8 ] + " " + titleParts[(x * x * x + x) % 8 ];
@@ -67,6 +68,7 @@ public class BooksController extends StandardModelController<Book> {
             save(book);
 
         }
+
 
     }
 }

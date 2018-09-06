@@ -26,6 +26,7 @@ import org.apache.xbean.classloader.JarFileClassLoader;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
@@ -106,7 +107,7 @@ public class PluginRegistry {
         if (_instance != null) {
 
             for (StallionJavaPlugin plugin: _instance.getJavaPluginByName().values()) {
-                plugin.shutdown();
+                plugin.onShutdown();
             }
         }
         _instance = null;
@@ -121,11 +122,21 @@ public class PluginRegistry {
     public List<StallionRunAction> getAllPluginDefinedStallionRunActions() {
         List<StallionRunAction> actions = list();
         for (StallionJavaPlugin plugin: getJavaPluginByName().values()) {
-            actions.addAll(plugin.getActions());
+            actions.addAll(plugin.getExtraActions());
         }
         return actions;
     }
 
+
+    public List<StallionJavaPlugin> listPluginsInAlphabeticOrder() {
+        List<String> names = new ArrayList<String>(getJavaPluginByName().keySet());
+        Collections.sort(names);
+        List<StallionJavaPlugin> plugins = list();
+        for(String name: names) {
+            plugins.add(getJavaPluginByName().get(name));
+        }
+        return plugins;
+    }
 
 
     public void loadJarPlugins(String targetPath) {
@@ -176,32 +187,18 @@ public class PluginRegistry {
             Log.finer("Booter class was loaded from: {0} ", booterClass.getProtectionDomain().getCodeSource().getLocation());
             StallionJavaPlugin booter = (StallionJavaPlugin)booterClass.newInstance();
             loadPluginFromBooter(booter);
-            DynamicSettings.instance().initGroup(booter.getPluginName());
+            DynamicSettings.instance().initGroup(booter.getName());
         }
     }
 
-    /**
-     * Boot all jar plugins that have already been loaded.
-     *
-     */
-     public void bootJarPlugins()  {
-        for(StallionJavaPlugin plugin: getJavaPluginByName().values()) {
-            try {
-                plugin.boot();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     public void loadPluginFromBooter(StallionJavaPlugin booter) {
-        Log.info("Load plugin {0} from class {1}", booter.getPluginName(), booter.getClass().getName());
-        if (getJavaPluginByName().containsKey(booter.getPluginName())) {
-            Log.warn("Plugin already loaded, skipping {0}", booter.getPluginName());
+        Log.info("Load plugin {0} from class {1}", booter.getName(), booter.getClass().getName());
+        if (getJavaPluginByName().containsKey(booter.getName())) {
+            Log.warn("Plugin already loaded, skipping {0}", booter.getName());
             return;
         }
-        booter.setPluginRegistry(this);
-        getJavaPluginByName().put(booter.getPluginName(), booter);
+        getJavaPluginByName().put(booter.getName(), booter);
     }
 
 

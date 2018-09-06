@@ -20,6 +20,8 @@ package io.stallion.settings;
 import com.moandjiezana.toml.Toml;
 import io.stallion.Context;
 import io.stallion.boot.CommandOptionsBase;
+import io.stallion.boot.ModeFlags;
+import io.stallion.boot.StallionRunAction;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.secrets.SecretsVault;
 import io.stallion.services.Log;
@@ -45,10 +47,10 @@ public class SettingsLoader  {
     }
 
     public <T extends ISettings> T loadSettings(String env, String targetFolder, String baseName, Class<T> settingsClass)  {
-        return loadSettings(env, targetFolder, baseName, settingsClass, null);
+        return loadSettings(env, targetFolder, baseName, settingsClass, null, null);
     }
 
-    public <T extends ISettings> T loadSettings(String env, String targetFolder, String baseName, Class<T> settingsClass, CommandOptionsBase options)  {
+    public <T extends ISettings> T loadSettings(String env, String targetFolder, String baseName, Class<T> settingsClass, CommandOptionsBase options, StallionRunAction runAction)  {
         String basePath = targetFolder + "/conf/" + baseName;
 
         // Load the default settings
@@ -120,12 +122,14 @@ public class SettingsLoader  {
             SecretsVault.init(targetFolder, secretsSettings);
         }
 
-        if (options != null && settings instanceof  Settings) {
-            options.hydrateSettings((Settings)settings);
+        if (options != null && runAction != null && settings instanceof Settings) {
+            loadModeFlags((Settings)settings, options, runAction);
         }
 
+        if (options != null && settings instanceof  Settings) {
 
-
+            options.hydrateSettings((Settings)settings);
+        }
 
         settings.assignDefaults();
 
@@ -138,6 +142,13 @@ public class SettingsLoader  {
         Log.finer("Settings Loaded. {0}", settings);
 
         return settings;
+    }
+
+    private void loadModeFlags(Settings settings, CommandOptionsBase options, StallionRunAction runAction) {
+        settings.setModeFlags(new ModeFlags(options, runAction, settings));
+        options.onPostLoadModeFlags(settings.getModeFlags(), settings, runAction);
+        settings.setDataEnvironmentType(settings.getModeFlags().getEnvironmentType());
+
     }
 
     public void assignDefaultsFromAnnotations(Object settings) throws IllegalAccessException, InstantiationException {

@@ -74,6 +74,7 @@ public class UserMemoryStash<T extends IUser> extends LocalMemoryStash<T> {
             loadItem(displayable);
         }
         loadPredefinedUsers();
+        dataPreloaded = true;
     }
 
 

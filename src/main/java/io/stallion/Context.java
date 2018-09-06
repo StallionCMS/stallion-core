@@ -17,7 +17,6 @@
 
 package io.stallion;
 
-import io.stallion.boot.AppContextLoader;
 import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.plugins.PluginRegistry;
@@ -38,9 +37,6 @@ public class Context {
     private static final ThreadLocal<IRequest> _request = new ThreadLocal<IRequest>();
 
 
-    public static AppContextLoader app() {
-        return AppContextLoader.instance();
-    }
 
     public static DB db() {
         return DB.instance();
@@ -99,11 +95,6 @@ public class Context {
 
 
 
-
-    @Deprecated
-    public static AppContextLoader getApp() {
-        return app();
-    }
 
     public static void setRequest(IRequest request) {
         _request.set(request);

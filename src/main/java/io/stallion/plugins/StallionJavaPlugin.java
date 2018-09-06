@@ -17,15 +17,15 @@
 
 package io.stallion.plugins;
 
+import io.stallion.StallionApplication;
 import io.stallion.boot.CommandOptionsBase;
-import io.stallion.boot.ServeCommandOptions;
+import io.stallion.http.ServeCommandOptions;
 import io.stallion.boot.StallionRunAction;
 import io.stallion.services.Log;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.IOException;
@@ -36,11 +36,13 @@ import java.util.List;
 import static io.stallion.utils.Literals.*;
 
 public abstract class StallionJavaPlugin {
-    private PluginRegistry pluginRegistry;
 
-    public abstract String getPluginName();
+    public abstract String getName();
 
     public List<String> getSqlMigrations() {
+        if (getClass().equals(StallionApplication.DefaultApplication.class)) {
+            return list();
+        }
         URL resource = getClass().getResource("/sql/migrations.txt");
         if (resource != null) {
             try {
@@ -63,6 +65,30 @@ public abstract class StallionJavaPlugin {
         return list();
     }
 
+
+    /**
+     * The main method that gets called to load the plugin -- do everything here,
+     * such as loading controllers, loading endpoints, etc.
+     *
+     * @throws Exception
+     */
+    public abstract void onRegisterAll();
+
+    /**
+     * This gets called after plugin load, when Stallion is running as an actual
+     * web server or job server. Specifically, this gets called by
+     * StallionApplication.startJobAndTaskProcessingServices().
+     *
+     * Override this if there are background services that do not need
+     * to be run when executing most Stallion actions, but do need to be run
+     * when running a script action.
+     *
+     */
+    public void onStartAll(boolean testMode) {
+
+
+    }
+
     public void preExecuteAction(String action, CommandOptionsBase options) {
 
     }
@@ -72,41 +98,14 @@ public abstract class StallionJavaPlugin {
      *
      * @return
      */
-    public List<? extends StallionRunAction> getActions() {
+    public List<? extends StallionRunAction> getExtraActions() {
         return Collections.EMPTY_LIST;
     }
 
-    /**
-     *  Override this to implement configuring this plugin via the command-line.
-     */
-    public void commandlineConfigure() {
-        System.out.println("No special configuration needed for this plugin.");
-    }
-
-    /**
-     * The main method that gets called to load the plugin -- do everything here,
-     * such as loading controllers, loading endpoints, etc.
-     *
-     * @throws Exception
-     */
-    public abstract void boot() throws Exception;
-
-    /**
-     * This gets called after plugin load, when Stallion is running as an actual
-     * web server. Specifically, this gets called by AppContextLoader.startAllServices().
-     * Override this if there are background services that do not need
-     * to be run when executing most Stallion actions, but do need to be run
-     * when running a script action.
-     *
-     */
-    public void startServices() {
 
 
-    }
+    public void onBuildResourceConfig(ResourceConfig rc) {
 
-    public void buildResourceConfig(ResourceConfig rc) {
-        String thisPackage = this.getClass().getPackage().getName();
-        rc.packages(thisPackage);
     }
 
     public void preStartJetty(Server server, HandlerCollection handlerCollection, ServeCommandOptions options) {
@@ -117,38 +116,22 @@ public abstract class StallionJavaPlugin {
 
     }
 
-    /**
-     * Called by AppContextLoader.startServicesForTests(), which is called when loading
-     * an app context via the BaseIntegrationTestCase JUnit test case base class.
-     *
-     */
-    public void startServicesForTests() {
-
-    }
-
 
     /**
      * Override this to shutdown services when the Stallion AppContext shutsdown
      */
-    public void shutdownJetty(Server server) {
+    public void onShutdownJetty(Server server) {
 
     }
 
     /**
      * Override this to shutdown services when the Stallion AppContext shutsdown
      */
-    public void shutdown() {
+    public void onShutdown() {
 
     }
 
-    public void bootForPackage(String packagePath) {
-
-        // TODO: use the Reflect library to find all classes matching each giving interface, insantiate, and load them
-    }
 
 
 
-    public void setPluginRegistry(PluginRegistry pluginRegistry) {
-        this.pluginRegistry = pluginRegistry;
-    }
 }

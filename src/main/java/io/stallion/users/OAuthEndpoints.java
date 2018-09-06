@@ -18,8 +18,8 @@
 package io.stallion.users;
 
 
-import io.stallion.jerseyProviders.BodyParam;
-import io.stallion.jerseyProviders.MinRole;
+import io.stallion.http.BodyParam;
+import io.stallion.http.MinRole;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
 import org.apache.commons.lang3.StringUtils;

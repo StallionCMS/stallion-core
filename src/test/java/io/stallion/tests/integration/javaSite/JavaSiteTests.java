@@ -47,21 +47,21 @@ public class JavaSiteTests extends JerseyIntegrationBaseCase {
 
         StallionJavaPlugin booter = new StallionJavaPlugin() {
             @Override
-            public String getPluginName() {
+            public String getName() {
                 return "java-site";
             }
 
             @Override
-            public void boot() throws Exception {
+            public void onRegisterAll()  {
                 ExamplePojoController.register();
             }
 
             @Override
-            public void buildResourceConfig(ResourceConfig rc) {
+            public void onBuildResourceConfig(ResourceConfig rc) {
                 rc.register(MyResource.class);
             }
         };
-        startApp("/java_site", booter);
+        startApp("/java_site", null, booter);
     }
 
     @Test

@@ -17,13 +17,9 @@
 
 package io.stallion.testing;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
-import io.stallion.boot.AppContextLoader;
-import io.stallion.boot.StallionServer;
-import io.stallion.plugins.PluginRegistry;
+import io.stallion.StallionApplication;
+import io.stallion.http.ServeJettyRunAction;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -55,6 +51,7 @@ import static io.stallion.utils.Literals.empty;
 
 
 public abstract class JerseyIntegrationBaseCase  {
+    private static StallionApplication activeApplication;
     private static InnerJerseyTest jerseyTest;
     private static Feature[] features;
 
@@ -108,55 +105,70 @@ public abstract class JerseyIntegrationBaseCase  {
     }
 
     public static void startApp(String folderName) throws Exception {
-        startApp(folderName, false, new Feature[0], new StallionJavaPlugin[0]);
+        startApp(folderName, null, new Feature[0], false, new StallionJavaPlugin[0]);
     }
 
-    public static void startApp(String folderName,  Feature ...features) throws Exception {
-        startApp(folderName, false, features, new StallionJavaPlugin[0]);
+    public static void startApp(String folderName, Feature ...features) throws Exception {
+        startApp(folderName, null, features, false, new StallionJavaPlugin[0]);
     }
 
-    public static void startApp(String folderName,  StallionJavaPlugin ...plugins) throws Exception {
-        startApp(folderName, false,  new Feature[0], plugins);
+    public static void startApp(String folderName, StallionApplication application, Feature ...features) throws Exception {
+        startApp(folderName, application, features, false, new StallionJavaPlugin[0]);
+    }
+
+    public static void startApp(String folderName,  StallionApplication application, StallionJavaPlugin ...plugins) throws Exception {
+        startApp(folderName, application,  new Feature[0], false, plugins);
     }
 
 
-    public static void startApp(String folderName, Boolean watchFolders, Feature[] theFeatures, StallionJavaPlugin ...plugins) throws Exception {
+    public static void startApp(String folderName, StallionApplication application, Feature[] theFeatures, boolean skipLoadingJersey, StallionJavaPlugin ...plugins) throws Exception {
+        if (application == null) {
+            application = new StallionApplication.DefaultApplication();
+        }
+        activeApplication = application;
+
         Log.info("setUpClass client and app");
         Settings.shutdown();
-        String path;
+        String targetPath;
         if (new File(folderName).exists()) {
-            path = folderName;
+            targetPath = folderName;
         } else {
-            URL resourceUrl = AppIntegrationCaseBase.class.
+            URL resourceUrl = JerseyIntegrationBaseCase.class.
                     getResource(folderName);
             Path resourcePath = Paths.get(resourceUrl.toURI());
-            path = resourcePath.toString();
+            targetPath = resourcePath.toString();
         }
         Log.fine("--------------------------------------------------------------------------------------------------");
-        Log.info("Booting app from folder: {0} ", path);
+        Log.info("Booting app from folder: {0} ", targetPath);
         Log.fine("--------------------------------------------------------------------------------------------------");
-        AppContextLoader.loadAndStartForTests(path);
+
+        try {
+            application.loadForTests(targetPath, plugins);
+        } catch (Exception e) {
+            application.shutdownAll();
+            throw new RuntimeException(e);
+        }
+
+
         String level = System.getenv("stallionLogLevel");
         if (!empty(level)) {
             Log.setLogLevel(Level.parse(level.toUpperCase()));
         }
-        for(StallionJavaPlugin plugin: plugins) {
-            PluginRegistry.instance().loadPluginFromBooter(plugin);
-            plugin.boot();
-        }
 
-        if (theFeatures != null) {
-            features = theFeatures;
-        } else {
-            features = new Feature[0];
+        if (!skipLoadingJersey) {
+            if (theFeatures != null) {
+                features = theFeatures;
+            } else {
+                features = new Feature[0];
+            }
+            jerseyTest = new InnerJerseyTest();
+            jerseyTest.setUp();
         }
-        jerseyTest = new InnerJerseyTest();
-        jerseyTest.setUp();
 
 
         //client = new TestClient(AppContextLoader.instance());
         Log.fine("--------------------------------------------------------------------------------------------------");
-        Log.info("App booted for folder: {0} ", path);
+        Log.info("App booted for folder: {0} ", targetPath);
         Log.fine("--------------------------------------------------------------------------------------------------");
 
     }
@@ -183,7 +195,7 @@ public abstract class JerseyIntegrationBaseCase  {
 
 
 
-            ResourceConfig rc = new StallionServer().buildResourceConfig();
+            ResourceConfig rc = new ServeJettyRunAction().buildResourceConfig();
             if (features != null) {
                 for (Feature feature : features) {
                     rc.register(feature);
@@ -252,7 +264,9 @@ public abstract class JerseyIntegrationBaseCase  {
     @AfterClass
     public static void baseAfterClass() throws Exception {
         features = new Feature[0];
-        jerseyTest.tearDown();
+        if (jerseyTest != null) {
+            jerseyTest.tearDown();
+        }
         jerseyTest = null;
 
 
@@ -267,10 +281,16 @@ public abstract class JerseyIntegrationBaseCase  {
 
 
     public static void cleanUpClass() {
-        AppContextLoader.shutdown();
+
+
+        if (activeApplication != null) {
+            activeApplication.shutdownAll();
+        }
         Settings.shutdown();
+
         mocks = new HashMap<>();
         Stubbing.reset();
+        activeApplication = null;
     }
 
     public void assertContains(String content, String expected) {
