@@ -18,6 +18,7 @@
 package io.stallion.dataAccess;
 
 import io.stallion.contentPublishing.SlugRegistry;
+import io.stallion.requests.MetaInformation;
 import io.stallion.services.Log;
 import io.stallion.templating.TemplateRenderer;
 
@@ -52,8 +53,12 @@ public class DisplayableModelController<T extends Displayable> extends StandardM
     }
 
     public String render(T item, Map<String, Object> context) {
+        return render(item, context, null);
+    }
+
+    public String render(T item, Map<String, Object> context, MetaInformation meta) {
         String template = or(getTemplate(item), settings().getPageTemplate());
-        return TemplateRenderer.instance().renderTemplate(template, context);
+        return TemplateRenderer.instance().renderTemplate(template, context, meta);
     }
 
     @Override

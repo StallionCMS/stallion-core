@@ -21,7 +21,9 @@ import io.stallion.Context;
 import io.stallion.dataAccess.Displayable;
 import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.Model;
+import io.stallion.dataAccess.ModelBase;
 import io.stallion.requests.IRequest;
+import io.stallion.requests.MetaInformation;
 import io.stallion.requests.RequestWrapper;
 import io.stallion.services.Log;
 import io.stallion.settings.Settings;
@@ -116,29 +118,28 @@ public class ContentSlugCatchallResource {
         }
 
 
-        // TODO fix meta stuff
-        /*
-        StResponse response = Context.getResponse();
-        response.getMeta().setDescription(item.getMetaDescription());
+        MetaInformation meta = new MetaInformation();
+        meta.setDescription(item.getMetaDescription());
         if (!empty(item.getTitleTag())) {
-            response.getMeta().setTitle(item.getTitleTag());
+            meta.setTitle(item.getTitleTag());
         } else {
-            response.getMeta().setTitle(item.getTitle());
+            meta.setTitle(item.getTitle());
         }
-        response.getMeta().setBodyCssId(item.getSlugForCssId());
-        response.getMeta().getCssClasses().add("st-" + ((ModelBase) item).getController().getBucket());
-        response.getMeta().setOgType(item.getOgType());
+        meta.setBodyCssId(item.getSlugForCssId());
+        meta.getCssClasses().add("st-" + ((ModelBase) item).getController().getBucket());
+        meta.setOgType(item.getOgType());
         if (!empty(item.getRelCanonical())) {
-            response.getMeta().setCanonicalUrl(item.getRelCanonical());
+            meta.setCanonicalUrl(item.getRelCanonical());
         }
+        String contentType = "text/html";
         if (!empty(item.getContentType())) {
-            response.setContentType(item.getContentType());
+            contentType = item.getContentType();
         }
-        */
+
 
         Map ctx = map(val("page", item), val("post", item), val("item", item));
-        String output = ((DisplayableModelController)baseItem.getController()).render(item, ctx);
-        return Response.ok(output, "text/html").build();
+        String output = ((DisplayableModelController)baseItem.getController()).render(item, ctx, meta);
+        return Response.ok(output, contentType).build();
     }
 
 }

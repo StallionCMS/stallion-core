@@ -23,6 +23,7 @@ import io.stallion.dataAccess.DisplayableModelController;
 import io.stallion.dataAccess.file.TextItem;
 import io.stallion.dataAccess.filtering.FilterChain;
 import io.stallion.dataAccess.filtering.Pager;
+import io.stallion.requests.MetaInformation;
 import io.stallion.settings.ContentFolder;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
@@ -188,20 +189,23 @@ public class ListingEndpoints  {
         context.put("blogConfig", getConfig());
         context.put("postsFilter", filterChain());
         // TODO fix hydration of meta
-        if (!empty(getConfig().getListingTitle())) {
-            //Context.getResponse().getMeta().setTitle(getConfig().getListingTitle());
-        }
-        if (!empty(getConfig().getListingMetaDescription())) {
-            //Context.getResponse().getMeta().setDescription(getConfig().getListingMetaDescription());
-        }
+
+
+
         String blogRoot = GeneralUtils.slugify(getConfig().getListingRootUrl());
         if (empty(blogRoot) || blogRoot.equals("-")) {
             blogRoot = "root";
         } else if (blogRoot.startsWith("-")) {
             blogRoot = blogRoot.substring(1);
         }
-        //Context.getResponse().getMeta().setBodyCssId("flatBlog-" + blogRoot);
-        //Context.getResponse().getMeta().getCssClasses().add("st-flatBlog-" + blogRoot);
+
+        MetaInformation meta = new MetaInformation();
+        meta.setBodyCssId("flatBlog-" + blogRoot);
+        meta.getCssClasses().add("st-flatBlog-" + blogRoot);
+        meta.setTitle(getConfig().getListingTitle());
+        meta.setDescription(getConfig().getListingMetaDescription());
+        context.put("meta", meta);
+
         return context;
     }
 

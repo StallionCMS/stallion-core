@@ -22,6 +22,7 @@ import io.stallion.settings.Settings;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.File;
 import java.net.URL;
 
 import static io.stallion.utils.Literals.*;
@@ -55,8 +56,11 @@ public class ModeFlags {
             if (!empty(System.getenv().getOrDefault("STALLION_DEPLOY_TIME", "")) ) {
                 runningFrom = RunningFrom.DEPLOYED_SERVICE;
             } else {
-                URL url = getClass().getResource("/sql/migrations-table.mysql.sql");
-                if ("file".equals(url.getProtocol())) {
+
+                //
+                // Could also check for the java command, looking for JUnit or maven:
+                // "sun.java.command" -> "com.intellij.rt.execution.junit.JUnitStarter -ideVersion5 io.clubby.server.TestEndpoints,testRoot"
+                if (new File("./pom.xml").isFile()) {
                     runningFrom = RunningFrom.DEVELOPER;
                 } else {
                     runningFrom = RunningFrom.MANUAL_COMMAND;

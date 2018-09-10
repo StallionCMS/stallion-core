@@ -17,6 +17,8 @@
 
 package io.stallion.jobs;
 
+import io.stallion.boot.ModeFlags;
+import io.stallion.boot.RunningFrom;
 import io.stallion.exceptions.CommandException;
 import io.stallion.exceptions.ConfigException;
 import io.stallion.exceptions.UsageException;
@@ -92,6 +94,7 @@ public class JobCoordinator extends Thread {
         registeredJobs = new HashSet<>();
     };
 
+    private boolean running = false;
     private Executor pool;
     private boolean shouldShutDown = false;
     private PriorityBlockingQueue<JobDefinition> queue;
@@ -102,12 +105,16 @@ public class JobCoordinator extends Thread {
 
     @Override
     public void run() {
-
-        if (Settings.instance().getLocalMode() && ("prod".equals(Settings.instance().getEnv()) || "qa".equals(Settings.instance().getEnv()))) {
-            Log.info("Running localMode, environment is QA or PROD, thus not running jobs. Do not want to run production jobs locally!");
+        ModeFlags mode = Settings.instance().getModeFlags();
+        if ((mode.isProduction() || mode.isStaging()) && !mode.getRunningFrom().equals(RunningFrom.DEPLOYED_SERVICE)) {
+            Log.info("Data environment is STAGING or PROD, but not running as deployed service, thus not running jobs. Do not want to run production jobs locally!");
             return;
         }
-
+        // Make sure all jobs have an initial job status.
+        for(JobDefinition def: jobByName.values()) {
+            JobStatusController.instance().initializeJobStatus(def, utcNow());
+        }
+        running = true;
         while (!shouldShutDown) {
             try {
                 executeJobsForCurrentTime(utcNow());
@@ -127,6 +134,8 @@ public class JobCoordinator extends Thread {
             }
 
         }
+
+        running = false;
 
         // Shut down the thread pool
         // Wait for everything to exit
@@ -247,7 +256,9 @@ public class JobCoordinator extends Thread {
         registeredJobs.add(job.getName());
         jobByName.put(job.getName(), job);
 
-        JobStatusController.instance().initializeJobStatus(job, now);
+        if (running) {
+            JobStatusController.instance().initializeJobStatus(job, now);
+        }
     }
 
 

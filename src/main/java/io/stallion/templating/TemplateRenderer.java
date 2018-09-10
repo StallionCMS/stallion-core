@@ -159,8 +159,11 @@ public class TemplateRenderer {
         return renderTemplate(url.toString(), context);
     }
 
-
     public String renderTemplate(String path, Map<String, Object> context) {
+        return renderTemplate(path, context, null);
+    }
+
+    public String renderTemplate(String path, Map<String, Object> context, MetaInformation meta) {
         if (empty(path)) {
             throw new UsageException("No template selected for renderTemplate");
         }
@@ -178,19 +181,15 @@ public class TemplateRenderer {
         context.put("styleSettings", Settings.instance().getStyles());
 
         // TODO: store meta information, css in request?
-        MetaInformation meta = new MetaInformation();
+        if (meta == null) {
+            meta = (MetaInformation)context.getOrDefault("meta", null);
+        }
+        if (meta == null) {
+            meta = new MetaInformation();
+        }
         meta.getCssClasses().add("st-template-" + GeneralUtils.slugify(path));
         context.put("meta", meta);
 
-        /*
-        if (Context.response() != null) {
-
-            Context.response().getMeta().getCssClasses().add("st-template-" + GeneralUtils.slugify(path));
-            context.put("meta", Context.response().getMeta());
-        } else {
-            context.put("meta", map());
-        }
-        */
 
         Site site = new Site();
         site.setTitle(Settings.instance().getDefaultTitle());
