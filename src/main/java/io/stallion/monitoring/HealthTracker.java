@@ -202,7 +202,9 @@ public class HealthTracker {
         if (minuteInfo == null) {
             minuteInfo = new MinuteInfo();
             minuteInfo.setMinute(now);
-            queue.add(minuteInfo);
+            synchronized (queue) {
+                queue.add(minuteInfo);
+            }
         }
         //Log.info("Increment minute {0} {1}", minuteInfo.getMinute().toString(), minuteInfo.getCount().get());
         minuteInfo.getCount().incrementAndGet();

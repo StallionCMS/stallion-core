@@ -119,7 +119,8 @@ public abstract class StallionApplication extends StallionJavaPlugin {
 
 
     public void loadForTests(String targetPath, StallionJavaPlugin ...plugins) {
-        loadForTests(targetPath, plugins, "test");
+        String env = or(System.getProperty("stallionEnv"), "test");
+        loadForTests(targetPath, plugins, env);
     }
     public void loadForTests(String targetPath, StallionJavaPlugin[] plugins, String env) {
         if (_instance != null) {
