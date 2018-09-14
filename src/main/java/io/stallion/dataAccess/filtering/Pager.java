@@ -20,6 +20,7 @@ package io.stallion.dataAccess.filtering;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class Pager<T> {
     private int pageCount = 0;
     private int currentPage = 1;
     private int itemsPerPage = 10;
+    private int totalCount = 0;
     private boolean hasNextPage = false;
     private boolean hasPreviousPage = false;
     private int nextPageNumber = 2;
@@ -96,7 +98,14 @@ public class Pager<T> {
         return itemsPerPage;
     }
 
+    public int getTotalCount() {
+        return totalCount;
+    }
 
+    public Pager setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+        return this;
+    }
 
     /**
      * True if there is a next page of data.

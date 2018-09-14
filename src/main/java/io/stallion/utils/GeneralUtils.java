@@ -75,7 +75,8 @@ public class GeneralUtils {
             val("eot", "application/octet-stream"),
             val("ttf", "application/octet-stream"),
             val("map", "application/json"),
-            val("json", "application/json")
+            val("json", "application/json"),
+            val("ico", "image/x-icon")
     );
 
     /**

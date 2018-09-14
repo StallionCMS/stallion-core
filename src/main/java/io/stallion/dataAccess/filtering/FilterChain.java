@@ -748,6 +748,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
             pager.setPreviousPageNumber(pager.getCurrentPage());
         }
         if (size > 0) {
+            pager.setTotalCount(getMatchingCount());
             pager.setPageCount((getMatchingCount() / size));
             if (getMatchingCount() % size > 0) {
                 pager.setPageCount(pager.getPageCount() + 1);
