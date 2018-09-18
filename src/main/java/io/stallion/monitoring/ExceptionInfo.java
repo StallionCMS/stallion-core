@@ -68,11 +68,16 @@ public class ExceptionInfo {
         for(String name: request().getHeaderNames()) {
             info.requestHeaders.put(name, request().getHeader(name));
         }
+        /*
+        TODO: problem with this is that once we read the body, nothing else can read the body
+              maybe only call this if we know we are past the lifecycle where we need to read from
+              the entity? if the request is dread?
         try {
             info.setRequestBody(request().getBodyString());
         } catch (RuntimeException e2) {
             Log.info("Error logging the exception - could not get the request body: {0}", e2);
         }
+        */
         if (!Context.getUser().isAnon()) {
             info.setEmail(Context.getUser().getEmail());
             info.setUsername(Context.getUser().getUsername());
