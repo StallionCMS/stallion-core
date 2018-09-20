@@ -76,6 +76,8 @@ public class GeneralUtils {
             val("ttf", "application/octet-stream"),
             val("map", "application/json"),
             val("json", "application/json"),
+            val("svg", "image/svg+xml"),
+            val(".svgz", "image/svg+xml"),
             val("ico", "image/x-icon")
     );
 

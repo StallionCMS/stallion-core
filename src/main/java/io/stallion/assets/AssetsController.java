@@ -18,12 +18,15 @@
 package io.stallion.assets;
 
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import io.stallion.Context;
 import io.stallion.exceptions.UsageException;
 import io.stallion.settings.Settings;
+import io.stallion.utils.ResourceHelpers;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -136,6 +139,35 @@ public class AssetsController {
         return Context.settings().getCdnUrl() + "/st-resource/" + plugin + "/" + path;
     }
 
+
+    /**
+     * Gets the resource file and returns it at the string for direct writing into the HTML
+     * of the page.
+     *
+     * @param path
+     * @param plugin
+     * @return
+     */
+    public String writeResource(String path, String plugin) throws IOException {
+        return writeResource(path, plugin, false);
+    }
+
+    public String writeResource(String path, String plugin, boolean base64encode) throws IOException {
+        if (path.contains("..")) {
+            throw new UsageException("Invalid path.");
+        }
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        if (!path.startsWith("/assets/")) {
+            path = "/assets" + path;
+        }
+        if (base64encode) {
+            return Base64.encode(ResourceHelpers.loadBinaryResource(plugin, path));
+        } else {
+            return ResourceHelpers.loadAssetResource(plugin, path);
+        }
+    }
 
 
 
