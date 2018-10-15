@@ -91,10 +91,10 @@
                         }                        
                     }
                     console.error(e, message, debugMessage);
-                    that.$notify({
-                        title: 'Error',
-                        type: 'error',
-                        message: message
+                    that.$toast.open({
+                        duration: 5000,
+                        message: message,
+                        type: 'is-danger'
                     });
                 });
             }
