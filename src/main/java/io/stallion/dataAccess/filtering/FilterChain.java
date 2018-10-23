@@ -28,6 +28,7 @@ import io.stallion.utils.Literals;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.ws.rs.NotFoundException;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -637,9 +638,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     public T first()  {
         T cached = (T)getCached("first");
         if (cached != null) {
-            if (getStash() instanceof LocalMemoryStash) {
-                cached = getStash().getController().detach(cached);
-            }
+            cached = getStash().forceDetach(cached);
             return cached;
         }
         process(1, 1, false);
@@ -647,14 +646,20 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         if (things.size() > 0) {
             T thing = things.get(0);
             setCached("first", thing);
-            if (getStash() instanceof LocalMemoryStash) {
-                thing = getStash().detach(thing);
-            }
+            thing = getStash().forceDetach(thing);
             return thing;
         } else {
             return null;
         }
 
+    }
+
+    public T firstOrNotFound() {
+        T item = first();
+        if (item == null) {
+            throw new NotFoundException("Could not find requested '" + bucket + "' object.");
+        }
+        return  item;
     }
 
 

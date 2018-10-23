@@ -140,24 +140,15 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         cloneInto(obj, existing, null, false, changedKeyFields);
     }
 
+
     @Override
     public T detach(T obj) {
         T existing = this.itemByPrimaryKey.get(obj.getId());
         if (existing == null) {
             return obj;
         }
-        T newItem = null;
-        try {
-            newItem = (T)existing.getClass().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        newItem.setId(obj.getId());
-        cloneInto(existing, newItem, null, true, null);
-        return newItem;
+        return forceDetach(obj);
     }
-
-
 
     @Override
     public void save(T obj) {

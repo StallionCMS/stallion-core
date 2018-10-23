@@ -113,48 +113,6 @@ public class PartialStash<T extends Model> extends Stash<T> {
     }
 
 
-    /**
-     * Clones all non-null values from "source" into "dest"
-     * @param source
-     * @param dest
-     * @param properties
-     * @param copyNulls
-     * @param changedKeyFields
-     */
-    public boolean cloneInto(Object source, Object dest, Iterable<String> properties, Boolean copyNulls, List<String> changedKeyFields) {
-        if (changedKeyFields == null) {
-            changedKeyFields = new ArrayList<String>();
-        }
-        boolean hasChanges = false;
-        if (properties == null){
-            //properties = PropertyUtils.describe(dest).keySet();
-            properties = PropertyUtils.getProperties(dest).keySet();
-        }
-        for(String name: properties) {
-            if (name.equals("id")) {
-                continue;
-            }
-            if (name.equals("class")) {
-                continue;
-            }
-            if (name.equals("controller")) {
-                continue;
-            }
-            Object o = PropertyUtils.getProperty(source, name);
-            Object previous = PropertyUtils.getProperty(dest, name);
-            if (o != null || copyNulls) {
-                if (previous == o || o != null && o.equals(previous)) {
-                    continue;
-                }
-                if (getKeyFields() != null && this.getKeyFields().contains(name) && previous != null && !previous.equals(o)) {
-                    changedKeyFields.add(name);
-                }
-                hasChanges = true;
-                PropertyUtils.setProperty(dest, name, o);
-            }
-        }
-        return hasChanges;
-    }
 
 
 
@@ -164,15 +122,7 @@ public class PartialStash<T extends Model> extends Stash<T> {
         if (existing == null) {
             return obj;
         }
-        T newItem = null;
-        try {
-            newItem = (T)existing.getClass().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        newItem.setId(obj.getId());
-        cloneInto(existing, newItem, null, true, null);
-        return newItem;
+        return forceDetach(obj);
     }
 
 

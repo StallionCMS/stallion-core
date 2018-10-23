@@ -44,6 +44,7 @@ public class ModelPropertyComparator <T extends Model> implements Comparator<T> 
         }
         Comparable val1 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o1, propertyName);
         Comparable val2 = (Comparable)PropertyUtils.getPropertyOrMappedValue(o2, propertyName);
+
         if (val1 == null && val2 == null) {
             if (idIsSecondarySort && o1.getId() != null && o2.getId() != null) {
                 return o1.getId().compareTo(o2.getId());
@@ -56,7 +57,12 @@ public class ModelPropertyComparator <T extends Model> implements Comparator<T> 
             return -1;
         }
 
-        int result = val1.compareTo(val2);
+        int result;
+        if (val1 instanceof String && val2 instanceof String) {
+            result = ((String) val1).compareToIgnoreCase((String)val2);
+        } else {
+            result = val1.compareTo(val2);
+        }
         if (result == 0 && idIsSecondarySort && o1.getId() != null && o2.getId() != null) {
             o1.getId().compareTo(o2.getId());
         }

@@ -18,7 +18,9 @@
 package io.stallion.dataAccess;
 
 import io.stallion.dataAccess.filtering.FilterChain;
+import io.stallion.reflection.PropertyUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -137,6 +139,63 @@ public abstract class Stash<T extends Model> {
      * @return
      */
     public abstract T detach(T obj);
+
+    public T forceDetach(T obj) {
+
+        T newItem = null;
+        try {
+            newItem = (T)obj.getClass().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        newItem.setId(obj.getId());
+        cloneInto(obj, newItem, null, true, null);
+        return newItem;
+    }
+
+
+    /**
+     * Clones all non-null values from "source" into "dest"
+     * @param source
+     * @param dest
+     * @param properties
+     * @param copyNulls
+     * @param changedKeyFields
+     */
+    public boolean cloneInto(Object source, Object dest, Iterable<String> properties, Boolean copyNulls, List<String> changedKeyFields) {
+        if (changedKeyFields == null) {
+            changedKeyFields = new ArrayList<String>();
+        }
+        boolean hasChanges = false;
+        if (properties == null){
+            //properties = PropertyUtils.describe(dest).keySet();
+            properties = PropertyUtils.getProperties(dest).keySet();
+        }
+        for(String name: properties) {
+            if (name.equals("id")) {
+                continue;
+            }
+            if (name.equals("class")) {
+                continue;
+            }
+            if (name.equals("controller")) {
+                continue;
+            }
+            Object o = PropertyUtils.getProperty(source, name);
+            Object previous = PropertyUtils.getProperty(dest, name);
+            if (o != null || copyNulls) {
+                if (previous == o || o != null && o.equals(previous)) {
+                    continue;
+                }
+                if (getKeyFields() != null && this.getKeyFields().contains(name) && previous != null && !previous.equals(o)) {
+                    changedKeyFields.add(name);
+                }
+                hasChanges = true;
+                PropertyUtils.setProperty(dest, name, o);
+            }
+        }
+        return hasChanges;
+    }
 
     /**
      * Save the object to the stash and the underlying data store
