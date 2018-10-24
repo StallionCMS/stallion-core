@@ -17,8 +17,10 @@
 
 package io.stallion.dataAccess.filtering;
 
+import io.stallion.dataAccess.DataAccessRegistry;
 import io.stallion.dataAccess.LocalMemoryStash;
 import io.stallion.dataAccess.Model;
+import io.stallion.dataAccess.Stash;
 import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.ModelPropertyComparator;
 import io.stallion.reflection.PropertyUtils;
@@ -1292,8 +1294,12 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         this.objects = objects;
     }
 
-    LocalMemoryStash<T> getStash() {
-        return stash;
+    Stash<T> getStash() {
+        if (stash == null) {
+            return (Stash<T>)DataAccessRegistry.instance().get(getBucket()).getStash();
+        } else {
+            return stash;
+        }
     }
 
     FilterChain setStash(LocalMemoryStash<T> stash) {
