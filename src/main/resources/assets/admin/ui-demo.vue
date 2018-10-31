@@ -1,17 +1,34 @@
 
 <style lang="scss">
- .ui-demo-vue {
+ #ui-demo-form {
 
  }
 </style>
 
 
 <template>
-    <div class="ui-demo-vue">
-        <form method="post" @submit.prevent="onSubmit" enctype="multipart/form-data">
-            <h4>Upload Files</h4>
-            <input type="file" name="file" multiple>
-            <input type="submit" value="Upload File" name="submit">
+    <div class="ui-demo-vue" id="ui-demo-form">
+        <form  method="post" @submit.prevent="onSubmit" enctype="multipart/form-data" v-stallion-floating-labels>
+            <div class="p">
+                <h4>Upload Files</h4>
+                <input type="file" name="file" multiple>
+                <input type="submit" value="Upload File" name="submit">
+            </div>
+            <div class="p">
+                <b-field label="Title" >
+                    <b-input v-model="book.title" ></b-input>
+                </b-field>
+                <b-field label="Author">
+                    <b-input v-model="book.author" ></b-input>
+                </b-field>
+                <b-field label="Publisher">
+                    <b-input v-model="book.publisher" ></b-input>
+                </b-field>
+                <b-field label="City">
+                    <b-input v-model="book.city"  ></b-input>
+                </b-field>
+                
+            </div>
         </form>
         <hr>
         <div>
@@ -30,6 +47,12 @@
      data: function() {
          return {
              isLoading: true,
+             book: {
+                 title: 'A Tale of a Team of Beards',
+                 author: 'Mike Napoli',
+                 publisher: '',
+                 city: ''
+             },
              things: []
          };
      },

@@ -80,3 +80,43 @@ h1.p-bottom, h2.p-bottom, h3.p-bottom, h4.p-bottom, h5.p-bottom, h6.p-bottom {
   border-top-color: rgba(70, 70, 70, .8);
   animation: stallionlockingspinner .6s linear infinite;
 }
+
+
+.floating-labels-form {
+    .field {
+        position: relative;
+    }
+    input.input {
+        border-radius: 0px;
+        height: 3em;
+        padding-left: 11px;
+    }
+    label.label {
+        transform: translateY(4px);
+        position: absolute;
+        top: 0;
+        z-index: 1;
+        margin-top: 0.42857em;
+        margin-left: 1px;
+        padding: 0 0.91667em;
+        font-size: 0.85714em;
+        font-weight: 500;
+        color: #777;
+        opacity: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transition: all 0.2s ease-out;
+    }
+    
+    .field.floating-label-active .label {
+        transform: none;
+        opacity: 1;
+    }
+    
+    .field.floating-label-active input {
+        padding-top: 1.5em;
+        padding-bottom: 0.35714em;
+        font-size: 13px;
+    }
+}
