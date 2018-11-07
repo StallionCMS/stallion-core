@@ -18,6 +18,7 @@
 package io.stallion.dataAccess;
 
 
+import io.stallion.exceptions.UsageException;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.utils.GeneralUtils;
 import io.stallion.utils.Sanitize;
@@ -147,6 +148,12 @@ public class SafeMerger {
     public <T> T merge(T newValues, T dest) {
         List<String> errors = list();
         for (OneParam param : params) {
+            if (!PropertyUtils.isWriteable(dest, param.getFieldName())) {
+                throw new UsageException("Tried to merge field '" + param.getFieldName() + "' but it is not writable on object of type " + dest.getClass().getCanonicalName());
+            }
+            if (!PropertyUtils.isReadable(newValues, param.getFieldName())) {
+                throw new UsageException("Tried to merge field '" + param.getFieldName() + "' but it is not readable on object of type " + newValues.getClass().getCanonicalName());
+            }
             Object val = PropertyUtils.getPropertyOrMappedValue(newValues, param.getFieldName());
             mergeForParam(param, val, dest, errors);
         }

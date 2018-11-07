@@ -72,7 +72,12 @@ public class ModeFlags {
         ActionModeFlags[] actionModeFlags = action.getActionModeFlags();
         if (options.getLightweightMode() != null && options.getLightweightMode()) {
             actionModeFlags = new ActionModeFlags[]{ActionModeFlags.NO_JOB_AND_TASK_EXECUTION, ActionModeFlags.NO_PRELOADED_DATA};
+        } else if (options.isNoServices() == true) {
+            actionModeFlags = new ActionModeFlags[]{ActionModeFlags.NO_JOB_AND_TASK_EXECUTION};
         }
+
+
+
         init(environmentType, runningFrom, actionModeFlags, null, null);
         Log.info("Environment type: {0} RunningFrom: {1} ActionModeFlags: {2}", environmentType, runningFrom, JSON.stringify(actionModeFlags));
     }

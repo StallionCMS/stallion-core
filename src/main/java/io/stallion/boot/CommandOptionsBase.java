@@ -22,6 +22,7 @@ import io.stallion.settings.Settings;
 import io.stallion.settings.StrictnessLevel;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.ExplicitBooleanOptionHandler;
 
 import javax.persistence.Column;
 import java.util.ArrayList;
@@ -58,7 +59,8 @@ public class CommandOptionsBase {
     @Option(name="-lightweightMode", usage="Set to 'true' if you don't want all data to be synced from the database.")
     private Boolean lightweightMode = false;
 
-
+    @Option(name="-noServices", usage="Set to true if you jobs and tasks items should not be running.")
+    private boolean noServices = false;
 
 
 
@@ -159,8 +161,14 @@ public class CommandOptionsBase {
         this.env = env;
     }
 
+    public boolean isNoServices() {
+        return noServices;
+    }
 
-
+    public CommandOptionsBase setNoServices(boolean noServices) {
+        this.noServices = noServices;
+        return this;
+    }
 
     public boolean isLoggingAlwaysIncludesLineNumber() {
         return loggingAlwaysIncludesLineNumber;
