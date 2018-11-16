@@ -22,6 +22,8 @@ import io.stallion.settings.SettingMeta;
 import io.stallion.settings.Settings;
 import io.stallion.users.Role;
 
+import javax.persistence.Column;
+
 import static io.stallion.utils.Literals.empty;
 
 public class UserSettings implements SettingsSection {
@@ -31,6 +33,22 @@ public class UserSettings implements SettingsSection {
     private String passwordResetPage;
     @SettingMeta(val = "/st-users/verify-email")
     private String verifyEmailPage;
+
+
+    @SettingMeta(val = "stallion:email/verify-email-address.jinja")
+    private String verifyEmailTemplate;
+
+    @SettingMeta(val = "stallion:email/reset-password.jinja")
+    private String resetEmailTemplate;
+
+    @SettingMeta(val = "")
+    private String verifyEmailSubject;
+
+    @SettingMeta(val = "")
+    private String resetEmailSubject;
+
+
+
 
     @SettingMeta(valBoolean = true)
     private Boolean syncAllUsersToMemory;
@@ -296,6 +314,43 @@ public class UserSettings implements SettingsSection {
 
     public UserSettings setDisableStLoginParam(Boolean disableStLoginParam) {
         this.disableStLoginParam = disableStLoginParam;
+        return this;
+    }
+
+
+    public String getVerifyEmailTemplate() {
+        return verifyEmailTemplate;
+    }
+
+    public UserSettings setVerifyEmailTemplate(String verifyEmailTemplate) {
+        this.verifyEmailTemplate = verifyEmailTemplate;
+        return this;
+    }
+
+    public String getResetEmailTemplate() {
+        return resetEmailTemplate;
+    }
+
+    public UserSettings setResetEmailTemplate(String resetEmailTemplate) {
+        this.resetEmailTemplate = resetEmailTemplate;
+        return this;
+    }
+
+    public String getVerifyEmailSubject() {
+        return verifyEmailSubject;
+    }
+
+    public UserSettings setVerifyEmailSubject(String verifyEmailSubject) {
+        this.verifyEmailSubject = verifyEmailSubject;
+        return this;
+    }
+
+    public String getResetEmailSubject() {
+        return resetEmailSubject;
+    }
+
+    public UserSettings setResetEmailSubject(String resetEmailSubject) {
+        this.resetEmailSubject = resetEmailSubject;
         return this;
     }
 }

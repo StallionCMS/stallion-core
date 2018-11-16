@@ -19,6 +19,8 @@ package io.stallion.users;
 
 import io.stallion.dataAccess.ModelBase;
 
+import javax.persistence.Column;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,12 @@ public class EmptyUser extends ModelBase implements IUser {
     private List<IGroup> groups = new ArrayList<IGroup>();
     private String secret = "";
     private String timeZoneId = "";
+    private boolean initialized = false;
+    private boolean fromGdprCountry = false;
+    private ZonedDateTime rightToBeForgottenInvokedAt = null;
+    private ZonedDateTime acceptedTermsAt = null;
+    private String acceptedTermsVersion = "";
+
 
     public String getUsername() {
         return username;
@@ -248,4 +256,58 @@ public class EmptyUser extends ModelBase implements IUser {
 
     }
 
+    @Override
+    @Column(nullable = false)
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public EmptyUser setInitialized(boolean initialized) {
+        this.initialized = initialized;
+        return this;
+    }
+
+    @Override
+    @Column(nullable = false)
+    public boolean isFromGdprCountry() {
+        return fromGdprCountry;
+    }
+
+    public EmptyUser setFromGdprCountry(boolean fromGdprCountry) {
+        this.fromGdprCountry = fromGdprCountry;
+        return this;
+    }
+
+    @Override
+    @Column(nullable = false)
+    public ZonedDateTime getRightToBeForgottenInvokedAt() {
+        return rightToBeForgottenInvokedAt;
+    }
+
+    public EmptyUser setRightToBeForgottenInvokedAt(ZonedDateTime rightToBeForgottenInvokedAt) {
+        this.rightToBeForgottenInvokedAt = rightToBeForgottenInvokedAt;
+        return this;
+    }
+
+    @Override
+    @Column(nullable = false)
+    public ZonedDateTime getAcceptedTermsAt() {
+        return acceptedTermsAt;
+    }
+
+    public EmptyUser setAcceptedTermsAt(ZonedDateTime acceptedTermsAt) {
+        this.acceptedTermsAt = acceptedTermsAt;
+        return this;
+    }
+
+    @Override
+    @Column(nullable = false)
+    public String getAcceptedTermsVersion() {
+        return acceptedTermsVersion;
+    }
+
+    public EmptyUser setAcceptedTermsVersion(String acceptedTermsVersion) {
+        this.acceptedTermsVersion = acceptedTermsVersion;
+        return this;
+    }
 }

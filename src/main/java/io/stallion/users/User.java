@@ -29,10 +29,12 @@ import io.stallion.utils.json.RestrictedViews;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.stallion.utils.Literals.empty;
+import static io.stallion.utils.Literals.utcNow;
 
 
 @Table(name="stallion_users")
@@ -62,6 +64,11 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
     private boolean totallyOptedOut = false;
     private String honorific = "";
     private Long createdAt = 0L;
+    private boolean initialized = false;
+    private boolean fromGdprCountry = false;
+    private ZonedDateTime rightToBeForgottenInvokedAt = null;
+    private ZonedDateTime acceptedTermsAt = null;
+    private String acceptedTermsVersion = "";
 
 
     @Override
@@ -415,6 +422,62 @@ public class User extends ModelBase implements IUser, ModelWithFilePath {
 
     public User setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+        return this;
+    }
+
+
+    @Column(nullable = false)
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public User setInitialized(boolean initialized) {
+        this.initialized = initialized;
+        return this;
+    }
+
+    @Column(nullable = false)
+    @Override
+    public boolean isFromGdprCountry() {
+        return fromGdprCountry;
+    }
+
+    public User setFromGdprCountry(boolean fromGdprCountry) {
+        this.fromGdprCountry = fromGdprCountry;
+        return this;
+    }
+
+    @Column(nullable = true)
+    @Override
+    public ZonedDateTime getRightToBeForgottenInvokedAt() {
+        return rightToBeForgottenInvokedAt;
+    }
+
+    public User setRightToBeForgottenInvokedAt(ZonedDateTime rightToBeForgottenInvokedAt) {
+        this.rightToBeForgottenInvokedAt = rightToBeForgottenInvokedAt;
+        return this;
+    }
+
+    @Column()
+    @Override
+    public ZonedDateTime getAcceptedTermsAt() {
+        return acceptedTermsAt;
+    }
+
+    public User setAcceptedTermsAt(ZonedDateTime acceptedTermsAt) {
+        this.acceptedTermsAt = acceptedTermsAt;
+        return this;
+    }
+
+    @Column(nullable = false)
+    @Override
+    public String getAcceptedTermsVersion() {
+        return acceptedTermsVersion;
+    }
+
+    public User setAcceptedTermsVersion(String acceptedTermsVersion) {
+        this.acceptedTermsVersion = acceptedTermsVersion;
         return this;
     }
 }

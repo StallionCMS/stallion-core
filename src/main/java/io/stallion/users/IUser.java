@@ -24,6 +24,8 @@ import io.stallion.dataAccess.file.ModelWithFilePath;
 import io.stallion.email.Contactable;
 import io.stallion.utils.json.RestrictedViews;
 
+import javax.persistence.Column;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface IUser extends Contactable, Model, ModelWithFilePath {
@@ -112,4 +114,19 @@ public interface IUser extends Contactable, Model, ModelWithFilePath {
     public <U extends IUser> U setEmailVerified(boolean verified);
     public <U extends IUser> U setDisabled(boolean disabled);
 
+
+    @Column(nullable = false)
+    boolean isInitialized();
+
+    @Column(nullable = false)
+    boolean isFromGdprCountry();
+
+    @Column(nullable = true)
+    ZonedDateTime getRightToBeForgottenInvokedAt();
+
+    @Column()
+    ZonedDateTime getAcceptedTermsAt();
+
+    @Column(nullable = false)
+    String getAcceptedTermsVersion();
 }

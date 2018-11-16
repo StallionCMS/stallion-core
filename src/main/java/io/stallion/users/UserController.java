@@ -747,7 +747,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            url = url + "#verify-email";
+            url = url + "&verify-email";
             put("verifyUrl", url);
         }
 
@@ -758,12 +758,16 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
         @Override
         public String getTemplate()  {
-            return "stallion:email/verify-email-address.jinja";
+            return  Settings.instance().getUsers().getVerifyEmailTemplate();
         }
 
         @Override
         public String getSubject() {
-            return "Verify your email address.";
+            if (empty(Settings.instance().getUsers().getVerifyEmailSubject())) {
+                return "Verify your email address.";
+            } else {
+                return Settings.instance().getUsers().getVerifyEmailSubject();
+            }
         }
 
         @Override
@@ -788,7 +792,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            url = url + "#confirm-reset-token";
+            url = url + "&confirm-reset-token";
             put("resetUrl", url);
         }
 
@@ -799,12 +803,16 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
         @Override
         public String getTemplate() {
-            return "stallion:email/reset-password.jinja";
+            return Settings.instance().getUsers().getResetEmailTemplate();
         }
 
         @Override
         public String getSubject() {
-            return "Reset your password for " + Settings.instance().getSiteName();
+            if (empty(Settings.instance().getUsers().getResetEmailSubject())) {
+                return "Reset your password for " + Settings.instance().getSiteName();
+            } else {
+                return Settings.instance().getUsers().getResetEmailSubject();
+            }
         }
 
         @Override
