@@ -1,7 +1,7 @@
 /*
  * Stallion Core: A Modern Web Framework
  *
- * Copyright (C) 2015 - 2016 Stallion Software LLC.
+ * Copyright (C) 2015 - 2019 Stallion Software LLC.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 2 of

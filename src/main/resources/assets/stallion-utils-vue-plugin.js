@@ -1,3 +1,21 @@
+/*
+ * Stallion Core: A Modern Web Framework
+ *
+ * Copyright (C) 2015 - 2019 Stallion Software LLC.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 2 of
+ * the License, or (at your option) any later version. This program is distributed in the hope that
+ * it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/gpl-2.0.html>.
+ *
+ *
+ *
+ */
+
+
 
 (function() {
 
@@ -35,43 +53,48 @@
                  el.classList.add('floating-labels-form');
                  el.querySelectorAll("input").forEach(function(input) {
                      var labelEle = null;
-                     var fieldEle = null;
+                     var fieldEle = input.closest('.field');
                      // floating-active
-                     if (input.parentElement && input.parentElement.classList.contains("field")) {
+                     if (fieldEle === null) {
                          fieldEle = input.parentElement;
-                     } else if (input.parentElement && input.parentElement.parentElement && input.parentElement.parentElement.classList.contains("field")) {
-                         fieldEle = input.parentElement.parentElement;
                      }
-                     if (fieldEle) {
-                         labelEle = fieldEle.querySelector('label.label');
-                         if (input.value) {
-                             fieldEle.classList.add('floating-label-active');
-                             input.setAttribute('placeholder', '');
-                         } else if (labelEle) {
-                             input.setAttribute('placeholder', labelEle.innerText);
-                         }
+                     labelEle = fieldEle.querySelector('label.label');
+                     var tagInputContainer = input.closest('.taginput-container');
+                     
+                     if (input.value || (tagInputContainer && tagInputContainer.querySelectorAll('.tag').length > 0)) {
+                         fieldEle.classList.add('floating-label-active');
+                         input.setAttribute('placeholder', '');
+                     } else if (labelEle) {
+                         input.setAttribute('placeholder', labelEle.innerText);
+                         fieldEle.classList.add('floating-label-empty');
                      }
-                     
-                     input.addEventListener('input', function onInputChanged(evt) {
-                         var ele = evt.target;
-                         if (ele.value) {
-                             ele.parentElement.parentElement.classList.add("floating-label-active");
+
+                     function onValueChanged(evt) {
+                         console.log('onValueChanged');
+                         if (input.value || (tagInputContainer && tagInputContainer.querySelectorAll('.tag').length > 0)) {
+                             fieldEle.classList.add("floating-label-active");
+                             fieldEle.classList.remove("floating-label-empty");
                              input.setAttribute('placeholder', '');
-                         }
-                     });
-                     
-                     input.addEventListener('blur', function onBlur(evt) {
-                         var ele = evt.target;
-                         if (ele.value) {
-                             ele.parentElement.parentElement.classList.add("floating-label-active");
                          } else {
-                             ele.parentElement.parentElement.classList.remove("floating-label-active");
-                             if (labelEle) {
+                             fieldEle.classList.remove("floating-label-active");
+                             fieldEle.classList.add("floating-label-empty");
+                         }
+                     };
+                     
+                     input.addEventListener('input', onValueChanged);
+                     console.log('input ', input);
+                     input.addEventListener('change', onValueChanged);
+                     
+                     input.addEventListener('blur', onValueChanged);
+
+                     input.addEventListener('blur', function(evt) {
+                         if (labelEle) {
+                             if (!input.value && !(tagInputContainer && tagInputContainer.querySelectorAll('.tag').length > 0)) {
                                  input.setAttribute('placeholder', labelEle.innerText);
                              }
                          }
-
                      });
+
                  });                 
                  
              },
