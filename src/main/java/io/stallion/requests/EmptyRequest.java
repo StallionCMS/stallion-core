@@ -20,6 +20,8 @@ package io.stallion.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.stallion.services.Log;
+import io.stallion.users.EmptyOrg;
+import io.stallion.users.EmptyUser;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 import io.stallion.utils.IEmpty;
@@ -38,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.stallion.utils.Literals.list;
+import static io.stallion.utils.Literals.set;
 
 public class EmptyRequest implements IRequest, IEmpty {
 
@@ -69,22 +72,22 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public String requestUrl() {
-        return null;
+        return "";
     }
 
     @Override
     public String getScheme() {
-        return null;
+        return "";
     }
 
     @Override
     public String getRemoteAddr() {
-        return null;
+        return "";
     }
 
     @Override
     public String getHost() {
-        return null;
+        return "";
     }
 
     @Override
@@ -94,12 +97,12 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public String getQueryParam(String name) {
-        return null;
+        return "";
     }
 
     @Override
     public String getBodyString() {
-        return null;
+        return "";
     }
 
     @Override
@@ -114,17 +117,17 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public Iterable<String> getHeaderNames() {
-        return null;
+        return list();
     }
 
     @Override
     public String getQueryParam(String name, String defaultValue) {
-        return null;
+        return defaultValue;
     }
 
     @Override
     public IUser getUser() {
-        return null;
+        return new EmptyUser();
     }
 
     @Override
@@ -134,7 +137,7 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public IOrg getOrg() {
-        return null;
+        return new EmptyOrg();
     }
 
     @Override
@@ -144,7 +147,7 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public Boolean getIsJsonRequest() {
-        return null;
+        return false;
     }
 
     @Override
@@ -159,12 +162,12 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public Set<String> getScopes() {
-        return null;
+        return set();
     }
 
     @Override
     public IRequest setScopes(Set<String> scopes) {
-        return null;
+        return this;
     }
 
     @Override
@@ -174,7 +177,7 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public IRequest setScoped(boolean scoped) {
-        return null;
+        return this;
     }
 
     @Override
@@ -184,7 +187,7 @@ public class EmptyRequest implements IRequest, IEmpty {
 
     @Override
     public String getValetEmail() {
-        return null;
+        return "";
     }
 
     public static Map<String, String> splitQuery(URL url) {
