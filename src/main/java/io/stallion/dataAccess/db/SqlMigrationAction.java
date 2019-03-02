@@ -29,11 +29,14 @@ import io.stallion.utils.ResourceHelpers;
 import io.stallion.utils.json.JSON;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.parboiled.common.FileUtils;
 
 import javax.script.ScriptEngine;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -209,13 +212,25 @@ public class SqlMigrationAction  implements StallionRunAction<SqlMigrateCommandO
                 Log.info("fileStub: {0}", fileStub);
                 int version = Integer.parseInt(fileStub.split("\\-")[0]);
                 String fileName = fileStub + "." + DB.instance().getDbImplementation().getName().toLowerCase() + ".sql";
+                String source = null;
                 if (!ResourceHelpers.resourceExists(entry.getKey(), "/sql/" + fileName)) {
                     fileName = fileStub + "." + DB.instance().getDbImplementation().getName().toLowerCase() + ".js";
                 }
-                if (!ResourceHelpers.resourceExists(entry.getKey(), "/sql/" + fileName)) {
-                    throw new ConfigException("The sql migration file /sql/" + fileName + " does not exist in plugin " + entry.getKey());
+                if (ResourceHelpers.resourceExists(entry.getKey(), "/sql/" + fileName)) {
+                    source = ResourceHelpers.loadResource(entry.getKey(), "/sql/" + fileName);
+
+                } else {
+                    URL url = DB.instance().getDbImplementation().getClass().getClassLoader().getResource("/sql/" + fileName);
+                    if (url == null) {
+                        throw new ConfigException("The sql migration file /sql/" + fileName + " does not exist in plugin " + entry.getKey());
+                    }
+                    try {
+                        source = IOUtils.toString(url, UTF8);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-                String source = ResourceHelpers.loadResource(entry.getKey(), "/sql/" + fileName);
+
                 SqlMigration migration = new SqlMigration()
                         .setAppName(entry.getKey())
                         .setFilename(fileName)

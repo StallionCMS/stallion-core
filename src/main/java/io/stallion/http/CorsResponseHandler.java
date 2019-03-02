@@ -45,7 +45,7 @@ public class CorsResponseHandler {
         if (request.getMethod().toUpperCase().equals("OPTIONS")) {
             handlePreflight(request, response);
         } else {
-            handleSimpleRequest(request);
+            handleSimpleRequest(request, response);
         }
 
     }
@@ -55,7 +55,12 @@ public class CorsResponseHandler {
         //Access-Control-Allow-Methods: GET, POST, PUT
         //Access-Control-Allow-Headers: X-Custom-Header
         //Content-Type: text/html; charset=utf-8
-        handleOriginAllowed(request);
+
+        String originAllowed = getOriginAllowedHeader(request);
+        if (!empty(originAllowed)) {
+            response.addHeader("Access-Control-Allow-Origin", originAllowed);
+        }
+
         CorsSettings cors = Settings.instance().getCors();
         response.addHeader("Access-Control-Allow-Credentials", ((Boolean)cors.isAllowCredentials()).toString().toLowerCase());
         response.addHeader("Access-Control-Allow-Methods", cors.getAllowedMethodsString());
@@ -74,20 +79,24 @@ public class CorsResponseHandler {
 
         response.addHeader("Access-Control-Max-Age", cors.getPreflightMaxAge().toString());
 
-        response.setContentType("text/html; charset=utf-8");
-        response.setStatus(200);
-        throw new ResponseComplete();
+        //response.setContentType("text/html; charset=utf-8");
+        //response.setStatus(200);
+        //throw new ResponseComplete();
     }
 
 
-    protected void handleSimpleRequest(IRequest request) {
-        handleOriginAllowed(request);
+    protected void handleSimpleRequest(IRequest request, HttpServletResponse response) {
+        String originAllowed = getOriginAllowedHeader(request);
+        if (!empty(originAllowed)) {
+            response.addHeader("Access-Control-Allow-Origin", originAllowed);
+        }
+        //handleOriginAllowed(request);
         CorsSettings cors = Settings.instance().getCors();
         if (!empty(cors.getExposeHeadersString())) {
-            request.addResponseHeader("Access-Control-Expose-Headers", cors.getExposeHeadersString());
+            response.addHeader("Access-Control-Expose-Headers", cors.getExposeHeadersString());
         }
 
-        request.addResponseHeader("Access-Control-Allow-Credentials", ((Boolean)cors.isAllowCredentials()).toString().toLowerCase());
+        response.addHeader("Access-Control-Allow-Credentials", ((Boolean)cors.isAllowCredentials()).toString().toLowerCase());
         //Access-Control-Expose-Headers: FooBar
     }
 
@@ -95,7 +104,7 @@ public class CorsResponseHandler {
      * Adds the Access-Control-Allow-Origin header if allowed, it not, raise an exception
      * @param request
      */
-    private void handleOriginAllowed(IRequest request) {
+    private String getOriginAllowedHeader(IRequest request) {
         CorsSettings cors = Settings.instance().getCors();
 
 
@@ -104,40 +113,43 @@ public class CorsResponseHandler {
         String baseUrl = request.getScheme() + "://" + request.getHost();
 
         if (isFontRequest(request) && cors.isAllowAllForFonts()) {
-            request.addResponseHeader("Access-Control-Allow-Origin", "*");
-            return;
+            return "*";
         }
 
         if (baseUrl.equals(origin)) {
-            return;
+            return null;
         }
 
-
-        if (cors.isAllowAll()) {
-            request.addResponseHeader("Access-Control-Allow-Origin", "*");
-            matches = true;
-        } else if (cors.getOriginWhitelist().contains(origin)) {
-            request.addResponseHeader("Access-Control-Allow-Origin", request.getScheme() + "://" + origin);
-            matches = true;
-        } else {
-            for (Pattern pattern: cors.getOriginPatternWhitelist()) {
-                if (pattern.matcher(origin).matches()) {
-                    request.addResponseHeader("Access-Control-Allow-Origin", request.getScheme() + "://" + origin);
-                    matches = true;
-                    break;
-                }
-            }
-        }
-
-        if (!matches) {
-            throw new ClientErrorException("CORS request not allowed for this origin", 400);
-        }
 
         if (cors.getUrlPattern() != null) {
             if (!cors.getUrlPattern().matcher(request.getPath()).matches()) {
                 throw new ClientErrorException("CORS request not allowed for this URL path", 400);
             }
         }
+
+        if (cors.isAllowAll()) {
+            return "*";
+        } else if (cors.getOriginWhitelist().contains(origin)) {
+            //request.addResponseHeader("Access-Control-Allow-Origin", request.getScheme() + "://" + origin);
+            return origin;
+            //request.addResponseHeader("Access-Control-Allow-Origin", origin);
+        } else {
+            for (Pattern pattern: cors.getOriginPatternWhitelist()) {
+                if (pattern.matcher(origin).matches()) {
+                    //request.addResponseHeader("Access-Control-Allow-Origin", request.getScheme() + "://" + origin);
+                    //request.addResponseHeader("Access-Control-Allow-Origin", origin);
+                    return origin;
+                    //matches = true;
+                    //break;
+                }
+            }
+        }
+
+
+        throw new ClientErrorException("CORS request not allowed for this origin", 400);
+
+
+
 
     }
 

@@ -238,4 +238,73 @@ public class DynamicSettings {
             }
         }
     }
+
+
+
+    public String getStringOrDefault(String group, String name, String defaultObject) {
+        String val = getString(group, name);
+        if (val == null) {
+            return defaultObject;
+        }
+        return val;
+    }
+
+
+    public <T> T getObjectOrDefault(String group, String name, Class<T> cls, T defaultObject) {
+        T val = getObject(group, name, cls);
+        if (val == null) {
+            return defaultObject;
+        }
+        return val;
+    }
+
+    public String getString(String group, String name) {
+        return get(group, name);
+    }
+
+    public void updateString(String group, String name, String value) {
+       put(group, name, value);
+    }
+
+    public <T> T getObject(String group, String name, Class<T> cls) {
+        T obj = (T)getParsedObject(group, name);
+        if (obj != null) {
+            return obj;
+        }
+        String json = get(group, name);
+        if (empty(json)) {
+            return null;
+        }
+        if (Long.class.equals(cls)) {
+            obj = (T)new Long(Long.parseLong(json));
+        } else if (Double.class.equals(cls)) {
+            obj = (T)new Double(Double.parseDouble(json));
+        } else if (Integer.class.equals(cls)) {
+            obj = (T)new Integer(Integer.parseInt(json));
+        } else if (Float.class.equals(cls)) {
+            obj = (T)new Float(Float.parseFloat(json));
+        } else if (ZonedDateTime.class.equals(cls)) {
+            obj = (T)DateUtils.ISO_FORMAT.parse(json);
+        } else {
+            obj = JSON.parse(json, cls);
+        }
+        stashParsedObject(group, name, obj);
+        return obj;
+    }
+
+    public void updateObject(String group, String name, Object obj) {
+        String stringVal = null;
+        if (obj instanceof Long || obj instanceof Integer || obj instanceof Float || obj instanceof Double) {
+            stringVal = obj.toString();
+        } else if (obj instanceof ZonedDateTime) {
+            stringVal = DateUtils.ISO_FORMAT.format((ZonedDateTime)obj);
+        } else {
+            stringVal = JSON.stringify(obj);
+        }
+
+        put(group, name, stringVal);
+        stashParsedObject(group, name, obj);
+
+    }
+
 }

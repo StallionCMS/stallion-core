@@ -340,6 +340,8 @@ public class AsyncTask extends ModelBase implements Comparable<AsyncTask> {
         return Long.compare(this.getExecuteAt(), o.getExecuteAt());
     }
 
+
+    @Column
     public String getLocalMode() {
         return localMode;
     }

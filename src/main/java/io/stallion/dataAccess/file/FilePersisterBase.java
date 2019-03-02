@@ -103,7 +103,7 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
             }
         }
         TreeVisitor visitor = new TreeVisitor();
-        Path folderPath = FileSystems.getDefault().getPath(getBucketFolderPath());
+        Path folderPath = FileSystems.getDefault().getPath(getBucketFolderPath()).toAbsolutePath().normalize();
         try {
             Files.walkFileTree(folderPath, visitor);
         } catch (IOException e) {

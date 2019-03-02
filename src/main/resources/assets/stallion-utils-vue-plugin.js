@@ -180,15 +180,21 @@
 
                 that.$el.querySelectorAll(".stallion-locking").forEach(function(el) {
                     var elLock = el.getAttribute('data-stallion-locking');
+                    var lockFound = false;
                     if (elLock.indexOf(lockPrefix + ".") === 0) {
                         el.classList.add('stallion-locking-disabled');
                         el.setAttribute('disabled', true);
+                        lockFound = true;
                     }
                     if (elLock === opts.lock) {
                         el.classList.add('stallion-locking-processing');
                         el.setAttribute('disabled', true);
+                        lockFound = true;
                     }
-                    lockedElements.push(el);
+                    if (lockFound) {
+                        lockedElements.push(el);
+                    }
+
                 });
                 // Clear existing errors
                 
@@ -218,6 +224,7 @@
                         }                        
                     }
                     console.error(e, message, debugMessage);
+
                     that.$toast.open({
                         duration: 5000,
                         message: message,
