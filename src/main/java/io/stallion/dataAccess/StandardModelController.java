@@ -95,6 +95,10 @@ public class StandardModelController<T extends Model> implements ModelController
     }
 
     public T newModel(Map o, String ...fields) {
+        return newModel(o, false, fields);
+    }
+
+    public T newModel(Map o, boolean skipUnwriteableFields, String ...fields) {
         Set fieldSet = null;
         if (fields != null && fields.length > 0) {
             fieldSet = set(fields);
@@ -105,6 +109,9 @@ public class StandardModelController<T extends Model> implements ModelController
             if (o != null && o.size() > 0) {
                 for(Object key: o.keySet()) {
                     if (fieldSet != null && !fieldSet.contains(key)) {
+                        continue;
+                    }
+                    if (skipUnwriteableFields && !PropertyUtils.isWriteable(model, key.toString())) {
                         continue;
                     }
                     Object value = o.get(key);
