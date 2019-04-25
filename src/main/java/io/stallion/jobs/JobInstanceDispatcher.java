@@ -17,7 +17,9 @@
 
 package io.stallion.jobs;
 
+import io.stallion.Context;
 import io.stallion.monitoring.HealthTracker;
+import io.stallion.requests.JobRequest;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -64,6 +66,11 @@ class JobInstanceDispatcher implements Runnable {
 
         try {
             // Run the job
+
+            Context.setRequest(
+                    new JobRequest()
+                            .setName(definition.getName())
+            );
             job.execute();
             status.setCompletedAt(DateUtils.mils());
             status.setFailedAt(0);
@@ -84,6 +91,7 @@ class JobInstanceDispatcher implements Runnable {
             }
             JobStatusController.instance().save(status);
         } finally {
+            Context.setRequest(null);
             JobStatusController.instance().resetLockAndNextRunAt(status, now.plusMinutes(1));
         }
     }

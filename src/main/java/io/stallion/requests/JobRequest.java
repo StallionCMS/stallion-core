@@ -19,4 +19,21 @@ package io.stallion.requests;
 
 
 public class JobRequest extends TaskRequest {
+
+    @Override
+    public String getScheme() {
+        return "stallion-job://";
+    }
+
+
+    @Override
+    public String getPath() {
+        return "/" + getName();
+    }
+
+
+    @Override
+    public String getMethod() {
+        return "JOB";
+    }
 }

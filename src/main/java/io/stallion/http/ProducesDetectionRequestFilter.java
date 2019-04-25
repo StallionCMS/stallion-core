@@ -51,8 +51,9 @@ public class ProducesDetectionRequestFilter  implements ContainerRequestFilter {
         if (produces == null) {
             produces = uriInfo
                     .getMatchedResourceMethod()
-                    .getParent()
-                    .getClass()
+                    .getInvocable()
+                    .getHandlingMethod()
+                    .getDeclaringClass()
                     .getAnnotation(Produces.class);
         }
         String producesContentType = "text/html";

@@ -20,10 +20,12 @@ package io.stallion.requests;
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
 
+import javax.persistence.Column;
 import java.util.Map;
 import java.util.Set;
 
 import static io.stallion.utils.Literals.map;
+import static io.stallion.utils.Literals.or;
 import static io.stallion.utils.Literals.set;
 
 /**
@@ -35,6 +37,9 @@ public class TaskRequest implements IRequest {
     private IOrg org;
     private IUser user;
     private Map<String, Object> items = map();
+    private String name = "";
+    private Long taskId = 0L;
+    private String customKey = "";
 
     @Override
     public String requestUrl() {
@@ -43,7 +48,7 @@ public class TaskRequest implements IRequest {
 
     @Override
     public String getScheme() {
-        return "";
+        return "stallion-async-task://";
     }
 
     @Override
@@ -69,14 +74,14 @@ public class TaskRequest implements IRequest {
 
     @Override
     public String getPath() {
-        return "";
+        return "/" + getName() + "?taskId=" + taskId + "&customKey=" + customKey;
     }
 
 
 
     @Override
     public String getHost() {
-        return "";
+        return or(System.getenv("STALLION_HOST"), "");
     }
 
     @Override
@@ -112,7 +117,7 @@ public class TaskRequest implements IRequest {
 
     @Override
     public String getMethod() {
-        return "";
+        return "ASYNC_TASK";
     }
 
 
@@ -193,5 +198,32 @@ public class TaskRequest implements IRequest {
     @Override
     public String getQueryParam(String name, String defaultValue) {
         return null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public TaskRequest setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    public TaskRequest setTaskId(Long taskId) {
+        this.taskId = taskId;
+        return this;
+    }
+
+    public String getCustomKey() {
+        return customKey;
+    }
+
+    public TaskRequest setCustomKey(String customKey) {
+        this.customKey = customKey;
+        return this;
     }
 }
