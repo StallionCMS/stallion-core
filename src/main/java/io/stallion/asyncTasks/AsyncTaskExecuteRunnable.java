@@ -17,8 +17,10 @@
 
 package io.stallion.asyncTasks;
 
+import io.stallion.Context;
 import io.stallion.plugins.PluginRegistry;
 import io.stallion.plugins.StallionJavaPlugin;
+import io.stallion.requests.TaskRequest;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 
@@ -49,7 +51,12 @@ public class AsyncTaskExecuteRunnable implements Runnable {
     public void run(boolean synchronousMode) {
         try {
             Log.info("Executing task: {0}", task.getId());
-
+            Context.setRequest(
+                    new TaskRequest()
+                            .setName(task.getHandlerName())
+                            .setCustomKey(task.getCustomKey())
+                            .setTaskId(task.getId())
+            );
             Class cls = lookupClass(task.getHandlerName());
             Log.info("Loaded async handler class: {0}", cls.getName());
             AsyncTaskHandler handler = (AsyncTaskHandler)JSON.parse(task.getDataJson(), cls);
@@ -77,6 +84,8 @@ public class AsyncTaskExecuteRunnable implements Runnable {
             } catch (Exception persistException) {
                 Log.exception(persistException, "Exception persisting task changes for id:{0}", task.getId());
             }
+        } finally {
+            Context.setRequest(null);
         }
     }
 
