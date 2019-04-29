@@ -102,6 +102,7 @@ public class AsyncTaskExecuteRunnable implements Runnable {
         }
         if (cls != null) {
             classCache.put(className, cls);
+            return cls;
         }
         for (StallionJavaPlugin booter: PluginRegistry.instance().getJavaPluginByName().values()) {
             try {
