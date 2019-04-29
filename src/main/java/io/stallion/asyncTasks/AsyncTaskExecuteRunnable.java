@@ -125,7 +125,7 @@ public class AsyncTaskExecuteRunnable implements Runnable {
 
             }
         }
-        throw new ClassNotFoundException("Class not found: " + className);
+        throw new ClassNotFoundException("Class not found, even after looking at all plugins: " + className);
     }
 
 
