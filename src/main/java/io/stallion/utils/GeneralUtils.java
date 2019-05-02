@@ -99,6 +99,11 @@ public class GeneralUtils {
         return Literals.truncateSmart(s, length);
     }
 
+    public static String formatCurrencyCents(Integer amt) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        return formatter.format(amt / 100.0);
+    }
+
     public static String formatCurrency(Double amt) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         return formatter.format(amt);
