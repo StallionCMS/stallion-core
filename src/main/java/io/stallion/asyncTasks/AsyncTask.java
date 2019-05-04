@@ -116,7 +116,7 @@ public class AsyncTask extends ModelBase implements Comparable<AsyncTask> {
      */
     public AsyncTask setHandler(AsyncTaskHandler handler) {
 
-        setHandlerName(handler.getClass().getCanonicalName());
+        setHandlerName(handler.getClass().getName());
         setDataJson(JSON.stringify(handler));
 
         return this;

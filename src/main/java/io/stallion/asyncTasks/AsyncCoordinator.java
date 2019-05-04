@@ -264,7 +264,10 @@ public abstract class AsyncCoordinator extends Thread {
      */
     public abstract boolean markCompleted(AsyncTask task);
 
-
+    public void runTaskForCustomKey(String customKey, boolean force) {
+        AsyncTask task = AsyncTaskController.instance().forUniqueKeyOrNotFound("customKey", customKey);
+        runTaskForId(task.getId(), force);
+    }
     /**
      * Directly, synchronously execute the task with the given ID, regardless
      * of whether it has errored out or is scheduled for the future.

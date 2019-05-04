@@ -19,6 +19,7 @@ package io.stallion.requests;
 
 import io.stallion.users.IOrg;
 import io.stallion.users.IUser;
+import org.apache.commons.collections.ListUtils;
 
 import javax.persistence.Column;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class TaskRequest implements IRequest {
 
     @Override
     public Iterable<String> getHeaderNames() {
-        return null;
+        return ListUtils.EMPTY_LIST;
     }
 
     @Override
@@ -197,7 +198,7 @@ public class TaskRequest implements IRequest {
 
     @Override
     public String getQueryParam(String name, String defaultValue) {
-        return null;
+        return defaultValue;
     }
 
     public String getName() {

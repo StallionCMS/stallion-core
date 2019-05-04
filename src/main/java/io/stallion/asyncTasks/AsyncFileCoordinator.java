@@ -47,6 +47,7 @@ public class AsyncFileCoordinator extends AsyncCoordinator {
 
     @Override
     public AsyncTask enqueue(AsyncTaskHandler handler, String customKey, long executeAt) {
+
         AsyncTask task = new AsyncTask(handler, customKey, executeAt);
         enqueue(task);
         return task;
@@ -101,7 +102,13 @@ public class AsyncFileCoordinator extends AsyncCoordinator {
             task.setId(Context.dal().getTickets().nextId());
         }
         saveNewTask(task);
-        if (AsyncCoordinator.instance() != null && AsyncCoordinator.instance().isSynchronousMode()) {
+        if (AsyncCoordinator.instance() != null
+                && AsyncCoordinator.instance().isSynchronousMode()
+                // We only want to execute tasks synchronously that are supposed to happen basically
+                // immediately -- not tasks that are scheduled for the far future.
+                && (task.getExecuteAt() < (DateUtils.mils() + 60000))
+                ) {
+
             AsyncCoordinator.instance().executeNext();
         }
     }

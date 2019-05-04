@@ -93,6 +93,9 @@ public class AsyncTaskExecuteRunnable implements Runnable {
         if (classCache.containsKey(className)) {
             return classCache.get(className);
         }
+        if (classCache.containsKey(className.replace("$", "."))) {
+            return classCache.get(className.replace("$", "."));
+        }
         Class cls = null;
 
         try {
