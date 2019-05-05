@@ -428,6 +428,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
 
     @Override
     public FilterChain<T> filterChain() {
+        onPreRead();
         return new FilterChain<T>(getBucket(), this);
     }
 
