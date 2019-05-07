@@ -100,6 +100,9 @@ public class GeneralUtils {
     }
 
     public static String formatCurrencyCents(Integer amt) {
+        if (amt == null) {
+            return "";
+        }
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         return formatter.format(amt / 100.0);
     }
@@ -116,6 +119,9 @@ public class GeneralUtils {
 
 
     public static String urlEncode(String s) {
+        if  (s == null) {
+            return "";
+        }
         try {
             return URLEncoder.encode(s, "utf-8");
         } catch (UnsupportedEncodingException e) {
