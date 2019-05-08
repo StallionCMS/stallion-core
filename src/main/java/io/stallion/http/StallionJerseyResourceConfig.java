@@ -89,7 +89,8 @@ public class StallionJerseyResourceConfig extends ResourceConfig {
         //packages("io.stallion.jerseyProviders");
 
 
-        register(CsrfProtectionFilter.class);
+        //register(CsrfProtectionFilter.class);
+        register(XsrfRequestFilter.class);
         register(BodyParamProvider.class);
         register(CookiesAndHeadersResponseFilter.class);
         register(CorsRequestFilter.class);

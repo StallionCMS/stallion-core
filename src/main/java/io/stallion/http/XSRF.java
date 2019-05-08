@@ -17,6 +17,8 @@
 
 package io.stallion.http;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
