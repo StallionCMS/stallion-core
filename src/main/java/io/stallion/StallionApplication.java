@@ -36,10 +36,7 @@ import io.stallion.contentPublishing.NewDraftPageAction;
 import io.stallion.contentPublishing.SiteMapController;
 import io.stallion.contentPublishing.SlugRegistry;
 import io.stallion.dataAccess.DataAccessRegistry;
-import io.stallion.dataAccess.db.DB;
-import io.stallion.dataAccess.db.SqlCheckNeedsMigrationAction;
-import io.stallion.dataAccess.db.SqlGenerationAction;
-import io.stallion.dataAccess.db.SqlMigrationAction;
+import io.stallion.dataAccess.db.*;
 import io.stallion.dataAccess.file.ListingExporter;
 import io.stallion.dataAccess.filtering.FilterCache;
 import io.stallion.exceptions.CommandException;
@@ -435,8 +432,10 @@ public abstract class StallionApplication extends StallionJavaPlugin {
                 new SqlMigrationAction(),
                 new SqlCheckNeedsMigrationAction(),
                 new SqlGenerationAction(),
+                new SqlObsoleteAction(),
                 new ForceTaskAction(),
                 new SecretsDecryptAction()
+
         );
     }
 

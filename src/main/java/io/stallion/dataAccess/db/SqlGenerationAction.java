@@ -281,15 +281,20 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
         int i = 0;
         for (Col col: columns) {
             sql.append("\n    ADD COLUMN `" + col.getName() + "` ");
-            sql.append(" " + dbTypeForColumn(col) + " ");
-            if (col.getNullable()) {
+            String typeForColumn = dbTypeForColumn(col);
+            sql.append(" " + typeForColumn + " ");
+            if (typeForColumn.contains("text")) {
+
+            } else if (col.getNullable()) {
                 sql.append(" NULL");
             } else {
                 sql.append(" NOT NULL");
             }
             if (col.getDefaultValue() != null) {
                 Object defaultValue = col.getDefaultValue();
-                if (col.getDefaultValue().equals(true)) {
+                if (typeForColumn.contains("text")) {
+
+                } else if (col.getDefaultValue().equals(true)) {
                     sql.append(" DEFAULT 1 ");
                 } else if (defaultValue.equals(false)) {
                     sql.append(" DEFAULT 0 ");

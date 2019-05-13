@@ -62,6 +62,7 @@ public class DB {
     //@Converter(converterName = "")
     private List<Schema> tables = new ArrayList<Schema>();
     private Map<String, Schema> classToSchema = new HashMap<String, Schema>();
+    private Map<String, Schema> tableNameToSchema = new HashMap<String, Schema>();
     private DataSource dataSource;
     private Map<String, AttributeConverter> converters = new HashMap<String, AttributeConverter>();
     private Tickets tickets;
@@ -899,8 +900,15 @@ public class DB {
         Schema schema = modelToSchema(cls);
         this.addTable(schema);
         classToSchema.put(schema.getClazz().getName(), schema);
+        tableNameToSchema.put(schema.getName(), schema);
         return schema;
     }
+
+    public Schema tableNameToSchema(String tableName) {
+        return tableNameToSchema.getOrDefault(tableName, null);
+    }
+
+
 
     /**
      * Add a dynamicModelDefinition to the internal registry of schemas
