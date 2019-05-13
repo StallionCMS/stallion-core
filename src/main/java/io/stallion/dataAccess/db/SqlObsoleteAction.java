@@ -101,7 +101,11 @@ public class SqlObsoleteAction implements StallionRunAction<CommandOptionsBase> 
                     extraColumns.add(sqlCol.get("field").toString());
                 }
             }
-            Log.info("Columns without matching bean property for table: " + schema.getName() + "  \n\n" + CollectionUtils.join(extraColumns, ",\nDROP ") + "\n\n");
+            if (extraColumns.size() > 0) {
+                Log.info("Columns without matching bean property for table: " + schema.getName() + "  \n\nDROP " + CollectionUtils.join(extraColumns, ",\nDROP ") + ";\n\n");
+            } else {
+                Log.info("No obsolete columns for table: " + schema.getName());
+            }
         }
     }
 }
