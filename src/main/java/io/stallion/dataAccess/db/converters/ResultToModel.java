@@ -21,7 +21,10 @@ import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.db.Col;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.Schema;
+import io.stallion.exceptions.IllegalEnumValue;
 import io.stallion.reflection.PropertyUtils;
+import io.stallion.services.Log;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.math.BigInteger;
 import java.sql.Date;
@@ -77,7 +80,11 @@ public interface ResultToModel<T extends Model> {
                 if (value == null && col.getDefaultValue() != null) {
                     value = col.getDefaultValue();
                 }
-                PropertyUtils.setProperty(obj, col.getPropertyName(), value);
+                try {
+                    PropertyUtils.setProperty(obj, col.getPropertyName(), value);
+                } catch (IllegalEnumValue e) {
+                    Log.warn("Illegal enum value error: " + e.getMessage() + "\n" + ExceptionUtils.getStackTrace(e));
+                }
             }
 
             Object idObj = resultSet.getObject("id");

@@ -26,7 +26,9 @@
 package io.stallion.reflection;
 
 import io.stallion.dataAccess.MappedModel;
+import io.stallion.exceptions.IllegalEnumValue;
 import io.stallion.utils.GeneralUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -503,7 +505,13 @@ public final class PropertyUtils {
 
         // Convert Strings to Enums, if target type was an enum
         if (destinationClass.isEnum()) {
-            return Enum.valueOf(destinationClass, value.toString());
+
+            if (!EnumUtils.isValidEnum(destinationClass, value.toString())) {
+                throw new IllegalEnumValue("Enum value: '" + value.toString() + "' is not valid for enum of type " + destinationClass.getCanonicalName());
+            } else {
+                return Enum.valueOf(destinationClass, value.toString());
+            }
+
         }
 
         if ((destinationClass == boolean.class || destinationClass == Boolean.class)) {
