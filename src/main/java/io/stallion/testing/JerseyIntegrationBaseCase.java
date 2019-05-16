@@ -323,7 +323,7 @@ public abstract class JerseyIntegrationBaseCase  {
 
     public void assertResponseSucceeded(Response response) {
         if (response.getStatus() != 200) {
-            throw new AssertionError("Response status was: " + response.getStatus() + " Content: " + response.getEntity().toString());
+            throw new AssertionError("Response status was: " + response.getStatus() + " Content: " + response.readEntity(String.class));
         }
     }
     public void assertResponseContains(Response response, String content) {
