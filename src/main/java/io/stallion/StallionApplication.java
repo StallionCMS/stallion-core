@@ -309,7 +309,7 @@ public abstract class StallionApplication extends StallionJavaPlugin {
 
         JobStatusController.selfRegister();
 
-        SimpleAsyncRunner.load(true);
+        SimpleAsyncRunner.load(testMode);
 
         AsyncCoordinator.init(testMode);
 
