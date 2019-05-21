@@ -18,10 +18,12 @@
 package io.stallion.monitoring;
 
 import io.stallion.Context;
+import io.stallion.requests.TaskRequest;
 import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import javax.persistence.Column;
 import java.lang.reflect.InvocationTargetException;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -47,6 +49,7 @@ public class ExceptionInfo {
     private String outerClassName = "";
     private String username;
     private String email;
+    private String taskDataJson = "";
     private Long userId;
     private Long valetId;
 
@@ -67,6 +70,9 @@ public class ExceptionInfo {
         info.requestHeaders = map();
         for(String name: request().getHeaderNames()) {
             info.requestHeaders.put(name, request().getHeader(name));
+        }
+        if (request() instanceof TaskRequest) {
+            info.taskDataJson = ((TaskRequest) request()).getDataJson();
         }
         /*
         TODO: problem with this is that once we read the body, nothing else can read the body
@@ -216,6 +222,16 @@ public class ExceptionInfo {
 
     public ExceptionInfo setValetId(Long valetId) {
         this.valetId = valetId;
+        return this;
+    }
+
+
+    public String getTaskDataJson() {
+        return taskDataJson;
+    }
+
+    public ExceptionInfo setTaskDataJson(String taskDataJson) {
+        this.taskDataJson = taskDataJson;
         return this;
     }
 }

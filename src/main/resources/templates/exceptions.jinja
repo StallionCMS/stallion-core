@@ -30,3 +30,6 @@
 <h5>Headers:</h5>
 <code><pre>{{ exception.requestHeadersString|e }}</pre></code>
 {% endfor %}
+{% if exception.taskDataJson %}
+{{ exception.taskDataJson }}
+{% endif %}

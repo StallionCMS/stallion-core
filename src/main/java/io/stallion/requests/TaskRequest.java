@@ -41,10 +41,11 @@ public class TaskRequest implements IRequest {
     private String name = "";
     private Long taskId = 0L;
     private String customKey = "";
+    private String dataJson = "";
 
     @Override
     public String requestUrl() {
-        return "";
+        return getScheme() + getPath();
     }
 
     @Override
@@ -57,6 +58,14 @@ public class TaskRequest implements IRequest {
         return "";
     }
 
+    public String getDataJson() {
+        return dataJson;
+    }
+
+    public TaskRequest setDataJson(String dataJson) {
+        this.dataJson = dataJson;
+        return this;
+    }
 
     @Override
     public String getRemoteAddr() {

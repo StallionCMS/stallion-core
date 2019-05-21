@@ -53,6 +53,7 @@ public class AsyncTaskExecuteRunnable implements Runnable {
             Log.info("Executing task: {0}", task.getId());
             Context.setRequest(
                     new TaskRequest()
+                            .setDataJson(task.getDataJson())
                             .setName(task.getHandlerName())
                             .setCustomKey(task.getCustomKey())
                             .setTaskId(task.getId())
