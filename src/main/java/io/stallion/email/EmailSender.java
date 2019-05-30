@@ -31,10 +31,7 @@ import io.stallion.testing.Stubbing;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
@@ -223,6 +220,10 @@ public abstract class EmailSender implements Runnable, SelfMocking {
      * @return
      */
     private String restrictToAddress(String emailAddress) {
+        // .test domains are never real, live domains, so we never send a real email to them
+        if (emailAddress.endsWith(".test")) {
+            return emailAddress;
+        }
         // Running in prod, not in debug mode
         if (Settings.instance().getDevMode() != true && "prod".equals(Settings.instance().getEnv())) {
             return emailAddress;
@@ -266,7 +267,20 @@ public abstract class EmailSender implements Runnable, SelfMocking {
         if (empty(settings.getHost())) {
             throw new ConfigException("No SMTP host configured for sending outbound emails");
         }
+
+        boolean hasNonTest = false;
+
         try {
+            for (Address a:message.getAllRecipients()) {
+                if (!a.toString().endsWith(".test")) {
+                    hasNonTest = true;
+                }
+            }
+            if (!hasNonTest) {
+                Log.warn("All email addresses in this message are going to invalid test domains, so skipping actual send: {0}", message.getAllRecipients());
+                return;
+            }
+
             Transport transport = session.getTransport("smtp");
             transport.connect(settings.getHost(), settings.getUsername(), settings.getPassword());
             transport.sendMessage(message, message.getAllRecipients());
