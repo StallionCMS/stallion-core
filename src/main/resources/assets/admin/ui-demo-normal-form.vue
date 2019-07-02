@@ -9,9 +9,10 @@
 <template>
     <div class="ui-demo-vue" id="ui-demo-form">
         <div>
-            <a href=""></a>
+            <a href="#/ui-demo-floating-form">Floating Form</a>
+            <a href="#/ui-demo-normal-form">Normal Form</a>
         </div>
-        <form  method="post" @submit.prevent="onSubmit" enctype="multipart/form-data" v-stallion-floating-labels style="max-width: 700px;">
+        <form  method="post" @submit.prevent="onSubmit" enctype="multipart/form-data" style="max-width: 700px;">
             <div class="p">
                 <h4>Upload Files</h4>
                 <input type="file" name="file" multiple>
@@ -19,7 +20,10 @@
             </div>
             <div class="p">
                 <b-field label="Associated Article">
-                    <st-autocomplete placeholder="Choose associated article..." required="true" label-field="title" value-field="id" v-model="book.articleId" :data="articles"></st-autocomplete>
+                    <st-autocomplete placeholder="Choose associated article..." required expanded label-field="title" value-field="id"  v-model="book.articleId" :data="articles" ></st-autocomplete>
+                </b-field>
+                <b-field label="Tags">
+                    <st-taginput expanded :data="tags" placeholder="Tags" :allow-new="true"  v-model="book.tags"  :keep-open="true" :required="true" :min-count="2" :max-count="4"></st-taginput>
                 </b-field>                
                 <b-field label="Title" >
                     <b-input v-model="book.title" ></b-input>
@@ -28,14 +32,28 @@
                     <b-input v-model="book.author" ></b-input>
                 </b-field>
                 <b-field label="Publisher">
-                    <b-input v-model="book.publisher" ></b-input>
+                    <b-input v-model="book.publisher" :required="true"></b-input>
                 </b-field>
                 <b-field label="City">
                     <b-input v-model="book.city"  ></b-input>
                 </b-field>
-                <b-field label="Category">
-                    <st-autocomplete :data="categories" placeholder="Category"  v-model="book.category" ></st-autocomplete>
+                <b-field label="Genre">
+                    <b-select expanded>
+                        <option>Non-Fiction</option>
+                        <option>Fiction</option>
+                    </b-select>
                 </b-field>
+                    
+                <b-field label="Category">
+                    <st-autocomplete expanded :data="categories" placeholder="Category"  v-model="book.category" ></st-autocomplete>
+                </b-field>
+                <b-field label="Available in these stores">
+                    <st-taginput expanded :data="stores" label-field="name" value-field="id" placeholder="Available in these stores..."  v-model="book.stores" ></st-taginput>
+                </b-field>                
+                
+            </div>
+            <div class="p">
+                <button class="button" type="submit">Submit</button>
             </div>
         </form>
         <hr>
@@ -47,6 +65,27 @@
                 </tr>
             </table>
         </div>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        
     </div>
 </template>
 
@@ -65,6 +104,32 @@
                  'Immigration',
                  'Emmigration',
                  'Economy'
+             ],
+             tags: [
+                 'funny',
+                 'sad',
+                 'happy',
+                 'page turner',
+                 'trash',
+                 'pulp fiction',
+                 'the baby escapes her cage',
+                 'the cow jumped over the moon',
+                 'drug & apothecary shops',
+                 'retrofitting & renovation services'
+             ],
+             stores: [
+                 {
+                     id: 200,
+                     name: 'Amazon',
+                 },
+                 {
+                     id: 201,
+                     name: 'Borders',
+                 },
+                 {
+                     id: 202,
+                     name: 'Barnes & Noble',
+                 }                 
              ],
              articles: [
                  {
@@ -111,7 +176,8 @@
                  publisher: '',
                  city: '',
                  articleId: 106,
-                 category: 'Healthcare'
+                 category: 'Healthcare',
+                 stores: [200]
              },
              things: []
          };

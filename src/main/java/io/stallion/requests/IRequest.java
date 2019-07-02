@@ -147,6 +147,10 @@ public interface IRequest {
      */
     public String getActualIp();
 
+    default int getActualPort() {
+        return 0;
+    }
+
     /**
      * Interpret the body of the request as JSON and parse it into the given object.
      *

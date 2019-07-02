@@ -46,18 +46,90 @@
             }
         })
 
+        function initAutocompleteFloatingLabels(el, binding, vnode, autocompleteEl) {
+            var selectEle = autocompleteEl.querySelector('select.select');
+            var fieldEle = autocompleteEl.closest('.field');
+            // floating-active
+            if (fieldEle === null) {
+                fieldEle = autocompleteEl.parentElement;
+            }
+            function onChange(evt) {
+                var that = this;
+                if (selectEle.value) {
+                    if (!fieldEle.classList.contains('floating-label-active')) {
+                        fieldEle.classList.add("floating-label-active");
+                    }
+                    fieldEle.classList.remove("floating-label-empty");
+                } else {
+                    if (!fieldEle.classList.contains('floating-label-empty')) {
+                        fieldEle.classList.add("floating-label-empty");
+                    }
+                    fieldEle.classList.remove("floating-label-active");
+                }
+            }
+            onChange();
+            selectEle.addEventListener('change', function(evt) {
+                onChange();
+            });            
 
+        }
+
+
+        function initTaginputFloatingLabels(el, binding, vnode, taginputEle) {
+            var fieldEle = taginputEle.closest('.field');
+            var inputEle = taginputEle.querySelector('input');
+            // floating-active
+            if (fieldEle === null) {
+                fieldEle = taginputEle.parentElement;
+            }
+            function onChange(evt) {
+                var that = this;
+                
+                if (Number(inputEle.getAttribute('data-count')) > 0) {
+                    if (!fieldEle.classList.contains('floating-label-active')) {
+                        fieldEle.classList.add("floating-label-active");
+                    }
+                    fieldEle.classList.remove("floating-label-empty");
+                } else {
+                    if (!fieldEle.classList.contains('floating-label-empty')) {
+                        fieldEle.classList.add("floating-label-empty");
+                    }
+                    fieldEle.classList.remove("floating-label-active");
+                }
+            }
+            onChange();
+            inputEle.addEventListener('change', function(evt) {
+                onChange();
+            });            
+
+        }
+        
+        
         Vue.directive('stallion-floating-labels', {
              // directive definition
-             inserted: function (el, binding, vnode) {
+            inserted: function (el, binding, vnode) {
+               
                  el.classList.add('floating-labels-form');
-                 el.querySelectorAll("input").forEach(function(input) {
+                el.querySelectorAll("input").forEach(function(input) {
+                     var autocomplete = input.closest('.st-autocomplete-vue');
+                     if (autocomplete) {
+                         initAutocompleteFloatingLabels(el, binding, vnode, autocomplete);
+                         return;
+                     }
+                    var taginput = input.closest('.st-taginput-vue');
+                    if (taginput) {
+                        initTaginputFloatingLabels(el, binding, vnode, taginput);
+                        return;
+                    }
+                    
                      var labelEle = null;
                      var fieldEle = input.closest('.field');
                      // floating-active
                      if (fieldEle === null) {
                          fieldEle = input.parentElement;
                      }
+                     
+                     
                      labelEle = fieldEle.querySelector('label.label');
                      var tagInputContainer = input.closest('.taginput-container');
                      
@@ -98,17 +170,17 @@
                  });                 
                  
              },
-             componentUpdated: function(el, binding, vnode, oldNode) {
-                 var that = this;
-                 
-                 
-             },
-             onInputChanged: function(evt) {
-                 debugger;
-             },
-             onBlur: function(evt) {
-                 debugger;
-             }
+            componentUpdated: function(el, binding, vnode, oldNode) {
+                var that = this;
+                
+                
+            },
+            onInputChanged: function(evt) {
+                debugger;
+            },
+            onBlur: function(evt) {
+                debugger;
+            }
         });          
 
 

@@ -1,5 +1,5 @@
 # The public URL at which your site is located
-siteUrl = ""
+
 # Optional, if you are proxying your /st-assets/ path with a CDN, put the CDN Url here, and all links
 # generated to the assets will use the CDN url rather than the siteUrl
 #cdnUrl = ""

@@ -24,6 +24,7 @@ import io.stallion.services.Log;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -58,6 +59,7 @@ public class QueryToPager<T extends Model> {
     private boolean _requestProcessed = false;
     private String defaultSort = "";
     private boolean idAsSecondarySort = true;
+    private String secondarySort = "";
 
 
 
@@ -186,6 +188,19 @@ public class QueryToPager<T extends Model> {
                 this.chain = chain.sortBy(sort, dir);
             }
         }
+        if (!empty(this.secondarySort)) {
+            SortDirection dir = SortDirection.DESC;
+            String sort2 = this.secondarySort;
+            if (sort2.startsWith("-")) {
+                sort2 = sort2.substring(1);
+                dir = SortDirection.DESC;
+            }
+            if (!_allSorts && !_allowedSortable.contains(sort)) {
+                Log.warn("Sort not allowed: " + sort);
+            } else {
+                this.chain = chain.secondarySortBy(sort2, dir);
+            }
+        }
 
         for(String filter: request.getQueryParamAsList("filter_by")) {
             if (empty(filter) || !filter.contains(":")) {
@@ -225,6 +240,13 @@ public class QueryToPager<T extends Model> {
 
     public QueryToPager setChain(FilterChain<T> chain) {
         this.chain = chain;
+        return this;
+    }
+
+
+
+    public QueryToPager setSecondarySort(String secondarySort) {
+        this.secondarySort = secondarySort;
         return this;
     }
 }

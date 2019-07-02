@@ -1,6 +1,7 @@
 
 # The URL at which your site is located
-siteUrl = "http://localhost:{port}"
+siteUrl = "http://stalliondemo.localhost:{port}"
+cdnUrl = "http://stalliondemo.localhost:{port}"
 
 # The public facing name of your site. Will be included in various standard templates by default.
 siteName = "UI Demo"

@@ -28,7 +28,8 @@
         });
 
         const routes = [
-            { path: '/ui-demo', component: allComponents['ui-demo'] },
+            { path: '/ui-demo-floating-form', component: allComponents['ui-demo-floating-form'] },
+            { path: '/ui-demo-normal-form', component: allComponents['ui-demo-normal-form'] },
             { path: '/user/:userId', component: allComponents['users-edit'] },
             { path: '/', component: allComponents['users-table'] }
         ]

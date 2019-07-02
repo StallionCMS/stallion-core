@@ -30,6 +30,7 @@ import io.stallion.utils.Literals;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.Column;
 import javax.ws.rs.NotFoundException;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
@@ -64,6 +65,8 @@ public class FilterChain<T extends Model> implements Iterable<T> {
     protected ArrayList<FilterOperation> operations = new ArrayList<FilterOperation>();
     private String sortField = "";
     private SortDirection sortDirection;
+    private String secondarySortField = "";
+    private SortDirection secondarySortDirection;
     private String bucket;
     private String extraCacheKey = "";
     private boolean _includeDeleted = false;
@@ -378,6 +381,10 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         chain.setIncludeDeleted(getIncludeDeleted());
         chain.averageColumns = averageColumns;
         chain.sumColumns = sumColumns;
+        chain.sortDirection = sortDirection;
+        chain.sortField = sortField;
+        chain.secondarySortField = secondarySortField;
+        chain.secondarySortDirection = secondarySortDirection;
         return chain;
     }
 
@@ -687,6 +694,31 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         FilterChain<T> chain = newCopy();
         chain.setSortField(fieldName);
         chain.setSortDirection(direction);
+        return chain;
+    }
+
+    /**
+     * Adds a secondary sort direction the filter chain response.
+     *
+     * @param fieldName
+     * @param direction - either asc or desc
+     * @return
+     */
+    public FilterChain<T> secondarySort(String fieldName, String direction)  {
+        return secondarySortBy(fieldName, SortDirection.fromString(direction));
+    }
+
+    /**
+     * Adds a secondary sort direction the filter chain response.
+     *
+     * @param fieldName
+     * @param direction
+     * @return
+     */
+    public FilterChain<T> secondarySortBy(String fieldName, SortDirection direction)  {
+        FilterChain<T> chain = newCopy();
+        chain.secondarySortField = fieldName;
+        chain.secondarySortDirection = direction;
         return chain;
     }
 
@@ -1345,4 +1377,16 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         this.sums = sums;
         return this;
     }
+
+
+    public String getSecondarySortField() {
+        return secondarySortField;
+    }
+
+
+
+    public SortDirection getSecondarySortDirection() {
+        return secondarySortDirection;
+    }
+
 }

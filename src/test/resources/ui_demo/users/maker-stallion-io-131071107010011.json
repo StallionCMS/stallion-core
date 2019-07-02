@@ -1,7 +1,7 @@
 {
-  "id" : 59448141010011,
+  "id" : 131071107010011,
   "deleted" : false,
-  "lastModifiedMillis" : 0,
+  "lastModifiedMillis" : 1489958730000,
   "username" : "maker@stallion.io",
   "displayName" : "Stallion Maker",
   "givenName" : "Stallion",
@@ -13,10 +13,10 @@
   "secret" : "RsvpOky7a9q9Fb4Cv6",
   "encryptionSecret" : "OCIkhIA2QFFkEXLmGjGjLMmAvaZCsLNJ9wOZ",
   "timeZoneId" : "",
-  "bcryptedPassword" : "$2a$10$.DsNlOeK39Ok.pSPLBpkjOoidJsUKtssiOJ930.6utSXD1JeMMILi",
-  "filePath" : "maker-stallion-io-59448141010011.json",
+  "bcryptedPassword" : "$2a$10$COIcADkTuV/R6cDC.fqZUeoFn0PvHW67ctdiKyICNr57W.QuCinAm",
+  "filePath" : "maker-stallion-io-131071107010011.json",
   "predefined" : true,
-  "approved" : false,
+  "approved" : true,
   "emailVerified" : false,
   "resetToken" : "",
   "aliasForId" : 0,
@@ -25,6 +25,11 @@
   "totallyOptedOut" : false,
   "honorific" : "",
   "createdAt" : 1489958730697,
-  "authorized" : false,
-  "staff" : false
+  "initialized" : false,
+  "fromGdprCountry" : false,
+  "rightToBeForgottenInvokedAt" : null,
+  "acceptedTermsAt" : null,
+  "acceptedTermsVersion" : "",
+  "authorized" : true,
+  "staff" : true
 }

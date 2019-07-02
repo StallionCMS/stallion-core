@@ -107,21 +107,43 @@ h1.p-bottom, h2.p-bottom, h3.p-bottom, h4.p-bottom, h5.p-bottom, h6.p-bottom {
         .field {
             margin-bottom: 0em;
         }
-     }    
+    }
+    .st-autocomplete-vue {
+        margin-bottom: 1em;
+        border: 1px solid transparent;
+        height: 3.5rem;
+        select {
+            border-radius: 0px;
+            height: 3.5rem;
+            padding-left: 13px;
+            font-size: 14px;
+        }
+    }
+    .taginput-container {
+        .placeholder {
+            margin-top: 12px;
+        }
+        .tags-wrapper {
+            margin-top: 7px;
+        }
+    }
     input.input {
         border-radius: 0px;
         height: 3.5rem;
         padding-left: 13px;
         font-size: 14px;
     }
+    .taginput .placeholder {
+        font-size: 14px;
+    }
     .taginput .taginput-container {
         border-radius: 0px;
-        height: 3.5rem;
+        min-height: 3.5rem;
         input.input {
             padding-left: 6px;
         }
     }
-    .taginput .taginput-container .tag {
+    .taginput .taginput-container .tags-wrapper {
         margin-top: 1.1em;
     }
     label.label {
@@ -141,7 +163,12 @@ h1.p-bottom, h2.p-bottom, h3.p-bottom, h4.p-bottom, h5.p-bottom, h6.p-bottom {
         text-overflow: ellipsis;
         transition: all 0.2s ease-out;
     }
-
+    .select {
+        color: #aaa;
+    }
+    .select:not(.is-multiple):not(.is-loading):after {
+        margin-top: .35em;
+    }
     
     
     .field.floating-label-active .label {
@@ -149,8 +176,12 @@ h1.p-bottom, h2.p-bottom, h3.p-bottom, h4.p-bottom, h5.p-bottom, h6.p-bottom {
         opacity: 1;
         z-index: 1;
     }
+    .field.floating-label-active  select.select {
+        color: #363636;
+        padding-top: 1.5em;
+    }
     
-    .field.floating-label-active input, .field.floating-label-active .taginput .taginput-container .autocomplete input {
+    .field.floating-label-active input.input, .field.floating-label-active .taginput .taginput-container .autocomplete input {
         padding-top: 1.5em;
         padding-bottom: 0.35714em;
         

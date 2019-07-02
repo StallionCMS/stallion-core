@@ -1,0 +1,6 @@
+{% extends "stallion:/admin-app-base.jinja" %}
+{% block pre_end_body %}
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", StallionAdminUsersManageMain.boot);
+</script>
+{% endblock %}

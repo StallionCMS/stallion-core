@@ -87,6 +87,18 @@ public class RequestWrapper implements IRequest {
     }
 
     @Override
+    public int getActualPort() {
+        String portHeader = getHeader("X - Forwarded - Port");
+        if (!empty(portHeader)) {
+            return Integer.parseInt(portHeader);
+        } else if (this.request != null && this.request.getUriInfo() != null) {
+            return this.request.getUriInfo().getRequestUri().getPort();
+        }
+        return 80;
+    }
+
+
+    @Override
     public String getQueryString() {
         return request.getRequestUri().getQuery();
     }

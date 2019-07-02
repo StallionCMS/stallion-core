@@ -110,7 +110,12 @@ public class CorsResponseHandler {
 
         String origin = request.getHeader("Origin");
         boolean matches = false;
-        String baseUrl = request.getScheme() + "://" + request.getHost();
+        int port = request.getActualPort();
+        String portString = "";
+        if (port != 80 && port != 443) {
+            portString = ":" + port;
+        }
+        String baseUrl = request.getScheme() + "://" + request.getHost() + portString;
 
         if (isFontRequest(request) && cors.isAllowAllForFonts()) {
             return "*";

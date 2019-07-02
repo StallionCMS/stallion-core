@@ -135,6 +135,9 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 throw new UsageException(MessageFormat.format("Sort field not found in schema: field={0} schema={1}", getSortField(), clazz.getName()));
             }
             sqlBuilder.append(" ORDER BY " + getSortField() + " " + getSortDirection().forSql());
+            if (!Literals.empty(getSecondarySortField())) {
+                sqlBuilder.append(", " + getSecondarySortField() + " " + getSecondarySortDirection().forSql());
+            }
             if (isIdAsSecondarySort()) {
                 sqlBuilder.append(", id ASC");
             }
