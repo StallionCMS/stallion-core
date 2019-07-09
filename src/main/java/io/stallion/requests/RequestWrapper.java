@@ -88,9 +88,12 @@ public class RequestWrapper implements IRequest {
 
     @Override
     public int getActualPort() {
-        String portHeader = getHeader("X - Forwarded - Port");
+        String portHeader = getHeader("X-Forwarded-Port");
         if (!empty(portHeader)) {
             return Integer.parseInt(portHeader);
+        } else if (!empty(getHeader("x-forwarded-host"))) {
+            // We default to assuming that the port was the default port on the proxy server.
+            return 80;
         } else if (this.request != null && this.request.getUriInfo() != null) {
             return this.request.getUriInfo().getRequestUri().getPort();
         }

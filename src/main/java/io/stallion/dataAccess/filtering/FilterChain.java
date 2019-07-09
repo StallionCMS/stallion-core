@@ -22,6 +22,7 @@ import io.stallion.dataAccess.LocalMemoryStash;
 import io.stallion.dataAccess.Model;
 import io.stallion.dataAccess.Stash;
 import io.stallion.exceptions.UsageException;
+import io.stallion.reflection.ModelDoublePropertyComparator;
 import io.stallion.reflection.ModelPropertyComparator;
 import io.stallion.reflection.PropertyUtils;
 import io.stallion.services.Log;
@@ -867,10 +868,15 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         // Apply the sort
         if (!Literals.empty(getSortField())) {
             //BeanComparator beanComparator = new BeanComparator(getSortField());
-            ModelPropertyComparator comparator = new ModelPropertyComparator(getSortField(), isIdAsSecondarySort());
-            Collections.sort(items, comparator);
-            if (getSortDirection().equals(SortDirection.DESC)) {
-                Collections.reverse(items);
+            if (!Literals.emptyObject(getSecondarySortField())) {
+                ModelDoublePropertyComparator comparator = new ModelDoublePropertyComparator(getSortField(), getSortDirection(), getSecondarySortField(), getSecondarySortDirection());
+                Collections.sort(items, comparator);
+            } else {
+                ModelPropertyComparator comparator = new ModelPropertyComparator(getSortField(), isIdAsSecondarySort());
+                Collections.sort(items, comparator);
+                if (getSortDirection().equals(SortDirection.DESC)) {
+                    Collections.reverse(items);
+                }
             }
         }
 
