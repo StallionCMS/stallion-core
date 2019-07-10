@@ -23,7 +23,7 @@
                     <st-autocomplete placeholder="Choose associated article..." required expanded label-field="title" value-field="id"  v-model="book.articleId" :data="articles" ></st-autocomplete>
                 </b-field>
                 <b-field label="Tags">
-                    <st-taginput expanded :data="tags" placeholder="Tags" :allow-new="true"  v-model="book.tags"  :keep-open="true"  :min-count="3" :max-count="3"></st-taginput>
+                    <st-taginput expanded :data="tags" placeholder="Tags" :allow-new="true"  v-model="book.tags"  :keep-open="true"  :mintags="3" :maxtags="3"></st-taginput>
                 </b-field>                
                 <b-field label="Title" >
                     <b-input v-model="book.title" ></b-input>

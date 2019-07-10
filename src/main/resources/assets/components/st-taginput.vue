@@ -20,7 +20,6 @@
          background: white;
          border: 1px solid #CCC;
          z-index: 1000;
-         height: 400px;
          max-height: calc(50vh - 100px);
 
          -webkit-box-shadow: 0px 4px 5px 2px rgba(163,163,163,0.71);
@@ -89,9 +88,9 @@
                         <b-tag v-for="tag in tagInfos" closable @close="removeItem(tag)" :key="tag.id">{{ tag.label }}</b-tag>
                     </div>
                 </div>
-                <div class="min-max"  v-if="min || maxCount">
+                <div class="min-max"  v-if="min || maxtags">
                     <span v-if="min">Min: {{ min }}</span>
-                    <span v-if="maxCount">Max: {{ maxCount }}</span>
+                    <span v-if="maxtags">Max: {{ maxtags }}</span>
                 </div>
             </div>
         </div>
@@ -99,8 +98,8 @@
             <div class="autocomplete-input">
                 <input @keypress.enter.prevent="onEnter" @keydown="onArrow" ref="theinput" autofocus="autofocus" @input="updateSearch">
             </div>
-            <div class="autocomplete-items">
-                <div v-if="allowNew" :class="['autocomplete-item', highlightedIndex === -1 ? 'autocomplete-highlight' : '']"><button class="button" type="button" @click="addNewFromInput" :disabled="!search">Add as new item</button></div>
+            <div class="autocomplete-items" ref="itemsdiv">
+                <div v-if="allowNew && !noData" :class="['autocomplete-item', highlightedIndex === -1 ? 'autocomplete-highlight' : '']"><button class="button" type="button" @click="addNewFromInput" :disabled="!search">Add as new item</button></div>
                 <div :class="['autocomplete-item', item.highlight ? 'autocomplete-highlight' : '']" v-for="item in dataFiltered" @click="chooseItem(item)">
                     {{ item.label }}
                 </div>
@@ -113,7 +112,12 @@
  module.exports = {
      props: {
          allowNew: false,
-         data: '',
+         data: {
+             type: Array,
+             default: function() {
+                 return [];
+             }
+         },
          expanded: {
              type: Boolean
          },
@@ -129,8 +133,8 @@
              }
              
          },
-         minCount: 0,
-         maxCount: null,
+         mintags: 0,
+         maxtags: null,
          size: '',
          valueField: '',
          value: {
@@ -178,6 +182,7 @@
              labelById: labelById,
              isNumeric: isNumeric,
              autoCompleteShown: false,
+             noData: !this.data.length,
              search: '',
              dataFiltered: this.data,
              highlightedIndex: 0,
@@ -209,10 +214,10 @@
      },
      computed: {
          min: function() {
-             if (this.minCount === 0 && this.required) {
+             if (this.mintags === 0 && this.required) {
                  return 1;
              } else {
-                 return this.minCount;
+                 return this.mintags;
              }
          }
      },
@@ -228,18 +233,18 @@
          },
          onHiddenInputInvalid: function(evt) {
              evt.target.setCustomValidity('');
-             if (this.value.length < this.minCount) {
+             if (this.value.length < this.mintags) {
                  var itemStr = 'items';
-                 if (this.minCount === 1) {
+                 if (this.mintags === 1) {
                      itemStr = 'item';
                  }
-                 evt.target.setCustomValidity("Must select at least " + this.minCount + " " + itemStr);
-             } else if (this.value.length > this.maxCount) {
+                 evt.target.setCustomValidity("Must select at least " + this.mintags + " " + itemStr);
+             } else if (this.value.length > this.maxtags) {
                  var itemStr = 'items';
-                 if (this.minCount === 1) {
+                 if (this.mintags === 1) {
                      itemStr = 'item';
                  }
-                 evt.target.setCustomValidity("Cannot select more than " + this.maxCount + " " + itemStr);
+                 evt.target.setCustomValidity("Cannot select more than " + this.maxtags + " " + itemStr);
 
              } else if (this.required && !this.value.length) {
 
@@ -260,9 +265,9 @@
                  tagInfos.push({value: val, label: label});
              });
              that.tagInfos = tagInfos;
-             if (!that.required && !that.minCount && !that.maxCount) {
+             if (!that.required && !that.mintags && !that.maxtags) {
                  that.$refs.hiddeninput.value = '1';
-             } else if (((!that.required && !this.minCount) || that.tagInfos.length >= this.minCount) && that.tagInfos.length <= this.maxCount) {
+             } else if (((!that.required && !this.mintags) || that.tagInfos.length >= this.mintags) && that.tagInfos.length <= this.maxtags) {
                  that.$refs.hiddeninput.value = '1';
              } else {
                  that.$refs.hiddeninput.value = '';
@@ -284,7 +289,7 @@
          },
          openSelect: function(initial) {
              var that = this;
-             if (this.value && this.value.length >= this.maxCount) {
+             if (this.value && this.value.length >= this.maxtags) {
                  return;
              }
              that.search = initial;
@@ -309,6 +314,8 @@
                  that.$refs.choicesdiv.classList.add('pop-downwards');
                  that.$refs.choicesdiv.style.maxHeight = (h - rect.top - 50) + 'px'    
              }
+
+             that.$refs.itemsdiv.style.maxHeight = (parseInt(that.$refs.choicesdiv.style.maxHeight, 10) - 46) + 'px';
              
              if (that.$refs.choicesdiv.getBoundingClientRect().width < rect.width) {
                  that.$refs.choicesdiv.style.width = rect.width + 'px';
@@ -357,6 +364,8 @@
          onEnter: function() {
              var that = this;
              if (this.highlightedIndex === -1) {
+                 this.addNewFromInput();
+             } else if (!this.data.length) {
                  this.addNewFromInput();
              } else {
                  this.chooseItem(this.dataFiltered[this.highlightedIndex]);
@@ -411,7 +420,7 @@
              }
              newValue.push(itemValue);
 
-             if (!that.keepOpen || newValue.length >= that.maxCount) {
+             if (!that.keepOpen || newValue.length >= that.maxtags) {
                  that.autoCompleteShown = false;
              } else {
                  that.$refs.theinput.value = '';

@@ -218,7 +218,6 @@
 
              if (selectPos > (h/2)) {
                  that.$refs.choicesdiv.style.bottom = (rect.height) + 'px';
-                 debugger;
                  that.$refs.choicesdiv.style.top = '';
                  that.$refs.choicesdiv.classList.add('pop-upwards');
                  that.$refs.choicesdiv.classList.remove('pop-downwards');
