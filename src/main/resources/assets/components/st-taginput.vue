@@ -79,7 +79,7 @@
 <template>
     <div class="st-taginput-vue control taginput">
         <div :class="['taginput-container', 'is-focusable', expanded ? 'is-fullwidth' : '', value ? '' : 'is-empty', size]" @click="clickOpenSelect" ref="taginputcontainer">
-            <input ref="hiddeninput" type="text" style="left: 0px; top:0px;height:100%; width: 100%; border-width: 0px; position:absolute; color: transparent; background-color: transparent;" @keypress.prevent="keyPressOpenSelect" required="required" :minlength="minCount" :maxlength="maxCount" @invalid="onHiddenInputInvalid">
+            <input ref="hiddeninput" type="text" style="left: 0px; top:0px;height:100%; width: 100%; border-width: 0px; position:absolute; color: transparent; background-color: transparent;" @keypress.prevent="keyPressOpenSelect" required="required"  @invalid="onHiddenInputInvalid">
             <div style=" z-index: 10px; background-color: white; display:flex; justify-content: space-between; width: calc(100% - 20px); margin-bottom: 3px; ">
                 <div style="flex: grow;">
                     <div v-if="!value || !value.length && placeholder" class="placeholder">
@@ -123,7 +123,11 @@
          numericValues: null,
          placeholder: '',
          required: {
-             type: Boolean
+             type: Boolean,
+             default: function() {
+                 return undefined;
+             }
+             
          },
          minCount: 0,
          maxCount: null,
@@ -223,6 +227,7 @@
 
          },
          onHiddenInputInvalid: function(evt) {
+             evt.target.setCustomValidity('');
              if (this.value.length < this.minCount) {
                  var itemStr = 'items';
                  if (this.minCount === 1) {
@@ -255,7 +260,9 @@
                  tagInfos.push({value: val, label: label});
              });
              that.tagInfos = tagInfos;
-             if (that.tagInfos.length >= this.minCount && that.tagInfos.length <= this.maxCount) {
+             if (!that.required && !that.minCount && !that.maxCount) {
+                 that.$refs.hiddeninput.value = '1';
+             } else if ((!that.required || that.tagInfos.length >= this.minCount) && that.tagInfos.length <= this.maxCount) {
                  that.$refs.hiddeninput.value = '1';
              } else {
                  that.$refs.hiddeninput.value = '';
