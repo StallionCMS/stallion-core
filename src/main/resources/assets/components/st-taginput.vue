@@ -262,7 +262,7 @@
              that.tagInfos = tagInfos;
              if (!that.required && !that.minCount && !that.maxCount) {
                  that.$refs.hiddeninput.value = '1';
-             } else if ((!that.required || that.tagInfos.length >= this.minCount) && that.tagInfos.length <= this.maxCount) {
+             } else if (((!that.required && !this.minCount) || that.tagInfos.length >= this.minCount) && that.tagInfos.length <= this.maxCount) {
                  that.$refs.hiddeninput.value = '1';
              } else {
                  that.$refs.hiddeninput.value = '';
