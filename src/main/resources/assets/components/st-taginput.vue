@@ -21,10 +21,17 @@
          border: 1px solid #CCC;
          z-index: 1000;
          height: 400px;
-         max-height: calc(100vh - 50% - 100px);
-         -webkit-box-shadow: 0px 0px 7px -2px rgba(0,0,0,0.75);
-         -moz-box-shadow: 0px 0px 7px -2px rgba(0,0,0,0.75);
-         box-shadow: 0px 0px 7px -2px rgba(0,0,0,0.75);
+         max-height: calc(50vh - 100px);
+
+         -webkit-box-shadow: 0px 4px 5px 2px rgba(163,163,163,0.71);
+         -moz-box-shadow: 0px 4px 5px 2px rgba(163,163,163,0.71);
+         box-shadow: 0px 4px 5px 2px rgba(163,163,163,0.71);
+         
+     }
+     .autocomplete-choices.pop-upwards {
+         -webkit-box-shadow: 0px -4px 7px 2px rgba(163,163,163,0.71);
+         -moz-box-shadow: 0px -4px 7px 2px rgba(163,163,163,0.71);
+         box-shadow: 0px -4px 7px 2px rgba(163,163,163,0.71);         
      }
      .autocomplete-item:hover {
          background: #EEE;
@@ -32,7 +39,7 @@
      }
      .autocomplete-items {
          overflow: scroll;
-         max-height: 100%;
+         max-height: calc(100% - 46px);
      }
      .autocomplete-item {
          padding: 4px 4px 4px 11px;
@@ -285,10 +292,17 @@
              if (selectPos > (h/2)) {
                  that.$refs.choicesdiv.style.bottom = (rect.height) + 'px'; 
                  that.$refs.choicesdiv.style.top = '';
+                 that.$refs.choicesdiv.classList.add('pop-upwards');
+                 that.$refs.choicesdiv.classList.remove('pop-downwards');
+                 that.$refs.choicesdiv.style.maxHeight = (rect.top - 50) + 'px'
              } else {
                  that.$refs.choicesdiv.style.bottom = '';
                  that.$refs.choicesdiv.style.top = rect.height + 'px';
+                 that.$refs.choicesdiv.classList.remove('pop-upwards');
+                 that.$refs.choicesdiv.classList.add('pop-downwards');
+                 that.$refs.choicesdiv.style.maxHeight = (h - rect.top - 50) + 'px'    
              }
+             
              if (that.$refs.choicesdiv.getBoundingClientRect().width < rect.width) {
                  that.$refs.choicesdiv.style.width = rect.width + 'px';
              }
