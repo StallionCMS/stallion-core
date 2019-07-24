@@ -64,7 +64,7 @@
 <template>
     <div class="st-autocomplete-vue control">
         <div :class="['select', expanded ? 'is-fullwidth' : '', value ? '' : 'is-empty', size]">
-            <select :required="required" ref="theselect" @mousedown.prevent="noop" @click="openSelect" placeholder="placeholder" :class="['select', value ? '' : 'select-empty']" @keypress.enter.prevent="openSelect" >
+            <select :required="required" ref="theselect" @mousedown.prevent="noop" @click="openSelect" placeholder="placeholder" :class="['select', value ? '' : 'select-empty']" @keypress.enter.prevent="openSelect" :disabled="disabled" >
                 <option v-if="placeholder" ref="placeholderoption" value=""  >{{ placeholder }}</option>
                 <option ref="firstoption" value=""></option>
             </select>
@@ -87,6 +87,7 @@
  module.exports = {
      props: {
          data: '',
+         disabled: null,
          expanded: {
              type: Boolean
          },

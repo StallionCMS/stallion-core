@@ -55,6 +55,7 @@ import io.stallion.secrets.SecretsDecryptAction;
 import io.stallion.services.*;
 import io.stallion.settings.Settings;
 import io.stallion.templating.TemplateRenderer;
+import io.stallion.testing.CommandOptionsForTests;
 import io.stallion.testing.TestingRunAction;
 import io.stallion.tools.ExportToHtml;
 import io.stallion.tools.NewProjectBuilder;
@@ -130,7 +131,7 @@ public abstract class StallionApplication extends StallionJavaPlugin {
         PluginRegistry.loadWithJavaPlugins(targetPath, plugins);
 
         TestingRunAction action = new TestingRunAction();
-        CommandOptionsBase options = new CommandOptionsBase();
+        CommandOptionsForTests options = new CommandOptionsForTests();
         options.setTargetPath(targetPath);
         options.setEnv(env);
 
