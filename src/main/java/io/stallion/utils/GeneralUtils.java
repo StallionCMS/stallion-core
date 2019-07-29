@@ -64,6 +64,7 @@ public class GeneralUtils {
     private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
     private static final Pattern MULTIHYPHENS = Pattern.compile("\\-\\-+");
+    private static final Pattern ENDING_HYPHENS = Pattern.compile("\\-+$");
     // Because probeContentType doesn't work on all platforms;
     private static final Map<String, String> mimeTypes = map(
             val("css", "text/css"),
@@ -89,9 +90,12 @@ public class GeneralUtils {
      * @return
      */
     public static String slugify(String input) {
+        input = input.replace("&", " and ");
+        input = input.replace("$", " dollar ");
         String nowhitespace = WHITESPACE.matcher(input).replaceAll("-");
         String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
         String slug = MULTIHYPHENS.matcher(NONLATIN.matcher(normalized).replaceAll("-")).replaceAll("-");
+        slug = ENDING_HYPHENS.matcher(slug).replaceAll("");
         return slug.toLowerCase(Locale.ENGLISH);
     }
 
