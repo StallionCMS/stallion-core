@@ -327,6 +327,9 @@ public class PartialStash<T extends Model> extends Stash<T> {
         T value = map.get(lookupValue);
         if (value != null) {
             onPreRead();
+            if (value.getDeleted()) {
+                return null;
+            }
             return detach(value);
         } else {
             T item = filterChain().setUseCache(false).filter(keyName, value).first();
