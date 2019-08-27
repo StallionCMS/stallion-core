@@ -17,7 +17,6 @@
 
 package io.stallion.dataAccess;
 
-import com.sun.java.swing.plaf.windows.TMSchema;
 import io.stallion.dataAccess.db.Col;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.Schema;
