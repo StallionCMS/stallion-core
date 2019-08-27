@@ -97,9 +97,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
     public T forEmail(String email)  {
         // TODO make lookup by key work
-        T user = filterChain()
-                .filterBy("email", email, FilterOperator.EQUAL, true)
-                .first();
+        T user = forUniqueKey("email", email);
         if (user == null) {
             return null;
         }
@@ -111,9 +109,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
 
     public T forUsername(String username) {
         // TODO make lookup by key work
-        T user = filterChain()
-                .filterBy("username", username, FilterOperator.EQUAL, true)
-                .first();
+        T user = forUniqueKey("username", username);
         if (user != null && !empty(user.getAliasForId())) {
             user = forId(user.getAliasForId());
         }

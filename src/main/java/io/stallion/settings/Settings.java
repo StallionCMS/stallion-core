@@ -1151,6 +1151,8 @@ public class Settings implements ISettings {
         return items;
     }
 
+
+
     public String getxFrameOptions() {
         return xFrameOptions;
     }
