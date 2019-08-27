@@ -208,6 +208,13 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
             sync(obj);
             itemByPrimaryKey.remove(obj.getId());
         }
+        for(String field: this.uniqueFields) {
+            Object val = PropertyUtils.getProperty(obj, field);
+            if (val != null && this.keyNameToUniqueKeyToValue.get(field).containsKey(val)) {
+                this.keyNameToUniqueKeyToValue.get(field).remove(val);
+            }
+        }
+
         FilterCache.clearBucket(getBucket());
     }
 
@@ -409,6 +416,9 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         }
         T value = map.get(lookupValue);
         if (value == null) {
+            if (value.getDeleted()) {
+                return null;
+            }
             return value;
         }
         return detach(value);
