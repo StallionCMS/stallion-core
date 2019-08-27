@@ -416,10 +416,10 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         }
         T value = map.get(lookupValue);
         if (value == null) {
-            if (value.getDeleted() == true) {
-                return null;
-            }
-            return value;
+            return null;
+        }
+        if (value.getDeleted() == true) {
+            return null;
         }
         return detach(value);
     }
