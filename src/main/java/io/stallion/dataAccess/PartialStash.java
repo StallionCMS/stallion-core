@@ -17,6 +17,7 @@
 
 package io.stallion.dataAccess;
 
+import com.sun.java.swing.plaf.windows.TMSchema;
 import io.stallion.dataAccess.db.Col;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.Schema;
@@ -167,6 +168,12 @@ public class PartialStash<T extends Model> extends Stash<T> {
         if (existing != null) {
             existing.setDeleted(true);
             itemByPrimaryKey.remove(obj.getId());
+        }
+        for(String field: this.uniqueFields) {
+            Object val = PropertyUtils.getProperty(obj, field);
+            if (val != null && this.keyNameToUniqueKeyToValue.get(field).containsKey(val)) {
+                this.keyNameToUniqueKeyToValue.get(field).remove(val);
+            }
         }
         getPersister().hardDelete(obj);
         FilterCache.clearBucket(getBucket());
