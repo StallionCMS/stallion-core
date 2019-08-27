@@ -333,7 +333,7 @@ public class PartialStash<T extends Model> extends Stash<T> {
         T value = map.get(lookupValue);
         if (value != null) {
             onPreRead();
-            if (value.getDeleted()) {
+            if (value.getDeleted() == true) {
                 return null;
             }
             return detach(value);
