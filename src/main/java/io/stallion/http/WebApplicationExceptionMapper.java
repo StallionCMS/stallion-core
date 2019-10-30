@@ -20,6 +20,8 @@ package io.stallion.http;
 import io.stallion.services.Log;
 import io.stallion.templating.TemplateRenderer;
 import io.stallion.utils.json.JSON;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
@@ -49,6 +51,8 @@ public class WebApplicationExceptionMapper extends BaseExceptionMapper<WebApplic
                 Log.exception(exception, "ServerWebApplicationException in main request loop");
             }
 
+            Log.finest("WebApplicationException: " + exception.getResponse().getStatus()
+                    + exception.getClass().getCanonicalName() + exception.getMessage() + StringUtils.join(ExceptionUtils.getRootCauseStackTrace(exception), '\n'));
             if (isJson(exception.getResponse())) {
                 Map info = map(
                         val("succeeded", false),

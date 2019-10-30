@@ -71,7 +71,7 @@ public abstract class FilePersisterBase<T extends Model> extends BasePersister<T
 
         if (!StringUtils.isEmpty(registration.getAbsolutePath())) {
             Boolean exists = new File(registration.getAbsolutePath()).isDirectory();
-            Log.fine("DAL target {0} exists? {1}", registration.getAbsolutePath(), exists);
+            Log.finer("DAL target {0} exists? {1}", registration.getAbsolutePath(), exists);
             if (!exists) {
                 new File(registration.getAbsolutePath()).mkdirs();
             }

@@ -17,6 +17,7 @@
 
 package io.stallion.dataAccess.filtering;
 
+import io.stallion.services.Log;
 import io.stallion.settings.Settings;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -80,14 +81,16 @@ public class FilterCache {
 
 
     public static void load() {
-
+        Log.finest("Load cache manager.");
         Configuration config = new Configuration();
         config.setName("stallionFilterCache");
         CacheManager.create(config);
         manager = CacheManager.create();
+        Log.finest("Cache manager created.");
     }
 
     public static void initCache(String bucket) {
+        Log.finer("Init cache for {0}", bucket);
         if (manager == null) {
             load();
         }
@@ -115,6 +118,7 @@ public class FilterCache {
         //sizeOfPolicyConfiguration.
         //config.addSizeOfPolicy();
         //config.set
+        Log.finest("Construct new cache for " + bucket);
         Cache cache = new Cache(config);
 
         manager.addCache(cache);
@@ -124,6 +128,7 @@ public class FilterCache {
 
 
         //config.setMaxBytesLocalHeap(150000000L);
+        Log.finer("Finish cache for {0}", bucket);
     }
 
 

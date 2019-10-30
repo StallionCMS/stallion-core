@@ -1,5 +1,6 @@
 #!/usr/bin/python
-
+from datetime import datetime
+print "Starting mvnwatch at " + datetime.now().isoformat()
 import os
 import sys
 import time
@@ -16,7 +17,10 @@ def main():
     handler = MvnHandler(maven_args)
     handler.start_maven()
     observer = make_observer(handler, path)
-
+    conf_path = os.getcwd() + "/../site/conf"
+    if os.path.isdir(conf_path):
+        observer2 = make_observer(handler, conf_path)
+    
     try:
         time.sleep(100000000)
     finally:
@@ -52,6 +56,7 @@ class MvnHandler(FileSystemEventHandler):
         
     def start_maven(self):
         args = ['mvn'] + self.maven_args
+        print "Run mvn at " + datetime.now().isoformat()                
         self.process = subprocess.Popen(args)
 
 def make_observer(handler, path):

@@ -120,6 +120,8 @@ public class ServeJettyRunAction implements StallionRunAction<ServeCommandOption
 
         server.start();
 
+        Log.info("Server started successfully.");
+
         System.out.print("-------------------------------------------------------\n");
         System.out.print(MessageFormat.format(
                 "Final registration count: {1} controllers. {2} plugins. {3} slugs. V=3\n",

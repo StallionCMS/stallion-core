@@ -237,6 +237,8 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
      */
     public ModelController register(DataAccessRegistration registration) {
 
+        Log.fine("Register model {0}", registration.getModelClass().getCanonicalName());
+
         // Validation, de-duping, and normalization
         if (StringUtils.isEmpty(registration.getPath()) && StringUtils.isEmpty(registration.getTableName()) && empty(registration.getBucket())) {
             throw new ConfigException(String.format("You tried to load a model/controller. But both the folder path and the table name were empty. One the two must be set. model=%s, controller=%s", registration.getModelClass(), registration.getControllerClass()));
@@ -327,7 +329,7 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
         // Add the controller to the DalRegistry lookup table
         internalMap.put(controller.getBucket(), controller);
         // Add the model to the DalRegistry lookup table
-        Log.info("Register model {0}", registration.getModelClass().getCanonicalName());
+
         modelClassToBucketName.put(registration.getModelClass().getCanonicalName(), registration.getBucket());
 
 
@@ -348,11 +350,13 @@ public class DataAccessRegistry implements Map<String, ModelController>  {
     Load all the data into the local stash
      */
     public void preloadStashData() {
-        Log.info("Preload stash data for all data controllers.");
+        Log.info("Preload stash data for {0} data controllers.", internalMap.entrySet().size());
         for (Map.Entry<String, ModelController> entry: internalMap.entrySet()) {
-            Log.fine("Load data for {0} {1}", entry.getKey(), entry.getClass().getCanonicalName());
+            Log.finer("Load data for {0} {1}", entry.getKey(), entry.getValue().getClass().getCanonicalName());
             entry.getValue().getStash().loadAll();
+            Log.finer("Finished preloading for {0} {1}", entry.getKey(), entry.getValue().getClass().getCanonicalName());
         }
+        Log.fine("End preloading data.");
     }
 
     @Deprecated

@@ -95,7 +95,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
         // Get the unique keys and alternative keys from annotations
         for(String propertyName: PropertyUtils.getPropertyNames(this.getPersister().getModelClass())) {
             if (PropertyUtils.propertyHasAnnotation(this.getPersister().getModelClass(), propertyName, UniqueKey.class)) {
-                Log.fine("Model:{0} has uniquekey on {1}", this.getPersister().getModelClass(), propertyName);
+                Log.finer("Model:{0} has uniquekey on {1}", this.getPersister().getModelClass(), propertyName);
                 UniqueKey uk = PropertyUtils.getAnnotationForProperty(getPersister().getModelClass(), propertyName, UniqueKey.class);
                 if (uk.caseInsensitive()) {
                     this.uniqueFieldsCaseInsensitive.add(propertyName);
@@ -104,7 +104,7 @@ public class LocalMemoryStash<T extends Model> extends StashBase<T> {
 
             }
             if (PropertyUtils.propertyHasAnnotation(this.getPersister().getModelClass(), propertyName, AlternativeKey.class)) {
-                Log.fine("Model:{0} has alternativeKey on {1}", this.getPersister().getModelClass(), propertyName);
+                Log.finer("Model:{0} has alternativeKey on {1}", this.getPersister().getModelClass(), propertyName);
                 this.keyNameToKeyToValue.put(propertyName, new HashMap<Object, Set<T>>());
             }
         }

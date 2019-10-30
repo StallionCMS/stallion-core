@@ -61,6 +61,7 @@ public class UserController<T extends IUser> extends StandardModelController<T> 
     }
 
     public static void load() {
+        Log.info("Register default UserController");
         DataAccessRegistration registration = new DataAccessRegistration()
                 .setStashClass(UserMemoryStash.class)
                 .setControllerClass(UserController.class)

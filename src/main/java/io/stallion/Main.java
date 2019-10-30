@@ -21,6 +21,8 @@ import io.stallion.exceptions.CommandException;
 import io.stallion.plugins.StallionJavaPlugin;
 import io.stallion.services.Log;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.logging.Level;
 
 /**
@@ -35,6 +37,7 @@ public class Main
      * @throws Exception
      */
     public static void main( String[] args ) throws Exception {
+        System.out.println("Entered io.stallion.Main at " + LocalDateTime.now().toString());
         System.setProperty("java.awt.headless", "true");
         mainWithPlugins(new StallionApplication.DefaultApplication(), args);
     }
@@ -49,6 +52,7 @@ public class Main
      * @throws Exception
      */
     public static void mainWithPlugins(StallionApplication app, String[] args, StallionJavaPlugin...plugins) throws Exception {
+        System.out.println("Entered io.stallion.mainWithPlugins at " + LocalDateTime.now().toString());
         if (app == null) {
             app = new StallionApplication.DefaultApplication();
         }

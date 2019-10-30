@@ -20,6 +20,7 @@ package io.stallion.secrets;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.stallion.exceptions.UsageException;
+import io.stallion.services.Log;
 import io.stallion.settings.childSections.SecretsSettings;
 import io.stallion.utils.Encrypter;
 import io.stallion.utils.json.JSON;
@@ -68,6 +69,7 @@ public class SecretsVault {
 
 
     public static Map<String, String> loadIfExists(String appPath) {
+        Log.finer("Load secrets if exists.");
         String rawPath = appPath + "/conf/secrets.json";
         String encryptedPath = appPath + "/conf/secrets.json.aes";
         File rawFile = new File(rawPath);
@@ -79,13 +81,16 @@ public class SecretsVault {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            Log.finer("Loaded secrets from unenecrypted file.");
             return JSON.parse(json, typeRef);
         }
         if (new File(encryptedPath).isFile()) {
             // Get passphrase
             SecretsVault vault = new SecretsCommandLineManager().loadVault(appPath, secretsSettings);
             if (vault != null) {
-                return vault.getSecrets();
+                Map<String, String> m = vault.getSecrets();
+                Log.finer("Loaded secrets from encrypted file.");
+                return m;
             }
 
         }
@@ -106,7 +111,9 @@ public class SecretsVault {
             try {
                 String encrypted = FileUtils.readFileToString(file, UTF8);
                 encrypted = encrypted.replace("\n", "");
+                Log.finer("Decrypt and parse secrets");
                 secrets = decryptAndParse(encrypted);
+                Log.finer("End decrypt and parse");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

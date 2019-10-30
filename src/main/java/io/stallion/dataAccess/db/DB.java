@@ -174,8 +174,9 @@ public class DB {
         }
 
 
-
+        Log.finest("Construct ComboPooledDataSource");
         ComboPooledDataSource cpds = new ComboPooledDataSource();
+        Log.finest("End construct ComboPooledDataSource");
         /*
         try {
             try (Connection conn = cpds.getConnection()) {

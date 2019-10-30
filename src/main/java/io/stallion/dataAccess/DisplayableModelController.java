@@ -65,7 +65,7 @@ public class DisplayableModelController<T extends Displayable> extends StandardM
     public void onPostLoadItem(T obj) {
         StandardDisplayableModel item = (StandardDisplayableModel)obj;
 
-        Log.fine("Add to slug registry slug={0} id={1} bucket=bucket:{2}", item.getSlug(), item.getId(), getBucket());
+        Log.finer("Add to slug registry slug={0} id={1} bucket=bucket:{2}", item.getSlug(), item.getId(), getBucket());
         SlugRegistry.instance().addDisplayable(item);
         if (!empty(item.getOldUrls())) {
             for (String url: item.getOldUrls()) {

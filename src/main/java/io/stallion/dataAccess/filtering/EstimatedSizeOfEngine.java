@@ -26,8 +26,9 @@ import java.util.Collection;
 
 public class EstimatedSizeOfEngine implements SizeOfEngine {
     public EstimatedSizeOfEngine() {
-        Log.finer("EstimatedSizeOfEngine being loaded.");
+        Log.finest("EstimatedSizeOfEngine being loaded.");
     }
+
     @Override
     public Size sizeOf(Object key, Object value, Object container) {
         int itemCount = 0;

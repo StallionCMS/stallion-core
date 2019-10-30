@@ -54,7 +54,7 @@ public class AssetsResourceEndpointsResource {
             @QueryParam("isFullResourceBundle") boolean isFullResourceBundle,
             @QueryParam("bundlePath") String bundlePath
     ) throws Exception {
-        Log.info("Serve resource for plugin {0} path {1} isFullresourecBundle: {2}", pluginName, path, isFullResourceBundle);
+        Log.finest("Serve resource for plugin {0} path {1} isFullresourecBundle: {2}", pluginName, path, isFullResourceBundle);
         if (isFullResourceBundle) {
             return new AssetServing(pluginName, path, referer).serveResourceBundle();
         } else {

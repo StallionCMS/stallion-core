@@ -46,6 +46,14 @@ public class ModeFlags {
                 environmentType = DataEnvironmentType.STAGING;
             } else if ("test".equals(env) || "jenkins".equals(env)) {
                 environmentType = DataEnvironmentType.TEST;
+            } else if (env.contains("prod")) {
+                environmentType = DataEnvironmentType.PRODUCTION;
+            } else if (env.contains("qa")) {
+                environmentType = DataEnvironmentType.STAGING;
+            } else if (env.contains("staging")) {
+                environmentType = DataEnvironmentType.STAGING;
+            } else if (env.contains("dev")) {
+                environmentType = DataEnvironmentType.SANDBOX;
             } else {
                 environmentType = DataEnvironmentType.STAGING;
             }

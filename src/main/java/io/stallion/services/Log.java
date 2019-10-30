@@ -135,9 +135,9 @@ public class Log {
         //System.out.println(message);
         if (alwaysIncludeLineNumber) {
             Throwable t = new Throwable();
-            t.getStackTrace()[2].toString();
-            String clz = t.getStackTrace()[2].getClassName().replace("io.stallion.", "");
-            String method = t.getStackTrace()[2].getMethodName();
+            t.getStackTrace()[1].toString();
+            String clz = t.getStackTrace()[1].getClassName().replace("io.stallion.", "");
+            String method = t.getStackTrace()[1].getMethodName();
             logger.logp(Level.FINE, clz, method, message, args);
         } else {
             logger.logp(Level.FINE, "", "", message, args);
@@ -153,9 +153,9 @@ public class Log {
         //System.out.println(message);
 
         Throwable t = new Throwable();
-        t.getStackTrace()[2].toString();
-        String clz = t.getStackTrace()[2].getClassName().replace("io.stallion.", "");
-        String method = t.getStackTrace()[2].getMethodName();
+        t.getStackTrace()[1].toString();
+        String clz = t.getStackTrace()[1].getClassName().replace("io.stallion.", "");
+        String method = t.getStackTrace()[1].getMethodName();
         logger.logp(Level.FINER, clz, method, message, args);
 
     }
@@ -166,9 +166,9 @@ public class Log {
         }
         //System.out.println(message);
         Throwable t = new Throwable();
-        t.getStackTrace()[2].toString();
-        String clz = t.getStackTrace()[2].getClassName().replace("io.stallion.", "");
-        String method = t.getStackTrace()[2].getMethodName();
+        t.getStackTrace()[1].toString();
+        String clz = t.getStackTrace()[1].getClassName().replace("io.stallion.", "");
+        String method = t.getStackTrace()[1].getMethodName();
         logger.logp(Level.FINEST, clz, method, message, args);
 
     }

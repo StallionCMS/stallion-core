@@ -60,7 +60,7 @@ public class SecretsCommandLineManager {
     }
 
     public SecretsVault loadVault(String appPath, SecretsSettings secretsSettings, String password) {
-
+        Log.finer("Load secrets vault");
         targetFolder = appPath;
         keyringServiceName = "Stallion Secrets Key: " + targetFolder;
 
@@ -77,7 +77,7 @@ public class SecretsCommandLineManager {
             password = findPasswordFromFile(secretsSettings);
         }
 
-
+        Log.finest("Find get password from keyring.");
         if (empty(password)) {
             password = findPasswordInKeyring();
         }
@@ -102,6 +102,7 @@ public class SecretsCommandLineManager {
         vault = new SecretsVault(targetFolder, password);
 
         promptStorePassword(password);
+        Log.finer("End load secrets vault");
         return vault;
     }
 

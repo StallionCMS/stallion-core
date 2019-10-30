@@ -19,6 +19,7 @@ package io.stallion;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -91,11 +92,15 @@ public abstract class StallionApplication extends StallionJavaPlugin {
 
 
         // Load the plugin jars, to get additional actions
+        System.out.println("Load plugins in io.stallion.StallionApplication.run at " + LocalDateTime.now().toString());
         PluginRegistry.loadWithJavaPlugins(targetPath, plugins);
+        System.out.println("Load the run action in io.stallion.StallionApplication.run at " + LocalDateTime.now().toString());
         StallionRunAction action = loadTheRunAction(args);
         CommandOptionsBase options = loadCommandLineOptions(targetPath, action, args, plugins);
         registerShutdownHooks();
+        System.out.println("Load settings in io.stallion.StallionApplication.run at " + LocalDateTime.now().toString());
         loadSettings(options, action);
+        System.out.println("Load logger in io.stallion.StallionApplication.run at " + LocalDateTime.now().toString());
         loadLogger(options);
 
 
@@ -285,6 +290,7 @@ public abstract class StallionApplication extends StallionJavaPlugin {
         if (!Settings.instance().getLogToConsole()) {
             Log.disableConsoleHandler();
         }
+        Log.info("Logger initialized.");
     }
 
     public void initializeRegistriesAndServices(boolean testMode) {
@@ -294,15 +300,19 @@ public abstract class StallionApplication extends StallionJavaPlugin {
         SlugRegistry.load();
 
         // Data sources
+        Log.info("Initialize database and caches");
         DB.load();
         FilterCache.load();
         DataAccessRegistry.load();
+        Log.info("Initialize AssetsController");
         AssetsController.load();
+        Log.info("Load dynamic settings");
         DynamicSettings.load();
 
         TemplateRenderer.load();
 
         // Load users, admin and other default functionality
+        Log.info("Register TransactionLogController, AuditTrailController, UserController.");
         TransactionLogController.register();
         AuditTrailController.register();
         UserController.load();
@@ -310,6 +320,7 @@ public abstract class StallionApplication extends StallionJavaPlugin {
         //ListingEndpoints.register();
         ListingExporter.register();
 
+        Log.info("Register JobStatusController, SimpleAysncRunner and AsyncCoordinator");
         JobStatusController.selfRegister();
 
         SimpleAsyncRunner.load(testMode);
@@ -344,6 +355,7 @@ public abstract class StallionApplication extends StallionJavaPlugin {
 
     public void startJobAndTaskProcessingServices(boolean testMode) {
         if (!testMode) {
+            Log.info("Start all services and watchers (JobCoordinator, AsyncCoordinator, HealthTracker, etc.");
             if (AsyncCoordinator.instance() != null) {
                 AsyncCoordinator.startup();
             }

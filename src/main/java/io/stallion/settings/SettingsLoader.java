@@ -160,7 +160,7 @@ public class SettingsLoader  {
                 Object value = cs.get(key);
                 if (value instanceof  String && ((String) value).startsWith("secret:::")) {
                     String secretName = ((String) value).substring(9);
-                    Log.info("Load secret {0} ", secretName);
+                    Log.finer("Load secret {0} ", secretName);
                     value = SecretsVault.getAppSecrets().getOrDefault(secretName, null);
                     cs.put(key, value);
                 }
@@ -193,7 +193,7 @@ public class SettingsLoader  {
 
             if (value instanceof String && value != null && ((String) value).startsWith("secret:::")) {
                 String secretName = ((String) value).substring(9);
-                Log.info("Load secret {0} ", secretName);
+                Log.finer("Load secret {0} ", secretName);
                 value = SecretsVault.getAppSecrets().getOrDefault(secretName, null);
                 field.set(settings, value);
             }
