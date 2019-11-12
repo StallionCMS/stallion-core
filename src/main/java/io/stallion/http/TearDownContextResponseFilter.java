@@ -18,6 +18,7 @@
 package io.stallion.http;
 
 import io.stallion.Context;
+import io.stallion.services.Log;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -32,6 +33,12 @@ public class TearDownContextResponseFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) throws IOException {
+        if (containerRequestContext.getUriInfo().getPath().startsWith("/st-assets")
+                || containerRequestContext.getUriInfo().getPath().startsWith("/st-resource")) {
+            Log.finest("Response: {0} {1} for request {2}", containerResponseContext.getLength(), containerResponseContext.getStatus(), containerRequestContext.getUriInfo().getPath());
+        } else {
+            Log.fine("Response: {0} {1} for request {2}", containerResponseContext.getLength(), containerResponseContext.getStatus(), containerRequestContext.getUriInfo().getPath());
+        }
         Context.setValet(null, null);
         Context.setUser(null);
         Context.setOrg(null);

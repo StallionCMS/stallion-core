@@ -20,6 +20,7 @@ package io.stallion.http;
 import io.stallion.Context;
 import io.stallion.requests.IRequest;
 import io.stallion.requests.RequestWrapper;
+import io.stallion.services.Log;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -39,7 +40,11 @@ public class PopulateContextRequestFilter implements ContainerRequestFilter {
         //containerRequestContext.getRequest();
 
         IRequest req = new RequestWrapper(containerRequestContext);
-
+        if (!req.getPath().startsWith("/st-resource") && !req.getPath().startsWith("/st-assets")) {
+            Log.fine("Request: {0} {1}", req.getMethod(), req.getPath() + req.getQueryString());
+        } else {
+            Log.finest("Request: {0} {1}", req.getMethod(), req.getPath() + req.getQueryString());
+        }
         Context.setRequest(
                 req
         );
