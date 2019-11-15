@@ -21,7 +21,7 @@
 
     <groupId>io.stallion</groupId>
     <artifactId>stallion-core</artifactId>
-    <version>1.0.1-beta-01-SNAPSHOT</version>
+    <version>1.0.2-beta-01-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>stallion-core</name>
@@ -36,13 +36,21 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.8.0</version>
                 <configuration>
+                    <release>11</release>
                     <!-- or whatever version you use -->
-                    <source>1.8</source>
-                    <target>1.8</target>
                     <staleMillis>1</staleMillis>
                 </configuration>
             </plugin>
@@ -50,7 +58,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.5.0</version>
+                <version>1.6.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -62,7 +70,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
+                <version>3.1.1</version>
                 <configuration>
                     <top><![CDATA[<link rel="stylesheet" href="/st-assets/css/javadoc.css"><div class="stallion-logo-bar-top"><a target="_top" href="https://stallion.io"><img class="logo-100" src="/st-assets/stallion-rearing-white-100.png"> <span class="logo-text">Stallion: The Blazing Fast, Rock Solid CMS</span></a></div>]]></top>
                     <footer><![CDATA[<script src="/st-assets/js/javadoc.js"></script>]]></footer>
@@ -99,7 +107,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -128,7 +136,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh</artifactId>
-                <version>2.10</version>
+                <version>3.3.4</version>
             </extension>
         </extensions>
     </build>
@@ -139,147 +147,152 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.7.v20170914</version>
+            <version>9.4.22.v20191022</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.7.v20170914</version>
+            <version>9.4.22.v20191022</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>9.4.7.v20170914</version>
+            <version>9.4.22.v20191022</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-continuation</artifactId>
-            <version>9.4.7.v20170914</version>
+            <version>9.4.22.v20191022</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>javax.inject</artifactId>
-            <version>2.5.0-b42</version>
+            <version>2.5.0-b62</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.4</version>
+            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-common</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>
             <artifactId>jersey-test-framework-provider-jetty</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>
             <artifactId>jersey-test-framework-provider-inmemory</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-jetty-http</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-entity-filtering</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.6</version>
+            <version>4.5.10</version>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1</version>
+            <version>2.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.8.10</version>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.8.10</version>
+            <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>2.8.10</version>
+            <version>2.10.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.8.10</version>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.8.10</version>
+            <version>2.10.1</version>
 
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>2.8.10</version>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
         <dependency>
             <groupId>org.pegdown</groupId>
@@ -291,13 +304,13 @@
         <dependency>
             <groupId>com.hubspot.jinjava</groupId>
             <artifactId>jinjava</artifactId>
-            <version>2.4.4</version>
+            <version>2.5.2</version>
         </dependency>
 
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.3</version>
+            <version>1.9.4</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -313,12 +326,12 @@
         <dependency>
             <groupId>org.apache.xbean</groupId>
             <artifactId>xbean-classloader</artifactId>
-            <version>4.9</version>
+            <version>4.15</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.2</version>
+            <version>4.4</version>
         </dependency>
         <dependency>
             <groupId>com.moandjiezana.toml</groupId>
@@ -341,13 +354,13 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>2.2.6</version>
+            <version>2.5.1</version>
         </dependency>
         <!-- http://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4.1211</version>
+            <version>42.2.8.jre7</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/sax/sax -->
         <dependency>
@@ -365,12 +378,12 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.11</version>
+            <version>1.13</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.6.1</version>
+            <version>1.6.2</version>
         </dependency>
 
         <dependency>
@@ -391,7 +404,7 @@
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
-            <version>2.14.2</version>
+            <version>2.14.6</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
@@ -411,28 +424,28 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
+            <version>1.7.29</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.21</version>
+            <version>1.7.29</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.384</version>
+            <version>1.11.673</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-            <version>2.6.0</version>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.jodd</groupId>
             <artifactId>jodd-lagarto</artifactId>
-            <version>5.0.3</version>
+            <version>5.1.0-20190624</version>
         </dependency>
         <dependency>
             <groupId>net.east301</groupId>
@@ -442,7 +455,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
-            <version>5.0.7.RELEASE</version>
+            <version>5.2.1.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>io.stallion</groupId>
@@ -465,23 +478,23 @@
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-core</artifactId>
-
+            <version>3.10.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-jpa</artifactId>
-
+            <version>3.10.1</version>
         </dependency>
         <dependency>
             <groupId>org.jdbi</groupId>
             <artifactId>jdbi3-sqlobject</artifactId>
-
+            <version>3.10.1</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.test-framework</groupId>
             <artifactId>jersey-test-framework-core</artifactId>
-            <version>2.27</version>
+            <version>2.29.1</version>
         </dependency>
     </dependencies>
 

@@ -23,8 +23,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import io.stallion.exceptions.JsonWriteException;
-import jdk.nashorn.api.scripting.JSObject;
-import jdk.nashorn.internal.runtime.ScriptObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,10 +47,11 @@ public class JSON {
 
         SimpleModule mod = new SimpleModule("nashornConverter", Version.unknownVersion());
 
+        /* Nashorn deprecated
         mod.addSerializer(JSObject.class, new JSObjectSerializer());
         mod.addSerializer(ScriptObject.class, new ScriptObjectSerializer());
         mod.addDeserializer(JSObject.class, new JSObjectDeserializer());
-
+*/
 
         //SimpleModule mod2 = new SimpleModule("rawJsonConverter", Version.unknownVersion());
         //mod2.addSerializer(RawJson.class, new RawJsonSerializer());
@@ -93,6 +92,7 @@ public class JSON {
         }
     }
 
+    /*
     public static JSObject parse(String json) throws io.stallion.exceptions.JsonMappingException {
         try {
             return mapper.readValue(json, JSObject.class);
@@ -100,6 +100,8 @@ public class JSON {
             throw new io.stallion.exceptions.JsonMappingException("Exception parsing json", e);
         }
     }
+
+     */
 
     public static List parseList(String json) throws io.stallion.exceptions.JsonMappingException {
         try {

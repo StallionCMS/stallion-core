@@ -18,11 +18,12 @@
 package io.stallion.assets;
 
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+
 import io.stallion.Context;
 import io.stallion.exceptions.UsageException;
 import io.stallion.settings.Settings;
 import io.stallion.utils.ResourceHelpers;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
@@ -163,7 +164,8 @@ public class AssetsController {
             path = "/assets" + path;
         }
         if (base64encode) {
-            return Base64.encode(ResourceHelpers.loadBinaryResource(plugin, path));
+            return Base64.encodeBase64String(ResourceHelpers.loadBinaryResource(plugin, path));
+            //return Base64.encode();
         } else {
             return ResourceHelpers.loadAssetResource(plugin, path);
         }
