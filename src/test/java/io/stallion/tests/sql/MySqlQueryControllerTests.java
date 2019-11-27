@@ -39,6 +39,7 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -231,6 +232,7 @@ public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
     @Test
     public void testAllColumnTypes() {
         String location = "Central Park " + UUID.randomUUID().toString();
+        LocalDate replyBy = LocalDate.of(2019, 3, 14);
         Picnic picnic = new Picnic()
                 .setAdminIds(set(123L, 124L))
                 .setDishes(list("salad", "burgers"))
@@ -238,6 +240,7 @@ public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
                         new PicnicAttendence().setCount(2).setName("Jamie Doe").setRsvp(PicnicRsvpStatus.YES),
                         new PicnicAttendence().setCount(1).setName("Jane Smith").setRsvp(PicnicRsvpStatus.NO)
                 ))
+                .setReplyBy(replyBy)
                 .setCanceled(false)
                 .setDate(ZonedDateTime.of(2019, 3, 20, 10, 30, 0, 0, ZoneId.of("UTC")))
                 .setDescription("We will be meeting at the Great Park")
@@ -258,6 +261,16 @@ public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
         assertEquals(picnic.getExtra(), picnic2.getExtra());
         assertEquals(picnic.getDate(), picnic2.getDate());
         assertEquals("Jamie Doe", picnic.getAttendees().get(0).getName());
+        assertEquals(picnic.getReplyBy(), picnic2.getReplyBy());
+
+        String picnicJson = JSON.stringify(picnic);
+        Picnic picnic3 = JSON.parse(picnicJson, Picnic.class);
+
+        assertEquals(picnic.getDate(), picnic3.getDate());
+        assertEquals(picnic.getReplyBy(), picnic3.getReplyBy());
+
+        Picnic picnic4 = JSON.parse("{\"replyBy\": \"2019-03-14\"}", Picnic.class);
+        assertEquals(picnic.getReplyBy(), picnic4.getReplyBy());
 
     }
 

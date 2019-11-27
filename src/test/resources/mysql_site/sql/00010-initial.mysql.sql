@@ -31,6 +31,7 @@ CREATE TABLE `stallion_test_payment` (
 CREATE TABLE `stallion_test_picnic` (
   `id` bigint NOT NULL,
   `date` datetime DEFAULT NULL,
+  `replyBy` date DEFAULT NULL,
   `deleted` bit DEFAULT 0,
   `canceled` bit DEFAULT 0,
   `location` VARCHAR(100) NOT NULL DEFAULT '',

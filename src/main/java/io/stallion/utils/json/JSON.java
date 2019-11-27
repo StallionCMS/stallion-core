@@ -15,18 +15,23 @@
  */
 package io.stallion.utils.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import io.stallion.exceptions.JsonWriteException;
 import jdk.nashorn.api.scripting.JSObject;
-import jdk.nashorn.internal.runtime.ScriptObject;
+
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +40,6 @@ public class JSON {
 
     private static final ObjectMapper mapper;
 
-
     static {
 
         mapper = new ObjectMapper();
@@ -43,14 +47,21 @@ public class JSON {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+
         mapper.registerModule(new JavaTimeModule());
+
+        //mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.registerModule(new JaxbAnnotationModule());
         //mapper.findAndRegisterModules();
+
+        SimpleModule customMod = new SimpleModule("customConversions", Version.unknownVersion());
+        customMod.addSerializer(new LocalDateAsStringSerializer());
+        mapper.registerModule(customMod);
 
         SimpleModule mod = new SimpleModule("nashornConverter", Version.unknownVersion());
 
         mod.addSerializer(JSObject.class, new JSObjectSerializer());
-        mod.addSerializer(ScriptObject.class, new ScriptObjectSerializer());
+
         mod.addDeserializer(JSObject.class, new JSObjectDeserializer());
 
 
