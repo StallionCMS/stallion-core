@@ -33,6 +33,8 @@ import org.parboiled.common.FileUtils;
 import javax.script.ScriptEngine;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -355,6 +357,10 @@ public class SqlGenerationAction  implements StallionRunAction<SqlGenerateComman
             return "double";
         } else if (column.getjType() == ZonedDateTime.class) {
             return "datetime";
+        } else if (column.getjType() == LocalDateTime.class) {
+            return "datetime";
+        } else if (column.getjType() == LocalDate.class) {
+            return "date";
         } else if (List.class.isAssignableFrom(column.getjType())) {
             return "longtext";
         } else if (Map.class.isAssignableFrom(column.getjType())) {
