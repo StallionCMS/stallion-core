@@ -17,9 +17,9 @@
 
 package io.stallion.asyncTasks;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import io.stallion.services.Log;
+
+import java.util.concurrent.*;
 
 /**
  * The SimpleAsyncRunner is an alternative way to run asynchronous tasks from AsyncCoordinator.
@@ -61,13 +61,25 @@ public class SimpleAsyncRunner {
         _instance = null;
     }
 
-    private ExecutorService pool;
-
+    private ThreadPoolExecutor pool;
+    //ThreadPoolExecutor
     public SimpleAsyncRunner() {
-        pool = Executors
+        pool = (ThreadPoolExecutor)Executors
                 .newFixedThreadPool(5);
+        pool.setThreadFactory(new ExceptionCatchingThreadFactory(pool.getThreadFactory()));
     }
 
+    public SimpleAsyncRunner submit(SimpleWrappedRunnable runnable) {
+        if (syncMode) {
+            runnable.run();
+        } else {
+            pool.submit(runnable);
+        }
+        return this;
+    }
+
+
+    @Deprecated
     public SimpleAsyncRunner submit(Runnable runnable) {
         if (syncMode) {
             runnable.run();
@@ -75,6 +87,27 @@ public class SimpleAsyncRunner {
             pool.submit(runnable);
         }
         return this;
+    }
+
+    public static class ExceptionCatchingThreadFactory implements ThreadFactory {
+        private final ThreadFactory delegate;
+
+        private ExceptionCatchingThreadFactory(ThreadFactory delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = delegate.newThread(r);
+            t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread t2, Throwable e) {
+                    Log.exception(e, "Error in SimpleAsyncRunner executing thread for {0}", r.getClass().getCanonicalName());
+                }
+            });
+            return t;
+
+        }
     }
 
 }
