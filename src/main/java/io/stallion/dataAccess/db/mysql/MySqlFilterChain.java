@@ -33,8 +33,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -275,6 +279,10 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             return "%" + val.toString() + "%";
         } else if (val instanceof ZonedDateTime) {
             return DateUtils.SQL_FORMAT.format(((ZonedDateTime) val).withZoneSameInstant(Literals.UTC));
+        } else if (val instanceof LocalDateTime) {
+            return DateUtils.SQL_FORMAT.format(((LocalDateTime) val));
+        } else if (val instanceof LocalDate) {
+            return DateTimeFormatter.ISO_LOCAL_DATE.format((LocalDate) val);
         } else if (val != null && val.getClass().isEnum()) {
             return val.toString();
         } else {

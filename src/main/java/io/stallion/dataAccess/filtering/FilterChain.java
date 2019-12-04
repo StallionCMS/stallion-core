@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.persistence.Column;
 import javax.ws.rs.NotFoundException;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -1062,7 +1063,9 @@ public class FilterChain<T extends Model> implements Iterable<T> {
 
         int i;
         if (propValue instanceof ZonedDateTime) {
-            i = ((ZonedDateTime) op.getTypedValue()).compareTo((ZonedDateTime)propValue);
+            i = ((ZonedDateTime) op.getTypedValue()).compareTo((ZonedDateTime) propValue);
+        } else if (propValue instanceof LocalDate) {
+            i = ((LocalDate) op.getTypedValue()).compareTo((LocalDate) propValue);
         } else {
             i = op.getComparableValue().compareTo(propValue);
         }

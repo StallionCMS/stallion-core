@@ -27,6 +27,7 @@ package io.stallion.reflection;
 
 import io.stallion.dataAccess.MappedModel;
 import io.stallion.exceptions.IllegalEnumValue;
+import io.stallion.utils.DateUtils;
 import io.stallion.utils.GeneralUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +39,9 @@ import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static io.stallion.utils.Literals.UTC;
@@ -478,30 +481,54 @@ public final class PropertyUtils {
             return ((Long)value).intValue();
         }
         // Convert ints and longs to ZonedDateTime, if ZonedDateTime was a long
-        if (destinationClass == ZonedDateTime.class && (
-                value.getClass() == long.class ||
-                value.getClass() == Long.class ||
-                value.getClass() == int.class ||
-                value.getClass() == Integer.class
-                )
+        if (destinationClass == ZonedDateTime.class) {
+            if (
+                    value.getClass() == long.class ||
+                            value.getClass() == Long.class ||
+                            value.getClass() == int.class ||
+                            value.getClass() == Integer.class
             ) {
-            if (value.getClass() == Integer.class || value.getClass() == int.class) {
-                return ZonedDateTime.ofInstant(Instant.ofEpochMilli(((int) value) * 1000), GeneralUtils.UTC);
-            } else {
-                return ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) value), GeneralUtils.UTC);
+                if (value.getClass() == Integer.class || value.getClass() == int.class) {
+                    return ZonedDateTime.ofInstant(Instant.ofEpochMilli(((int) value) * 1000), GeneralUtils.UTC);
+                } else {
+                    return ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) value), GeneralUtils.UTC);
+                }
             }
+            if (value instanceof Timestamp) {
+                return ZonedDateTime.ofInstant(((Timestamp) value).toInstant(), UTC);
+            }
+            if (value.getClass() == double.class || value.getClass() == Double.class) {
+                return ZonedDateTime.ofInstant(Instant.ofEpochMilli(Math.round((Double)value)), GeneralUtils.UTC);
+            }
+            if (value.getClass() == String.class) {
+                String dval = (String)value;
+                if ("".equals(dval)) {
+                    return null;
+                } else if (dval.contains("t") || dval.contains("T")) {
+                    return DateTimeFormatter.ISO_LOCAL_DATE.parse(dval);
+                } else {
+                    if (dval.length() > 19) {
+                        return DateUtils.SQL_FORMAT_ZONED.parse(dval);
+                    } else {
+                        return DateUtils.SQL_FORMAT.parse(dval);
+                    }
+                }
+            }
+
         }
 
-        if (destinationClass == ZonedDateTime.class && value instanceof Timestamp) {
-            return ZonedDateTime.ofInstant(((Timestamp) value).toInstant(), UTC);
+        if (destinationClass == LocalDate.class && value.getClass().equals(String.class)) {
+            if ("".equals(value)) {
+                return null;
+            }
+            return DateTimeFormatter.ISO_LOCAL_DATE.parse((String)value);
         }
+
+       
         if (destinationClass == Long.class && value instanceof BigInteger) {
             return ((BigInteger) value).longValue();
         }
 
-        if (destinationClass == ZonedDateTime.class && (value.getClass() == double.class || value.getClass() == Double.class)) {
-            return ZonedDateTime.ofInstant(Instant.ofEpochMilli(Math.round((Double)value)), GeneralUtils.UTC);
-        }
 
         // Convert Strings to Enums, if target type was an enum
         if (destinationClass.isEnum()) {
