@@ -43,6 +43,7 @@ public class DateUtils {
     public static final DateTimeFormatter SQL_FORMAT =       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final DateTimeFormatter SQL_FORMAT_ZONED =       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss VV");
     public static final DateTimeFormatter MINUTE_FORMAT =    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static final DateTimeFormatter HOUR_FORMAT =    DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
     public static final DateTimeFormatter DAY_FORMAT =    DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 

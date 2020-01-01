@@ -41,15 +41,16 @@ public class EndpointResourceTest extends AppIntegrationCaseBase {
     public void testIntrospectResource() {
         List<JavaRestEndpoint> endpoints = new ResourceToEndpoints("/_stx/junit-endpoints").convert(new HelloResource());
         Assert.assertEquals(4, endpoints.size());
-        JavaRestEndpoint nameEndpoint;
-        JavaRestEndpoint personEndpoint;
-        if (endpoints.get(0).getRoute().endsWith("name")) {
-            nameEndpoint = endpoints.get(0);
-            personEndpoint = endpoints.get(1);
-        } else {
-            nameEndpoint = endpoints.get(1);
-            personEndpoint = endpoints.get(0);
+        JavaRestEndpoint nameEndpoint = null;
+        JavaRestEndpoint personEndpoint = null;
+        for(JavaRestEndpoint endpoint: endpoints) {
+            if (endpoint.getRoute().contains(":name")) {
+                nameEndpoint = endpoint;
+            } else if (endpoint.getRoute().contains(":person")) {
+                personEndpoint = endpoint;
+            }
         }
+        
         Assert.assertEquals("/_stx/junit-endpoints/hello/:name", nameEndpoint.getRoute());
         Assert.assertEquals("/_stx/junit-endpoints/hello/:person", personEndpoint.getRoute());
         Assert.assertEquals("POST", personEndpoint.getMethod());
