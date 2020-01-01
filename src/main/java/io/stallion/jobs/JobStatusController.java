@@ -104,7 +104,7 @@ public class JobStatusController extends StandardModelController<JobStatus> {
             if (!empty(job.getLockedAt())) {
                 Log.info("Job is locked: {0} {1}", job.getName(), job.getLockedAt());
                 if ((now.toInstant().getEpochSecond() - job.getLockedAt()) > (2 * 60 * 60 * 1000)) {
-                    Log.warn("Job locked for more than 120 minutes! Resetting the lock.");
+                    Log.warn("Job locked for more than 120 minutes! Resetting the lock for job {0}", job.getName());
                     resetLockAndNextRunAt(job, now.plusMinutes(1));
                 }
                 continue;
@@ -151,7 +151,7 @@ public class JobStatusController extends StandardModelController<JobStatus> {
         ZonedDateTime next = definition.getSchedule().nextAt(now);
         jobStatus.setNextExecuteAt(next);
         jobStatus.setNextExecuteMinuteStamp(TIME_STAMP_FORMAT.format(next));
-        Log.fine("Job {0} set to run next at {1}", jobStatus.getName(), jobStatus.getNextExecuteMinuteStamp());
+        Log.info("Job {0} set to run next at {1}", jobStatus.getName(), jobStatus.getNextExecuteMinuteStamp());
         save(jobStatus);
     }
 

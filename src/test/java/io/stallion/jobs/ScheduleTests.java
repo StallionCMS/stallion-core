@@ -137,6 +137,26 @@ public class ScheduleTests  {
 
         }
 
+
+        {
+
+            Schedule schedule = new Schedule()
+                    .everyMonth()
+                    .everyDay()
+                    .hours(9)
+                    .timezone("America/New_York")
+                    .minutes(0)
+                    .verify()
+                    ;
+            now = ZonedDateTime.of(2019, 12, 31,
+                    14, 1, 0, 0, ZoneId.of("UTC"));
+            expected = ZonedDateTime.of(2020, 1, 1,
+                    14, 0, 0, 0, ZoneId.of("UTC"));
+            actual = schedule.nextAt(now);
+            Assert.assertEquals(expected, actual);
+
+        }
+
     }
 
     @Test

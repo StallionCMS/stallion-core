@@ -23,6 +23,7 @@ import io.stallion.utils.DateUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Handles the actually running of a Job on a different thread, with reporting
@@ -71,7 +72,11 @@ class JobInstanceDispatcher implements Runnable {
             status.setError("");
             ZonedDateTime nextRunAt = definition.getSchedule().nextAt(DateUtils.utcNow().plusMinutes(3));
             Long nextCompleteBy = nextRunAt.plusMinutes(definition.getAlertThresholdMinutes()).toInstant().toEpochMilli();
-            Log.info("Job Completed: {0} Threshold minutes: {1} next complete by: {2}", definition.getName(), definition.getAlertThresholdMinutes(), nextCompleteBy);
+            Log.info("Job Completed: {0} next run at: {1} Threshold minutes: {2} next complete by: {2} ",
+                    DateTimeFormatter.ISO_DATE_TIME.format(nextRunAt),
+                    definition.getName(), definition.getAlertThresholdMinutes(),
+                    nextCompleteBy
+            );
             status.setShouldSucceedBy(nextCompleteBy);
             JobStatusController.instance().save(status);
         } catch (Exception e) {
