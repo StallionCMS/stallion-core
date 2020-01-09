@@ -128,6 +128,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         return uploaded;
     }
 
+
     protected File downloadExternalToLocalFile(U uploaded) {
 
         URI uri = URI.create(urlToFetch);
@@ -137,8 +138,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         String fullFileName = FilenameUtils.getName(uri.getPath());
         String extension = FilenameUtils.getExtension(fullFileName);
         String fileName = truncate(fullFileName, 85);
-        String relativePath = GeneralUtils.slugify(truncate(FilenameUtils.getBaseName(fullFileName), 75)) + "-" + DateUtils.mils() + "." + extension;
-        relativePath = "stallion-file-" + uploaded.getId() + "/" + GeneralUtils.secureRandomToken(8) + "/" + relativePath;
+        String relativePath = makeRelativePath(fullFileName, uploaded);
 
         String destPath = uploadsFolder + relativePath;
         try {
@@ -192,9 +192,15 @@ public class UploadRequestProcessor<U extends UploadedFile> {
                 .setPubliclyViewable(Settings.instance().getUserUploads().getUploadsArePublic())
                 .setId(id)
                 ;
+        onPreSaveNewUploadedFile(uploaded);
         fileController.save(uploaded);
         return uploaded;
     }
+
+    protected void onPreSaveNewUploadedFile(U uploaded) {
+        
+    }
+
 
     protected File writeMultiPartToLocalFile(U uploaded) throws IOException {
        // stRequest.setAsMultiPartRequest();
@@ -205,8 +211,7 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         String fullFileName = fileMetaData.getFileName(); //getFileNameFromPart(filePart);
         String extension = FilenameUtils.getExtension(fullFileName);
         String fileName = truncate(fullFileName, 85);
-        String relativePath = GeneralUtils.slugify(truncate(FilenameUtils.getBaseName(fullFileName), 75)) + "-" + DateUtils.mils() + "." + extension;
-        relativePath = "stallion-file-" + uploaded.getId() + "/" + GeneralUtils.secureRandomToken(8) + "/" + relativePath;
+        String relativePath = makeRelativePath(fullFileName, uploaded);
 
         String destPath = uploadsFolder + relativePath;
         FileUtils.forceMkdir(new File(destPath).getParentFile());
@@ -265,6 +270,16 @@ public class UploadRequestProcessor<U extends UploadedFile> {
         }
         return new File(destPath);
     }
+
+
+    protected String makeRelativePath(String fullFileName, U uploaded) {
+        String extension = FilenameUtils.getExtension(fullFileName);
+        String relativePath = GeneralUtils.slugify(truncate(FilenameUtils.getBaseName(fullFileName), 75)) + "-" + DateUtils.mils() + "." + extension;
+        relativePath = "stallion-file-" + uploaded.getId() + "/" + GeneralUtils.secureRandomToken(8) + "/" + relativePath;
+        return relativePath;
+
+    }
+
 
     protected String makeRawUrlForFile(U uploadedFile, String size) {
         String endingSlug = GeneralUtils.slugify(truncate(FilenameUtils.getBaseName(uploadedFile.getName()), 50));
