@@ -71,6 +71,20 @@ public class DateUtils {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(mils), UTC);
     }
 
+    /**
+     * Compares just the date part of a ZonedDateTime for equality, ignoring time.
+     * @param a
+     * @param b
+     * @return
+     */
+    public static boolean isDatePartEqual(ZonedDateTime a, ZonedDateTime b) {
+        if (a.getYear() == b.getYear() && a.getMonth() == b.getMonth() &&
+        a.getDayOfMonth() == b.getDayOfMonth()) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Formats a ZonedDateTime into a string with the given DateTimeFormatter pattern

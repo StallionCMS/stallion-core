@@ -23,6 +23,7 @@ import io.stallion.dataAccess.db.converters.JsonSetConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class Picnic extends ModelBase {
     private List<String> dishes = list();
     private Map<String, Object> extra = map();
     private PicnicType type = PicnicType.INVITEES_ONLY;
+    private LocalDate replyBy;
 
 
     @Column
@@ -134,6 +136,16 @@ public class Picnic extends ModelBase {
 
     public Picnic setType(PicnicType type) {
         this.type = type;
+        return this;
+    }
+
+    @Column(nullable = false)
+    public LocalDate getReplyBy() {
+        return replyBy;
+    }
+
+    public Picnic setReplyBy(LocalDate replyBy) {
+        this.replyBy = replyBy;
         return this;
     }
 }

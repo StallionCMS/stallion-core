@@ -82,6 +82,9 @@ public class JdbiModelMapper <T extends Model> implements RowMapper<T> {
                     //value = ((Timestamp)value)
                     value = ZonedDateTime.ofInstant(((Timestamp) value).toInstant(), ZoneId.of("UTC"));
                 }
+                if (value instanceof Date) {
+                    value = ((Date)value).toLocalDate();
+                }
                 if (value == null && col.getDefaultValue() != null) {
                     value = col.getDefaultValue();
                 }

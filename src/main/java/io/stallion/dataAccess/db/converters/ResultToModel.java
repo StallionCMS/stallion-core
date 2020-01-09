@@ -31,6 +31,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -76,6 +77,9 @@ public interface ResultToModel<T extends Model> {
                 if (value instanceof Timestamp) {
                     //value = ((Timestamp)value)
                     value = ZonedDateTime.ofInstant(((Timestamp) value).toInstant(), ZoneId.of("UTC"));
+                }
+                if (value instanceof Date) {
+                    value = ((Date) value).toLocalDate();
                 }
                 if (value == null && col.getDefaultValue() != null) {
                     value = col.getDefaultValue();

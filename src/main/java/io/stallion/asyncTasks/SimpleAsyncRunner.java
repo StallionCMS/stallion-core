@@ -62,13 +62,24 @@ public class SimpleAsyncRunner {
     }
 
     private ThreadPoolExecutor pool;
-//ThreadPoolExecutor
+
     public SimpleAsyncRunner() {
         pool = (ThreadPoolExecutor)Executors
                 .newFixedThreadPool(5);
         pool.setThreadFactory(new ExceptionCatchingThreadFactory(pool.getThreadFactory()));
     }
 
+    public SimpleAsyncRunner submit(SimpleWrappedRunnable runnable) {
+        if (syncMode) {
+            runnable.run();
+        } else {
+            pool.submit(runnable);
+        }
+        return this;
+    }
+
+
+    @Deprecated
     public SimpleAsyncRunner submit(Runnable runnable) {
         if (syncMode) {
             runnable.run();
@@ -90,13 +101,12 @@ public class SimpleAsyncRunner {
             Thread t = delegate.newThread(r);
             t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
-                public void uncaughtException(Thread t, Throwable e) {
+                public void uncaughtException(Thread t2, Throwable e) {
                     Log.exception(e, "Error in SimpleAsyncRunner executing thread for {0}", r.getClass().getCanonicalName());
                 }
             });
             return t;
 
-            
         }
     }
 

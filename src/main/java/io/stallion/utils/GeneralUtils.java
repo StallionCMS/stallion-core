@@ -42,10 +42,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static io.stallion.utils.Literals.map;
@@ -122,6 +119,29 @@ public class GeneralUtils {
     public static String formatCurrency(Float amt) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         return formatter.format(amt);
+    }
+
+    public static String lexicalJoin(List<String> items) {
+        if (items == null || items.size() == 0) {
+            return "";
+        } else if (items.size() == 1) {
+            return items.get(0);
+        } else if (items.size() == 2) {
+            return items.get(0) + " and " + items.get(1);
+        } else {
+            StringBuilder builder = new StringBuilder();
+            for(int i = 0; i<items.size(); i++) {
+                builder.append(items.get(i));
+                if (i + 1 == items.size()) {
+                    continue;
+                } else if (i + 2 == items.size()) {
+                    builder.append(", and ");
+                } else{
+                    builder.append(", ");
+                }
+            }
+            return builder.toString();
+        }
     }
 
 
