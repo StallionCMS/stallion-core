@@ -161,6 +161,8 @@ public class InternalEndpoints  {
         info.setxUpstreamForwardedProto(request().getHeader("x-upstream-forwarded-proto"));
         info.setEnv(Settings.instance().getEnv());
         info.setPort(settings().getPort());
+        info.setJavaVendor(System.getProperty("java.vendor"));
+        info.setJavaVersion(System.getProperty("java.version"));
         List<ClassLoader> loaders = new ArrayList<>();
         loaders.add(getClass().getClassLoader());
         for (StallionJavaPlugin booter: PluginRegistry.instance().getJavaPluginByName().values()) {

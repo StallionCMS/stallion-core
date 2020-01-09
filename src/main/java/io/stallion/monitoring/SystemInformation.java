@@ -17,6 +17,7 @@
 
 package io.stallion.monitoring;
 
+import javax.persistence.Column;
 import java.util.Map;
 
 import static io.stallion.utils.Literals.map;
@@ -39,6 +40,8 @@ public class SystemInformation {
     private String guessedScheme = "";
     private String xForwardedProto = "";
     private String xUpstreamForwardedProto = "";
+    private String javaVersion = "";
+    private String javaVendor = "";
 
     public String getRemoteAddr() {
         return remoteAddr;
@@ -169,6 +172,24 @@ public class SystemInformation {
 
     public SystemInformation setxUpstreamForwardedProto(String xUpstreamForwardedProto) {
         this.xUpstreamForwardedProto = xUpstreamForwardedProto;
+        return this;
+    }
+
+    public String getJavaVersion() {
+        return javaVersion;
+    }
+
+    public SystemInformation setJavaVersion(String javaVersion) {
+        this.javaVersion = javaVersion;
+        return this;
+    }
+
+    public String getJavaVendor() {
+        return javaVendor;
+    }
+
+    public SystemInformation setJavaVendor(String javaVendor) {
+        this.javaVendor = javaVendor;
         return this;
     }
 }
