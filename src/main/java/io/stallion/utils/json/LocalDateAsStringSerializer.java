@@ -25,7 +25,9 @@ import java.util.Map;
 
 import static io.stallion.utils.Literals.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.stallion.services.Log;
@@ -41,22 +43,32 @@ public class LocalDateAsStringSerializer extends LocalDateSerializer {
         super();
     }
 
-    protected LocalDateAsStringSerializer(LocalDateSerializer base, Boolean useTimestamp, DateTimeFormatter dtf) {
-        super(base, useTimestamp, dtf);
+    protected LocalDateAsStringSerializer(LocalDateSerializer base, Boolean useTimestamp, DateTimeFormatter dtf, JsonFormat.Shape shape) {
+        super(base, useTimestamp, dtf, shape);
     }
+
+    
+    
+
 
     public LocalDateAsStringSerializer(DateTimeFormatter formatter) {
         super(formatter);
     }
 
-    protected LocalDateSerializer withFormat(Boolean useTimestamp, DateTimeFormatter dtf) {
-        return new LocalDateAsStringSerializer(this, useTimestamp, dtf);
+    protected LocalDateSerializer withFormat(Boolean useTimestamp, DateTimeFormatter dtf, JsonFormat.Shape shape) {
+        return new LocalDateAsStringSerializer(this, useTimestamp, dtf, shape);
     }
 
     public void serialize(LocalDate date, JsonGenerator generator, SerializerProvider provider) throws IOException {
 
         String str = this._formatter == null ? date.toString() : date.format(this._formatter);
         generator.writeString(str);
+
+    }
+
+    protected JsonToken serializationShape(SerializerProvider provider) {
+
+        return JsonToken.VALUE_STRING;
 
     }
 
