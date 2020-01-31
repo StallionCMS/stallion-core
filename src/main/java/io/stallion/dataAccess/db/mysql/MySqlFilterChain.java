@@ -29,6 +29,7 @@ import io.stallion.exceptions.UsageException;
 import io.stallion.services.Log;
 import io.stallion.utils.DateUtils;
 import io.stallion.utils.Literals;
+import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -40,6 +41,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -106,7 +108,9 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (op.isOrOperation()) {
                 addOrOperation(op, whereBuilder, params);
             } else {
-                if (op.getOperator().equals(FilterOperator.ANY)) {
+                if (op.getOperator().equals(FilterOperator.INTERSECTS)) {
+                    addIntersectsClause(whereBuilder, op, params);
+                } else if (op.getOperator().equals(FilterOperator.ANY)) {
                     addInClause(whereBuilder, op, params);
                 } else {
                     String operatorSql = op.getOperatorForSql();
@@ -149,6 +153,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         sqlBuilder.append(" LIMIT " + (page - 1) * size + ", " + size);
 
         Object[] paramObjects = params.toArray();
+        Log.finest(sqlBuilder.toString());
         setObjects(DB.instance().query(clazz, sqlBuilder.toString(), paramObjects));
 
         if (page == 1 && getObjects().size() < size) {
@@ -199,6 +204,8 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
     }
 
+
+
     public Double toDouble(Object obj) {
         if (obj instanceof BigInteger) {
             return ((BigInteger)obj).doubleValue();
@@ -246,6 +253,41 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
         }
         whereBuilder.append(")");
+    }
+
+    private void addIntersectsClause(StringBuilder whereBuilder, FilterOperation op, List<Object> params) {
+        Object val = op.getOriginalValue();
+        List<Object> items = list();
+        if (val == null) {
+            items.add(val);
+        } else if (val.getClass().isArray()) {
+            for(Object v: (Object[])val) {
+                items.add(v);
+            }
+        } else if (val instanceof Collection) {
+            for(Object v: (Collection)val) {
+                items.add(v);
+            }
+        } else {
+            items.add(val);
+        }
+        // If empty list, everything matches
+        if (items.size() == 0) {
+            whereBuilder.append(" true ");
+            return;
+        }
+        whereBuilder.append("(");
+
+        for(int i =0; i< items.size(); i++) {
+            if (i >= 1) {
+                whereBuilder.append(" OR ");
+            }
+            whereBuilder.append( " JSON_CONTAINS(" + op.getFieldName() + ", ?)");
+            params.add(JSON.stringify(items.get(i) ));
+        }
+
+        whereBuilder.append(")");
+
     }
 
     private void addInClause(StringBuilder whereBuilder, FilterOperation op, List<Object> params) {

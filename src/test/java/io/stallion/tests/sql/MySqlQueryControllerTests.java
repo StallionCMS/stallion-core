@@ -22,7 +22,9 @@ import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Pager;
+import io.stallion.dataAccess.filtering.SortDirection;
 import io.stallion.services.DynamicSettings;
 import io.stallion.services.Log;
 import io.stallion.testing.AppIntegrationCaseBase;
@@ -42,6 +44,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static io.stallion.utils.Literals.*;
@@ -164,11 +167,77 @@ public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
 
     @Test
     public void testComplexQueries() {
-        Log.warn("Implement me");
-        //TODO implement me
-        // Test exclude
-        // Test less than, greater than
-        // Test
+        DB.instance().execute("DELETE FROM stallion_test_picnic");
+        {
+            Picnic picnic = new Picnic()
+                    .setDescription("testComplexQueries")
+                    .setLocation("Arboretum")
+                    .setAdminIds(set(123L, 124L))
+                    .setDishes(list("salad", "burgers"));
+            PicnicController.instance().save(picnic);
+        }
+        {
+            Picnic picnic = new Picnic()
+                    .setDescription("testComplexQueries")
+                    .setLocation("Breeds Hill")
+                    .setAdminIds(set(500L, 124L))
+                    .setDishes(list("chips", "burgers", "tapas"));
+            PicnicController.instance().save(picnic);
+        }
+        {
+            Picnic picnic = new Picnic()
+                    .setDescription("testComplexQueries")
+                    .setLocation("Esplanad")
+                    .setAdminIds(set(600L, 700L))
+                    .setDishes(list("chips", "pitas", "salad"));
+            PicnicController.instance().save(picnic);
+        }
+        {
+            Picnic picnic = new Picnic()
+                    .setDescription("testComplexQueries")
+                    .setLocation("Washington Square")
+                    .setAdminIds(set(500L, 900L))
+                    .setDishes(list("pasta", "cookies", "cake"));
+            PicnicController.instance().save(picnic);
+        }
+
+        {
+            List<Picnic> results = PicnicController.instance()
+                    .filterChain()
+                    .filterBy("dishes", list("salad", "burgers"), FilterOperator.INTERSECTS)
+                    .sortBy("location", SortDirection.ASC)
+                    .all();
+            assertEquals(3, results.size());
+        }
+
+        {
+            List<Picnic> results = PicnicController.instance()
+                    .filterChain()
+                    .filterBy("dishes", list("burgers", "sdf'ads`f"), FilterOperator.INTERSECTS)
+                    .sortBy("location", SortDirection.ASC)
+                    .all();
+            assertEquals(2, results.size());
+        }
+
+        {
+            List<Picnic> results = PicnicController.instance()
+                    .filterChain()
+                    .filterBy("dishes", list(), FilterOperator.INTERSECTS)
+                    .sortBy("location", SortDirection.ASC)
+                    .all();
+            assertEquals(4, results.size());
+        }
+
+        {
+            List<Picnic> results = PicnicController.instance()
+                    .filterChain()
+                    .filterBy("adminIds", list(500L, 124L), FilterOperator.INTERSECTS)
+                    .sortBy("location", SortDirection.ASC)
+                    .all();
+            assertEquals(3, results.size());
+        }
+
+
     }
 
     @Test

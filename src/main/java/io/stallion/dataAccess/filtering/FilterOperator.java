@@ -28,7 +28,8 @@ public enum FilterOperator {
     IN,
     LIKE,
     ANY,
-    GREATER_THAN_OR_EQUAL
+    GREATER_THAN_OR_EQUAL,
+    INTERSECTS
     ;
     public static FilterOperator fromString(String op) {
         switch (op) {
@@ -58,6 +59,8 @@ public enum FilterOperator {
                 return LESS_THAN_OR_EQUAL;
             case "in":
                 return IN;
+            case "intersects":
+                return INTERSECTS;
             default:
                 return Enum.valueOf(FilterOperator.class, op);
         }
