@@ -851,7 +851,7 @@ public class FilterChain<T extends Model> implements Iterable<T> {
         List<T> items = new ArrayList<T>();
         for(T o: availableItems) {
             Boolean exclude = false;
-            if (getIncludeDeleted() != true && o.getDeleted() == true) {
+            if (getIncludeDeleted() != true && o.getDeleted() != null && o.getDeleted() == true) {
                 continue;
             }
             for (FilterOperation operation: getOperations()) {
