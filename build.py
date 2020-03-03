@@ -163,10 +163,12 @@ def copy():
 
     for folder in []:
         folder = folder.replace('~/', os.environ['HOME'] + '/')
-        shutil.copy(os.environ['HOME'] + '/st/distributions/dev/stallion-publisher', folder + '/bin/stallion-publisher')
+        if os.path.isdir(folder):
+            shutil.copy(os.environ['HOME'] + '/st/distributions/dev/stallion-publisher', folder + '/bin/stallion-publisher')
         
     for folder in ['~/repos/oldbooks', '~/repos/upfor', '~/repos/devinhelton', '~/st/sandbox-site', '~/repos/clubby-www', '~/repos/patfitzsimmons', '~/st/www']:
         folder = folder.replace('~/', os.environ['HOME'] + '/')
-        shutil.copy(os.environ['HOME'] + '/st/core/target/stallion', folder + '/bin/stallion')
+        if os.path.isdir(folder):
+            shutil.copy(os.environ['HOME'] + '/st/core/target/stallion', folder + '/bin/stallion')
 
 main()                

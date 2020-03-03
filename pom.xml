@@ -447,10 +447,11 @@
             <artifactId>jodd-lagarto</artifactId>
             <version>5.1.0-20190624</version>
         </dependency>
+
         <dependency>
-            <groupId>net.east301</groupId>
+            <groupId>com.github.javakeyring</groupId>
             <artifactId>java-keyring</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>

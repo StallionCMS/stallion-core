@@ -95,7 +95,7 @@ public class StandardModelController<T extends Model> implements ModelController
     }
 
     public T newModel(Map o, String ...fields) {
-        return newModel(o, false, fields);
+        return newModel(o, true, fields);
     }
 
     public T newModel(Map o, boolean skipUnwriteableFields) {

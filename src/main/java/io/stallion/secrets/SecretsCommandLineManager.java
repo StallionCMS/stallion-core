@@ -17,15 +17,13 @@
 
 package io.stallion.secrets;
 
+import com.github.javakeyring.PasswordAccessException;
 import io.stallion.boot.CommandOptionsBase;
 import io.stallion.services.Log;
 import io.stallion.settings.childSections.SecretsSettings;
 import io.stallion.utils.Prompter;
-import net.east301.keyring.BackendNotSupportedException;
-import net.east301.keyring.Keyring;
-import net.east301.keyring.PasswordRetrievalException;
-import net.east301.keyring.PasswordSaveException;
-import net.east301.keyring.util.LockException;
+import com.github.javakeyring.BackendNotSupportedException;
+import com.github.javakeyring.Keyring;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -178,6 +176,7 @@ public class SecretsCommandLineManager {
         // some backend directory handles a file to store password to disks.
         // in this case, we must set path to password store file by Keyring.setKeyStorePath
         // before using Keyring.getPassword and Keyring.getPassword.
+        /*
         if (keyring.isKeyStorePathRequired()) {
             try {
                 File keyStoreFile = File.createTempFile("keystore", ".keystore");
@@ -186,6 +185,7 @@ public class SecretsCommandLineManager {
                 throw new RuntimeException(ex);
             }
         }
+*/
 
         //
         // Retrieve password from password store
@@ -200,9 +200,7 @@ public class SecretsCommandLineManager {
                 inKeyChain = true;
             }
             return password;
-        } catch (LockException ex) {
-            throw new RuntimeException(ex);
-        } catch (PasswordRetrievalException ex) {
+        } catch (PasswordAccessException ex) {
             Log.info("Could not retrieve passphrase from the keychain");
             return "";
         }
@@ -233,6 +231,7 @@ public class SecretsCommandLineManager {
         // some backend directory handles a file to store password to disks.
         // in this case, we must set path to password store file by Keyring.setKeyStorePath
         // before using Keyring.getPassword and Keyring.getPassword.
+        /*
         if (keyring.isKeyStorePathRequired()) {
             try {
                 File keyStoreFile = File.createTempFile("keystore", ".keystore");
@@ -241,15 +240,15 @@ public class SecretsCommandLineManager {
                 throw new RuntimeException(ex);
             }
         }
+        */
+
 
         // Password can be stored to password store by using Keyring.setPassword method.
         // PasswordSaveException is thrown when some error happened while saving password.
         // LockException is thrown when keyring backend failed to lock password store file.
         try {
             keyring.setPassword(keyringServiceName, keyringAccountName, password);
-        } catch (LockException ex) {
-            throw new RuntimeException(ex);
-        } catch (PasswordSaveException ex) {
+        } catch (PasswordAccessException ex) {
             throw new RuntimeException(ex);
         }
 
