@@ -56,6 +56,7 @@ import static io.stallion.utils.Literals.*;
 public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
     private Class<T> clazz;
     private String table;
+    private String baseSql = "";
 
     public MySqlFilterChain(String table, String bucket, Class<T> clazz) {
         super(bucket);
@@ -77,6 +78,15 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         return newCopy(chain);
     }
 
+    public String getBaseSql() {
+        return baseSql;
+    }
+
+    public MySqlFilterChain<T> setBaseSql(String baseSql) {
+        this.baseSql = baseSql;
+        return this;
+    }
+
     @Override
     protected void process(int page, int size, boolean fetchTotalCount)  {
 
@@ -85,8 +95,8 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         }
 
         StringBuilder whereBuilder = new StringBuilder();
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT * FROM " + getSchema().getName());
+
+
 
         int x = 0;
         List<Object> params = new ArrayList<>();
@@ -115,9 +125,9 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
                 } else {
                     String operatorSql = op.getOperatorForSql();
                     if (operatorSql.equals("=") && op.getOriginalValue() == null) {
-                        whereBuilder.append(MessageFormat.format(" (`{0}` IS NULL) ", op.getFieldName()));
+                        whereBuilder.append(MessageFormat.format(" (`{0}`.`{1}` IS NULL) ", getSchema().getName(), op.getFieldName()));
                     } else {
-                        whereBuilder.append(MessageFormat.format(" (`{0}` {1} ?) ", op.getFieldName(), operatorSql));
+                        whereBuilder.append(MessageFormat.format(" (`{0}`.`{1}` {2} ?) ", getSchema().getName(), op.getFieldName(), operatorSql));
                         params.add(formatParam(op));
                     }
 
@@ -133,9 +143,20 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             whereBuilder.append(" deleted=0 ");
         }
         String whereSql = whereBuilder.toString();
-        if (whereSql.trim().length() > 0) {
-            whereSql = " WHERE " + whereSql;
-            sqlBuilder.append(whereSql);
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        if (Literals.empty(baseSql)) {
+            sqlBuilder.append("SELECT * FROM " + getSchema().getName() + " ");
+            if (whereSql.trim().length() > 0) {
+                whereSql = " WHERE " + whereSql;
+                sqlBuilder.append(whereSql);
+            }
+        } else {
+            sqlBuilder.append(baseSql);
+            if (whereSql.trim().length() > 0) {
+                whereSql = " AND (" + whereSql + ")";
+                sqlBuilder.append(whereSql);
+            }
         }
         if (!Literals.empty(getSortField())) {
             List<String> columnNames = apply(getSchema().getColumns(), col->col.getName());
@@ -282,7 +303,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (i >= 1) {
                 whereBuilder.append(" OR ");
             }
-            whereBuilder.append( " JSON_CONTAINS(" + op.getFieldName() + ", ?)");
+            whereBuilder.append( " JSON_CONTAINS(" + getSchema().getName() + "." + op.getFieldName() + ", ?)");
             params.add(JSON.stringify(items.get(i) ));
         }
 
@@ -312,7 +333,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             params.add(inParams[x]);
         }
         placeholders.append(") ");
-        whereBuilder.append("(`" + op.getFieldName() + "` IN " + placeholders.toString() + ")");
+        whereBuilder.append("(`" + getSchema().getName() + "`.`" + op.getFieldName() + "` IN " + placeholders.toString() + ")");
     }
 
     private Object formatParam(FilterOperation op) {

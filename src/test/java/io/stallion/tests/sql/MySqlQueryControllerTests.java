@@ -22,6 +22,7 @@ import io.stallion.dataAccess.DataAccessRegistration;
 import io.stallion.dataAccess.NoStash;
 import io.stallion.dataAccess.db.DB;
 import io.stallion.dataAccess.db.DbPersister;
+import io.stallion.dataAccess.db.mysql.MySqlFilterChain;
 import io.stallion.dataAccess.filtering.FilterOperator;
 import io.stallion.dataAccess.filtering.Pager;
 import io.stallion.dataAccess.filtering.SortDirection;
@@ -98,6 +99,7 @@ public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
     }
 
 
+
     @Test
     public void testQueryController() {
         DB.instance().execute("DELETE FROM stallion_test_payment WHERE accountId='franklin-warzal-19380203'");
@@ -119,7 +121,7 @@ public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
         // Update
         paymentQ.setMemo("via cash rebate");
         PaymentController.instance().save(paymentQ);
-        Payment paymentQ2 = PaymentController.instance().filter("accountId", "franklin-warzal-19380203").first();
+        Payment paymentQ2 = PaymentController.instance().filter("accountId", "franklin-warzal-19380203").setUseCache(false).first();
         assertEquals("via cash rebate", paymentQ2.getMemo());
 
         // Delete
@@ -237,8 +239,12 @@ public class MySqlQueryControllerTests extends JerseyIntegrationBaseCase {
             assertEquals(3, results.size());
         }
 
-
+        Pager<Picnic> pager = ((MySqlFilterChain<Picnic>)PicnicController.instance().filterChain()).setBaseSql("" +
+                "SELECT * FROM stallion_test_picnic WHERE stallion_test_picnic.type='INVITEES_ONLY' "
+        ).filter("location", "Arboretum").sortBy("id", SortDirection.DESC).pager(1, 20);
+        assertEquals(1, pager.getItems().size());
     }
+
 
     @Test
     public void testCachingEndpoints() throws SQLException {

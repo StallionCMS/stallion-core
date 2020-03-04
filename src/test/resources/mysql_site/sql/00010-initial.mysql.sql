@@ -25,6 +25,7 @@ CREATE TABLE `stallion_test_payment` (
   `payee` varchar(250) DEFAULT NULL,
   `deleted` bit DEFAULT 0,
   `memo` varchar(250) DEFAULT NULL,
+  `row_updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -41,5 +42,6 @@ CREATE TABLE `stallion_test_picnic` (
   `dishes` longtext,
   `extra` longtext,
   `type` varchar(30) DEFAULT NULl,
+  `row_updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
