@@ -78,6 +78,13 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         return newCopy(chain);
     }
 
+    protected FilterChain<T> newCopy(FilterChain<T> chain) {
+        chain = super.newCopy(chain);
+        ((MySqlFilterChain)chain).setBaseSql(getBaseSql());
+        return chain;
+
+    }
+
     public String getBaseSql() {
         return baseSql;
     }
@@ -120,7 +127,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             } else {
                 if (op.getOperator().equals(FilterOperator.INTERSECTS)) {
                     addIntersectsClause(whereBuilder, op, params);
-                } else if (op.getOperator().equals(FilterOperator.ANY)) {
+                } else if (op.getOperator().equals(FilterOperator.ANY) || op.getOperator().equals(FilterOperator.NONE_OF)) {
                     addInClause(whereBuilder, op, params);
                 } else {
                     String operatorSql = op.getOperatorForSql();
@@ -140,7 +147,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (whereBuilder.length() > 0) {
                 whereBuilder.append(" AND ");
             }
-            whereBuilder.append(" deleted=0 ");
+            whereBuilder.append(" " + getSchema().getName() + ".deleted=0 ");
         }
         String whereSql = whereBuilder.toString();
 
@@ -163,12 +170,12 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (!"id".equals(getSortField()) && !columnNames.contains(getSortField().toLowerCase())) {
                 throw new UsageException(MessageFormat.format("Sort field not found in schema: field={0} schema={1}", getSortField(), clazz.getName()));
             }
-            sqlBuilder.append(" ORDER BY " + getSortField() + " " + getSortDirection().forSql());
+            sqlBuilder.append(" ORDER BY  " + getSchema().getName() + "." + getSortField() + " " + getSortDirection().forSql());
             if (!Literals.empty(getSecondarySortField())) {
-                sqlBuilder.append(", " + getSecondarySortField() + " " + getSecondarySortDirection().forSql());
+                sqlBuilder.append(", " +  getSchema().getName() + "." + getSecondarySortField() + " " + getSecondarySortDirection().forSql());
             }
             if (isIdAsSecondarySort()) {
-                sqlBuilder.append(", id ASC");
+                sqlBuilder.append(", " + getSchema().getName() + ".id ASC");
             }
         }
         sqlBuilder.append(" LIMIT " + (page - 1) * size + ", " + size);
@@ -258,7 +265,7 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             if (subOp.getIsExclude()) {
                 whereBuilder.append(" NOT ");
             }
-            if (subOp.getOperator().equals(FilterOperator.ANY)) {
+            if (subOp.getOperator().equals(FilterOperator.ANY) || subOp.getOperator().equals(FilterOperator.NONE_OF)) {
                 addInClause(whereBuilder, subOp, params);
             } else {
                 if (subOp.getOperatorForSql().equals("=") && subOp.getOriginalValue() == null) {
@@ -333,7 +340,11 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             params.add(inParams[x]);
         }
         placeholders.append(") ");
-        whereBuilder.append("(`" + getSchema().getName() + "`.`" + op.getFieldName() + "` IN " + placeholders.toString() + ")");
+        if (op.getOperator().equals(FilterOperator.NONE_OF)) {
+            whereBuilder.append("(`" + getSchema().getName() + "`.`" + op.getFieldName() + "` NOT IN " + placeholders.toString() + ")");
+        } else {
+            whereBuilder.append("(`" + getSchema().getName() + "`.`" + op.getFieldName() + "` IN " + placeholders.toString() + ")");
+        }
     }
 
     private Object formatParam(FilterOperation op) {

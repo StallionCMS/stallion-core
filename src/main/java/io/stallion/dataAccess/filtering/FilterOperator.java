@@ -28,6 +28,7 @@ public enum FilterOperator {
     IN,
     LIKE,
     ANY,
+    NONE_OF,
     GREATER_THAN_OR_EQUAL,
     INTERSECTS
     ;
@@ -59,6 +60,8 @@ public enum FilterOperator {
                 return LESS_THAN_OR_EQUAL;
             case "in":
                 return IN;
+            case "none":
+                return NONE_OF;
             case "intersects":
                 return INTERSECTS;
             default:
