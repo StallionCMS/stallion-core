@@ -108,7 +108,8 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         int x = 0;
         List<Object> params = new ArrayList<>();
         boolean hasDeletedOp = false;
-        for(FilterOperation op: getOperations()) {
+        List<FilterOperation> ops = removeEmptyInQueries(getOperations());
+        for(FilterOperation op: ops) {
             if (getSchema().getColumns().contains(op.getFieldName())) {
                 throw new UsageException(MessageFormat.format("Trying to filter on a field that is not in the schema: {0} schema:{1}", op.getFieldName(), clazz.getName()));
             }
@@ -233,7 +234,6 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
     }
 
 
-
     public Double toDouble(Object obj) {
         if (obj instanceof BigInteger) {
             return ((BigInteger)obj).doubleValue();
@@ -253,11 +253,12 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
 
     private void addOrOperation(FilterOperation or, StringBuilder whereBuilder, List<Object> params) {
         whereBuilder.append("(");
-        for (int x = 0; x < or.getOrSubOperations().size(); x++) {
+        List<FilterOperation> ops = removeEmptyInQueries(or.getOrSubOperations());
+        for (int x = 0; x < ops.size(); x++) {
             if (x > 0) {
                 whereBuilder.append(" OR ");
             }
-            FilterOperation subOp = or.getOrSubOperations().get(x);
+            FilterOperation subOp = ops.get(x);
             if (subOp.isOrOperation()) {
                 addOrOperation(subOp, whereBuilder, params);
                 continue;
@@ -345,6 +346,26 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
         } else {
             whereBuilder.append("(`" + getSchema().getName() + "`.`" + op.getFieldName() + "` IN " + placeholders.toString() + ")");
         }
+    }
+
+
+    private List<FilterOperation> removeEmptyInQueries(List<FilterOperation> ops) {
+        List<FilterOperation> filtered = list();
+        for (FilterOperation op: ops) {
+            if (FilterOperator.ANY.equals(op.getOperator()) || FilterOperator.NONE_OF.equals(op.getOperator())) {
+                Object[] inParams = null;
+                if (op.getOriginalValue() instanceof List) {
+                    inParams = asArray((List)op.getOriginalValue(), Object.class);
+                } else {
+                    inParams = (Object[])op.getOriginalValue();
+                }
+                if (inParams.length == 0) {
+                    continue;
+                }
+            }
+            filtered.add(op);
+        }
+        return filtered;
     }
 
     private Object formatParam(FilterOperation op) {
