@@ -32,7 +32,8 @@
                         useDefaultCatch: true,
                         data: {
                             username: that.username,
-                            password: that.password
+                            password: that.password,
+                            rememberMe: that.rememberMe
                         }
                     }).then(function(res) {
                         var o = res.data;

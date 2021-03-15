@@ -32,6 +32,7 @@ import io.stallion.utils.Literals;
 import io.stallion.utils.json.JSON;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -347,6 +348,8 @@ public class MySqlFilterChain<T extends Model> extends FilterChain<T> {
             whereBuilder.append("(`" + getSchema().getName() + "`.`" + op.getFieldName() + "` IN " + placeholders.toString() + ")");
         }
     }
+
+
 
 
     private List<FilterOperation> removeEmptyInQueries(List<FilterOperation> ops) {
